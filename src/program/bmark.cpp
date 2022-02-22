@@ -65,7 +65,7 @@ int bmark(){
 		sim::integrate(sim::partial_time);
 
 		// Calculate mag_m, mag after sim::partial_time steps
-        stats::mag_m();
+		stats::update();
 
 		vout::data();
 
@@ -75,4 +75,3 @@ int bmark(){
 }
 
 }//end of namespace program
-

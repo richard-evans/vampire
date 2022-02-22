@@ -81,7 +81,7 @@ void fmr(){
 		sim::integrate(sim::partial_time);
 
 		// Calculate magnetisation statistics
-		stats::mag_m();
+		stats::update();
 
 		// Output data
 		vout::data();
@@ -95,7 +95,7 @@ void fmr(){
 	   sim::temperature=temp;
 
       // Reset mean magnetisation counters
-      stats::mag_m_reset();
+      stats::reset();
 
    }
 
@@ -115,7 +115,7 @@ void fmr(){
       sim::integrate(sim::partial_time);
 
       // Calculate magnetisation statistics
-      stats::mag_m();
+      stats::update();
 
       // Output data
       vout::data();

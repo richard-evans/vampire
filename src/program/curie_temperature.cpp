@@ -108,7 +108,7 @@ int curie_temperature(){
 		sim::integrate(sim::equilibration_time);
 
 		// Reset mean magnetisation counters
-		stats::mag_m_reset();
+		stats::reset();
 
 		// Reset start time
 		int start_time=sim::time;
@@ -120,7 +120,7 @@ int curie_temperature(){
 			sim::integrate(sim::partial_time);
 
 			// Calculate magnetisation statistics
-			stats::mag_m();
+			stats::update();
 
 		}
 

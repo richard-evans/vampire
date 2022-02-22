@@ -73,32 +73,6 @@ namespace stats
 
 	// function prototypes
 
-	bool is_initialised=false;
-
-	//double data_counter=0.0;		/// number of data points for averaging
-
-int mag_m(){
-
-   // update statistics - need to eventually replace mag_m() with stats::update()...
-   stats::update(atoms::x_spin_array, 				  		atoms::y_spin_array, 				    atoms::z_spin_array,
-					  atoms::x_total_spin_field_array,     atoms::y_total_spin_field_array, 	 atoms::z_total_spin_field_array,
-					  atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array,
-					  atoms::m_spin_array, 					   atoms::type_array, 						 sim::temperature);
-
-   return EXIT_SUCCESS;
-}
-
-//
-void mag_m_reset(){
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "stats::mag_m_reset() has been called" << std::endl;}
-
-   stats::reset();
-
-}
-
 double max_torque(){
   ///================================================================================================
   ///

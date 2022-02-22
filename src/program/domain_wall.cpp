@@ -276,7 +276,7 @@ namespace program{
 			sim::integrate(sim::partial_time);
 
 			// Calculate magnetisation statistics
-			stats::mag_m();
+			stats::update();
 
 			// Output data
 			vout::data();
@@ -293,7 +293,7 @@ namespace program{
 			sim::temperature = temp;
 
 			// Reset mean magnetisation counters
-			stats::mag_m_reset();
+			stats::reset();
 
 		}
 
@@ -329,7 +329,7 @@ namespace program{
 			sim::integrate(sim::partial_time);
 
 			// Calculate magnetisation statistics
-			stats::mag_m();
+			stats::update();
 			//		std::cout << "integrate" <<  "\t" << num_local_atoms << std::endl;
 
 

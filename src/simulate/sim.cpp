@@ -233,13 +233,8 @@ int run(){
       stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array, non_magnetic_materials_array);
    }
 
-   // Precalculate initial statistics
-   stats::update(atoms::x_spin_array, 				  		atoms::y_spin_array, 				    atoms::z_spin_array,
-					  atoms::x_total_spin_field_array,     atoms::y_total_spin_field_array, 	 atoms::z_total_spin_field_array,
-					  atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array,
-					  atoms::m_spin_array, 					   atoms::type_array, 						 sim::temperature);
-
-	// resst statistical averages
+   // Precalculate initial statistics and then reset averages
+   stats::update();
 	stats::reset();
 
    // Initialize GPU acceleration if enabled

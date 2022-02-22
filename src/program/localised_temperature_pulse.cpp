@@ -51,7 +51,7 @@ namespace program{
       }
 
       // Calculate magnetisation statistics
-      stats::mag_m();
+      stats::update();
 
       // Output data
       vout::data();
@@ -78,7 +78,7 @@ namespace program{
       }
 
       // Calculate magnetisation statistics
-      stats::mag_m();
+      stats::update();
 
       // Output data
       vout::data();

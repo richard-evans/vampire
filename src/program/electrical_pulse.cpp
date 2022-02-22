@@ -79,7 +79,7 @@ void electrical_pulse(){
       sim::integrate(sim::partial_time);
 
       // Calculate magnetisation statistics
-      stats::mag_m();
+      stats::update();
 
       // Output data
       vout::data();
@@ -109,7 +109,7 @@ void electrical_pulse(){
       }
 
       // Calculate magnetisation statistics
-      stats::mag_m();
+      stats::update();
 
       // Output data
       vout::data();

@@ -269,7 +269,7 @@ void temperature_pulse(){
 		sim::integrate(sim::partial_time);
 
 		// Calculate magnetisation statistics
-		stats::mag_m();
+		stats::update();
 
 		// Output data
 		vout::data();
@@ -299,7 +299,7 @@ void temperature_pulse(){
 		}
 
 		// Calculate magnetisation statistics
-		stats::mag_m();
+		stats::update();
 
 		// Output data
 		vout::data();

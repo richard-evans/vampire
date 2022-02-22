@@ -24,8 +24,6 @@ namespace stats
 	extern int num_atoms;				//Number of atoms for statistic purposes
 
 	// Member Functions
-	extern int mag_m();
-	extern void mag_m_reset();
 	extern double max_torque();
 
    /// Statistics energy types
@@ -48,11 +46,11 @@ namespace stats
                    const std::vector<int>& height_category_array,
                    const std::vector<bool>& non_magnetic_materials_array);
 
-   void update(const std::vector<double>& sx,  const std::vector<double>& sy,  const std::vector<double>& sz,
-					const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
-					const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
-               const std::vector<double>& mm,  const std::vector<int>& mat,    const double temperature);
 
+	// Function to update statistics
+	void update();
+
+	// Function to reset average statistics counters
    void reset();
 
    // Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
@@ -296,8 +294,11 @@ namespace stats
 
    };
 
-   // Statistics classes
-   extern energy_statistic_t system_energy;
+
+   //----------------------------------
+	// Statistics class instantiations
+   //----------------------------------
+	extern energy_statistic_t system_energy;
    extern energy_statistic_t material_energy;
 
    extern magnetization_statistic_t system_magnetization;

@@ -237,7 +237,7 @@ void exchange_stiffness(){
 			sim::integrate(sim::equilibration_time);
 
 			// Reset mean magnetisation counters
-			stats::mag_m_reset();
+			stats::reset();
 
 			// Reset start time
 			int start_time=sim::time;
@@ -249,7 +249,7 @@ void exchange_stiffness(){
 				sim::integrate(sim::partial_time);
 
 				// Calculate statistics
-				stats::mag_m();
+				stats::update();
 				calculate_torque(constraint_mask, atoms::type_array, torques, magnetizations);
 				counter += 1.0;
 

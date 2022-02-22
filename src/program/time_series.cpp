@@ -48,7 +48,7 @@ void time_series(){
 		sim::integrate(sim::partial_time);
 
 		// Calculate magnetisation statistics
-		stats::mag_m();
+		stats::update();
 
 		// Output data
 		vout::data();
@@ -62,7 +62,7 @@ void time_series(){
 	   sim::temperature = temp;
 
       // Reset mean magnetisation counters
-      stats::mag_m_reset();
+      stats::reset();
 
    }
 
@@ -73,7 +73,7 @@ void time_series(){
 		sim::integrate(sim::partial_time);
 
 		// Calculate magnetisation statistics
-		stats::mag_m();
+		stats::update();
 
 		// Output data
 		vout::data();
