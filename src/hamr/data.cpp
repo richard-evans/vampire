@@ -22,6 +22,7 @@ namespace hamr{
    // Externally visible variables
    //-----------------------------------------------------------------------------------------------
    bool head_laser_on   = false;
+   bool run_program = false;
 
    namespace internal{
 

@@ -377,6 +377,7 @@ namespace vin{
             test="hamr-simulation";
             if(value==test){
                 sim::program=7;
+                hamr::run_program=true;
                 return EXIT_SUCCESS;
             }
             test="cmc-anisotropy";
