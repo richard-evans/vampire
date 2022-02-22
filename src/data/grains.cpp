@@ -55,6 +55,75 @@ namespace grains{
 	std::vector <double> mat_mag_m_array(0);
 	std::vector <double> mat_sat_mag_array(0);
 
+//---------------------------------------------------------------------------
+// Remix grain numbers so no empty grains exist
+//---------------------------------------------------------------------------
+void remix_grain_numbers(){
+
+	#ifdef MPICF
+		const unsigned int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+	#else
+		const unsigned int num_local_atoms = atoms::num_atoms;
+	#endif
+
+	std::vector<int> new_grain_numbers(grains::num_grains,0); // array to store new grain number for each grain
+	std::vector<int> old_grain_numbers(0); // array to store old grain number for each grain
+
+	// loop over all atoms to find unique grain numbers
+	for(unsigned int atom=0;atom< num_local_atoms;atom++){
+		const int grain = atoms::grain_array[atom];
+
+		// lets be optimistic and assume we will find a new one
+		bool found_a_new_one = true;
+
+		// loop over all grains to see if its a new grain
+		for(int g = 0; g < old_grain_numbers.size(); g++){
+			if( grain == old_grain_numbers[g]){
+				// grain found, exit !
+				found_a_new_one = false;
+			}
+		}
+
+		// now check if we have found a new one
+		if(found_a_new_one){
+			old_grain_numbers.push_back(grain);
+		}
+
+	}
+
+	// now generate new numbers based on index of old_grain_numbers array
+	for(int grain = 0; grain < old_grain_numbers.size(); grain++){
+
+		const int old_grain_number = old_grain_numbers[grain];
+		const int new_grain_number = grain;
+
+		// do a bounds check for sanity
+		if( old_grain_number < grains::num_grains){
+			new_grain_numbers[old_grain_number] = new_grain_number;
+		}
+		else{
+			std::cerr << "Programmer error! grain index of " << old_grain_number << " is greater than total number of grains " << grains::num_grains << std::endl;
+			err::vexit();
+		}
+
+	}
+
+	// Now lets renumber the grains
+	for(unsigned int atom=0;atom< num_local_atoms;atom++){
+		const int old_grain_number = atoms::grain_array[atom];
+		const int new_grain_number = new_grain_numbers[old_grain_number];
+
+		// set atom grain ID to new grain number
+		atoms::grain_array[atom] = new_grain_number;
+	}
+
+	// Finally reset number of grains
+	grains::num_grains = old_grain_numbers.size();
+
+	return;
+
+}
+
 
 int set_properties(){
 	//========================================================================================================
@@ -64,7 +133,7 @@ int set_properties(){
 	//
 	///												R F Evans 15/07/2009
 	//
-	//========================================================================================================
+   //========================================================================================================
 
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
@@ -76,7 +145,11 @@ int set_properties(){
 		const unsigned int num_local_atoms = atoms::num_atoms;
 	#endif
 
+	remix_grain_numbers();
+
+	//---------------------------------------------------------------------------
 	// resize and initialise grain arrays
+	//---------------------------------------------------------------------------
 	if(grains::num_grains > 0){
 		grains::grain_size_array.resize(grains::num_grains,0);
 		grains::x_coord_array.resize(grains::num_grains,0.0);
@@ -127,11 +200,6 @@ int set_properties(){
 
 	// Reduce grain properties on all CPUs
 	#ifdef MPICF
-		//MPI::COMM_WORLD.Allreduce(&grains::grain_size_array[0], &grains::grain_size_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		//MPI::COMM_WORLD.Allreduce(&grains::x_coord_array[0], &grains::x_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		//MPI::COMM_WORLD.Allreduce(&grains::y_coord_array[0], &grains::y_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		//MPI::COMM_WORLD.Allreduce(&grains::z_coord_array[0], &grains::z_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		//MPI::COMM_WORLD.Allreduce(&grains::sat_mag_array[0], &grains::sat_mag_array[0],grains::num_grains, MPI_INT,MPI_SUM);
 		MPI_Allreduce(MPI_IN_PLACE, &grains::grain_size_array[0],grains::num_grains, MPI_INT,MPI_SUM, MPI_COMM_WORLD);
 		MPI_Allreduce(MPI_IN_PLACE, &grains::x_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
 		MPI_Allreduce(MPI_IN_PLACE, &grains::y_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
@@ -157,6 +225,10 @@ int set_properties(){
 			//vinfo << "\t" << grains::y_coord_array[grain] << "\t" << grains::z_coord_array[grain] << std::endl;
 		}
 	}
+
+
+	std::cout << "Grain sizes:\n";
+	for(int i=0; i<grains::num_grains; i++) std::cout << "\t" << i << "\t" << grains::grain_size_array[i] << std::endl;
 
 	return EXIT_SUCCESS;
 

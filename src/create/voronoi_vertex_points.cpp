@@ -201,6 +201,13 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
             if (vertex_array[vertex_number][1]>cs::system_dimensions[1]) {
                vertex_array[vertex_number][1] = cs::system_dimensions[1];
             }
+
+            // but only include grains with a centre of mass inside the system dimensions
+            const double tol = create::internal::voronoi_grain_size * 0.25; // allow grains with half the mean grain size
+            bool inx = grain_coord_array[i][0] >= -tol && grain_coord_array[i][0] < cs::system_dimensions[0] + tol;
+            bool iny = grain_coord_array[i][1] >= -tol && grain_coord_array[i][1] < cs::system_dimensions[1] + tol;
+            if( !(inx && iny) ) inf = true;
+
          }
           else{
              // check for bounded grains with vertices outside bounding box
