@@ -55,6 +55,23 @@ namespace hamr{
    //-----------------------------------------------------------------------------
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 
+   //-----------------------------------------------------------------------------
+   // Function to HAMR parameters
+   //-----------------------------------------------------------------------------
+   double get_head_position_x();
+   double get_head_position_y();
+   double get_head_speed();
+   double get_FWHM_x();
+   double get_FWHM_y();
+   double get_laser_sigma_x();
+   double get_laser_sigma_y();
+   double get_field_bounds_x();
+   double get_field_bounds_y();
+   double get_bit_size();
+   double get_track_size();
+   double get_field_ramp_time();
+   double get_NPS();
+
    //-----------------------------------------------------------------------------------------------
    // Externally visible variables used for HAMR calculation
    //-----------------------------------------------------------------------------------------------

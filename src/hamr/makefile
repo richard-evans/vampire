@@ -8,6 +8,7 @@ bit_sequence.o \
 data.o \
 fields.o \
 field_profiles.o \
+get_hamr_variables.o \
 hamr_continuous.o \
 initialize.o \
 interface.o \
