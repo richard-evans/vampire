@@ -60,4 +60,21 @@ namespace gpu{
       return;
    }
 
+   //-------------------------------------------------------------------------------
+   // Function to call correct initialization function depending on cuda,opencl etc
+   //-------------------------------------------------------------------------------
+   void initialize_hamr(){
+
+      // check for gpu functions and data initialised
+      if( !gpu::initialized ) return;
+
+      #ifdef CUDA
+         vcuda::initialize_hamr();
+      #elif OPENCL
+         // At the moment no implementation in OPENCL
+      #endif
+
+      return;
+   }
+
 } // end of namespace gpu

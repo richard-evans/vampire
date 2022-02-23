@@ -51,10 +51,20 @@ void update_external_fields (){
    */
    // copy simulation variables to temporary constants
    const cu_real_t global_temperature = sim::temperature;
+   const cu_real_t Tmin = sim::Tmin;
+   const cu_real_t Tmax = sim::Tmax;
    const cu_real_t Hx = sim::H_vec[0]*sim::H_applied;
    const cu_real_t Hy = sim::H_vec[1]*sim::H_applied;
    const cu_real_t Hz = sim::H_vec[2]*sim::H_applied;
    const int num_atoms = ::atoms::num_atoms;
+
+   // update hamr field if program is hamr simulations
+	if(sim::program==7){
+      cu::update_hamr_field(global_temperature,
+                           Tmin, Tmax,
+                           Hx, Hy, Hz,
+                           num_atoms);
+   }
 
 //   // update dipole field
 //    update_dipolar_fields();  //-- disabled  as causes NaN and deferred to CPU code for now
@@ -63,6 +73,7 @@ void update_external_fields (){
    cu::update_external_fields_kernel <<< cu::grid_size, cu::block_size >>> (
          cu::atoms::d_materials, cu::mp::d_material_params,
          cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
+         cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
          cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
          cu::d_rand_state,
          global_temperature,
@@ -95,6 +106,7 @@ __global__ void update_external_fields_kernel (
       int *  material,
       vcuda::internal::material_parameters_t * material_params,
       cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+      cu_real_t * x_hamr_field, cu_real_t * y_hamr_field, cu_real_t * z_hamr_field,
       cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
       curandState * rand_states,
       cu_real_t global_temperature,
@@ -125,6 +137,10 @@ __global__ void update_external_fields_kernel (
       /*
       * TODO: HAMR fields
       */
+      // add hamr field
+      field_x += x_hamr_field[atom];
+      field_y += y_hamr_field[atom];
+      field_z += z_hamr_field[atom];
 
       // thermal field calculation
       //cu_real_t temp = mat.temperature;

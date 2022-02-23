@@ -56,6 +56,7 @@ namespace vcuda{
       bool __initialize_fields ();
       bool __initialize_cells ();
       bool __initialize_dipole ();
+      bool __initialize_hamr ();
       bool __initialize_materials ();
       bool __initialize_topology ();
       bool __initialize_curand ();
@@ -74,6 +75,11 @@ namespace vcuda{
       void update_external_fields ();
       void update_dipolar_fields ();
       void update_cell_magnetizations ();
+      void update_hamr_field (
+			cu_real_t temperature,
+			cu_real_t Tmin, cu_real_t Tmax,
+			cu_real_t Hx_app, cu_real_t Hy_app, cu_real_t Hz_app,
+			int num_atoms);
 
 
 
@@ -118,6 +124,7 @@ namespace vcuda{
             int * material,
             material_parameters_t * material_params,
             cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+            cu_real_t * x_hamr_field, cu_real_t * y_hamr_field, cu_real_t * z_hamr_field,
             cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
             curandState * rand_state,
             cu_real_t global_temperature,
@@ -153,6 +160,8 @@ namespace vcuda{
             cu_real_t * x_mu0H_dip_field, cu_real_t * y_mu0H_dip_field, cu_real_t * z_mu0H_dip_field,
             int * cells, int n_atoms
             );
+
+      
 
       namespace stats{
          extern bool use_cpu;

@@ -15,6 +15,7 @@ CUDA_OBJECTS= \
 	obj/cuda/exchange_fields.o \
 	obj/cuda/external_fields.o \
 	obj/cuda/finalize.o \
+	obj/cuda/hamr_fields.o \
 	obj/cuda/initialize.o \
 	obj/cuda/internal.o \
 	obj/cuda/llg_heun.o \
