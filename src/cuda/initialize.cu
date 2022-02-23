@@ -371,9 +371,9 @@ namespace vcuda{
 
          cudaMalloc((void**)&cu::d_spin_field, num_bytes * 3);
 
-	 cu::d_x_spin_field = cu::d_spin_field;
-	 cu::d_y_spin_field = cu::d_spin_field + ::atoms::num_atoms;
-	 cu::d_z_spin_field = cu::d_spin_field + 2 * ::atoms::num_atoms;
+         cu::d_x_spin_field = cu::d_spin_field;
+         cu::d_y_spin_field = cu::d_spin_field + ::atoms::num_atoms;
+         cu::d_z_spin_field = cu::d_spin_field + 2 * ::atoms::num_atoms;
 
          std::copy(::atoms::x_total_spin_field_array.begin(), ::atoms::x_total_spin_field_array.end(), tmp_buffer.begin());
          cudaMemcpy(cu::d_x_spin_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
@@ -421,8 +421,16 @@ namespace vcuda{
          std::copy(::atoms::z_total_external_field_array.begin(), ::atoms::z_total_external_field_array.end(), tmp_buffer.begin());
          cudaMemcpy(cu::d_z_external_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
 
-         // Initialise hamr fields to zero
+			
+         /*
+          * Allocate memory in the device and transfer the
+          * total external field in each atom.
+          */
          num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
+         cudaMalloc((void**)&cu::d_x_hamr_field, num_bytes);
+         cudaMalloc((void**)&cu::d_y_hamr_field, num_bytes);
+         cudaMalloc((void**)&cu::d_z_hamr_field, num_bytes);
+         // Initialise hamr fields to zero
          cudaMemset(cu::d_x_hamr_field, 0, num_bytes);
          cudaMemset(cu::d_y_hamr_field, 0, num_bytes);
          cudaMemset(cu::d_z_hamr_field, 0, num_bytes);
