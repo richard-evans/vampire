@@ -109,14 +109,16 @@ namespace program{
 			//-------------------------------------------------------------------------//
 			// Disable laser
 			hamr::head_laser_on=false;
-			std::cout << ">>>> Disabling laser and integrating system for 1 time-step" << std::endl;
+			// Switch off external field 
+			sim::H_applied = 0.0;
+			std::cout << " Disabling laser and external field and integrating system for 1 time-step" << std::endl;
 			// Integrate
 			sim::integrate(1);
 			// Calculate magnetisation statistics
 			stats::mag_m();
 			// Output data
 			vout::data();
-			std::cout << ">>>> Outputting system at the end of HAMR simulations\n" << std::endl;
+			std::cout << " Outputting system at the end of HAMR simulations\n" << std::endl;
 
 	} // end of hamr()
 

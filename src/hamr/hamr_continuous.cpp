@@ -9,6 +9,7 @@
 
 // C++ standard library headers
 #include <iostream>
+#include <math.h>   // for round() function
 
 // Vampire headers
 #include "errors.hpp"
@@ -44,15 +45,18 @@ namespace hamr{
 		const double head_position_initial = 0.0; // -hamr::internal::system_dimensions_x*0.5 - NPS;
 		const int n_bits = hamr::internal::num_bits;
 		const int n_bits_per_tack = hamr::internal::bits_per_tack;
-		const uint64_t bit_time   = int((BL/speed)/mp::dt_SI);
+		const uint64_t bit_time   = int(round((BL/speed)/mp::dt_SI));
 		const uint64_t extra_time = 0; //int(((BL*0.5)/speed)/mp::dt_SI);  // time to sweeping across half of bit size necessary to cover initial distance of head from track
-		const uint64_t NPS_time   = int((NPS/speed)/mp::dt_SI); // time to cover extra sweeping due to NPS
+		const uint64_t NPS_time   = int(round((NPS/speed)/mp::dt_SI)); // time to cover extra sweeping due to NPS
 		const uint64_t track_time = n_bits_per_tack*bit_time + extra_time*2; 
 		const uint64_t total_time =  n_bits * bit_time + extra_time*2;
-		const uint64_t ramp_time = int(hamr::internal::H_ramp_time/mp::dt_SI);
+		const uint64_t ramp_time = int(round(hamr::internal::H_ramp_time/mp::dt_SI));
 		// Initial head position
 		hamr::internal::head_position_x = head_position_initial;	
 		hamr::internal::head_position_y = 0.5*hamr::internal::system_dimensions_y;
+		// Initialise field magnitude to min value at beginning of simulation
+		sim::H_applied = hamr::internal::Hmin;
+		std::cout << " Setting initial field magnitude to: " << sim::H_applied << " T" << std::endl;
 
 		std::cout << " Writing bit sequence ";
       for(auto i=0; i<hamr::internal::bit_sequence.size(); i++){ std::cout << hamr::internal::bit_sequence[i] << " ";}
@@ -60,6 +64,7 @@ namespace hamr{
 		std::cout << " Number of bits in x,y:\t" << n_bits_per_tack << "\t" << hamr::internal::num_tracks << std::endl;
 		std::cout << " Initial Head position:\t" << hamr::internal::head_position_x*0.1 << "\t" << hamr::internal::head_position_y*0.1 << " nm" << std::endl;
 		std::cout << " Head velocity:\t" << hamr::internal::head_speed*1e-10 << "\tm/s" << std::endl;
+		std::cout << " Field ramp time:\t" << ramp_time*mp::dt_SI << "\ts" << std::endl;
 		std::cout << " Time per bit:\t" << bit_time*mp::dt_SI << "\ts" << std::endl;
 		std::cout << " Time per track:\t" << track_time*mp::dt_SI << "\ts" << std::endl;
 		std::cout << " New total simulated time:\t" << total_time*mp::dt_SI << "\ts" << std::endl;
@@ -70,22 +75,23 @@ namespace hamr{
 		while(sim::time-sim::equilibration_time < total_time){ // loop over whole time
 			uint64_t tmp_time = 0;
 
-			hamr::internal::head_position_x = head_position_initial;	
+			// hamr::internal::head_position_x = head_position_initial;	
 			hamr::internal::head_position_y = TW*(0.5 + track);
 			zlog << zTs() << "New head position:" << hamr::internal::head_position_x*0.1 << ", " << hamr::internal::head_position_y*0.1 << " nm" << std::endl;
 
-			track = int(bit_tot/n_bits_per_tack);
+			track = int(round(bit_tot/n_bits_per_tack));
 			bit = bit_tot - track*n_bits_per_tack;
 			while(tmp_time < bit_time){
 				// track = int(bit_tot/n_bits_per_tack);
 				// bit = bit_tot - track*n_bits_per_tack;
 				hamr::internal::head_position_x = head_position_initial + (speed/**1e-10*/) * tmp_time * mp::dt_SI + BL*bit;
 				hamr::internal::head_position_y = TW*(0.5 + track);
-				int H_app_dir = hamr::internal::bit_sequence[bit_tot];
+				const double H_app_dir = static_cast<double>(hamr::internal::bit_sequence[bit_tot]);
 
 				// Update applied field value depending on trapezoidal time profile
-				hamr::internal::update_field_time_trapz_profile(tmp_time, ramp_time, bit_time, sim::H_applied);
-				sim::H_applied *= H_app_dir; 
+				const double H_app_abs = fabs(sim::H_applied) + hamr::internal::update_field_time_trapz_profile(tmp_time, ramp_time, bit_time);
+				// Determine sign of applied field
+				sim::H_applied = H_app_abs * H_app_dir; 
 
 				// Integrate system
 				sim::integrate(sim::partial_time);
@@ -98,7 +104,7 @@ namespace hamr{
 				tmp_time++;
 			}
 			// Print update on screen and log file
-			zlog << zTs() << "Bit " << bit_tot << " (" << bit << "," << track << ") written, with Happ " << sim::H_applied << " T" << std::endl;
+			zlog << zTs() << "Bit " << bit_tot << " (" << bit << "," << track << ") written" << std::endl;
 
 			bit_tot++;
 		}

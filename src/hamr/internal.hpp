@@ -34,10 +34,9 @@ namespace hamr{
       //-----------------------------------------------------------------------------
       // Function to calculate the external field with trapezoidal temporal profile
       //-----------------------------------------------------------------------------
-      void update_field_time_trapz_profile(const uint64_t current_time,  
+      double update_field_time_trapz_profile(const uint64_t current_time,  
                                           const uint64_t ramp_time,
-                                          const uint64_t bit_time,
-                                          double &H_applied);
+                                          const uint64_t bit_time);
 
       //-----------------------------------------------------------------------------
       // Function to apply field only to atoms within box around centre of writer coil
