@@ -101,6 +101,8 @@ namespace program{
 
 			// now enable laser
 			hamr::head_laser_on=true;
+			std::cout << " Equilibration terminated, enabling hamr simulation ..." << std::endl;
+			zlog << zTs() << " Equilibration terminated, enabling hamr simulation ..." << std::endl;
 			// Perform harm continuous simulation
 			hamr::hamr_continuous();
 

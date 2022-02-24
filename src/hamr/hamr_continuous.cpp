@@ -66,6 +66,14 @@ namespace hamr{
 		std::cout << " Head velocity:\t" << hamr::internal::head_speed*1e-10 << "\tm/s" << std::endl;
 		std::cout << " Field ramp time:\t" << ramp_time*mp::dt_SI << "\ts" << std::endl;
 		std::cout << " Time per bit:\t" << bit_time*mp::dt_SI << "\ts" << std::endl;
+		// Check that field ramp time < bit time
+		if(ramp_time >= 2*bit_time){
+         terminaltextcolor(RED);
+			std::cerr << "Error - value for \'hamr:field-ramp-time\' too small. Make sure is less than twice time per bit." << std::endl;
+         terminaltextcolor(WHITE);
+			zlog << zTs() << "Error - value for \'hamr:field-ramp-time\' too small. Make sure is less than twice time per bit." << std::endl;
+         err::vexit();
+		}
 		std::cout << " Time per track:\t" << track_time*mp::dt_SI << "\ts" << std::endl;
 		std::cout << " New total simulated time:\t" << total_time*mp::dt_SI << "\ts" << std::endl;
 
