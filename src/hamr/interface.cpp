@@ -171,7 +171,7 @@ namespace hamr{
       if(word==test || word==test2){
          double f = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
          hamr::internal::NPS = f;
          return true;
       }

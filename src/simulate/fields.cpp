@@ -143,6 +143,8 @@ void calculate_external_fields(const int start_index,const int end_index){
 	fill (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index,0.0);
 
 	if(sim::program==7){ //calculate_hamr_fields(start_index,end_index);
+
+		// Calculate thermal field and applied field due to HAMR process
 		hamr::fields(start_index,
 					end_index,
 					sim::H_applied,
@@ -156,7 +158,6 @@ void calculate_external_fields(const int start_index,const int end_index){
 					atoms::y_total_external_field_array,
 					atoms::z_total_external_field_array);
 	}
-
    else if(sim::program==13){
 
       // Local thermal Fields
