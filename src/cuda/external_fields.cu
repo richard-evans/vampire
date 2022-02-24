@@ -18,6 +18,7 @@
 #include "exchange_fields.hpp"
 #include "data.hpp"
 #include "internal.hpp"
+#include "thermal_fields.hpp"
 
 // Conditional compilation of all cuda code
 #ifdef CUDA
@@ -50,20 +51,18 @@ void update_external_fields (){
    cu_real_t * d_z_ext_field = thrust::raw_pointer_cast(cu::z_total_external_field_array.data());
    */
    // copy simulation variables to temporary constants
-   const cu_real_t global_temperature = sim::temperature;
-   const cu_real_t Tmin = sim::Tmin;
-   const cu_real_t Tmax = sim::Tmax;
    const cu_real_t Hx = sim::H_vec[0]*sim::H_applied;
    const cu_real_t Hy = sim::H_vec[1]*sim::H_applied;
    const cu_real_t Hz = sim::H_vec[2]*sim::H_applied;
    const int num_atoms = ::atoms::num_atoms;
 
-   // update hamr field if program is hamr simulations
+   // update hamr fields (Happ and Hth) if program is hamr simulations
 	if(sim::program==7){
-      cu::update_hamr_field(global_temperature,
-                           Tmin, Tmax,
-                           Hx, Hy, Hz,
-                           num_atoms);
+      cu::update_hamr_field();
+   }
+   // Calculate global thermal field otherwise
+   else{
+      cu::update_global_thermal_field();
    }
 
 //   // update dipole field
@@ -74,9 +73,8 @@ void update_external_fields (){
          cu::atoms::d_materials, cu::mp::d_material_params,
          cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
          cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
+         cu::d_x_thermal_field, cu::d_y_thermal_field, cu::d_z_thermal_field,
          cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
-         cu::d_rand_state,
-         global_temperature,
          Hx, Hy, Hz,
          num_atoms);
 
@@ -107,9 +105,8 @@ __global__ void update_external_fields_kernel (
       vcuda::internal::material_parameters_t * material_params,
       cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
       cu_real_t * x_hamr_field, cu_real_t * y_hamr_field, cu_real_t * z_hamr_field,
+      cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
       cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
-      curandState * rand_states,
-      cu_real_t global_temperature,
       cu_real_t Hx_app, cu_real_t Hy_app, cu_real_t Hz_app,
       int n_atoms
       )
@@ -126,46 +123,22 @@ __global__ void update_external_fields_kernel (
       // Load parameters to local variables from memory
       cu::material_parameters_t mat = material_params[mid];
 
-      // Load the curand state into local memory
-      curandState local_state = rand_states[tid];
-
       // initialize registers for total external field
       cu_real_t field_x = 0.0;
       cu_real_t field_y = 0.0;
       cu_real_t field_z = 0.0;
 
-      /*
-      * TODO: HAMR fields
-      */
-      // add hamr field
+      // Hamr fields
       field_x += x_hamr_field[atom];
       field_y += y_hamr_field[atom];
       field_z += z_hamr_field[atom];
+//      printf("       %d  %lf  %lf  %lf\n",atom,x_hamr_field[atom],y_hamr_field[atom],z_hamr_field[atom]);
 
-      // thermal field calculation
-      //cu_real_t temp = mat.temperature;
-      cu_real_t temp = global_temperature;
-      cu_real_t alpha = mat.temperature_rescaling_alpha;
-      cu_real_t sigma = mat.H_th_sigma;
-      cu_real_t tc = mat.temperature_rescaling_Tc;
-
-      #ifdef CUDA_DP
-         double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
-         double rsigma = sigma*sqrt(resc_temp);
-      #else
-         float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
-         float rsigma = sigma*sqrtf(resc_temp);
-      #endif
-
-      #ifdef CUDA_DP
-         field_x = rsigma * curand_normal_double (&local_state);
-         field_y = rsigma * curand_normal_double (&local_state);
-         field_z = rsigma * curand_normal_double (&local_state);
-      #else
-         field_x = rsigma * curand_normal(&local_state);
-         field_y = rsigma * curand_normal(&local_state);
-         field_z = rsigma * curand_normal(&local_state);
-      #endif
+      // Thermal fields
+      field_x += x_thermal_field[atom];
+      field_y += y_thermal_field[atom];
+      field_z += z_thermal_field[atom];
+      // if(atom<10){printf("       %d  %lf  %lf  %lf\n",atom,x_thermal_field[atom],y_thermal_field[atom],z_thermal_field[atom]);}
 
       // Local applied field
       cu_real_t norm_h = mat.applied_field_strength;
@@ -197,9 +170,6 @@ __global__ void update_external_fields_kernel (
       x_ext_field[atom] = field_x;
       y_ext_field[atom] = field_y;
       z_ext_field[atom] = field_z;
-
-      // Write local curand state back to global memory
-      rand_states[tid] = local_state;
 
    }
 }

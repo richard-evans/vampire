@@ -75,11 +75,8 @@ namespace vcuda{
       void update_external_fields ();
       void update_dipolar_fields ();
       void update_cell_magnetizations ();
-      void update_hamr_field (
-			cu_real_t temperature,
-			cu_real_t Tmin, cu_real_t Tmax,
-			cu_real_t Hx_app, cu_real_t Hy_app, cu_real_t Hz_app,
-			int num_atoms);
+      void update_hamr_field ();
+      void update_global_thermal_field ();
 
 
 
@@ -125,9 +122,8 @@ namespace vcuda{
             material_parameters_t * material_params,
             cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
             cu_real_t * x_hamr_field, cu_real_t * y_hamr_field, cu_real_t * z_hamr_field,
+            cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
             cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
-            curandState * rand_state,
-            cu_real_t global_temperature,
             cu_real_t Hx, cu_real_t Hy, cu_real_t Hz,
             int num_atoms
             );
@@ -160,6 +156,14 @@ namespace vcuda{
             cu_real_t * x_mu0H_dip_field, cu_real_t * y_mu0H_dip_field, cu_real_t * z_mu0H_dip_field,
             int * cells, int n_atoms
             );
+
+	__global__ void apply_global_temperature_kernel(
+			cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
+			cu_real_t temperature,
+			curandState * rand_states,
+			material_parameters_t * material_params,
+			int * material,
+			int n_atoms);
 
       
 
