@@ -143,6 +143,10 @@ namespace vcuda
       extern cu_real_t *d_y_hamr_field;
       extern cu_real_t *d_z_hamr_field;
 
+      extern cu_real_t *d_x_thermal_field;
+      extern cu_real_t *d_y_thermal_field;
+      extern cu_real_t *d_z_thermal_field;
+
       /*
        * Required by the total external field calculator
        * and the dipolar field updater

@@ -146,7 +146,7 @@ namespace vcuda{
       }
 
 
-      cu::mc::initialise();
+      // cu::mc::initialise();
 
       // Successful initialization
       return success;
@@ -434,6 +434,19 @@ namespace vcuda{
          cudaMemset(cu::d_x_hamr_field, 0, num_bytes);
          cudaMemset(cu::d_y_hamr_field, 0, num_bytes);
          cudaMemset(cu::d_z_hamr_field, 0, num_bytes);
+
+         /*
+          * Allocate memory in the device and transfer the
+          * total external field in each atom.
+          */
+         num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
+         cudaMalloc((void**)&cu::d_x_thermal_field, num_bytes);
+         cudaMalloc((void**)&cu::d_y_thermal_field, num_bytes);
+         cudaMalloc((void**)&cu::d_z_thermal_field, num_bytes);
+         // Initialise thermal fields to zero
+         cudaMemset(cu::d_x_thermal_field, 0, num_bytes);
+         cudaMemset(cu::d_y_thermal_field, 0, num_bytes);
+         cudaMemset(cu::d_z_thermal_field, 0, num_bytes);
 
          /*cu::x_total_external_field_array.resize(::atoms::num_atoms);
          cu::y_total_external_field_array.resize(::atoms::num_atoms);
