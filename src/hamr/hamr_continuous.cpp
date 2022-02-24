@@ -67,11 +67,11 @@ namespace hamr{
 		std::cout << " Field ramp time:\t" << ramp_time*mp::dt_SI << "\ts" << std::endl;
 		std::cout << " Time per bit:\t" << bit_time*mp::dt_SI << "\ts" << std::endl;
 		// Check that field ramp time < bit time
-		if(ramp_time >= 2*bit_time){
+		if(2*ramp_time >= bit_time){
          terminaltextcolor(RED);
-			std::cerr << "Error - value for \'hamr:field-ramp-time\' too small. Make sure is less than twice time per bit." << std::endl;
+			std::cerr << "Error - value for \'hamr:field-ramp-time\' too large. Make sure is less than half time per bit." << std::endl;
          terminaltextcolor(WHITE);
-			zlog << zTs() << "Error - value for \'hamr:field-ramp-time\' too small. Make sure is less than twice time per bit." << std::endl;
+			zlog << zTs() << "Error - value for \'hamr:field-ramp-time\' too large. Make sure is less than half time per bit." << std::endl;
          err::vexit();
 		}
 		std::cout << " Time per track:\t" << track_time*mp::dt_SI << "\ts" << std::endl;
@@ -83,12 +83,13 @@ namespace hamr{
 		while(sim::time-sim::equilibration_time < total_time){ // loop over whole time
 			uint64_t tmp_time = 0;
 
-			// hamr::internal::head_position_x = head_position_initial;	
+			track = int(round(bit_tot/n_bits_per_tack));
+			bit = bit_tot - track*n_bits_per_tack;
+
+			hamr::internal::head_position_x = head_position_initial + BL*bit;	
 			hamr::internal::head_position_y = TW*(0.5 + track);
 			zlog << zTs() << "New head position:" << hamr::internal::head_position_x*0.1 << ", " << hamr::internal::head_position_y*0.1 << " nm" << std::endl;
 
-			track = int(round(bit_tot/n_bits_per_tack));
-			bit = bit_tot - track*n_bits_per_tack;
 			while(tmp_time < bit_time){
 				// track = int(bit_tot/n_bits_per_tack);
 				// bit = bit_tot - track*n_bits_per_tack;

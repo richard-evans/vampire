@@ -103,6 +103,10 @@ namespace program{
 			hamr::head_laser_on=true;
 			std::cout << " Equilibration terminated, enabling hamr simulation ..." << std::endl;
 			zlog << zTs() << " Equilibration terminated, enabling hamr simulation ..." << std::endl;
+
+			// Set system temperature as minimum temperature
+			sim::temperature=sim::Tmin;
+
 			// Perform harm continuous simulation
 			hamr::hamr_continuous();
 
