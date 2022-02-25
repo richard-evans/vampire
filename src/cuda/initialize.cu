@@ -137,6 +137,7 @@ namespace vcuda{
       success = success && cu::__initialize_topology ();
       success = success && cu::__initialize_curand ();
       success = success && cu::__initialize_stats ();
+      success = success && cu::__initialize_hamr ();
 
       // Set up the exchange fields
       if( cu::exchange::initialise_exchange() != EXIT_SUCCESS)
@@ -178,25 +179,6 @@ namespace vcuda{
 #endif
    }
 
-   bool initialize_hamr()
-   {
-      #ifdef CUDA
-         bool success = true;
-
-            // Initialise hamr
-            if( cu::__initialize_hamr() != true)
-            {
-               std::cerr << "Failed to initialise hamr" << std::endl;
-               success = false;
-            }
-
-            // Successful initialization
-            return success;
-      #else
-         // Default (initializtion failed)
-         return false;
-      #endif
-   }
 
 
 #ifdef CUDA
@@ -421,19 +403,6 @@ namespace vcuda{
          std::copy(::atoms::z_total_external_field_array.begin(), ::atoms::z_total_external_field_array.end(), tmp_buffer.begin());
          cudaMemcpy(cu::d_z_external_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
 
-			
-         /*
-          * Allocate memory in the device and transfer the
-          * total external field in each atom.
-          */
-         num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
-         cudaMalloc((void**)&cu::d_x_hamr_field, num_bytes);
-         cudaMalloc((void**)&cu::d_y_hamr_field, num_bytes);
-         cudaMalloc((void**)&cu::d_z_hamr_field, num_bytes);
-         // Initialise hamr fields to zero
-         cudaMemset(cu::d_x_hamr_field, 0, num_bytes);
-         cudaMemset(cu::d_y_hamr_field, 0, num_bytes);
-         cudaMemset(cu::d_z_hamr_field, 0, num_bytes);
 
          /*
           * Allocate memory in the device and transfer the
@@ -447,6 +416,19 @@ namespace vcuda{
          cudaMemset(cu::d_x_thermal_field, 0, num_bytes);
          cudaMemset(cu::d_y_thermal_field, 0, num_bytes);
          cudaMemset(cu::d_z_thermal_field, 0, num_bytes);
+			
+         /*
+          * Allocate memory in the device and transfer the
+          * total external field in each atom.
+          */
+         num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
+         cudaMalloc((void**)&cu::d_x_hamr_field, num_bytes);
+         cudaMalloc((void**)&cu::d_y_hamr_field, num_bytes);
+         cudaMalloc((void**)&cu::d_z_hamr_field, num_bytes);
+         // Initialise hamr fields to zero
+         cudaMemset(cu::d_x_hamr_field, 0, num_bytes);
+         cudaMemset(cu::d_y_hamr_field, 0, num_bytes);
+         cudaMemset(cu::d_z_hamr_field, 0, num_bytes);
 
          /*cu::x_total_external_field_array.resize(::atoms::num_atoms);
          cu::y_total_external_field_array.resize(::atoms::num_atoms);
@@ -700,13 +682,17 @@ namespace vcuda{
       // Function to initialise hamr parameters
       bool __initialize_hamr ()
       {
-         cu::hamr::d_head_position_x = ::hamr::get_head_position_x();
-         cu::hamr::d_head_position_y = ::hamr::get_head_position_y();
-         cu::hamr::d_laser_sigma_x   = ::hamr::get_laser_sigma_x();
-         cu::hamr::d_laser_sigma_y   = ::hamr::get_laser_sigma_y();
-         cu::hamr::d_H_bounds_x      = ::hamr::get_field_bounds_x();
-         cu::hamr::d_H_bounds_y      = ::hamr::get_field_bounds_y();
-         cu::hamr::d_NPS             = ::hamr::get_NPS();
+         // Initialise HAMR variables if hamr on cpu has been initialised
+         if(::hamr::get_initialisation_state){
+            zlog << zTs() << "Importing HAMR parameters on GPU ..." << std::endl;
+            cu::hamr::d_head_position_x = ::hamr::get_head_position_x();
+            cu::hamr::d_head_position_y = ::hamr::get_head_position_y();
+            cu::hamr::d_laser_sigma_x   = ::hamr::get_laser_sigma_x();
+            cu::hamr::d_laser_sigma_y   = ::hamr::get_laser_sigma_y();
+            cu::hamr::d_H_bounds_x      = ::hamr::get_field_bounds_x();
+            cu::hamr::d_H_bounds_y      = ::hamr::get_field_bounds_y();
+            cu::hamr::d_NPS             = ::hamr::get_NPS();
+         }
 
          return true;
       }

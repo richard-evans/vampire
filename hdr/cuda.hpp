@@ -22,7 +22,6 @@ namespace vcuda{
    //-----------------------------------------------------------------------------
    extern bool initialize(bool cpu_stats);
    extern bool initialize_dipole();
-   extern bool initialize_hamr();
    extern void llg_heun();
    extern void stats_update();
    extern void finalize();

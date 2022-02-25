@@ -94,11 +94,6 @@ namespace hamr{
       // Set initialised flag
       hamr::internal::initialised = true;
 
-      // Initialise hamr on GPU if CUDA is active
-      #ifdef CUDA
-         gpu::initialize_hamr();
-      #endif
-
       return;
    }
    
