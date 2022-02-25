@@ -43,7 +43,17 @@ namespace hamr{
 			const double cy = hamr::internal::atom_coords_y[atom]; 
 			const double cx2 = (cx-px)*(cx-px);
 			const double cy2 = (cy-py)*(cy-py);
-			const double sqrt_T = sqrt( Tmin + DeltaT * exp(-cx2/(2.0 * laser_sigma_x2)) * exp(-cy2/(2.0 * laser_sigma_y2)) );
+
+			const double denx = 2.0 * laser_sigma_x2;
+			const double one_over_denx = 1.0/denx;
+			const double deny = 2.0 * laser_sigma_y2;
+			const double one_over_deny = 1.0/deny;
+			double exp_x =  exp(-cx2 * one_over_denx); 
+			double exp_y =  exp(-cy2 * one_over_deny); 
+
+			double temp = Tmin + DeltaT * exp_x * exp_y;
+			double sqrt_T = sqrt(temp);
+			// const double sqrt_T = sqrt( Tmin + DeltaT * exp(-cx2/(2.0 * laser_sigma_x2)) * exp(-cy2/(2.0 * laser_sigma_y2)) );
 
          return sqrt_T;
 
