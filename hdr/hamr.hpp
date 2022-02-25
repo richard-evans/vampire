@@ -71,6 +71,7 @@ namespace hamr{
    double get_track_size();
    double get_field_ramp_time();
    double get_NPS();
+   bool get_initialisation_state();
 
    //-----------------------------------------------------------------------------------------------
    // Externally visible variables used for HAMR calculation

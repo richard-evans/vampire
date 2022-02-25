@@ -109,4 +109,11 @@ namespace hamr{
       return internal::NPS;
    }
 
+   //--------------------------------------------------------------------------------
+   // Function to get hamr initialised state on cpu
+   //--------------------------------------------------------------------------------
+   bool get_initialisation_state(){
+      return hamr::internal::initialised;
+   }
+
 } // end of hamr namespace
