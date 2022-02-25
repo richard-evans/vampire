@@ -37,27 +37,31 @@ namespace vcuda{
 	
 		// Function to calculate temperature of atom depending on Gaussian profile
 		__device__ cu_real_t calculate_gaussian_profile(
-			cu_real_t * atoms_coord_x, cu_real_t * atoms_coord_y,
-			const int atom, const cu_real_t Tmin, const cu_real_t Tmax,
-			const cu_real_t laser_sigma_x2, const cu_real_t laser_sigma_y2,
-			const cu_real_t px, const cu_real_t py
+			const int atom, const cu_real_t cx, const cu_real_t cy,
+			const cu_real_t px, const cu_real_t py, 
+			const cu_real_t Tmin, const cu_real_t DeltaT,
+			const cu_real_t laser_sigma_x2, const cu_real_t laser_sigma_y2
 			)
 		{
-			const cu_real_t cx = atoms_coord_x[atom];  
-			const cu_real_t cy = atoms_coord_y[atom];  
+
 			const cu_real_t cx2 = (cx-px)*(cx-px);
 			const cu_real_t cy2 = (cy-py)*(cy-py);
-			cu_real_t temperature = 0.0;
+			const cu_real_t denx = 2.0 * laser_sigma_x2;
+			const cu_real_t one_over_denx = 1.0/denx;
+			const cu_real_t deny = 2.0 * laser_sigma_y2;
+			const cu_real_t one_over_deny = 1.0/deny;
 
 			#ifdef CUDA_DP
-				double temp = Tmin + (Tmax-Tmin) * exp(-cx2/(2.0 * laser_sigma_x2)) * exp(-cy2/(2.0 * laser_sigma_y2));
-				// temperature = Tmin + (Tmax-Tmin) * exp(-cx2/(2.0 * laser_sigma_x2)) * exp(-cy2/(2.0 * laser_sigma_y2));
+				cu_real_t exp_x =  exp(-cx2*one_over_denx); 
+				cu_real_t exp_y =  exp(-cy2*one_over_deny); 
 			#else
-				float temp = Tmin + (Tmax-Tmin) * __expf(-cx2/(2.0 * laser_sigma_x2)) * __expf(-cy2/(2.0 * laser_sigma_y2));
-				// temperature = Tmin + (Tmax-Tmin) * __expf(-cx2/(2.0 * laser_sigma_x2)) * __expf(-cy2/(2.0 * laser_sigma_y2));
+				cu_real_t exp_x =  __expf(-cx2*one_over_denx); 
+				cu_real_t exp_y =  __expf(-cy2*one_over_deny); 
 			#endif
+			// if(i<5){printf("  %d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+			// 						i, cx, cy, px, py, DeltaT, denx, deny, one_over_denx, one_over_deny, exp_x, exp_y); }
 
-			temperature = temp;
+			cu_real_t temperature = Tmin + DeltaT * exp_x * exp_y;
 
 			return temperature;
 		} // end calculate_gaussian_profile
@@ -68,7 +72,6 @@ namespace vcuda{
 			 	cu_real_t * atoms_coord_x, cu_real_t * atoms_coord_y,
 				cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
 				const cu_real_t Tmin, const cu_real_t Tmax,
-				const cu_real_t global_temperature,
 				const cu_real_t laser_sigma_x2, const cu_real_t laser_sigma_y2,
 				const cu_real_t px, const cu_real_t py,	 
 				curandState * rand_states,
@@ -80,39 +83,32 @@ namespace vcuda{
 			int tid = blockIdx.x * blockDim.x + threadIdx.x;
 			for (int i = tid; 
 				i < n_atoms; 
-				i += blockDim.x * gridDim.x){
+				i += blockDim.x * gridDim.x)
+			{
 
 				// Get material of atom i
 				int mid = material[i];
 				// Load parameters from memory
 				cu::material_parameters_t mat = material_params[mid];
-
 				// Load the curand state into local memory
 				curandState local_state = rand_states[tid];
 
-				cu_real_t temp = global_temperature;
+				// Define temporary variables for field
+				cu_real_t field_x = 0.0;
+				cu_real_t field_y = 0.0;
+				cu_real_t field_z = 0.0;
+
+				// Assign tempeerature to atoms according to Gaussian profile
+				const cu_real_t DeltaT = Tmax - Tmin;
+				cu_real_t temp = calculate_gaussian_profile(i, atoms_coord_x[i], atoms_coord_y[i], px, py,
+																Tmin, DeltaT, laser_sigma_x2, laser_sigma_y2);
+				
 				// material dependent temperature rescaling
 				const cu_real_t alpha = mat.temperature_rescaling_alpha;
 				const cu_real_t Tc    = mat.temperature_rescaling_Tc;
 				const cu_real_t sigma = mat.H_th_sigma;
 
-				// Assign tempeerature to atoms according to Gaussian profile
-				temp = calculate_gaussian_profile(atoms_coord_x, atoms_coord_y, i, Tmin, Tmax, laser_sigma_x2, laser_sigma_y2, px, py);
-
-				// // Compute thermal field
-				// // Initialise register to hold total field
-				// cu_real_t field_th = 0.0;
-				// field_th = cu::calculate_thermal_field(temp, alpha, Tc, sigma, local_state);
-
-				// // No need to sum over previous values because already zeroed initially
-				// x_field_array[i] = field_th;
-				// y_field_array[i] = field_th;
-				// z_field_array[i] = field_th;
-
       		// thermal field calculation
-				cu_real_t field_x = 0.0;
-				cu_real_t field_y = 0.0;
-				cu_real_t field_z = 0.0;
 
       		#ifdef CUDA_DP
       		   double resc_temp = (temp < Tc) ? Tc * pow(temp / Tc, alpha) : temp;
@@ -131,7 +127,6 @@ namespace vcuda{
       		   field_y = rsigma * curand_normal(&local_state);
       		   field_z = rsigma * curand_normal(&local_state);
       		#endif
-      		// if(i<10){printf("         %d  %lf  %lf  %lf\n",i,field_x,field_y,field_z);}
 
       		x_field_array[i] = field_x;
       		y_field_array[i] = field_y;
@@ -159,30 +154,23 @@ namespace vcuda{
 		{
 			for (int i = blockIdx.x * blockDim.x + threadIdx.x; 
 				i < n_atoms; 
-				i += blockDim.x * gridDim.x){
-
-				// Initialise register to hold total field
-				cu_real_t field_x = 0.0;
-				cu_real_t field_y = 0.0;
-				cu_real_t field_z = 0.0;
+				i += blockDim.x * gridDim.x)
+			{
 
 				const cu_real_t cx = atoms_coord_x[i]; 
 				const cu_real_t cy = atoms_coord_y[i]; 
-				const cu_real_t Hloc_min_x = head_position_x - H_bounds_x - NPS;  // Shift field box in downtrack of NPS
-				const cu_real_t Hloc_max_x = head_position_x + H_bounds_x - NPS;  // Shift field box in downtrack of NPS
+				const cu_real_t Hloc_min_x = head_position_x - H_bounds_x - NPS;
+				const cu_real_t Hloc_max_x = head_position_x + H_bounds_x - NPS;
 				const cu_real_t Hloc_min_y = head_position_y - H_bounds_y;
 				const cu_real_t Hloc_max_y = head_position_y + H_bounds_y;
 
 				// If atoms within field box, add contribution from external field
 				if((cx >= Hloc_min_x) && (cx <= Hloc_max_x) && (cy >= Hloc_min_y) && (cy <= Hloc_max_y)){
-					field_x = Hx_app;
-					field_y = Hy_app;
-					field_z = Hz_app;
+					x_field_array[i] += Hx_app;
+					y_field_array[i] += Hy_app;
+					z_field_array[i] += Hz_app;
 				}
 
-				x_field_array[i] += field_x;
-				y_field_array[i] += field_y;
-				z_field_array[i] += field_z;
 			}
 
 			return;
@@ -197,9 +185,9 @@ namespace vcuda{
 			if(err::check==true){ std::cout << "calculate_hamr_fields has been called" << std::endl;}
 
 			// copy simulation variables to temporary constants
-			const cu_real_t global_temperature = sim::temperature;
 			const cu_real_t Tmin = sim::Tmin;
 			const cu_real_t Tmax = sim::Tmax;
+			const cu_real_t global_temperature = sim::temperature;
 			const cu_real_t Hx_app = sim::H_vec[0]*sim::H_applied;
 			const cu_real_t Hy_app = sim::H_vec[1]*sim::H_applied;
 			const cu_real_t Hz_app = sim::H_vec[2]*sim::H_applied;
@@ -233,7 +221,6 @@ namespace vcuda{
 					cu::atoms::d_x_coord, cu::atoms::d_x_coord,
 					cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
 					Tmin, Tmax,
-					global_temperature,
 					laser_sigma_x2, laser_sigma_y2,
 					px, py,	 
 					cu::d_rand_state,
