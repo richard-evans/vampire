@@ -683,7 +683,8 @@ namespace vcuda{
       bool __initialize_hamr ()
       {
          // Initialise HAMR variables if hamr on cpu has been initialised
-         if(::hamr::get_initialisation_state){
+         bool initialised = ::hamr::get_initialisation_state();
+         if(initialised == true){
             zlog << zTs() << "Importing HAMR parameters on GPU ..." << std::endl;
             cu::hamr::d_head_position_x = ::hamr::get_head_position_x();
             cu::hamr::d_head_position_y = ::hamr::get_head_position_y();
