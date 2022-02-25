@@ -126,6 +126,15 @@ namespace hamr{
          return true;
       }
       //--------------------------------------------------------------------
+      test="track-padding";
+      if(word==test){
+         double f = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         hamr::internal::track_padding = f;
+         return true;
+      }
+      //--------------------------------------------------------------------
       test="bit-sequence-type";
       if(word==test){
          // single-tone sequence automatically defined given bit_size, track_size and system dimensions

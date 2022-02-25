@@ -85,6 +85,7 @@ namespace hamr{
       extern double H_bounds_y;
       extern double H_ramp_time;
       extern double NPS; // NFT to pole spacing
+      extern double track_padding;
       extern std::vector<int> bit_sequence;
       //-----------------------------
       // Parameters to be removed 

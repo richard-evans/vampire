@@ -49,6 +49,7 @@ namespace hamr{
       double H_bounds_y = 0.0; // 
       double H_ramp_time = 1.0e-12;
       double NPS = 0.0; // NFT to pole spacing
+      double track_padding = 0.0;
       std::vector<int> bit_sequence;
       //-----------------------------
       // Parameters to be removed 

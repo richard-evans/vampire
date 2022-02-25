@@ -82,7 +82,7 @@ namespace hamr{
       hamr::internal::laser_sigma_y = hamr::internal::fwhm_y * one_over_sqrt;
 
       // Calculate max number of allowed tracks and bits-per-track in the system
-      hamr::internal::num_tracks = floor((hamr::internal::system_dimensions_y-1.0)/hamr::internal::track_size);
+      hamr::internal::num_tracks = floor((hamr::internal::system_dimensions_y-1.0)/(hamr::internal::track_size + 2.0*hamr::internal::track_padding));
       hamr::internal::bits_per_tack = floor((hamr::internal::system_dimensions_x-1.0)/hamr::internal::bit_size);
 
       // Check if need to create singletone

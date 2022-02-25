@@ -42,6 +42,7 @@ namespace hamr{
 		const double TW = hamr::internal::track_size;
 		const double speed = hamr::internal::head_speed;
 		const double NPS = hamr::internal::NPS;
+		const double padding = hamr::internal::track_padding;
 		const double head_position_initial = 0.0; // -hamr::internal::system_dimensions_x*0.5 - NPS;
 		const int n_bits = hamr::internal::num_bits;
 		const int n_bits_per_tack = hamr::internal::bits_per_tack;
@@ -87,14 +88,14 @@ namespace hamr{
 			bit = bit_tot - track*n_bits_per_tack;
 
 			hamr::internal::head_position_x = head_position_initial + BL*bit;	
-			hamr::internal::head_position_y = TW*(0.5 + track);
+			hamr::internal::head_position_y = TW*(0.5 + track) + padding;
 			zlog << zTs() << "New head position:" << hamr::internal::head_position_x*0.1 << ", " << hamr::internal::head_position_y*0.1 << " nm" << std::endl;
 
 			while(tmp_time < bit_time){
 				// track = int(bit_tot/n_bits_per_tack);
 				// bit = bit_tot - track*n_bits_per_tack;
 				hamr::internal::head_position_x = head_position_initial + (speed/**1e-10*/) * tmp_time * mp::dt_SI + BL*bit;
-				hamr::internal::head_position_y = TW*(0.5 + track);
+				hamr::internal::head_position_y = TW*(0.5 + track) + padding;
 				const double H_app_dir = static_cast<double>(hamr::internal::bit_sequence[bit_tot]);
 
 				// Update applied field value depending on trapezoidal time profile
