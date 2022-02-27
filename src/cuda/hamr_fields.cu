@@ -185,18 +185,13 @@ namespace vcuda{
 			if(err::check==true){ std::cout << "calculate_hamr_fields has been called" << std::endl;}
 
 			// copy simulation variables to temporary constants
-			const cu_real_t Tmin = sim::Tmin;
-			const cu_real_t Tmax = sim::Tmax;
 			const cu_real_t global_temperature = sim::temperature;
-			const cu_real_t Hx_app = sim::H_vec[0]*sim::H_applied;
-			const cu_real_t Hy_app = sim::H_vec[1]*sim::H_applied;
-			const cu_real_t Hz_app = sim::H_vec[2]*sim::H_applied;
 			const int num_atoms = ::atoms::num_atoms;
 
-			// Initialise to zero hamr fields
-			cudaMemset(cu::d_x_hamr_field, 0, num_atoms * sizeof(cu_real_t));
-			cudaMemset(cu::d_y_hamr_field, 0, num_atoms * sizeof(cu_real_t));
-			cudaMemset(cu::d_z_hamr_field, 0, num_atoms * sizeof(cu_real_t));
+			// // Initialise to zero hamr fields
+			// cudaMemset(cu::d_x_hamr_field, 0, num_atoms * sizeof(cu_real_t));
+			// cudaMemset(cu::d_y_hamr_field, 0, num_atoms * sizeof(cu_real_t));
+			// cudaMemset(cu::d_z_hamr_field, 0, num_atoms * sizeof(cu_real_t));
 
 			check_cuda_errors (__FILE__, __LINE__);
 
@@ -204,6 +199,11 @@ namespace vcuda{
 
 				check_cuda_errors (__FILE__, __LINE__);
 
+				const cu_real_t Tmin = sim::Tmin;
+				const cu_real_t Tmax = sim::Tmax;
+				const cu_real_t Hx_app = sim::H_vec[0]*sim::H_applied;
+				const cu_real_t Hy_app = sim::H_vec[1]*sim::H_applied;
+				const cu_real_t Hz_app = sim::H_vec[2]*sim::H_applied;
 				// Determine constants
 				const cu_real_t H_bounds_x = cu::hamr::d_H_bounds_x;
 				const cu_real_t H_bounds_y = cu::hamr::d_H_bounds_y;
@@ -218,7 +218,7 @@ namespace vcuda{
 
 				// Apply thermal field
 				apply_local_temperature_kernel <<< cu::grid_size, cu::block_size >>> (
-					cu::atoms::d_x_coord, cu::atoms::d_x_coord,
+					cu::atoms::d_x_coord, cu::atoms::d_y_coord,
 					cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
 					Tmin, Tmax,
 					laser_sigma_x2, laser_sigma_y2,
@@ -232,7 +232,7 @@ namespace vcuda{
 
 				// Apply external field 
 				apply_local_external_field_kernel <<< cu::grid_size, cu::block_size >>> (
-					cu::atoms::d_x_coord, cu::atoms::d_x_coord,
+					cu::atoms::d_x_coord, cu::atoms::d_y_coord,
 					cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
 					Hx_app, Hy_app, Hz_app,
 					px, py,
