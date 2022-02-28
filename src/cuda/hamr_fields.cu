@@ -202,11 +202,7 @@ namespace vcuda{
 			const cu_real_t global_temperature = sim::temperature;
 			const int num_atoms = ::atoms::num_atoms;
 
-			// Initialise to zero hamr fields
-			cudaMemset(cu::d_x_hamr_field, 0.0, num_atoms * sizeof(cu_real_t));
-			cudaMemset(cu::d_y_hamr_field, 0.0, num_atoms * sizeof(cu_real_t));
-			cudaMemset(cu::d_z_hamr_field, 0.0, num_atoms * sizeof(cu_real_t));
-
+			// Calculate local thermal and applied fields if laser is on
 			if(::hamr::head_laser_on){
 
 				// Determine constants

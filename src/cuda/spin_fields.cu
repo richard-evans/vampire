@@ -73,14 +73,26 @@ void update_spin_fields ()
 __device__ cu_real_t uniaxial_anisotropy_energy(cu::material_parameters_t &material,
         cu_real_t sx, cu_real_t sy, cu_real_t sz)
 {
-      cu_real_t ex = material.anisotropy_unit_x;
-      cu_real_t ey = material.anisotropy_unit_y;
-      cu_real_t ez = material.anisotropy_unit_z;
+      // Factors for k4
+      const cu_real_t fiveothirtyfive  = 0.14285714285; // 5/35
+      const cu_real_t thirtyothirtyfive = 0.85714285714; // 30/35
 
-      cu_real_t sdote = sx * ex + sy * ey + sz * ez;
+      const cu_real_t ex = material.anisotropy_unit_x;
+      const cu_real_t ey = material.anisotropy_unit_y;
+      const cu_real_t ez = material.anisotropy_unit_z;
 
-      cu_real_t k2 = material.sh2 * material.mu_s_si;
-      cu_real_t E = -k2 * sdote * sdote;
+      const cu_real_t sdote = sx * ex + sy * ey + sz * ez;
+      const cu_real_t sdote2 = sdote * sdote;
+
+      const cu_real_t k2 = material.sh2; // * material.mu_s_si;  <-- Values are already in real units (Joules)
+      const cu_real_t k4 = material.sh4; // * material.mu_s_si;
+      const cu_real_t k6 = material.sh6; // * material.mu_s_si;
+
+      const cu_real_t Ek2 = -k2 * sdote2;
+      const cu_real_t Ek4 =  k4 * (sdote2*sdote2 - thirtyothirtyfive*sdote2 - fiveothirtyfive);
+      const cu_real_t Ek6 = -0.04166666666 * k6 * (231.0*sdote2*sdote2*sdote2 - 315.0*sdote2*sdote2 + 105.0*sdote2); // factor = 2/3 * -1/16 = -1/6 = -0.04166666666
+
+      cu_real_t E = Ek2 + Ek4 + Ek6;
 
       return E;
 }
@@ -110,31 +122,31 @@ __global__ void update_non_exchange_spin_fields_kernel (
       cu_real_t field_y = 0.0;
       cu_real_t field_z = 0.0;
 
-      cu_real_t sx = x_spin[i];
-      cu_real_t sy = y_spin[i];
-      cu_real_t sz = z_spin[i];
+      const cu_real_t sx = x_spin[i];
+      const cu_real_t sy = y_spin[i];
+      const cu_real_t sz = z_spin[i];
 
-      cu_real_t ex = material.anisotropy_unit_x;
-      cu_real_t ey = material.anisotropy_unit_y;
-      cu_real_t ez = material.anisotropy_unit_z;
+      const cu_real_t ex = material.anisotropy_unit_x;
+      const cu_real_t ey = material.anisotropy_unit_y;
+      const cu_real_t ez = material.anisotropy_unit_z;
 
-      cu_real_t sdote = sx * ex + sy * ey + sz * ez;
-      cu_real_t sdote3 = sdote * sdote * sdote;
-      cu_real_t sdote5 = sdote3 * sdote * sdote;
+      const cu_real_t sdote = sx * ex + sy * ey + sz * ez;
+      const cu_real_t sdote3 = sdote * sdote * sdote;
+      const cu_real_t sdote5 = sdote3 * sdote * sdote;
 
       /*
        * Spherical harmonics
        */
 
-      cu_real_t scale = 0.6666666666666667;
+      const cu_real_t scale = 0.6666666666666667;
 
-      cu_real_t k2 = material.sh2;
-      cu_real_t k4 = material.sh4;
-      cu_real_t k6 = material.sh6;
+      const cu_real_t k2 = material.sh2;
+      const cu_real_t k4 = material.sh4;
+      const cu_real_t k6 = material.sh6;
 
-      cu_real_t ek2 = k2 * 3.0 * sdote;
-      cu_real_t ek4 = k4 * 0.125 * (140.0 * sdote3 - 60.0 *sdote);
-      cu_real_t ek6 = k6 * 0.0625 * (1386.0 * sdote5 - 1260.0 * sdote3 + 210.0 * sdote);
+      const cu_real_t ek2 = k2 * 3.0 * sdote;
+      const cu_real_t ek4 = -k4 * 0.125 * (140.0 * sdote3 - 60.0 *sdote);
+      const cu_real_t ek6 = k6 * 0.0625 * (1386.0 * sdote5 - 1260.0 * sdote3 + 210.0 * sdote);
 
       field_x += scale * ex * (ek2 + ek4 + ek6);
       field_y += scale * ey * (ek2 + ek4 + ek6);
