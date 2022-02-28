@@ -19,11 +19,11 @@ CUDA_OBJECTS= \
 	obj/cuda/initialize.o \
 	obj/cuda/internal.o \
 	obj/cuda/llg_heun.o \
+	obj/cuda/monte_carlo.o \
 	obj/cuda/spin_fields.o \
 	obj/cuda/statistics.o \
 	obj/cuda/thermal_fields.o \
-	obj/cuda/transfer.o \
-	obj/cuda/monte_carlo.o
+	obj/cuda/transfer.o 
 
 CUDA_ARCH=\
 -gencode arch=compute_35,code=sm_35 \

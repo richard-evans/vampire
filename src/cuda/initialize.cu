@@ -426,9 +426,18 @@ namespace vcuda{
          cudaMalloc((void**)&cu::d_y_hamr_field, num_bytes);
          cudaMalloc((void**)&cu::d_z_hamr_field, num_bytes);
          // Initialise hamr fields to zero
-         cudaMemset(cu::d_x_hamr_field, 0, num_bytes);
-         cudaMemset(cu::d_y_hamr_field, 0, num_bytes);
-         cudaMemset(cu::d_z_hamr_field, 0, num_bytes);
+         cudaMemset(cu::d_x_hamr_field, 0.0, num_bytes);
+         cudaMemset(cu::d_y_hamr_field, 0.0, num_bytes);
+         cudaMemset(cu::d_z_hamr_field, 0.0, num_bytes);
+
+         /*
+          * Allocate memory in the device and transfer the
+          * total external field in each atom.
+          */
+         num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
+         cudaMalloc((void**)&cu::d_x_applied_field, num_bytes);
+         cudaMalloc((void**)&cu::d_y_applied_field, num_bytes);
+         cudaMalloc((void**)&cu::d_z_applied_field, num_bytes);
 
          /*cu::x_total_external_field_array.resize(::atoms::num_atoms);
          cu::y_total_external_field_array.resize(::atoms::num_atoms);
