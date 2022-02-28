@@ -156,13 +156,6 @@ namespace vcuda{
 			const cu_real_t global_temperature = sim::temperature;
 			const int num_atoms = ::atoms::num_atoms;
 
-			// Initialise to zero hamr fields
-			cudaMemset(cu::d_x_thermal_field, 0, num_atoms * sizeof(cu_real_t));
-			cudaMemset(cu::d_y_thermal_field, 0, num_atoms * sizeof(cu_real_t));
-			cudaMemset(cu::d_z_thermal_field, 0, num_atoms * sizeof(cu_real_t));
-
-			check_cuda_errors (__FILE__, __LINE__);
-
 			apply_global_temperature_kernel <<< cu::grid_size, cu::block_size >>> (
 				cu::d_x_thermal_field, cu::d_y_thermal_field, cu::d_z_thermal_field,
 				global_temperature,
