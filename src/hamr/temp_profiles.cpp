@@ -52,10 +52,11 @@ namespace hamr{
 			double exp_y =  exp(-cy2 * one_over_deny); 
 
 			double temp = Tmin + DeltaT * exp_x * exp_y;
-			double sqrt_T = sqrt(temp);
-			// const double sqrt_T = sqrt( Tmin + DeltaT * exp(-cx2/(2.0 * laser_sigma_x2)) * exp(-cy2/(2.0 * laser_sigma_y2)) );
+			// double sqrt_T = sqrt(temp);
+			// // const double sqrt_T = sqrt( Tmin + DeltaT * exp(-cx2/(2.0 * laser_sigma_x2)) * exp(-cy2/(2.0 * laser_sigma_y2)) );
 
-         return sqrt_T;
+         // return sqrt_T;
+			return temp;
 
       }
 

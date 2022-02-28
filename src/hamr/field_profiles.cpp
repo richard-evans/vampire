@@ -66,20 +66,26 @@ namespace hamr{
 					                  std::vector<double>& y_total_external_field_array,
 					                  std::vector<double>& z_total_external_field_array
       									){
+
+			// Calculate constants for efficiency
+			const double Hx_app = Hvecx*Hloc_parity_field;
+			const double Hy_app = Hvecy*Hloc_parity_field;
+			const double Hz_app = Hvecz*Hloc_parity_field;
+			const double Hloc_min_x = hamr::internal::head_position_x - 0.5*hamr::internal::H_bounds_x - hamr::internal::NPS;  // Shift field box in downtrack of NPS
+			const double Hloc_max_x = hamr::internal::head_position_x + 0.5*hamr::internal::H_bounds_x - hamr::internal::NPS;  // Shift field box in downtrack of NPS
+			const double Hloc_min_y = hamr::internal::head_position_y - 0.5*hamr::internal::H_bounds_y;
+			const double Hloc_max_y = hamr::internal::head_position_y + 0.5*hamr::internal::H_bounds_y;
+
 			// Add localised applied field
 			for(int atom=start_index;atom<end_index;atom++){
 				const double cx = hamr::internal::atom_coords_x[atom];
 				const double cy = hamr::internal::atom_coords_y[atom];
-				const double Hloc_min_x = hamr::internal::head_position_x - hamr::internal::H_bounds_x - hamr::internal::NPS;  // Shift field box in downtrack of NPS
-				const double Hloc_max_x = hamr::internal::head_position_x + hamr::internal::H_bounds_x - hamr::internal::NPS;  // Shift field box in downtrack of NPS
-				const double Hloc_min_y = hamr::internal::head_position_y - hamr::internal::H_bounds_y;
-				const double Hloc_max_y = hamr::internal::head_position_y + hamr::internal::H_bounds_y;
 
 				// If atoms within field box, add contribution from external field
 				if((cx >= Hloc_min_x) && (cx <= Hloc_max_x) && (cy >= Hloc_min_y) && (cy <= Hloc_max_y)){
-					hamr::internal::x_field_array[atom] += Hvecx*Hloc_parity_field;
-					hamr::internal::y_field_array[atom] += Hvecy*Hloc_parity_field;
-					hamr::internal::z_field_array[atom] += Hvecz*Hloc_parity_field;
+					hamr::internal::x_field_array[atom] += Hx_app;
+					hamr::internal::y_field_array[atom] += Hy_app;
+					hamr::internal::z_field_array[atom] += Hz_app;
 				}
 				x_total_external_field_array[atom] += hamr::internal::x_field_array[atom];
 				y_total_external_field_array[atom] += hamr::internal::y_field_array[atom];

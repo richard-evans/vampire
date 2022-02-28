@@ -59,11 +59,21 @@ namespace hamr{
 		generate (hamr::internal::z_field_array.begin()+start_index,hamr::internal::z_field_array.begin()+end_index, mtrandom::gaussian);
 
 		if(hamr::head_laser_on){
+			
 			for(int atom=start_index;atom<end_index;atom++){
+
 				const int imaterial=hamr::internal::atom_type_array[atom];
+			   double alpha = mp::material[imaterial].temperature_rescaling_alpha;
+			   double Tc = mp::material[imaterial].temperature_rescaling_Tc;
+				
 				// Get local temperature filed from application of heat profile
-				const double sqrt_T = hamr::internal::calculate_gaussian_profile(atom, Tmin, DeltaT);
+				const double temp = hamr::internal::calculate_gaussian_profile(atom, Tmin, DeltaT);
+			   // if T<Tc T/Tc = (T/Tc)^alpha else T = T
+			   double rescaled_temperature = temp < Tc ? Tc*pow(temp/Tc,alpha) : temp;
+			   double sqrt_T=sqrt(rescaled_temperature);
+
 				const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
+
 				hamr::internal::x_field_array[atom] *= H_th_sigma;
 				hamr::internal::y_field_array[atom] *= H_th_sigma;
 				hamr::internal::z_field_array[atom] *= H_th_sigma;
@@ -77,12 +87,30 @@ namespace hamr{
 																y_total_external_field_array, 
 																z_total_external_field_array);
 		}
+		// Otherwise just use global temperature
 		else{
-			// Otherwise just use global temperature
-			double sqrt_T=sqrt(temperature);
+			// unroll sigma for speed
+			std::vector<double> sigma_prefactor(0);
+			sigma_prefactor.reserve(mp::material.size());
+
+			// Calculate material temperature (with optional rescaling)
+			for(unsigned int mat=0;mat<mp::material.size();mat++){
+			   // // Check for localised temperature
+			   // if(sim::local_temperature) temperature = mp::material[mat].temperature;
+			   // Calculate temperature rescaling
+			   double alpha = mp::material[mat].temperature_rescaling_alpha;
+			   double Tc = mp::material[mat].temperature_rescaling_Tc;
+			   // if T<Tc T/Tc = (T/Tc)^alpha else T = T
+			   double rescaled_temperature = temperature < Tc ? Tc*pow(temperature/Tc,alpha) : temperature;
+			   double sqrt_T=sqrt(rescaled_temperature);
+			   sigma_prefactor.push_back(sqrt_T*mp::material[mat].H_th_sigma);
+			}
+
 			for(int atom=start_index;atom<end_index;atom++){
+
 				const int imaterial=hamr::internal::atom_type_array[atom];
-				const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
+				const double H_th_sigma = sigma_prefactor[imaterial];
+
 				x_total_external_field_array[atom] = hamr::internal::x_field_array[atom] * H_th_sigma; 
 				y_total_external_field_array[atom] = hamr::internal::y_field_array[atom] * H_th_sigma; 
 				z_total_external_field_array[atom] = hamr::internal::z_field_array[atom] * H_th_sigma; 
