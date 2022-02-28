@@ -53,9 +53,12 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
+#include "grains.hpp"
 #include "environment.hpp"
+#include "hamr.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
+#include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
@@ -152,8 +155,6 @@ namespace sim{
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int program=0;
-
 
 	bool local_temperature=false; /// flag to enable material specific temperature
 	bool local_applied_field=false; /// flag to enable material specific applied field
@@ -231,11 +232,12 @@ int run(){
       for(int m = 0; m < mp::num_materials; m++){
          if( mp::material[m].non_magnetic == 2 ) non_magnetic_materials_array[m] = true;
       }
-      stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array, non_magnetic_materials_array);
+      stats::initialize(num_atoms_for_statistics, mp::num_materials, grains::num_grains, atoms::m_spin_array, atoms::type_array, atoms::grain_array, atoms::category_array, non_magnetic_materials_array);
    }
 
-   // Precalculate initial statistics
-   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
+   // Precalculate initial statistics and then reset averages
+   stats::update();
+	stats::reset();
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
@@ -243,7 +245,7 @@ int run(){
 	if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
 	micromagnetic::initialize(cells::num_local_cells,
 									  cells::num_cells,
-									  stats::num_atoms,
+									  atoms::num_atoms,
 									  mp::num_materials,
 									  cells::atom_cell_id_array,
 									  atoms::neighbour_list_array,
@@ -325,7 +327,7 @@ int run(){
 	#endif
 
 	// Select program to run
-	switch(sim::program){
+	switch(program::program){
 		case 0:
 			if(vmpi::my_rank==0){
 				std::cout << "Benchmark..." << std::endl;
@@ -462,6 +464,14 @@ int run(){
 	  		program::local_field_cool();
 	  		break;
 
+		case 17:
+	  		if(vmpi::my_rank==0){
+	    		std::cout << "electrical-pulse..." << std::endl;
+	    		zlog << "electrical-pulse..." << std::endl;
+	  		}
+	  		program::electrical_pulse();
+	  		break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;
@@ -525,8 +535,8 @@ int run(){
 			program::boltzmann_dist_micromagnetic_llg();
 			break;
 		default:{
-			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
-			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
+			std::cerr << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
+			zlog << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
 			}
 	}

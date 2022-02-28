@@ -14,6 +14,7 @@
 #include <iostream>
 
 // Vampire headers
+#include "program.hpp"
 #include "spintransport.hpp"
 #include "vmpi.hpp"
 
@@ -122,7 +123,7 @@ void calculate_magnetoresistance(){
       //-----------------------------------------------------
       // Compute stack current
       //-----------------------------------------------------
-      const double je = st::internal::voltage / total_stack_resistance;
+      const double je = st::internal::voltage * program::fractional_electric_field_strength / total_stack_resistance;
 
       //---------------------------------------------------------
       // Compute cell spin torque fields based on stack currents
@@ -153,7 +154,7 @@ void calculate_magnetoresistance(){
 
    // save total resistance and current
    st::total_resistance = 1.0 / sum_inv_resistance;
-   st::total_current = st::internal::voltage / st::total_resistance;
+   st::total_current = program::fractional_electric_field_strength * st::internal::voltage / st::total_resistance;
 
    return;
 

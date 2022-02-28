@@ -97,14 +97,14 @@ namespace program{
             }
 
             sim::integrate(timesteps);
-            stats::mag_m_reset();
+            stats::reset();
             int start_time=sim::time;
             // Simulate system
             while(sim::time<timesteps+start_time){
                sim::integrate(1);
 
                // Calculate mag_m, mag after sim::partial_time steps
-               stats::mag_m();
+               stats::update();
 
             } // end of time loop
             zmag << mp::dt_SI << "\t";
@@ -204,7 +204,7 @@ namespace program{
          }
 
          // Calculate magnetisation statistics
-         stats::mag_m();
+         stats::update();
 
          // Output data
          vout::data();

@@ -21,28 +21,10 @@ namespace stats
 // Namespace statistics
 //==========================================================
 {
-	extern int num_atoms;				/// Number of atoms for statistic purposes
-	extern double inv_num_atoms;	///1.0/num_atoms
-	extern double max_moment;		/// Total Maximum moment
-	extern double data_counter;		/// number of data points for averaging
+	extern int num_atoms;				//Number of atoms for statistic purposes
 
 	// Member Functions
-	extern int mag_m();
-	extern void mag_m_reset();
 	extern double max_torque();
-
-	extern bool calculate_torque;
-	extern double total_system_torque[3];
-	extern double total_mean_system_torque[3];
-
-	extern std::vector <double> sublattice_mean_torque_x_array;
-	extern std::vector <double> sublattice_mean_torque_y_array;
-	extern std::vector <double> sublattice_mean_torque_z_array;
-
-	extern double energy_data_counter;
-	extern double torque_data_counter;
-
-   extern bool calculate_energy;
 
    /// Statistics energy types
    enum energy_t { total = 0, exchange = 1, anisotropy = 2, applied_field = 3, magnetostatic = 4};
@@ -51,41 +33,59 @@ namespace stats
    enum stat_t { atotal=0, mean=1};
 
    /// Statistics output functions
-   extern void output_energy(std::ostream&, enum energy_t, enum stat_t,bool header);
+   //extern void output_energy(std::ostream&, enum energy_t, enum stat_t,bool header);
 
    //-------------------------------------------------
    // New statistics module functions and variables
    //-------------------------------------------------
 
    // Control functions
-   void initialize(const int num_atoms, const int num_materials,
+   void initialize(const int num_atoms,
+                   const int num_materials,
+                   const int num_grains,
                    const std::vector<double>& magnetic_moment_array,
                    const std::vector<int>& material_type_array,
+                   const std::vector<int>& grain_array,
                    const std::vector<int>& height_category_array,
                    const std::vector<bool>& non_magnetic_materials_array);
 
-   void update(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
-               const std::vector<double>& mm, const std::vector<int>& mat, const double temperature);
+
+	// Function to update statistics
+	void update();
+
+	// Function to reset average statistics counters
    void reset();
 
-   // Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
-   extern bool calculate_system_energy;
-   extern bool calculate_material_energy;
-   extern bool calculate_system_magnetization;
-   extern bool calculate_material_magnetization;
-   extern bool calculate_height_magnetization;
-   extern bool calculate_material_height_magnetization;
-   extern bool calculate_system_specific_heat;
-   extern bool calculate_material_specific_heat;
-   extern bool calculate_material_standard_deviation;// AJN
-   extern bool calculate_system_susceptibility;
-   extern bool calculate_material_susceptibility;
+	// Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
+	extern bool calculate_system_energy;
+	extern bool calculate_grain_energy;
+	extern bool calculate_material_energy;
 
-   // forward declaration of friend classes
-   class susceptibility_statistic_t;
-   class specific_heat_statistic_t;
+	extern bool calculate_system_magnetization;
+	extern bool calculate_grain_magnetization;
+	extern bool calculate_material_magnetization;
+	extern bool calculate_height_magnetization;
+	extern bool calculate_material_height_magnetization;
 
-   class standard_deviation_statistic_t;
+	extern bool calculate_system_torque;
+	extern bool calculate_grain_torque;
+	extern bool calculate_material_torque;
+
+	extern bool calculate_system_specific_heat;
+	extern bool calculate_grain_specific_heat;
+	extern bool calculate_material_specific_heat;
+
+	extern bool calculate_material_standard_deviation;
+
+	extern bool calculate_system_susceptibility;
+	extern bool calculate_grain_susceptibility;
+	extern bool calculate_material_susceptibility;
+
+	// forward declaration of friend classes
+	class susceptibility_statistic_t;
+	class specific_heat_statistic_t;
+
+	class standard_deviation_statistic_t;
    //----------------------------------
    // Energy class definition
    //----------------------------------
@@ -191,6 +191,42 @@ namespace stats
    };
 
 	//----------------------------------
+   // Torque class definition
+   //----------------------------------
+   class torque_statistic_t{
+
+      public:
+         torque_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
+         bool is_initialized();
+         void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
+         void get_mask(std::vector<int>& out_mask);
+         void calculate_torque(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
+										 const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
+										 const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
+										 const std::vector<double>& mm);
+         void set_torque(std::vector<double>& torque, std::vector<double>& mean_torque, long counter);
+         void reset_torque_averages();
+         const std::vector<double>& get_torque();
+         std::string output_torque(bool header);
+			std::string output_mean_torque(bool header);
+
+      private:
+         bool initialized;
+         int num_atoms;
+         int mask_size;
+         double mean_counter;
+         std::vector<int> mask;
+			std::vector<int> num_atoms_in_mask;
+         std::vector<double> torque;
+         std::vector<double> mean_torque;
+         std::vector<int> zero_list;
+         std::string name;
+
+   };
+
+	//----------------------------------
    // Specific Heat Class definition
    //----------------------------------
    class specific_heat_statistic_t{
@@ -271,21 +307,34 @@ namespace stats
 
    };
 
-   // Statistics classes
-   extern energy_statistic_t system_energy;
-   extern energy_statistic_t material_energy;
+
+   //----------------------------------
+	// Statistics class instantiations
+   //----------------------------------
+	extern energy_statistic_t system_energy;
+	extern energy_statistic_t grain_energy;
+	extern energy_statistic_t material_energy;
 
    extern magnetization_statistic_t system_magnetization;
-   extern magnetization_statistic_t material_magnetization;
+	extern magnetization_statistic_t grain_magnetization;
+	extern magnetization_statistic_t material_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
 
+	extern torque_statistic_t system_torque;
+	extern torque_statistic_t grain_torque;
+	extern torque_statistic_t material_torque;
+
    extern specific_heat_statistic_t system_specific_heat;
+	extern specific_heat_statistic_t grain_specific_heat;
    extern specific_heat_statistic_t material_specific_heat;
 
    extern susceptibility_statistic_t system_susceptibility;
+	extern susceptibility_statistic_t grain_susceptibility;
    extern susceptibility_statistic_t material_susceptibility;
+
    extern standard_deviation_statistic_t material_standard_deviation;
+
 }
 
 #endif /*STATS_H_*/

@@ -98,7 +98,7 @@ namespace vcuda{
             cudaMemcpy(cu::llg::d_y_spin_buffer, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
             cudaMemcpy(cu::llg::d_z_spin_buffer, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
             
-	    cudaMalloc((void**)&cu::llg::d_ds_x, ::atoms::num_atoms * sizeof(cu_real_t));
+            cudaMalloc((void**)&cu::llg::d_ds_x, ::atoms::num_atoms * sizeof(cu_real_t));
             cudaMalloc((void**)&cu::llg::d_ds_y, ::atoms::num_atoms * sizeof(cu_real_t));
             cudaMalloc((void**)&cu::llg::d_ds_z, ::atoms::num_atoms * sizeof(cu_real_t));
 

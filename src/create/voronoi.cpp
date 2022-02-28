@@ -281,7 +281,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		//	file << grain << '\t' << grain_coord_array[i][0]/10 << '\t' << grain_coord_array[i][1]/10 << '\t' << grains_r[i]/10 << std::endl;
 		}
 
-	 }
+	} // end of Poisson version
 
 	else{
 		//Calculate pointers
@@ -296,8 +296,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 				for (int particle_parity=0;particle_parity<2;particle_parity++){
 					particle_coords[0] = (particle_parity)*delta_particle_x_parity + delta_particle_x*x_particle + vp*double(1-2*particle_parity)*delta_particle_x_parity;
 					particle_coords[1] = (particle_parity)*delta_particle_y_parity + delta_particle_y*y_particle;
-					grain_coord_array[grain].push_back(particle_coords[0]+grain_sd*mtrandom::gaussian()*delta_particle_x);
-					grain_coord_array[grain].push_back(particle_coords[1]+grain_sd*mtrandom::gaussian()*delta_particle_y);
+					grain_coord_array[grain].push_back(particle_coords[0]+grain_sd*mtrandom::gaussian()*delta_particle_x - cs::system_dimensions[0]);
+					grain_coord_array[grain].push_back(particle_coords[1]+grain_sd*mtrandom::gaussian()*delta_particle_y - cs::system_dimensions[1]);
 					grain++;
 				}
 			}

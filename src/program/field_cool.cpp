@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -85,21 +85,21 @@ void field_cool(){
 
 		// Set equilibration temperature and field
 		sim::temperature=sim::Teq;
-		
+
 		// Equilibrate system
 		while(sim::time<sim::equilibration_time){
-			
+
 			sim::integrate(sim::partial_time);
-			
+
 			// Calculate magnetisation statistics
-			stats::mag_m();
-			
+			stats::update();
+
 			// Output data
 			vout::data();
 		}
-		
+
 		int start_time=sim::time;
-		
+
 		// Perform Field Cooling
 		while(sim::time<sim::total_time+start_time){
 
@@ -136,15 +136,15 @@ void field_cool(){
          }
 
 			// Calculate magnetisation statistics
-			stats::mag_m();
+			stats::update();
 
 			// Output data
 			vout::data();
 
 		}
-		
+
 	} // end of run loop
-	
+
 } // end of field_cool()
 
 }//end of namespace program

@@ -45,7 +45,7 @@ void local_field_cool(){
 			sim::integrate(sim::partial_time);
 
 			// Calculate magnetisation statistics
-			stats::mag_m();
+			stats::update();
 
 			// Output data
 			vout::data();
@@ -96,7 +96,7 @@ void local_field_cool(){
          }
 
 			// Calculate magnetisation statistics
-			stats::mag_m();
+			stats::update();
 
 			// Output data
 			vout::data();

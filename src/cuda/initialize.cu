@@ -147,7 +147,7 @@ namespace vcuda{
       }
 
 
-      // cu::mc::initialise();
+      cu::mc::initialise();
 
       // Successful initialization
       return success;

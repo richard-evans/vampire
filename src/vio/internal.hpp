@@ -78,6 +78,7 @@ namespace vout{
    void material_constraint_phi(std::ostream& stream,bool header);
    void material_constraint_theta(std::ostream& stream,bool header);
    void material_mean_systorque(std::ostream& stream,bool header);
+   void material_torque(std::ostream& stream, bool header);
    void standard_deviation(std::ostream& stream,bool header);
    void mean_system_susceptibility(std::ostream& stream,bool header);
    void phonon_temperature(std::ostream& stream,bool header);
@@ -92,6 +93,7 @@ namespace vout{
    void lfa_ms(std::ostream& stream,bool header);
    void x_track_pos(std::ostream& stream,bool header);
    void z_track_pos(std::ostream& stream,bool header);
+   void fractional_electric_field_strength(std::ostream& stream,bool header);
    //void total_cubic_anisotropy_energy(std::ostream& stream,bool header);
    //void mean_total_cubic_anisotropy_energy(std::ostream& stream,bool header);
    //void total_surface_anisotropy_energy(std::ostream& stream,bool header);

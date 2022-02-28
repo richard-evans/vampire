@@ -78,7 +78,6 @@ namespace hamr{
    // Externally visible variables used for HAMR calculation
    //-----------------------------------------------------------------------------------------------
    extern bool head_laser_on;
-   extern bool run_program;
    
 
 } // end of hamr namespace

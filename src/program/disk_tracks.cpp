@@ -385,7 +385,7 @@ void tracks(){
   step++;
 
     // Calculate magnetisation statistics
-    stats::mag_m();
+    stats::update();
 
     // Output data
     vout::data();
@@ -463,7 +463,7 @@ else {
           sim::integrate(sim::partial_time);
 
           // Calculate magnetisation statistics
-          stats::mag_m();
+          stats::update();
 
           // Output data
           vout::data();
@@ -508,7 +508,7 @@ else {
           sim::integrate(sim::partial_time);
 
           // Calculate magnetisation statistics
-          stats::mag_m();
+          stats::update();
 
           // Output data
           vout::data();

@@ -143,7 +143,7 @@ int field_sweep(){
 			start_time=sim::time;
 
 			// Reset mean magnetisation counters
-			stats::mag_m_reset();
+			stats::reset();
 
 			sim::loop_time = n_steps;
 			// Integrate system
@@ -153,7 +153,7 @@ int field_sweep(){
 				sim::integrate(sim::partial_time);
 
 				// Calculate mag_m, mag
-				stats::mag_m();
+				stats::update();
 
 			} // End of integration loop
 //			sim::iH=int64_t(Hfield); //sim::iH+=iHinc;

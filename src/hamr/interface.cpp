@@ -32,23 +32,14 @@ namespace hamr{
       //----------------------------------
       // Now test for all valid options
       //----------------------------------
-      //--------------------------------------------------------------------
-      std::string test="laser-peak-time";
+      std::string test="laser-FWHM-x";
       std::string test2;
-      if(word==test){
-         double dt = atof(value.c_str());
-         // Test for valid range                                                                                                                            
-         vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
-         hamr::internal::laser_peak_time = dt;
-         return true;
-      }
-      //--------------------------------------------------------------------
-      test="laser-FWHM-x";
       if(word==test){
          double f = atof(value.c_str());
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 5.0e7,"input","0.1 Angstroms - 5 millimetre");
          hamr::internal::fwhm_x = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -58,6 +49,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 5.0e7,"input","0.1 Angstroms - 5 millimetre");
          hamr::internal::fwhm_y = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -67,6 +59,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "velocity", 0.0, 1.0e18,"input","0 Angstroms/s - 100000000 m/s");
          hamr::internal::head_speed = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -76,6 +69,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
          hamr::internal::H_bounds_x = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -85,6 +79,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
          hamr::internal::H_bounds_y = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -94,6 +89,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
          hamr::internal::H_ramp_time = dt;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -103,6 +99,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_int(n, word, line, prefix, 0, 1000, "input", "1 - 1000");
          hamr::internal::num_bits = n;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -113,6 +110,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
          hamr::internal::bit_size = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -123,6 +121,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
          hamr::internal::track_size = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -132,6 +131,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
          hamr::internal::track_padding = f;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -141,11 +141,13 @@ namespace hamr{
          test="single-tone-predefined";
          if(value==test){
             hamr::internal::create_singletone = true;
+            hamr::internal::enabled = true;
             return true;
          }
          test="user-defined";
          if(value==test){
             hamr::internal::create_singletone = false;
+            hamr::internal::enabled = true;
             return true;
          }
          else{
@@ -172,6 +174,7 @@ namespace hamr{
          // Store sanitised vector into bit seuqnce
          hamr::internal::bit_sequence.clear();
          hamr::internal::bit_sequence = u;
+         hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -182,33 +185,7 @@ namespace hamr{
          // Test for valid range
          vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
          hamr::internal::NPS = f;
-         return true;
-      }
-      //--------------------------------------------------------------------
-      test="bit-spacing-x";
-      if(word==test){
-         double f = atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-         hamr::internal::bit_spacing_x = f;
-         return true;                                                                                                                                       
-      }
-      //--------------------------------------------------------------------
-      test="bit-spacing-y";
-      if(word==test){
-         double f = atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-         hamr::internal::bit_spacing_y = f;
-         return true;                                                                                                                                       
-      }
-      //--------------------------------------------------------------------
-      test="field-oscillation-frequency";
-      if(word==test){
-         double f = atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-         hamr::internal::H_osc_amplit = f;
+         hamr::internal::enabled = true;
          return true;
       }
 

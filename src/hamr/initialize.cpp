@@ -41,7 +41,7 @@ namespace hamr{
                   ){
    
 		// If program:hamr-simulation not requested, then stop 
-      if(!hamr::run_program){
+      if(!hamr::internal::enabled){
          return;
       }
 

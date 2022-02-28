@@ -28,6 +28,7 @@
 #include "dipole.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 #include "random.hpp"
 #include "vio.hpp"
@@ -222,7 +223,7 @@ int single_spin_system(){
 void check_hysteresis_loop_parameters(){
 
    // Only applies to hysteresis loop programs, all others return
-   if(sim::program!=12) return;
+   if(program::program!=12) return;
 
    double min=sim::Hmin;
    double max=sim::Hmax;

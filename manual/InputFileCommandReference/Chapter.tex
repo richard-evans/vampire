@@ -220,6 +220,21 @@ m(T) = \langle{\sqrt{\sum_i \sms}}\rangle = \left(1 - \frac{T}{T_{\mathrm{C}}} \
 
 {\zicf sim:program = temperature-pulse}\phantomsection\addcontentsline{toc}{subsubsection}{temperature-pulse}
 
+{\zicf sim:program = electrical-pulse}\phantomsection\addcontentsline{toc}{subsubsection}{temperature-pulse}
+Simulates the effect of an electrical pulse through either spin-transfer (STT) or
+spin-orbit (SOT) torques, or through the spin-transport circuit theory model. The
+system is first equilibrated at constant temperature with zero voltage. A
+trapezium shaped electrical pulse is applied, linearly increasing from zero
+voltage to that defined in the code, held constant, then linearly decreased back
+to zero. In the case of direct STT and SOT simulations, the effective fields are
+scaled in direct proportion with the applied voltage. The pulse duration is
+controlled by the parameter \textit{sim:electrical-pulse-time}
+with a rise time of \textit{sim:electrical-pulse-rise-time} and fall time of
+\textit{sim:electrical-pulse-fall-time}. The default pulse time is 1 ns, and
+default fall and rise times are 0, reproducing a square pulse. The time
+dependence of the fractional voltage can be printed in the output file with the
+parameter \textit{output:fractional-electric-field-strength}.
+
 {\zicf sim:program = cmc-anisotropy}\phantomsection\addcontentsline{toc}{subsubsection}{cmc-anisotropy} Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques.
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
@@ -260,7 +275,7 @@ Number of timesteps between recalculation of the demag field. Default value is s
 {\zicf sim:cooling-time}\phantomsection\addcontentsline{toc}{subsection}{sim:cooling-time}
 
 {\zicf sim:laser-pulse-temporal-profile}\phantomsection\addcontentsline{toc}{subsection}{sim:laser-pulse-temporal-profile} The shape of the laser temperature pulse in time, used in \textit{sim:program = temperature-pulse}.
-  
+
 \begin{itemize}
    \item[] square
    \item[] two-temperature
@@ -286,7 +301,7 @@ Number of timesteps between recalculation of the demag field. Default value is s
 
 {\zicf sim:two-temperature-phonon-heat-capacity}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-phonon-heat-capacity} The heat capacity of the phonons in the system, used in \textit{sim:program = temperature-pulse}.
 
-{\zicf sim:two-temperature-electron-phonon-coupling}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-electron-phonon-coupling} 
+{\zicf sim:two-temperature-electron-phonon-coupling}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-electron-phonon-coupling}
 Dictates the heat exchange coupling between the electrons and the phonons in the system, used in \newline\textit{sim:program = temperature-pulse}.
 
 {\zicf sim:cooling-function}\phantomsection\addcontentsline{toc}{subsection}{sim:cooling-function} Dictates the shape of the cooling curve in \textit{sim:program = field-cool} simulations. Choose from:
@@ -380,6 +395,20 @@ The adaptive move performs a gaussian move with a tuned trial width to attempt t
 \end{itemize}
 
 {\zicf sim:preconditioning-steps = integer [default 0]}\phantomsection\addcontentsline{toc}{subsection}{sim:preconditioning-steps} Defines a number of preconditioning steps to thermalise the spins at sim:equilibration-temperature prior to the main simulation starting. The preconditioner uses a Monte Carlo algorithm to develop a Boltzmann spin distribution prior to the main program starting. The method works in serial and parallel mode and is especially efficient for materials with low Gilbert damping. The preconditioning steps are applied after loading a checkpoint, allowing you to take a low temperature starting state and thermally equilibrate it.
+
+{\zicf sim:electrical-pulse-time = float [default $1.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:electrical-pulse-time}
+Defines the pulse time in the program \textit{electrical-pulse} with default
+units of seconds and a default pulse time of 1 ns.
+
+{\zicf sim:electrical-pulse-rise-time = float [default $0.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:electrical-pulse-rise-time}
+Defines the pulse linear rise time in the program \textit{electrical-pulse} with
+ default units of seconds and a default pulse time of 0, i.e. an instantaneous
+ turning on of the current.
+
+{\zicf sim:electrical-pulse-fall-time = float [default $0.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:electrical-pulse-fall-time}
+Defines the pulse linear fall time in the program \textit{electrical-pulse} with
+ default units of seconds and a default pulse time of 0, i.e. an instantaneous
+ turning off of the current.
 
 \section*{Data output}
 \phantomsection\addcontentsline{toc}{section}{Data output}
@@ -514,6 +543,9 @@ C_{\mathrm{v}} = \frac{\left(\langle U^2 \rangle - \langle U \rangle^2 \right)}{
 \noindent where $U$ is the internal (total) energy, $T$ is the system temperature and $k_{\mathrm{B}}$ is the Boltzmann constant. The outputted value has units of $k_{\mathrm{B}}$ per spin. For classical magnets the specific heat tends to a non-zero constant approaching zero temperature. When using spin temperature rescaling the specific heat tends to zero as expected for a quantum system.
 
 {\zicf output:material-mean-specific-heat}\phantomsection\addcontentsline{toc}{subsection}{output:material-mean-specific-heat} Outputs the mean specific heat for each defined material in the system in units of $k_{\mathrm{B}}$ per spin. The data is formatted as one column per material.
+
+{\zicf output:fractional-electric-field-strength}\phantomsection\addcontentsline{toc}{subsection}{output:fractional-electric-field-strength}
+Outputs the fractional electric field strngth (or voltage) during an \textit{electrical-pulse} simulation.
 
 {\zicf output:mpi-timings}\phantomsection\addcontentsline{toc}{subsection}{output:mpi-timings}
 

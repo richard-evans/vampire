@@ -19,6 +19,7 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
+#include "program.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
 #include "micromagnetic.hpp"
@@ -158,41 +159,12 @@ namespace vout{
 
    // Output Function 14 - with Header
    void systorque(std::ostream& stream, bool header){
-      std::ostringstream res;
-      if(vout::custom_precision){
-         res.precision(vout::precision);
-      }
-      vout::fixed_width_output result(res,vout::fw_size);
-      if(header){
-         result << "Tot_torque_x"
-                << "Tot_torque_y"
-                << "Tot_torque_z";
-      }else{
-         result << stats::total_system_torque[0]
-                << stats::total_system_torque[1]
-                << stats::total_system_torque[2];
-      }
-      stream << result.str();
+      stream << stats::system_torque.output_torque(header);
    }
 
    // Output Function 15 - with Header
    void mean_systorque(std::ostream& stream, bool header){
-      std::ostringstream res;
-      if(vout::custom_precision){
-         res.precision(vout::precision);
-      }
-      vout::fixed_width_output result(res,vout::fw_size);
-      if(header){
-         result << "Mean_torque_x"
-                << "Mean_torque_y"
-                << "Mean_torque_z";
-      }
-      else{
-         result << stats::total_mean_system_torque[0]/stats::torque_data_counter
-                << stats::total_mean_system_torque[1]/stats::torque_data_counter
-                << stats::total_mean_system_torque[2]/stats::torque_data_counter;
-      }
-      stream << result.str();
+      stream << stats::system_torque.output_mean_torque(header);
    }
 
    // Output Function 16 - with Header
@@ -237,26 +209,12 @@ namespace vout{
 
    // Output Function 20
    void material_mean_systorque(std::ostream& stream, bool header){
-      std::ostringstream res;
-      if(vout::custom_precision){
-         res.precision(vout::precision);
-      }
-      vout::fixed_width_output result(res,vout::fw_size);
-      for(int mat=0;mat<mp::num_materials;mat++){
-         if(header){
-            result << "ID" + std::to_string(mat) + "_Mean_tor_x"
-                   << "ID" + std::to_string(mat) + "_Mean_tor_y"
-                   << "ID" + std::to_string(mat) + "_Mean_tor_z";
-         }
-         else{
-            result << stats::sublattice_mean_torque_x_array[mat] / stats::torque_data_counter
-                   << stats::sublattice_mean_torque_y_array[mat] / stats::torque_data_counter
-                   << stats::sublattice_mean_torque_z_array[mat] / stats::torque_data_counter;
-         }
-      }
-      stream << result.str();
+      stream << stats::material_torque.output_mean_torque(header);
    }
 
+   void material_torque(std::ostream& stream, bool header){
+      stream << stats::material_torque.output_torque(header);
+   }
 
    // Output Function 21 - with Header
    void mean_system_susceptibility(std::ostream& stream, bool header){
@@ -538,4 +496,10 @@ namespace vout{
          stream << sim::track_pos_z << "\t";
       }
    }
+
+   // Output Function 72
+   void fractional_electric_field_strength(std::ostream& stream, bool header){
+      stream << generic_output_double("frac_voltage", program::fractional_electric_field_strength, header);
+   }
+
 }

@@ -65,6 +65,7 @@ namespace hamr{
       //-----------------------------------------------------------------------------
       // Shared variables used for hamr calculation
       //-----------------------------------------------------------------------------
+      extern bool enabled; // flag set if initialised
       extern bool initialised; // flag set if initialised
       extern bool create_singletone;
 
@@ -87,13 +88,6 @@ namespace hamr{
       extern double NPS; // NFT to pole spacing
       extern double track_padding;
       extern std::vector<int> bit_sequence;
-      //-----------------------------
-      // Parameters to be removed 
-      extern double H_osc_amplit;
-      extern double laser_peak_time;
-      extern double bit_spacing_x;
-      extern double bit_spacing_y;
-      //-----------------------------
 
       extern int num_local_atoms;
       extern double Hmin;

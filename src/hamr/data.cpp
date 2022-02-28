@@ -22,13 +22,13 @@ namespace hamr{
    // Externally visible variables
    //-----------------------------------------------------------------------------------------------
    bool head_laser_on   = false;
-   bool run_program = false;
 
    namespace internal{
 
       //-----------------------------------------------------------------------------
       // Shared variables used for hamr calculation
       //-----------------------------------------------------------------------------
+      bool enabled = false;
       bool initialised = false;
       bool create_singletone = false;
 
@@ -51,13 +51,6 @@ namespace hamr{
       double NPS = 0.0; // NFT to pole spacing
       double track_padding = 0.0;
       std::vector<int> bit_sequence;
-      //-----------------------------
-      // Parameters to be removed 
-      double H_osc_amplit = H_bounds_x; // A
-      double laser_peak_time = 500.0e-12; //s
-      double bit_spacing_x = 0.0;
-      double bit_spacing_y = 0.0;
-      //-----------------------------
 
       int num_local_atoms;
       double Hmin = 0.0;

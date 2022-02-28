@@ -180,7 +180,7 @@ namespace internal{
       const int num_atoms = ::atoms::num_atoms;
 
       // update hamr fields (Happ and Hth) if program is hamr simulations
-   	if(sim::program==7){
+      if(program::program==7){
          cu::update_hamr_field();
       }
       // Otherwise calculate global thermal field and applied fields

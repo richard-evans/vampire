@@ -26,6 +26,7 @@
 #include "cells.hpp"
 #include "demag.hpp"
 #include "material.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 
 #include "cuda_timer.h"
