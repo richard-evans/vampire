@@ -107,6 +107,9 @@ namespace program{
 			// Set system temperature as minimum temperature
 			sim::temperature=sim::Tmin;
 
+			// Reset mean magnetisation counters
+			stats::mag_m_reset();
+
 			// Perform harm continuous simulation
 			hamr::hamr_continuous();
 
@@ -117,10 +120,12 @@ namespace program{
 			hamr::head_laser_on=false;
 			// Switch off external field 
 			sim::H_applied = 0.0;
+			// Set system temperature as minimum temperature
+			sim::temperature=sim::Tmin;
 			std::cout << " Disabling laser and external field and integrating system for 1 time-step" << std::endl;
 			zlog << zTs() << " Disabling laser and external field and integrating system for 1 time-step" << std::endl;
 			// Integrate
-			sim::integrate(1);
+			sim::integrate(sim::partial_time);
 			// Calculate magnetisation statistics
 			stats::mag_m();
 			// Output data
