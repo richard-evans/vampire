@@ -94,8 +94,24 @@ namespace vcuda{
 				cu_real_t field_z = 0.0;
 
 				// Assign tempeerature to atoms according to Gaussian profile
-				cu_real_t temp = calculate_gaussian_profile(i, atoms_coord_x[i], atoms_coord_y[i], px, py,
-																Tmin, DeltaT, one_over_denx, one_over_deny);
+				// cu_real_t temp = calculate_gaussian_profile(i, atoms_coord_x[i], atoms_coord_y[i], px, py,
+				// 												Tmin, DeltaT, one_over_denx, one_over_deny);
+				//-------------------------------------------//
+				const cu_real_t cx = atoms_coord_x[i];
+				const cu_real_t cy = atoms_coord_y[i];
+				const cu_real_t cx2 = (cx-px)*(cx-px);
+				const cu_real_t cy2 = (cy-py)*(cy-py);
+
+				#ifdef CUDA_DP
+					cu_real_t exp_x =  exp(-cx2*one_over_denx);
+					cu_real_t exp_y =  exp(-cy2*one_over_deny);
+				#else
+					cu_real_t exp_x =  __expf(-cx2*one_over_denx);
+					cu_real_t exp_y =  __expf(-cy2*one_over_deny);
+				#endif
+				const cu_real_t temp = Tmin + DeltaT * exp_x * exp_y;
+
+				//-------------------------------------------//
 				
 				// material dependent temperature rescaling
 				const cu_real_t alpha = mat.temperature_rescaling_alpha;
@@ -111,6 +127,7 @@ namespace vcuda{
       		   float resc_temp = (temp < Tc) ? Tc * __powf(temp / Tc, alpha) : temp;
       		   float rsigma = sigma*sqrtf(resc_temp);
       		#endif
+				// if(fabs(cx-px)<10.0 && fabs(cy-py)<10.0){printf("  %d %lf %lf %lf %lf %lf %lf\n", i, cx, cy, Tmin, DeltaT+Tmin, temp, resc_temp);}
 
       		#ifdef CUDA_DP
       		   field_x = rsigma * curand_normal_double (&local_state);
@@ -134,6 +151,7 @@ namespace vcuda{
 		} // end apply_local_temperature_kernel
 
 
+		// Host Function to calculate local thermal field
 		void apply_local_temperature(const int num_atoms, const double Tmin, const double DeltaT)
 		{
 			const cu_real_t laser_sigma_x2 = cu::hamr::d_laser_sigma_x * cu::hamr::d_laser_sigma_x;
@@ -185,21 +203,47 @@ namespace vcuda{
 					y_field_array[i] += Hy_app;
 					z_field_array[i] += Hz_app;
 				}
-
 			}
-
 			return;
 		} // end apply_local_external_field_kernel
 
 
-		// Function to calculate update hamr field
+		// Host Function to calculate local external field
+		void apply_local_external_field(const int num_atoms)
+		{
+			const cu_real_t Hx_app = sim::H_vec[0]*sim::H_applied;
+			const cu_real_t Hy_app = sim::H_vec[1]*sim::H_applied;
+			const cu_real_t Hz_app = sim::H_vec[2]*sim::H_applied;
+			// Update head position - updated in src/hamr/hamr_continuous.cpp
+			cu::hamr::d_head_position_x = ::hamr::get_head_position_x();
+			cu::hamr::d_head_position_y = ::hamr::get_head_position_y();
+			// Determine bounding box for local applied field
+			const cu_real_t Hloc_min_x = cu::hamr::d_head_position_x - 0.5*cu::hamr::d_H_bounds_x - cu::hamr::d_NPS;
+			const cu_real_t Hloc_max_x = cu::hamr::d_head_position_x + 0.5*cu::hamr::d_H_bounds_x - cu::hamr::d_NPS;
+			const cu_real_t Hloc_min_y = cu::hamr::d_head_position_y - 0.5*cu::hamr::d_H_bounds_y;
+			const cu_real_t Hloc_max_y = cu::hamr::d_head_position_y + 0.5*cu::hamr::d_H_bounds_y;
+
+			apply_local_external_field_kernel <<< cu::grid_size, cu::block_size >>> (
+				cu::atoms::d_x_coord, cu::atoms::d_y_coord,
+				cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
+				Hx_app, Hy_app, Hz_app,
+				Hloc_min_x, Hloc_max_x,
+				Hloc_min_y, Hloc_max_y,
+				num_atoms);
+
+			check_cuda_errors (__FILE__, __LINE__);
+
+			return;
+		} // end of apply_local_external_field
+
+
+		// Host Function to calculate update hamr field
 		void update_hamr_field()
 		{
 			// Check that hamr field calculation has been called
 			if(err::check==true){ std::cout << "calculate_hamr_fields has been called" << std::endl;}
 
 			// copy simulation variables to temporary constants
-			const cu_real_t global_temperature = sim::temperature;
 			const int num_atoms = ::atoms::num_atoms;
 
 			// Calculate local thermal and applied fields if laser is on
@@ -209,49 +253,18 @@ namespace vcuda{
 				const cu_real_t Tmin = sim::Tmin;
 				const cu_real_t Tmax = sim::Tmax;
 				const cu_real_t DeltaT = Tmax - Tmin;
-				const cu_real_t Hx_app = sim::H_vec[0]*sim::H_applied;
-				const cu_real_t Hy_app = sim::H_vec[1]*sim::H_applied;
-				const cu_real_t Hz_app = sim::H_vec[2]*sim::H_applied;
-				// Update head position - updated in src/hamr/hamr_continuous.cpp
-				cu::hamr::d_head_position_x = ::hamr::get_head_position_x();
-				cu::hamr::d_head_position_y = ::hamr::get_head_position_y();
-				// Determine bounding box for local applied field
-				const cu_real_t Hloc_min_x = cu::hamr::d_head_position_x - 0.5*cu::hamr::d_H_bounds_x - cu::hamr::d_NPS;
-				const cu_real_t Hloc_max_x = cu::hamr::d_head_position_x + 0.5*cu::hamr::d_H_bounds_x - cu::hamr::d_NPS;
-				const cu_real_t Hloc_min_y = cu::hamr::d_head_position_y - 0.5*cu::hamr::d_H_bounds_y;
-				const cu_real_t Hloc_max_y = cu::hamr::d_head_position_y + 0.5*cu::hamr::d_H_bounds_y;
-			
 
 				// Apply thermal field
 				apply_local_temperature(num_atoms, Tmin, DeltaT);
-				// apply_local_temperature_kernel <<< cu::grid_size, cu::block_size >>> (
-				// 	cu::atoms::d_x_coord, cu::atoms::d_y_coord,
-				// 	cu::d_x_hamr_th_field, cu::d_y_hamr_th_field, cu::d_z_hamr_th_field,
-				// 	Tmin, DeltaT,
-				// 	laser_sigma_x2, laser_sigma_y2,
-				// 	cu::hamr::d_head_position_x, cu::hamr::d_head_position_y,	 
-				// 	cu::d_rand_state,
-				// 	cu::mp::d_material_params,
-				// 	cu::atoms::d_materials,
-				// 	num_atoms);
-
-				// check_cuda_errors (__FILE__, __LINE__);
 
 				// Apply external field 
-				apply_local_external_field_kernel <<< cu::grid_size, cu::block_size >>> (
-					cu::atoms::d_x_coord, cu::atoms::d_y_coord,
-					cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
-					Hx_app, Hy_app, Hz_app,
-					Hloc_min_x, Hloc_max_x, 
-					Hloc_min_y, Hloc_max_y,
-					num_atoms);
-
-				check_cuda_errors (__FILE__, __LINE__);
+				apply_local_external_field(num_atoms);
 			}
 			// Apply global temperature if laser is off
 			else{
 
-				std::cout << "\tglobal_temperature\t" << global_temperature << std::endl;
+				const cu_real_t global_temperature = sim::temperature;
+
 				cu::apply_global_temperature_kernel <<< cu::grid_size, cu::block_size >>> (
 					cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
 					global_temperature,
@@ -262,7 +275,6 @@ namespace vcuda{
 
 				check_cuda_errors (__FILE__, __LINE__);
 			}
-
 			return;
 		} // end update_hamr_field
 
