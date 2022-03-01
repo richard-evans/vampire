@@ -67,12 +67,19 @@ void command( int argc, char* argv[] ){
       else if (sw == "--povray"){ vdc::povray = true; } // pov coordinate file output
       else if (sw == "--vtk"   ){ vdc::vtk    = true; } // vtk coordinate file output
       else if (sw == "--text"  ){ vdc::txt    = true; } // plain text file output
-      else if (sw == "--cells" ){ vdc::cells  = true; }
+      else if (sw == "--cells" ){ // cell raw data
+         vdc::cells  = true; // calculate cell data
+         vdc::cellsf = true; // output cell data file
+      }
+      else if (sw == "--povray-cells" ){ // povray cell data
+         vdc::cells  = true; // calculate cell data
+         vdc::povcells = true; // enable povray cells output
+      }
       else if (sw == "--ssc" || sw == "--spin-spin-correlation"){ vdc::ssc = true; }
       //------------------------------------------------------------------------
       // Check for cell size
       //------------------------------------------------------------------------
-      else if (sw == "--cell-size"){
+      /*else if (sw == "--cell-size"){
          // check number of args not exceeded
          check_arg(arg, argc, argv, temp_str, "Error - size of cells in Angstroms." );
 
@@ -82,7 +89,7 @@ void command( int argc, char* argv[] ){
             std::cerr << "Error - cell size must be greater than 0.5 Angstroms." << std::endl;
             std::exit(EXIT_FAILURE);
          }
-      }
+      }*/
       //------------------------------------------------------------------------
       // Check for verbose output
       //------------------------------------------------------------------------
@@ -140,7 +147,7 @@ void command( int argc, char* argv[] ){
 
             std::string delimiters = ",(){}[]:=!";
             std::string temp_val;
-         
+
             // stop adding arguments when a command line paramter is reached (i.e. something starting with -- or -h)
             while ( !(temp_str[0] == '-' && (temp_str[1] == '-' || std::isalpha(temp_str[1]))) ){
 
@@ -155,7 +162,7 @@ void command( int argc, char* argv[] ){
 
                      // in case delimiters follow each other
                      if (temp_val == ""){ continue; }
-                     
+
                      // add to values
                      input.value.push_back(temp_val);
 
@@ -167,7 +174,7 @@ void command( int argc, char* argv[] ){
                }
 
                // push back last value if not empty and clear temp_val
-               if (temp_val != ""){ 
+               if (temp_val != ""){
                   input.value.push_back(temp_val);
                   temp_val.clear();
                }
@@ -186,7 +193,7 @@ void command( int argc, char* argv[] ){
          if (input.key.find("slice") == std::string::npos){
             vdc::cmdl_parameters.push_back(input.key);
          }
-         
+
 
          // set parameters using function wrapper and arguments
          vdc::key_list.at(input.key)(input);

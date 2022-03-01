@@ -24,7 +24,9 @@ namespace vdc{
    bool verbose  = false; // flag to specify verbosity of output to user
    bool xyz      = false; // flag to specify crystal.xyz file output
    bool povray   = false; // flag to specify povray file output
+   bool povcells = false; // flag to specify povray cells output
    bool cells    = false; // flag to specify cells output
+   bool cellsf   = false; // flag to output cell file
    bool vtk      = false; // flag to specify vtk output
    bool ssc      = false; // flag to specify spin-spin correlation
    bool txt      = false; // flag to specify plain text output
@@ -97,7 +99,7 @@ namespace vdc{
    std::vector<double> nm_coordinates(0);
 
    // cell data
-   double cell_size = 10.0; // Angstroms
+   double cell_size[3] = { 10.0, 10.0, 10.0 }; // Angstroms
    unsigned int total_cells = 0;
    unsigned int nx_cells = 1;
    unsigned int ny_cells = 1;
@@ -144,6 +146,8 @@ namespace vdc{
       {"slice-sphere"  , set_slice_sphere},
       {"sphere-slice"  , set_slice_sphere},
       {"slice-cylinder", set_slice_cylinder},
+      // cells
+      {"cell-size", set_cell_size},
       // colourmap
       {"vector-z" , set_vector_z},
       {"z-vector" , set_vector_z},

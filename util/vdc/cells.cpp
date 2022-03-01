@@ -34,7 +34,9 @@ namespace vdc{
       double atoms_min[3] = { 1.0e123, 1.0e123, 1.0e123 };
       double atoms_max[3] = { 0.0, 0.0, 0.0 };
 
-      const double cell_size = vdc::cell_size; // cell size (angstroms)
+      const double cell_size_x = vdc::cell_size[0]; // cell size (angstroms)
+      const double cell_size_y = vdc::cell_size[1]; // cell size (angstroms)
+      const double cell_size_z = vdc::cell_size[2]; // cell size (angstroms)
 
       // calculate minima and maxima
       for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
@@ -57,9 +59,9 @@ namespace vdc{
       }
 
       // calculate number of cells
-      unsigned int nx = ceil( (atoms_max[0] - atoms_min[0])/cell_size );
-      unsigned int ny = ceil( (atoms_max[1] - atoms_min[1])/cell_size );
-      unsigned int nz = ceil( (atoms_max[2] - atoms_min[2])/cell_size );
+      unsigned int nx = ceil( (atoms_max[0] - atoms_min[0])/cell_size_x );
+      unsigned int ny = ceil( (atoms_max[1] - atoms_min[1])/cell_size_y );
+      unsigned int nz = ceil( (atoms_max[2] - atoms_min[2])/cell_size_z );
 
       // check for zero cell size and ensure a minimum of 1 cell in x,y,z
       if( nx == 0 ) nx = 1;
@@ -98,9 +100,9 @@ namespace vdc{
                supercell_array[i][j][k]=cell;
 
                // calculate cell coordinates
-               init_cell_coords[3*cell + 0] = (double(i) + 0.0) * cell_size;
-               init_cell_coords[3*cell + 1] = (double(j) + 0.0) * cell_size;
-               init_cell_coords[3*cell + 2] = (double(k) + 0.0) * cell_size;
+               init_cell_coords[3*cell + 0] = (double(i) + 0.0) * cell_size_x;
+               init_cell_coords[3*cell + 1] = (double(j) + 0.0) * cell_size_y;
+               init_cell_coords[3*cell + 2] = (double(k) + 0.0) * cell_size_z;
 
                // increment cell number
                cell++;
@@ -131,9 +133,9 @@ namespace vdc{
                          vdc::coordinates[3*atom+2] - atoms_min[2] };
 
          // Determine supercell coordinates for atom (rounding down)
-         int scc[3] = { int( c[0] / cell_size ),
-                        int( c[1] / cell_size ),
-                        int( c[2] / cell_size ) };
+         int scc[3] = { int( c[0] / cell_size_x ),
+                        int( c[1] / cell_size_y ),
+                        int( c[2] / cell_size_z ) };
 
          // check super cell coordinates are in range
          /*bool error = false;
@@ -277,7 +279,10 @@ namespace vdc{
             else mm < 1.0e-9 ? 0.0 : vdc::cell_magnetization[cell][m][3] = norm/mm; // m/m_s
 
          }
-	 }
+      }
+
+      // only output cells file if needed
+      if(vdc::cellsf){
 
       // output cells to disk
       std::ofstream ofile;
@@ -318,6 +323,8 @@ namespace vdc{
       ofile.close();
 
       std::cout << "done!" << std::endl;
+
+      }
 
       return;
 

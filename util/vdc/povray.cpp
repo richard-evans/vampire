@@ -234,7 +234,7 @@ void output_povray_file(){
 	for(unsigned int imat=0; imat < vdc::materials.size(); imat++){
       if (std::find(remove_materials.begin(), remove_materials.end(), imat+1) == remove_materials.end() ){
          if(is_nm_mat[imat] == false){
-            // sscale affects the spin arrow 
+            // sscale affects the spin arrow
       		pfile << "#declare sscale" << imat << "=" << vdc::arrow_sizes[imat] << ";" << std::endl;
             // rscale affects sphere(atom) size
       		pfile << "#declare rscale" << imat << "=" << vdc::atom_sizes[imat]  << ";" << std::endl;

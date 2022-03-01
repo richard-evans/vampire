@@ -29,7 +29,9 @@ namespace vdc{
    extern bool verbose;
    extern bool xyz;
    extern bool povray;
+   extern bool povcells;
    extern bool cells;
+   extern bool cellsf;
    extern bool vtk;
    extern bool ssc; // flag to specify spin-spin correlation
    extern bool txt;
@@ -130,7 +132,7 @@ namespace vdc{
    extern std::vector<double> nm_coordinates;
 
    // cell data
-   extern double cell_size; // Angstroms
+   extern double cell_size[3]; // Angstroms
    extern unsigned int total_cells;
    extern unsigned int nx_cells;
    extern unsigned int ny_cells;
@@ -175,7 +177,7 @@ namespace vdc{
 
    // VTK
    void output_vtk_file(unsigned int spin_file_id);
-   
+
    // TXT
    void output_txt_file(unsigned int spin_file_id);
 
@@ -183,7 +185,9 @@ namespace vdc{
    void initialise_povray();
    void output_inc_file(unsigned int spin_file_id);
    void output_povray_file();
-   
+   void output_cells_inc_file(unsigned int spin_file_id);
+   void output_povray_cells_file();
+
    // Colour
    void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
    void initialise_colourwheel();
@@ -193,7 +197,7 @@ namespace vdc{
    void initialise_ssc();
    void output_average_ssc_file();
    void output_ssc_file(unsigned int spin_file_id);
- 
+
 
    // CELL
    void initialise_cells();
@@ -206,10 +210,11 @@ namespace vdc{
    void set_afm(const input_t &input);
    void set_slice(const input_t &input);
    void set_slice_void(const input_t &input);
-   void set_slice_sphere(const input_t &input); 
+   void set_slice_sphere(const input_t &input);
    void set_slice_cylinder(const input_t &input);
    void set_vector_z(const input_t &input);
    void set_vector_x(const input_t &input);
+   void set_cell_size(const input_t &input);
    void set_colourmap(const input_t &input);
    void set_custom_colourmap(const input_t &input);
    void set_3D(const input_t &input);

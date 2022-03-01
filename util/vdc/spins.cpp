@@ -41,7 +41,11 @@ void process_spins(){
 
    if(vdc::ssc) vdc::initialise_ssc();
 
-   if(vdc::povray) vdc::initialise_povray();
+   if(vdc::povray || vdc::povcells ) vdc::initialise_povray();
+
+   // output povray file
+   if(vdc::povray) output_povray_file();
+   if(vdc::povcells) output_povray_cells_file();
 
    unsigned int last_file_id = max_file_id;
 
@@ -57,10 +61,12 @@ void process_spins(){
       // read coordinate data
       vdc::read_spin_data();
 
-      // output povray file
-      if(vdc::povray) output_inc_file(file_id);
-
+      // output cells raw data
       if(vdc::cells) vdc::output_cell_file(file_id);
+
+      // output povray files
+      if(vdc::povray) output_inc_file(file_id);
+      if(vdc::povcells) output_cells_inc_file(file_id);
 
       // output vtk file
       if(vdc::vtk) output_vtk_file(file_id);
@@ -78,9 +84,6 @@ void process_spins(){
    // set global start and end file id
    vdc::start_file_id = min_file_id;
    vdc::final_file_id = last_file_id;
-
-   // output povray file
-   if(vdc::povray) output_povray_file();
 
    // output average ssc
    if(vdc::ssc) output_average_ssc_file();

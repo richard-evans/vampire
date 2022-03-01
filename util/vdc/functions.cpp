@@ -161,7 +161,7 @@ void set_slice(const input_t &input){
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){ 
+      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){
          error_message(input,"fractional coords must be in range (0,1)");
       }
    }
@@ -198,7 +198,7 @@ void set_slice_void(const input_t &input){
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){ 
+      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){
          error_message(input,"fractional coords must be in range (0,1)");
       }
    }
@@ -272,8 +272,8 @@ void set_slice_cylinder(const input_t &input){
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){ 
-         error_message(input,"fractional coords must be in range (0,1)"); 
+      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){
+         error_message(input,"fractional coords must be in range (0,1)");
       }
    }
 
@@ -398,7 +398,7 @@ void set_custom_colourmap(const input_t &input){
                 << "Povray uses User defined colourmap. Filename must contain 256 colours in RGB format:\n"
                 << "3 columns of space separated reals in range (0,1).\n\n"
                 << "Default: [not set]\n"
-                << "Example usage: custom_colourmap = colourmapfile.txt \n";       
+                << "Example usage: custom_colourmap = colourmapfile.txt \n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -473,8 +473,8 @@ void set_camera_look_at(const input_t &input){
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (vdc::camera_look_at[i] < -1.000001 || vdc::camera_look_at[i] > 1.000001){ 
-         error_message(input,"fractional coords must be in range (-1,1)"); 
+      if (vdc::camera_look_at[i] < -1.000001 || vdc::camera_look_at[i] > 1.000001){
+         error_message(input,"fractional coords must be in range (-1,1)");
       }
    }
 }
@@ -543,7 +543,7 @@ void set_atom_sizes(const input_t &input){
       std::cout << "\"atom-sizes\"\tExpects 1 or more arguments: positive real\n\n"
                 << "Povray atom sizes. Atoms are represented by spheres with a defined radius.\n"
                 << "Individual materials can have different atom sizes.\n\n"
-                << "Default: all atoms are set to " << vdc::atom_sizes[0] 
+                << "Default: all atoms are set to " << vdc::atom_sizes[0]
                 << "\nExample usage: atom-sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -561,7 +561,7 @@ void set_atom_sizes(const input_t &input){
 
       // check range
       if (vdc::atom_sizes.back() <= 0.0){
-         error_message(input,"atom size must be greater than 0.0"); 
+         error_message(input,"atom size must be greater than 0.0");
       }
    }
 }
@@ -576,7 +576,7 @@ void set_arrow_sizes(const input_t &input){
       std::cout << "\"arrow-sizes\"\tExpects 1 or more arguments: positive real\n\n"
                 << "Povray arrow sizes.\n"
                 << "Individual materials can have different arrow sizes.\n\n"
-                << "Default: all arrows are set to " << vdc::arrow_sizes[0] 
+                << "Default: all arrows are set to " << vdc::arrow_sizes[0]
                 << "\nExample usage: arrow-sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -594,9 +594,32 @@ void set_arrow_sizes(const input_t &input){
 
       // check range
       if (vdc::arrow_sizes.back() <= 0.0){
-         error_message(input,"atom size must be greater than 0.0");  
+         error_message(input,"atom size must be greater than 0.0");
       }
    }
+}
+
+//----------------------------------------------------------------------------------
+// Set cell size components for cells output
+//----------------------------------------------------------------------------------
+void set_cell_size(const input_t &input){
+
+   // print help message if argument is "-h"
+   if (input.value[0] == "-h"){
+      std::cout << "\"cell-size\"\tExpects 3 arguments: real (brackets and comma optional)\n\n"
+                << "Set cell sizes in x,y,z in Angstroms\n\n"
+                << "Default: cell-size = {10.0,10.0,10.0}\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,3,"eq");
+
+   for (int i=0; i<3; i++){
+      try { vdc::cell_size[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
+   }
+
 }
 
 // bookkeeping functino to check number of args provided is correct
@@ -608,13 +631,13 @@ void arg_count(const input_t &input, size_t args_required, std::string requireme
    // location message for input file or command line parameters
    std::string location_message;
    if (input.line_number == -1){ location_message = "' passed in the command line\n"; }
-   else { location_message = "' on line " + std::to_string(input.line_number) + " of input file '" + vdc::input_file + "'\n"; } 
+   else { location_message = "' on line " + std::to_string(input.line_number) + " of input file '" + vdc::input_file + "'\n"; }
 
    if (requirement == "eq"){
       if (num_args == args_required){ return; }
       else {
          std::cerr << "Error - expected " << args_required << " arguments in '" << input.key
-                   << location_message << "Instead got " << num_args << "\n"; 
+                   << location_message << "Instead got " << num_args << "\n";
       }
    }
    else if (requirement == "ge"){
@@ -629,7 +652,7 @@ void arg_count(const input_t &input, size_t args_required, std::string requireme
       std::cerr << "Bad requirement: " << requirement << std::endl;
       std::exit(EXIT_FAILURE);
    }
-   
+
    std::exit(EXIT_FAILURE);
 }
 
@@ -642,7 +665,7 @@ void error_message(const input_t &input, std::string message){
    else { location_message = "' on line " + std::to_string(input.line_number) + " of input file '" + vdc::input_file + "'\n"; }
 
    std::cerr << "Error - " << message << " in '" << input.key << location_message;
-   
+
    std::exit(EXIT_FAILURE);
 }
 

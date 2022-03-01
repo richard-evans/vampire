@@ -26,6 +26,7 @@ obj/functions.o \
 obj/main.o \
 obj/non_magnetic.o \
 obj/povray.o \
+obj/povray-cells.o \
 obj/read.o \
 obj/spins.o \
 obj/ssc.o \
@@ -55,7 +56,7 @@ $(GCCDB_OBJECTS): obj/%_gdb.o: ./%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $(OMP_FLAGS) $<
 
 $(OBJECTS): obj/%.o: ./%.cpp
-	$(GCC) -c -o $@ $(GCC_CFLAGS) $< 
+	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
 clean:
 	@rm -f obj/*.o
