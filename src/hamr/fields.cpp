@@ -60,7 +60,9 @@ namespace hamr{
 
 		if(hamr::head_laser_on){
 			
-			for(int atom=start_index;atom<end_index;atom++){
+			// Apply local temperature field
+			hamr::internal::apply_temperature_profile(start_index, end_index, Tmin, DeltaT);
+			/* for(int atom=start_index;atom<end_index;atom++){
 
 				const int imaterial=hamr::internal::atom_type_array[atom];
 			   double alpha = mp::material[imaterial].temperature_rescaling_alpha;
@@ -77,7 +79,7 @@ namespace hamr{
 				hamr::internal::x_field_array[atom] *= H_th_sigma;
 				hamr::internal::y_field_array[atom] *= H_th_sigma;
 				hamr::internal::z_field_array[atom] *= H_th_sigma;
-			}
+			} */
 
 			// Add localised applied field
 			hamr::internal::apply_field_spatial_box(start_index, end_index, 

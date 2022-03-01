@@ -31,6 +31,8 @@ namespace hamr{
                                        const double Tmin, 
                                        const double DeltaT); 
 
+      void apply_temperature_profile(const int start_index, const int end_index, const double Tmin, const double DeltaT);
+
       //-----------------------------------------------------------------------------
       // Function to calculate the external field with trapezoidal temporal profile
       //-----------------------------------------------------------------------------

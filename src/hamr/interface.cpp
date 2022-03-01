@@ -87,7 +87,7 @@ namespace hamr{
       if(word==test){
          double dt = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
+         vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0,"input","0.01 attosecond - 1 second");
          hamr::internal::H_ramp_time = dt;
          hamr::internal::enabled = true;
          return true;
