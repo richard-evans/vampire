@@ -353,6 +353,9 @@ void legacy_cells()
    // wait for all processes
    vmpi::barrier();
 
+   // update cells magnetization
+   cells::mag();
+
    // instantiate timer
    vutil::vtimer_t timer;
 
@@ -408,8 +411,17 @@ void legacy_cells()
 
       // Root process now outputs the cell magnetisations
       for (int cell = 0; cell < cells::num_cells; cell++){
+         // get cells magnetization
+         const double mx = cells::mag_array_x[cell]*inv_muB;
+         const double my = cells::mag_array_y[cell]*inv_muB;
+         const double mz = cells::mag_array_z[cell]*inv_muB;
+         const double mm = sqrt(mx*mx + my*my + mz*mz); // actual vector length (Bohr magnetons)
+         const double imm = 1.0/mm;
+         const double rm = mm / cells::pos_and_mom_array[4*cell+3]/inv_muB; // relative moment
+
+         // only output cells with magnetic moments
          if (cells::num_atoms_in_cell_global[cell] > 0){
-            cfg_file_ofstr << cells::mag_array_x[cell]*inv_muB << "\t" << cells::mag_array_y[cell]*inv_muB << "\t" << cells::mag_array_z[cell]*inv_muB << "\t";
+            cfg_file_ofstr << mx*imm << "\t" << my*imm << "\t" << mz*imm << "\t" << rm << "\t" << mm << "\t";
             if(dipole::activated) cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << "\n";
             else cfg_file_ofstr << "\n";
          }
@@ -520,10 +532,32 @@ void legacy_cells_coords()
 
       config::internal::total_output_cells = 0;
 
+      const double inv_muB = 1.0 / constants::muB;
+
       for (int cell = 0; cell < cells::num_cells; cell++){
+         // only output cells with magnetic moments
          if (cells::num_atoms_in_cell_global[cell] > 0){
-            cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell_global[cell] << "\t" << cells::pos_and_mom_array[4 * cell + 0] << "\t" << cells::pos_and_mom_array[4 * cell + 1] << "\t" << cells::pos_and_mom_array[4 * cell + 2] << std::endl;
+            const double nm = cells::num_atoms_in_cell_global[cell];
+            const double cx = cells::pos_and_mom_array[4 * cell + 0];
+            const double cy = cells::pos_and_mom_array[4 * cell + 1];
+            const double cz = cells::pos_and_mom_array[4 * cell + 2];
+            const double mm = cells::pos_and_mom_array[4 * cell + 3]*inv_muB;
+            // calculate cell corners
+            const double cxp = cx + cells::macro_cell_size_x * 0.5;
+            const double cyp = cy + cells::macro_cell_size_y * 0.5;
+            const double czp = cz + cells::macro_cell_size_z * 0.5;
+            const double cxm = cx - cells::macro_cell_size_x * 0.5;
+            const double cym = cy - cells::macro_cell_size_y * 0.5;
+            const double czm = cz - cells::macro_cell_size_z * 0.5;
+
+            cfg_file_ofstr << cell << "\t" << nm << "\t" << mm  << "\t"
+                           << cx  << "\t" << cy  << "\t" << cz  << "\t"
+                           << cxm << "\t" << cym << "\t" << czm << "\t"
+                           << cxp << "\t" << cyp << "\t" << czp << std::endl;
+
+            // increment cell counter
             config::internal::total_output_cells++;
+
          }
       }
       cfg_file_ofstr.close();

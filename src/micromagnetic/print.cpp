@@ -48,6 +48,7 @@ void output_system_parameters(std::vector<double>& pos_and_mom_array,
             << pos_and_mom_array[4*cell+1] << "\t"
             << pos_and_mom_array[4*cell+2] << "\t"
             << pos_and_mom_array[4*cell+3] << "\t"
+            // normalised magnetization
             << x_mag_array[cell]/pos_and_mom_array[4*cell+3] << "\t"
             << y_mag_array[cell]/pos_and_mom_array[4*cell+3] << "\t"
             << z_mag_array[cell]/pos_and_mom_array[4*cell+3] << "\t"
