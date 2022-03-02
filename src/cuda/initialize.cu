@@ -734,9 +734,10 @@ namespace vcuda{
             _materials[i].mu_s_si   = mu_s_SI;
             _materials[i].i_mu_s_si = 1.0 / mu_s_SI;
             _materials[i].k_latt = 0.0; //::mp::material[i].Klatt_SI / mu_s_SI;
-            _materials[i].sh2 = ku2;// / mu_s_SI;
-            _materials[i].sh4 = ku4;
-            _materials[i].sh6 = ku6;
+            _materials[i].sh2 = ku2 * _materials[i].i_mu_s_si;// J/T 
+            _materials[i].sh4 = ku4 * _materials[i].i_mu_s_si;
+            _materials[i].sh6 = ku6 * _materials[i].i_mu_s_si;
+            _materials[i].kc4 = kc4 * _materials[i].i_mu_s_si;
             _materials[i].anisotropy_unit_x = ku_vector[0];
             _materials[i].anisotropy_unit_y = ku_vector[1];
             _materials[i].anisotropy_unit_z = ku_vector[2];
@@ -744,7 +745,6 @@ namespace vcuda{
             _materials[i].applied_field_unit_x   = ::mp::material[i].applied_field_unit_vector[0];
             _materials[i].applied_field_unit_y   = ::mp::material[i].applied_field_unit_vector[1];
             _materials[i].applied_field_unit_z   = ::mp::material[i].applied_field_unit_vector[2];
-            _materials[i].kc4 = kc4;
             _materials[i].temperature = ::mp::material[i].temperature;
             _materials[i].temperature_rescaling_alpha = ::mp::material[i].temperature_rescaling_alpha;
             _materials[i].temperature_rescaling_Tc    = ::mp::material[i].temperature_rescaling_Tc;
