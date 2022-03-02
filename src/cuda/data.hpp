@@ -139,17 +139,6 @@ namespace vcuda
       extern cu_real_t *d_y_mu0H_dip_field;
       extern cu_real_t *d_z_mu0H_dip_field;
 
-      extern cu_real_t *d_x_applied_field;
-      extern cu_real_t *d_y_applied_field;
-      extern cu_real_t *d_z_applied_field;
-
-      extern cu_real_t *d_x_hamr_field;
-      extern cu_real_t *d_y_hamr_field;
-      extern cu_real_t *d_z_hamr_field;
- 
-      extern cu_real_t *d_x_thermal_field;
-      extern cu_real_t *d_y_thermal_field;
-      extern cu_real_t *d_z_thermal_field;
 
       /*
        * Required by the total external field calculator

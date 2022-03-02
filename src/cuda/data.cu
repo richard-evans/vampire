@@ -142,17 +142,6 @@ namespace vcuda{
       cu_real_t *d_y_mu0H_dip_field;
       cu_real_t *d_z_mu0H_dip_field;
 
-      cu_real_t *d_x_applied_field;
-      cu_real_t *d_y_applied_field;
-      cu_real_t *d_z_applied_field;
-
-      cu_real_t *d_x_hamr_field;
-      cu_real_t *d_y_hamr_field;
-      cu_real_t *d_z_hamr_field;
-
-      cu_real_t *d_x_thermal_field;
-      cu_real_t *d_y_thermal_field;
-      cu_real_t *d_z_thermal_field;
 
       /*cu_real_array_t x_total_spin_field_array(0UL);
       cu_real_array_t y_total_spin_field_array(0UL);

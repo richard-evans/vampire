@@ -164,7 +164,7 @@ namespace vcuda{
 			// Apply thermal field
 			apply_local_temperature_kernel <<< cu::grid_size, cu::block_size >>> (
 				cu::atoms::d_x_coord, cu::atoms::d_y_coord,
-				cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
+				cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
 				Tmin, DeltaT,
 				one_over_denx, one_over_deny,
 				cu::hamr::d_head_position_x, cu::hamr::d_head_position_y,	 
@@ -225,7 +225,7 @@ namespace vcuda{
 
 			apply_local_external_field_kernel <<< cu::grid_size, cu::block_size >>> (
 				cu::atoms::d_x_coord, cu::atoms::d_y_coord,
-				cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
+				cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
 				Hx_app, Hy_app, Hz_app,
 				Hloc_min_x, Hloc_max_x,
 				Hloc_min_y, Hloc_max_y,
@@ -266,7 +266,7 @@ namespace vcuda{
 				const cu_real_t global_temperature = sim::temperature;
 
 				cu::apply_global_temperature_kernel <<< cu::grid_size, cu::block_size >>> (
-					cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
+					cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
 					global_temperature,
 					cu::d_rand_state,
 					cu::mp::d_material_params,

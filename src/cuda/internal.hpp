@@ -121,9 +121,6 @@ namespace vcuda{
 
       __global__ void update_external_fields_kernel (
             cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
-            cu_real_t * x_hamr_field, cu_real_t * y_hamr_field, cu_real_t * z_hamr_field,
-            cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
-            cu_real_t * x_applied_field, cu_real_t * y_applied_field, cu_real_t * z_applied_field,
             cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
             int num_atoms
             );

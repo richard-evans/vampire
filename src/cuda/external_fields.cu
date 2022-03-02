@@ -66,9 +66,9 @@ namespace internal{
          field_y += Hy_app;
          field_z += Hz_app;
 
-   	   x_field_array[atom] = field_x;
-   	   y_field_array[atom] = field_y;
-   	   z_field_array[atom] = field_z;
+   	   x_field_array[atom] += field_x;
+   	   y_field_array[atom] += field_y;
+   	   z_field_array[atom] += field_z;
    	}
    } // end calculate_applied_fields_kernel
 
@@ -85,7 +85,7 @@ namespace internal{
    	const int num_atoms = ::atoms::num_atoms;
 
    	update_applied_fields_kernel <<< cu::grid_size, cu::block_size >>> (
-   		cu::d_x_applied_field, cu::d_y_applied_field, cu::d_z_applied_field,
+   		cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
          Hx_app, Hy_app, Hz_app,
          cu::atoms::d_materials, cu::mp::d_material_params,
    		num_atoms); 
@@ -101,9 +101,6 @@ namespace internal{
    //------------------------------------------------------------------------------
    __global__ void update_external_fields_kernel (
          cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
-         cu_real_t * x_hamr_field, cu_real_t * y_hamr_field, cu_real_t * z_hamr_field,
-         cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
-         cu_real_t * x_applied_field, cu_real_t * y_applied_field, cu_real_t * z_applied_field,
          cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
          int n_atoms
          )
@@ -115,45 +112,14 @@ namespace internal{
             atom < n_atoms;
             atom += blockDim.x * gridDim.x){
 
-         // initialize registers for total external field
-         cu_real_t field_x = 0.0;
-         cu_real_t field_y = 0.0;
-         cu_real_t field_z = 0.0;
-
-         // Hamr fields
-         field_x += x_hamr_field[atom];
-         field_y += y_hamr_field[atom];
-         field_z += z_hamr_field[atom];
-      //   if(atom<5){printf("  %d  %lf  %lf  %lf\n",atom,x_hamr_field[atom],y_hamr_field[atom],z_hamr_field[atom]);}
-
-         // Thermal fields
-         field_x += x_thermal_field[atom];
-         field_y += y_thermal_field[atom];
-         field_z += z_thermal_field[atom];
-         // if(atom<5){printf("    %d  %lf  %lf  %lf\n",atom,x_thermal_field[atom],y_thermal_field[atom],z_thermal_field[atom]);}
-
-   		// Applied fields
-         field_x += x_applied_field[atom];
-         field_y += y_applied_field[atom];
-         field_z += z_applied_field[atom];
-         // if(atom<5){printf("      %d  %lf  %lf  %lf\n",atom,x_applied_field[atom],y_applied_field[atom],z_applied_field[atom]);}
-
          /*
          * TODO: FMR fields?
          */
 
-         /*
-         * Dipolar fields
-         */
-         field_x += x_dip_field[atom];
-         field_y += y_dip_field[atom];
-         field_z += z_dip_field[atom];
-         // if(atom<5){ printf("        %d  %lf  %lf  %lf\n",atom,x_dip_field[atom],y_dip_field[atom],z_dip_field[atom]);}
-
-         // Write back to main memory
-         x_ext_field[atom] = field_x;
-         y_ext_field[atom] = field_y;
-         z_ext_field[atom] = field_z;
+			// Add dipolar fields
+         x_ext_field[atom] += x_dip_field[atom];
+         y_ext_field[atom] += y_dip_field[atom];
+         z_ext_field[atom] += z_dip_field[atom];
 
       }
    }
@@ -195,9 +161,6 @@ namespace internal{
       // Call kernel to calculate external fields
       cu::update_external_fields_kernel <<< cu::grid_size, cu::block_size >>> (
             cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
-            cu::d_x_hamr_field, cu::d_y_hamr_field, cu::d_z_hamr_field,
-            cu::d_x_thermal_field, cu::d_y_thermal_field, cu::d_z_thermal_field,
-            cu::d_x_applied_field, cu::d_y_applied_field, cu::d_z_applied_field,
             cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
             num_atoms);
 

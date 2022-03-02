@@ -21,7 +21,7 @@
 #include "cuda_utils.hpp"
 #include "data.hpp"
 #include "internal.hpp"
-#include "thermal_fields.hpp"
+// #include "thermal_fields.hpp"
 #include "typedefs.hpp"
 
 // Conditional compilation of all cuda code
@@ -56,10 +56,8 @@ namespace vcuda{
 			// Determine field 
 			#ifdef CUDA_DP
 				double field_tmp = rsigma * curand_normal_double (&local_state);
-				// field = rsigma * curand_normal_double (&local_state);
 			#else
 			   float field_tmp = rsigma * curand_normal(&local_state);
-			   // field = rsigma * curand_normal(&local_state);
 			#endif
 
 			field = field_tmp;
@@ -89,21 +87,6 @@ namespace vcuda{
 
 				// Load the curand state into local memory
 				curandState local_state = rand_states[tid];
-
-				// // Initialise register to hold total field
-				// cu_real_t field_th = 0.0;
-
-				// // material dependent temperature rescaling
-				// const cu_real_t alpha = mat.temperature_rescaling_alpha;
-				// const cu_real_t Tc    = mat.temperature_rescaling_Tc;
-				// const cu_real_t sigma = mat.H_th_sigma;
-
-				// // Compute thermal field
-				// field_th = calculate_thermal_field(temperature, alpha, Tc, sigma, local_state);
-
-				// x_field_array[i] = field_th;
-				// y_field_array[i] = field_th;
-				// z_field_array[i] = field_th;
 
 				cu_real_t field_x = 0.0;
 				cu_real_t field_y = 0.0;
@@ -157,7 +140,7 @@ namespace vcuda{
 			const int num_atoms = ::atoms::num_atoms;
 
 			apply_global_temperature_kernel <<< cu::grid_size, cu::block_size >>> (
-				cu::d_x_thermal_field, cu::d_y_thermal_field, cu::d_z_thermal_field,
+				cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
 				global_temperature,
 				cu::d_rand_state,
 				cu::mp::d_material_params,
