@@ -38,9 +38,9 @@ void write_grain_file(){
          // check for open ofstream
          if(vout::grain::output_list.size() > 0 && !zgrain.is_open()){
             // check for checkpoint continue and append data
-            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain",std::ofstream::app);
+            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain.txt",std::ofstream::app);
             // otherwise overwrite file
-            else zgrain.open("grain",std::ofstream::trunc);
+            else zgrain.open("grain.txt",std::ofstream::trunc);
          }
 
          // loop over all data in the output data list
