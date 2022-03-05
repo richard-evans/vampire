@@ -38,7 +38,6 @@ namespace vout{
 	// Namespace variable declarations
 	std::vector<unsigned int> file_output_list(0);
 	std::vector<unsigned int> screen_output_list(0);
-	std::vector<unsigned int> grain_output_list(0);
 
 	// Variables to control rate of data output to screen, output file and grain file
 	int output_rate=1;
@@ -46,5 +45,14 @@ namespace vout{
 	//int output_screen_rate=1; needs to be implemented
 
 	bool gnuplot_array_format=false;
+
+   namespace grain{
+
+      // internal variables
+      int output_rate; // rate of output compared to calculation
+
+      // grain output list
+      std::vector<grain::output_t> output_list(0);
+   }
 
 }

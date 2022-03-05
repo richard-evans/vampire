@@ -133,7 +133,7 @@ void susceptibility_statistic_t::reset_averages(){
 //------------------------------------------------------------------------------------------------------
 // Function to output mean susceptibility values as string
 //------------------------------------------------------------------------------------------------------
-std::string susceptibility_statistic_t::output_mean_susceptibility(const double temperature,bool header){
+std::string susceptibility_statistic_t::output_mean_susceptibility(const double temperature, bool header){
 
    // result string stream
    std::ostringstream res;
@@ -143,34 +143,36 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
       res.precision(vout::precision);
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    if(!header){
-   // determine inverse temperature mu_B/(kB T) (flushing to zero for very low temperatures)
-   const double itemp = temperature < 1.e-300 ? 0.0 : 9.274e-24/(1.3806503e-23*temperature);
 
-   // determine inverse mean counter and its square
-   const double imean_counter = 1.0/mean_counter;
-   const double imean_counter_sq = 1.0/(mean_counter*mean_counter);
+      // determine inverse temperature mu_B/(kB T) (flushing to zero for very low temperatures)
+      const double itemp = temperature < 1.e-300 ? 0.0 : 9.274e-24/(1.3806503e-23*temperature);
 
-   // loop over all elements
-   for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
+      // determine inverse mean counter and its square
+      const double imean_counter = 1.0/mean_counter;
+      const double imean_counter_sq = 1.0/(mean_counter*mean_counter);
 
-      const double prefactor = itemp*saturation[id]; // in mu_B
-      const double sus_x = prefactor*(mean_susceptibility_squared[4*id + 0]*imean_counter-mean_susceptibility[4*id + 0]*mean_susceptibility[4*id + 0]*imean_counter_sq);
-      const double sus_y = prefactor*(mean_susceptibility_squared[4*id + 1]*imean_counter-mean_susceptibility[4*id + 1]*mean_susceptibility[4*id + 1]*imean_counter_sq);
-      const double sus_z = prefactor*(mean_susceptibility_squared[4*id + 2]*imean_counter-mean_susceptibility[4*id + 2]*mean_susceptibility[4*id + 2]*imean_counter_sq);
-      const double sus_m = prefactor*(mean_susceptibility_squared[4*id + 3]*imean_counter-mean_susceptibility[4*id + 3]*mean_susceptibility[4*id + 3]*imean_counter_sq);
+      // loop over all elements
+      for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
 
-      result << sus_x << sus_y << sus_z << sus_m;
+         const double prefactor = itemp*saturation[id]; // in mu_B
+         const double sus_x = prefactor*(mean_susceptibility_squared[4*id + 0]*imean_counter-mean_susceptibility[4*id + 0]*mean_susceptibility[4*id + 0]*imean_counter_sq);
+         const double sus_y = prefactor*(mean_susceptibility_squared[4*id + 1]*imean_counter-mean_susceptibility[4*id + 1]*mean_susceptibility[4*id + 1]*imean_counter_sq);
+         const double sus_z = prefactor*(mean_susceptibility_squared[4*id + 2]*imean_counter-mean_susceptibility[4*id + 2]*mean_susceptibility[4*id + 2]*imean_counter_sq);
+         const double sus_m = prefactor*(mean_susceptibility_squared[4*id + 3]*imean_counter-mean_susceptibility[4*id + 3]*mean_susceptibility[4*id + 3]*imean_counter_sq);
 
+         result << sus_x << sus_y << sus_z << sus_m;
+
+      }
    }
-   }else{
-       for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
-          result << name + std::to_string(id) + "_sus_x"
-                 << name + std::to_string(id) + "_sus_y"
-                 << name + std::to_string(id) + "_sus_z"
-                 << name + std::to_string(id) + "_sus_m";
-       }
+   else {
+      for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
+         result << name + std::to_string(id) + "_sus_x"
+                << name + std::to_string(id) + "_sus_y"
+                << name + std::to_string(id) + "_sus_z"
+                << name + std::to_string(id) + "_sus_m";
+      }
    }
    return result.str();
 

@@ -54,11 +54,11 @@ namespace stats{
       if(stats::calculate_grain_energy){
          for(int atom=0; atom < stats::num_atoms; ++atom){
             // ignore non-magnetic atoms in stats calculation by assigning them to last mask
-            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_materials;
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_grains;
             // other atoms assigned to material level masks
             else mask[atom] = grain_array[atom];
          }
-         stats::material_energy.set_mask(num_grains+1,mask);
+         stats::grain_energy.set_mask(num_grains+1,mask);
       }
 
       //------------------------------------------------------------------------
@@ -93,11 +93,11 @@ namespace stats{
       if(stats::calculate_grain_magnetization){
          for(int atom=0; atom < stats::num_atoms; ++atom){
             // ignore non-magnetic atoms in stats calculation by assigning them to last mask
-            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_grains;
             // all other atoms are included
             else mask[atom] = grain_array[atom];
          }
-         stats::system_magnetization.set_mask(num_grains+1, mask, magnetic_moment_array);
+         stats::grain_magnetization.set_mask(num_grains+1, mask, magnetic_moment_array);
       }
 
       //------------------------------------------------------------------------
@@ -180,11 +180,11 @@ namespace stats{
       if(stats::calculate_grain_torque){
          for(int atom=0; atom < stats::num_atoms; ++atom){
             // ignore non-magnetic atoms in stats calculation by assigning them to last mask
-            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_grains;
             // all other atoms are included
             else mask[atom] = grain_array[atom];
          }
-         stats::system_torque.set_mask(num_grains+1, mask, magnetic_moment_array);
+         stats::grain_torque.set_mask(num_grains+1, mask, magnetic_moment_array);
       }
 
       //------------------------------------------------------------------------

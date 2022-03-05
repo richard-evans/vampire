@@ -453,59 +453,7 @@ namespace vout{
          write_out(std::cout,screen_output_list);
       } // End of if statement to output data to screen
 
-      if(sim::time%vout::output_grain_rate==0){
-
-   		// calculate grain magnetisations
-   		grains::mag();
-
-   		// Output data to zgrain
-   		if(vmpi::my_rank==0){
-
-   			// check for open ofstream
-   			if(vout::grain_output_list.size() > 0 && !zgrain.is_open()){
-   				// check for checkpoint continue and append data
-   				if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain",std::ofstream::app);
-   				// otherwise overwrite file
-   				else zgrain.open("grain",std::ofstream::trunc);
-   			}
-
-   			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
-      			switch(vout::grain_output_list[item]){
-      				case 0:
-      					vout::time(zgrain,false);
-      					break;
-      				case 1:
-      					vout::real_time(zgrain,false);
-      					break;
-      				case 2:
-      					vout::temperature(zgrain,false);
-      					break;
-      				case 3:
-      					vout::Happ(zgrain,false);
-      					break;
-      				case 4:
-      					vout::Hvec(zgrain,false);
-      					break;
-      				case 10:
-      					vout::grain_mvec(zgrain,false);
-      					break;
-      				case 11:
-      					vout::grain_magm(zgrain,false);
-      					break;
-      				case 13:
-      					vout::grain_mat_mvec(zgrain,false);
-      					break;
-      				case 22:
-      					vout::phonon_temperature(zgrain,false);
-      					break;
-               }
-            }
-
-            // Carriage return
-            if(vout::grain_output_list.size()>0) zgrain << std::endl;
-         }
-
-      }
+		vout::write_grain_file();
 
 		// Output configuration files to disk
 		config::output();

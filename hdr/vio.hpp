@@ -116,9 +116,7 @@ namespace vout{
    extern bool header_option; // column headers
 	extern std::vector<unsigned int> file_output_list;
 	extern std::vector<unsigned int> screen_output_list;
-	extern std::vector<unsigned int> grain_output_list;
 
-	extern int output_grain_rate;
    extern int output_rate;
 
    extern bool gnuplot_array_format;
@@ -145,9 +143,9 @@ namespace vout{
 //class that creates an object which acts like an output
 //stream but delivers fixed width output separated by
 //tabs
-//as a result, outputs that are part of one column 
-//should be concatenated before output, so as to 
-//prevent splitting out into multiple columns. 
+//as a result, outputs that are part of one column
+//should be concatenated before output, so as to
+//prevent splitting out into multiple columns.
 //to use you should use the output stream you
 //would normally be using as an argument during construction
 //and the width of your columns.
@@ -172,7 +170,7 @@ class fixed_width_output{
 
     // defines a function which returns a pointer to the fixed... object
     // takes one of type T as input.
-    fixed_width_output& operator<<(const T& output){ 
+    fixed_width_output& operator<<(const T& output){
       //sends the formatted output to a stream_obj
       stream_obj <<std::left<<std::setw(width) << output <<"\t";
 
@@ -180,7 +178,7 @@ class fixed_width_output{
       return *this;
     }
 
-    // specialises the function, for when the input is an output stream 
+    // specialises the function, for when the input is an output stream
     // which is being operated on, such as using <<std::endl;
     fixed_width_output& operator<<(std::ostringstream& (*func)(std::ostringstream&)){
         func(stream_obj);

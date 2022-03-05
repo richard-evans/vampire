@@ -49,28 +49,33 @@ namespace stats{
          else{
             // update energy statistics
             if(stats::calculate_system_energy)                 stats::system_energy.calculate(sx, sy, sz, mm, mat, temperature);
+            if(stats::calculate_grain_energy)                  stats::grain_energy.calculate(sx, sy, sz, mm, mat, temperature);
             if(stats::calculate_material_energy)               stats::material_energy.calculate(sx, sy, sz, mm, mat, temperature);
 
             // update magnetization statistics
             if(stats::calculate_system_magnetization)          stats::system_magnetization.calculate_magnetization(sx,sy,sz,mm);
+            if(stats::calculate_grain_magnetization)           stats::grain_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_material_magnetization)        stats::material_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_height_magnetization)          stats::height_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_material_height_magnetization) stats::material_height_magnetization.calculate_magnetization(sx,sy,sz,mm);
 
             // update torque statistics
             if(stats::calculate_system_torque)          stats::system_torque.calculate_torque(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
+            if(stats::calculate_grain_torque)           stats::grain_torque.calculate_torque(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
             if(stats::calculate_material_torque)        stats::material_torque.calculate_torque(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
 
             // update specific heat statistics
             if(stats::calculate_system_specific_heat)         stats::system_specific_heat.calculate(stats::system_energy.get_total_energy());
+            if(stats::calculate_grain_specific_heat)          stats::grain_specific_heat.calculate(stats::grain_energy.get_total_energy());
             if(stats::calculate_material_specific_heat)       stats::material_specific_heat.calculate(stats::material_energy.get_total_energy());
 
             // standard deviation in time-step
-            if(stats::calculate_material_standard_deviation)     stats::material_standard_deviation.update(stats::system_magnetization.get_magnetization());
+            if(stats::calculate_material_standard_deviation)  stats::material_standard_deviation.update(stats::system_magnetization.get_magnetization());
 
             // update susceptibility statistics
-            if(stats::calculate_system_susceptibility)         stats::system_susceptibility.calculate(stats::system_magnetization.get_magnetization());
-            if(stats::calculate_material_susceptibility)       stats::material_susceptibility.calculate(stats::material_magnetization.get_magnetization());
+            if(stats::calculate_system_susceptibility)        stats::system_susceptibility.calculate(stats::system_magnetization.get_magnetization());
+            if(stats::calculate_grain_susceptibility)         stats::grain_susceptibility.calculate(stats::grain_magnetization.get_magnetization());
+            if(stats::calculate_material_susceptibility)      stats::material_susceptibility.calculate(stats::material_magnetization.get_magnetization());
 
          }
 

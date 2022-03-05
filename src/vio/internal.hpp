@@ -41,7 +41,6 @@ namespace vin{
    int match_dimension(std::string const, std::string const, std::string const, int const);
    int match_sim(std::string const, std::string const, std::string const, int const);
    int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-   int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
    int match_material(std::string const, std::string const, std::string const, int const, int const, int const, std::string const, std::string const);
    int match_config(std::string const, std::string const, std::string const, int const);
 
@@ -54,8 +53,51 @@ namespace vin{
 }
 
 namespace vout{
+
+   // namespaced io lists (to avoid collisions)
+   namespace grain{
+      // defined enumerated types
+      enum output_t {
+         time_steps,
+         real_time,
+         temperature,
+         electron_temperature,
+         phonon_temperature,
+         applied_field,
+         applied_field_unit_vector,
+         constraint_phi,
+         constraint_theta,
+         magnetisation,
+         mean_magnetisation_length,
+         mean_specific_heat,
+         mean_susceptibility,
+         mean_torque
+      };
+
+      // internal variables
+      extern int output_rate; // rate of output compared to calculation
+
+      // grain output list
+      extern std::vector<grain::output_t> output_list;
+
+   }
+
    //-------------------------------------------------------------------------
-   // Funciton protypes for functions inside: outputfunctions.cpp
+   // New output functions
+   //-------------------------------------------------------------------------
+   void write_grain_file();
+
+   // formatting wrapper functions
+   std::string generic_output_double(const std::string str, const double d, const bool header);
+
+   //-------------------------------------------------------------------------
+   // New match functions
+   //-------------------------------------------------------------------------
+   int match_vout_grain_list(std::string const word, std::string const value, int const line, std::vector<grain::output_t> & output_list);
+
+
+   //-------------------------------------------------------------------------
+   // Function protypes for functions inside: outputfunctions.cpp
    //-------------------------------------------------------------------------
    void time(std::ostream& stream,bool header);
    void real_time(std::ostream& stream,bool header);
@@ -67,10 +109,7 @@ namespace vout{
    void mean_magm(std::ostream& stream,bool header);
    void mat_mvec(std::ostream& stream,bool header);
    void mat_mean_magm(std::ostream& stream,bool header);
-   void grain_mvec(std::ostream& stream,bool header);
-   void grain_magm(std::ostream& stream,bool header);
    void mdoth(std::ostream& stream,bool header);
-   void grain_mat_mvec(std::ostream& stream,bool header);
    void systorque(std::ostream& stream,bool header);
    void mean_systorque(std::ostream& stream,bool header);
    void constraint_phi(std::ostream& stream,bool header);

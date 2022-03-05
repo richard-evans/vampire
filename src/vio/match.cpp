@@ -140,8 +140,7 @@ namespace vin{
         else
         test="grain";
         if(key==test){
-            int frs=vin::match_vout_grain_list(word, value, line, vout::grain_output_list);
-            return frs;
+            return vout::match_vout_grain_list(word, value, line, vout::grain::output_list);
         }
         //===================================================================
         // Test for config output
@@ -1455,103 +1454,6 @@ namespace vin{
         else{
             terminaltextcolor(RED);
             std::cerr << "Error - Unknown control statement "<< prefix << word << "\' on line " << line << " of input file" << std::endl;
-            terminaltextcolor(WHITE);
-        return EXIT_FAILURE;
-        }
-        return EXIT_SUCCESS;
-    }
-    int match_vout_grain_list(string const word, string const value, int const line, std::vector<unsigned int> & output_list){
-
-        std::string prefix="grain:";
-
-        std::string test="time-steps";
-        if(word==test){
-            output_list.push_back(0);
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="real-time";
-        if(word==test){
-            output_list.push_back(1);
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="temperature";
-        if(word==test){
-            output_list.push_back(2);
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="applied-field-strength";
-        if(word==test){
-            output_list.push_back(3);
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="applied-field-unit-vector";
-        if(word==test){
-            output_list.push_back(4);
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="magnetisation";
-        if(word==test){
-            output_list.push_back(10);
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="mag-m";
-        if(word==test){
-            output_list.push_back(11);
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="material-magnetisation";
-        if(word==test){
-            output_list.push_back(13);
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="electron-temperature"; // identical to temperature
-        if(word==test){
-            output_list.push_back(2);
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="phonon-temperature";
-        if(word==test){
-            output_list.push_back(22);
-            return EXIT_SUCCESS;
-        }
-        test="magneto-resistance";
-        if(word==test){
-          //std::cout << "A" <<std::endl;
-          micromagnetic::enable_resistance = true;
-          output_list.push_back(65);
-          return EXIT_SUCCESS;
-       }
-        else
-        //-------------------------------------------------------------------
-        test="output-rate";
-        if(word==test){
-            int r=atoi(value.c_str());
-            check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-            vout::output_grain_rate=r;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        // keyword not found
-        //--------------------------------------------------------------------
-        else{
-        terminaltextcolor(RED);
-            std::cerr << "Error - Unknown control statement \'grain:" << word << "\' on line " << line << " of input file" << std::endl;
             terminaltextcolor(WHITE);
         return EXIT_FAILURE;
         }

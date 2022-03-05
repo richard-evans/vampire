@@ -14,9 +14,7 @@
 // C++ standard library headers
 
 // Vampire headers
-// Headers
 #include "vio.hpp"
-#include "grains.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
 #include "program.hpp"
@@ -41,17 +39,26 @@ namespace vout{
         }
       return result.str();
     }
-    std::string generic_output_double(std::string str,double d, bool header){
+    //--------------------------------------------------------------------------
+    // Function to format a standard double variable including a file header
+    //--------------------------------------------------------------------------
+    std::string generic_output_double(const std::string str, const double d, const bool header){
+
+      // resuting output stringstream
       std::ostringstream res;
+
+      // set up fixed width if defined
       vout::fixed_width_output result(res,vout::fw_size);
-      if(header){
-           result << str;
-        }
-      else{
-           result << d;
-        }
+
+      // switch between header text and actual variable
+      if(header) result << str;
+      else result << d;
+
+      // return  resulting sstream as string
       return result.str();
+
     }
+
     // why don't we do the fixed width stuff here? Yep - TBD
     void time(std::ostream& stream, bool header){
        stream << generic_output_int("Time_steps", sim::time,header);
@@ -111,50 +118,11 @@ namespace vout{
       stream << stats::material_magnetization.output_normalized_mean_magnetization_length(header);
    }
 
-   // Output Function 10
-   void grain_mvec(std::ostream& stream, bool header){
-
-      unsigned int id=0; // grain id (excluding grains with zero atoms)
-
-      // loop over all grains
-      for(int grain=0;grain<grains::num_grains;grain++){
-         // check for grains with zero atoms
-         if(grains::grain_size_array[grain]!=0){
-            stream << grains::x_mag_array[grain] << "\t";
-            stream << grains::y_mag_array[grain] << "\t";
-            stream << grains::z_mag_array[grain] << "\t";
-            stream << grains::mag_m_array[grain] << "\t";
-            id++;
-         }
-      }
-   }
-
-   // Output Function 11
-   void grain_magm(std::ostream& stream, bool header){
-
-      unsigned int id=0; // grain id (excluding grains with zero atoms)
-
-      // loop over all grains
-      for(int grain=0;grain<grains::num_grains;grain++){
-         // check for grains with zero atoms
-         if(grains::grain_size_array[grain]!=0){
-            stream << grains::mag_m_array[grain] << "\t";
-            id++;
-         }
-      }
-   }
-
    // Output Function 12 - with Header
    void mdoth(std::ostream& stream, bool header){
       // initialise vector of H
       std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
       stream << stats::system_magnetization.output_normalized_magnetization_dot_product(H,header);
-   }
-
-   // Output Function 13
-   void grain_mat_mvec(std::ostream& stream, bool header){
-      grains::output_mat_mag(stream);
-
    }
 
    // Output Function 14 - with Header
