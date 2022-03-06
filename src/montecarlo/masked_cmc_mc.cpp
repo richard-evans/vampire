@@ -359,12 +359,6 @@ void cmc_mc_step_mask(){
 			// Randomly select spin number 2 (i/=j) of same material type
 			const int atom2 = cmc::atom_list[mask1][int(mtrandom::grnd()*cmc::atom_list[mask1].size())];
 			const int mat2  = atoms::type_array[atom2];
-			// if(mask1 != mask2){
-			// 	terminaltextcolor(RED);
-			// 	std::cerr << "Error in MC/CMC integration! - atoms pairs are not from same material!" << std::endl;
-			// 	terminaltextcolor(WHITE);
-			// 	err::vexit();
-			// }
 
 			// Save initial Spin 2
 			spin2_initial[0] = atoms::x_spin_array[atom2];

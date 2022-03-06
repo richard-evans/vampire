@@ -28,15 +28,15 @@
 
 namespace vout{
 	// Output Function 0
-    std::string generic_output_int(std::string str,uint64_t i, bool header){
+   std::string generic_output_int(std::string str,uint64_t i, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size_int);
+      vout::fixed_width_output result(res, vout::fw_size_int);
       if(header){
-           result << str;
-        }
+         result << str;
+      }
       else{
-           result << i;
-        }
+         result << i;
+      }
       return result.str();
     }
     //--------------------------------------------------------------------------

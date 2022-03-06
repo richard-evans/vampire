@@ -495,10 +495,13 @@ int cmc_mc_step(){
 			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 
 			// Calculate Delta E for both spins
-			delta_energy21 = delta_energy1*rescaled_material_kBTBohr[imat1] + delta_energy2*rescaled_material_kBTBohr[imat2];
+			delta_energy21 = delta_energy1*rescaled_material_kBTBohr[imat1] +
+			                 delta_energy2*rescaled_material_kBTBohr[imat2];
 
 			// Compute Mz_other, Mz, Mz'
-			Mz_old = cmc::cmc_mat[imat].M_other[0]*cmc::cmc_mat[imat].ppolar_vector[0] + cmc::cmc_mat[imat].M_other[1]*cmc::cmc_mat[imat].ppolar_vector[1] + cmc::cmc_mat[imat].M_other[2]*cmc::cmc_mat[imat].ppolar_vector[2];
+			Mz_old = cmc::cmc_mat[imat].M_other[0]*cmc::cmc_mat[imat].ppolar_vector[0] +
+			         cmc::cmc_mat[imat].M_other[1]*cmc::cmc_mat[imat].ppolar_vector[1] +
+						cmc::cmc_mat[imat].M_other[2]*cmc::cmc_mat[imat].ppolar_vector[2];
 
 			Mz_new = (cmc::cmc_mat[imat].M_other[0] + spin1_final[0] + spin2_final[0]- spin1_initial[0] - spin2_initial[0])*cmc::cmc_mat[imat].ppolar_vector[0] +
 						(cmc::cmc_mat[imat].M_other[1] + spin1_final[1] + spin2_final[1]- spin1_initial[1] - spin2_initial[1])*cmc::cmc_mat[imat].ppolar_vector[1] +

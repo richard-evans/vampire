@@ -242,11 +242,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization(bool head
                 << name + std::to_string(mask_id) + "M_norm_y"
                 << name + std::to_string(mask_id) + "M_norm_z"
                 << name + std::to_string(mask_id) + "M_norm_l";
-      }else{
-         result << magnetization[4*mask_id + 0] //<< "\t"
-                << magnetization[4*mask_id + 1] //<< "\t"
-                << magnetization[4*mask_id + 2] //<< "\t"
-                << magnetization[4*mask_id + 3]; //<< "\t";
+      }
+      else{
+         result << magnetization[4*mask_id + 0]
+                << magnetization[4*mask_id + 1]
+                << magnetization[4*mask_id + 2]
+                << magnetization[4*mask_id + 3];
       }
    }
 
@@ -450,11 +451,8 @@ std::string magnetization_statistic_t::output_mean_magnetization_length(bool hea
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-       if(header){
-           result << name + std::to_string(mask_id) + "M_mean_l";
-       }else{
-           result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic;
-       }
+      if(header) result << name + std::to_string(mask_id) + "M_mean_l";
+      else result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic;
    }
 
    return result.str();
