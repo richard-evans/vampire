@@ -410,12 +410,12 @@ void cmc_mc_step_mask(){
 											 (cmc::cmc_mask[mask1].M_other[1] + spin1_final[1] + spin2_final[1]- spin1_initial[1] - spin2_initial[1])*cmc::cmc_mask[mask1].ppolar_vector[1] +
 											 (cmc::cmc_mask[mask1].M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*cmc::cmc_mask[mask1].ppolar_vector[2];
 
-				// Check for lower energy state and accept unconditionally
-				if((delta_energy21<0.0) && (Mz_new >= 0.0) ) continue;
+				// Check for lower energy state and accept unconditionally (this allows it to flip sign, why?)
+				//if((delta_energy21<0.0) && (Mz_new >= 1e-15) ) continue;
 
 				// If move is favorable then accept
 				const double probability = exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
-				if( ( probability >= mtrandom::grnd() ) && ( Mz_new >= 0.0 ) ){
+				if( ( probability >= mtrandom::grnd() ) && ( Mz_new >= 1e-15 ) ){
 					cmc::cmc_mask[mask1].M_other[0] = cmc::cmc_mask[mask1].M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
 					cmc::cmc_mask[mask1].M_other[1] = cmc::cmc_mask[mask1].M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];
 					cmc::cmc_mask[mask1].M_other[2] = cmc::cmc_mask[mask1].M_other[2] + spin1_final[2] + spin2_final[2] - spin1_initial[2] - spin2_initial[2];
