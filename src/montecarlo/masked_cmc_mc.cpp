@@ -352,7 +352,7 @@ void cmc_mc_step_mask(){
 			const double Enew = sim::calculate_spin_energy(atom1);
 
 			// Calculate difference in Joules/mu_B
-			const double delta_energy1 = (Enew-Eold)*mp::material[mat1].mu_s_SI*1.07828231e2; //1/9.27400915e-24
+			const double delta_energy1 = (Enew-Eold)*mp::material[mat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 
 			// Compute second move
 
