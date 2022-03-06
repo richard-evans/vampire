@@ -372,7 +372,9 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
 
 {\zicf sim:constraint-angle-phi-increment}\phantomsection\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-increment} Incremental Change of the angle of global magnetisation from z-direction in constrained simulations. Controls the resolution of the angular sweep.
 
-{\zicf sim:monte-carlo-algorithm}\phantomsection\addcontentsline{toc}{subsection}{sim:monte-carlo-algorithm} Selects the trial move algorithm for use with the Monte Carlo solver. The following options are available:
+{\zicf montecarlo:algorithm}\phantomsection\addcontentsline{toc}{subsection}{montecarlo:algorithm}
+Selects the trial move algorithm for use with the Monte Carlo solver. The
+following options are available:
 
 \begin{itemize}
   \item[] adaptive (default)
@@ -382,7 +384,22 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
   \item[] hinzke-nowak
 \end{itemize}
 
-The adaptive move performs a gaussian move with a tuned trial width to attempt to maintain a 50\% acceptance probability, and is the most efficient method in most cases. A spin flip flips the direction of the spin 180$^{\circ}$ and can be used to perform Ising-type simulations for a uniform starting configuration. Uniform moves a spin to a random location on the unit sphere. Angle performs a gaussian move with a parametric estimate of the optimal width. Hinzke-Nowak performs a random combination of spin-flip, uniform and angle type-moves.
+The adaptive move performs a gaussian move with a tuned trial width to attempt
+to maintain a 50\% acceptance probability, and is the most efficient method in
+most cases. A spin flip flips the direction of the spin 180$^{\circ}$ and can be
+used to perform Ising-type simulations for a uniform starting configuration.
+Uniform moves a spin to a random location on the unit sphere. Angle performs a
+gaussian move with a parametric estimate of the optimal width. Hinzke-Nowak
+performs a random combination of spin-flip, uniform and angle type-moves.
+
+{\zicf montecarlo:constrain-by-grain}\phantomsection\addcontentsline{toc}{subsection}{montecarlo:constrain-by-grain}
+Applies a local constraint in granular systems so that the magnetisation within
+individual grains is conserved along the global constraint directions
+\textit{sim:constrain-phi} and \textit{sim:constraint-theta}. Without this
+additional constraint, the system will tend to demagnetise and form a
+demagnetised state (with zero torque). With this parameter defined it is
+possible to determine grain-level properties and distributions of the Curie
+temperature and anisotropy.
 
 {\zicf sim:checkpoint flag [default false]}\phantomsection\addcontentsline{toc}{subsection}{sim:checkpoint} Enables checkpointing of spin configuration at end of the simulation. The options are:
 

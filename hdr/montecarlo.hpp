@@ -28,7 +28,7 @@ namespace montecarlo{
    //-----------------------------------------------------------------------------
    // Function to initialise montecarlo module
    //-----------------------------------------------------------------------------
-   void initialize();
+   void initialize(const int num_atoms, const int num_grains, const std::vector<int>& grain_array);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for montecarlo module
@@ -137,7 +137,8 @@ namespace montecarlo{
    	extern std::vector<cmc_material_t> cmc_mat;
 
    	extern bool is_initialised;
-      extern bool masked_cmc;
+      extern bool masked_cmc;         // determine if generic masked constraint is required
+      extern bool constrain_by_grain; // constrains by grain rather than globally
 
    	extern int active_material; /// material in current hybrid loop
 

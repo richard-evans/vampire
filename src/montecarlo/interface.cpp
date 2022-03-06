@@ -72,6 +72,12 @@ namespace montecarlo{
             err::vexit();
          }
       }
+      test = "constrain-by-grain";
+      if( word == test ){
+         // enable cmc with grain level rather than global constraints
+         cmc::constrain_by_grain = true;
+         return true;
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found

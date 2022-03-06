@@ -206,7 +206,7 @@ int run(){
    // Initialize vampire modules
    sim::internal::initialize_modules();
 
-   montecarlo::initialize();
+   montecarlo::initialize(atoms::num_atoms, grains::num_grains, atoms::grain_array);
 
    anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
 

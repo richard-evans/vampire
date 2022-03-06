@@ -28,7 +28,8 @@ namespace montecarlo{
    bool mc_parallel_initialized = false;
 
    namespace cmc{
-      bool masked_cmc = false;
+      bool masked_cmc = false;       // determine if generic masked constraint is required
+      bool constrain_by_grain = false; // constrains by grain rather than globally
    }
 
    // Monte Carlo update algorithm
