@@ -260,18 +260,22 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			sumV = sumV +V;
 			sumR = sumR +r;
 		}
+		//------------------------------------------------------------------------
+		// output voroni statistics to screen
+		//------------------------------------------------------------------------
 		double avR = sumR/grains_x.size();
 		std::sort(grains_r.begin(),grains_r.end());
 		int index = grains_r.size()/2;
 		double Mr = (grains_r[index-1] + grains_r[index])/2;
-		std::cout<< "Median temperature: " << Mr << std::endl;
-		std::cout<< "Mean temperature: " << avR << std::endl;
+		std::cout<< "Median grain radius: " << Mr << std::endl;
+		std::cout<< "Mean grain radius: " << avR << std::endl;
+		//------------------------------------------------------------------------
 		double totalV = (2*sdx + 2*grain_cell_size_x)*(2*sdy + 2*grain_cell_size_y);
 	 	double frac = sumV/totalV;
-		 std::cout<< " frac: " << frac << std::endl;
-		 std::cout << grain_cell_size_x/2.0 - avR << "\t" <<  2.0*(grain_cell_size_x/2.0 - avR)/grain_cell_size_x << std::endl;
-		 frac = frac + (grain_cell_size_x/2.0 - avR)/grain_cell_size_x;
-	 //	std::cout << sumV << '\t' << totalV << '\t' << frac  << "\t" << grains_x.size() << '\t'<<  grain_coord_array.size() << std::endl;
+		std::cout<< " frac: " << frac << std::endl;
+		std::cout << grain_cell_size_x/2.0 - avR << "\t" <<  2.0*(grain_cell_size_x/2.0 - avR)/grain_cell_size_x << std::endl;
+		frac = frac + (grain_cell_size_x/2.0 - avR)/grain_cell_size_x;
+	 	//	std::cout << sumV << '\t' << totalV << '\t' << frac  << "\t" << grains_x.size() << '\t'<<  grain_coord_array.size() << std::endl;
 
 		for (int i = 0; i < grain_coord_array.size(); i ++){
 		//	double r = grains_r[i];
@@ -376,17 +380,15 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 
-
-
-
-	double avR = sumR/R_med.size();
-	std::sort(R_med.begin(),R_med.end());
-	int index = R_med.size()/2;
-	std::cout<< "Median temperature: " << (R_med[index-1] + R_med[index])/2 << std::endl;
-	std::cout<< "Mean temperature: " << avR << std::endl;
-
-
-
+	//------------------------------------------------------------------------
+	// output grain properties to screen
+	//------------------------------------------------------------------------
+	//double avR = sumR/R_med.size();
+	//std::sort(R_med.begin(),R_med.end());
+	//int index = R_med.size()/2;
+	//std::cout<< "Median temperature: " << (R_med[index-1] + R_med[index])/2 << std::endl;
+	//std::cout<< "Mean temperature: " << avR << std::endl;
+	//------------------------------------------------------------------------
 
 	// Create a 2D supercell array of atom numbers to improve performance for systems with many grains
 	std::vector < std::vector < std::vector < int > > > supercell_array;

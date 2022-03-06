@@ -59,26 +59,33 @@ void remix_grain_numbers(){
 	std::vector<int> new_grain_numbers(grains::num_grains,0); // array to store new grain number for each grain
 	std::vector<int> old_grain_numbers(0); // array to store old grain number for each grain
 
-	// loop over all atoms to find unique grain numbers
-	for(unsigned int atom=0;atom< num_local_atoms;atom++){
+	//---------------------------------------------------------------------------
+	// determine which grains contain atoms
+	//---------------------------------------------------------------------------
+	std::vector<int> atoms_per_grain(grains::num_grains, 0); // store total atoms per grain on all processors
+
+	for(unsigned int atom = 0; atom < num_local_atoms; atom++){
+
+		// get grain ID
 		const int grain = atoms::grain_array[atom];
 
-		// lets be optimistic and assume we will find a new one
-		bool found_a_new_one = true;
+		// increment grain atom counter
+		atoms_per_grain[grain]++;
 
-		// loop over all grains to see if its a new grain
-		for(int g = 0; g < old_grain_numbers.size(); g++){
-			if( grain == old_grain_numbers[g]){
-				// grain found, exit !
-				found_a_new_one = false;
-			}
-		}
+	}
 
-		// now check if we have found a new one
-		if(found_a_new_one){
+	#ifdef MPICF
+		// add up atoms per grain on all processors
+		MPI_Allreduce(MPI_IN_PLACE, atoms_per_grain.data(), grains::num_grains, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+	#endif
+
+	// loop over all grains to find unique grain numbers
+	for(int grain = 0; grain < grains::num_grains; grain++){
+
+		// if grain has more than one atom, then add to list of grains to keep
+		if(atoms_per_grain[grain] > 0){
 			old_grain_numbers.push_back(grain);
 		}
-
 	}
 
 	// now generate new numbers based on index of old_grain_numbers array
@@ -110,6 +117,12 @@ void remix_grain_numbers(){
 	// Finally reset number of grains
 	grains::num_grains = old_grain_numbers.size();
 
+	// print helpful message to user about the number of grains generated (if more than 1)
+   if(grains::num_grains > 1){
+		std::cout << "Generated " << grains::num_grains << " grains" << std::endl;
+		zlog << zTs() << "Generated " << grains::num_grains << " grains" << std::endl;
+	}
+
 	return;
 
 }
@@ -140,32 +153,25 @@ int set_properties(){
 	//---------------------------------------------------------------------------
 	// resize and initialise grain arrays
 	//---------------------------------------------------------------------------
-	if(grains::num_grains > 0){
-		grains::grain_size_array.resize(grains::num_grains,0);
-		grains::x_coord_array.resize(grains::num_grains,0.0);
-		grains::y_coord_array.resize(grains::num_grains,0.0);
-		grains::z_coord_array.resize(grains::num_grains,0.0);
-		grains::sat_mag_array.resize(grains::num_grains,0.0);
-
-	}
-	else{
-		terminaltextcolor(RED);
-		std::cerr << "Warning - no grains detected!" << std::endl;
-		terminaltextcolor(WHITE);
-	}
+	grains::grain_size_array.resize(grains::num_grains,0);
+	grains::x_coord_array.resize(grains::num_grains,0.0);
+	grains::y_coord_array.resize(grains::num_grains,0.0);
+	grains::z_coord_array.resize(grains::num_grains,0.0);
+	grains::sat_mag_array.resize(grains::num_grains,0.0);
 
 	// loop over atoms to determine grain properties
-	for(unsigned int atom=0;atom< num_local_atoms;atom++){
-		const int grain = atoms::grain_array[atom];
-		const int mat = atoms::type_array[atom];
+	for(unsigned int atom=0;atom < num_local_atoms;atom++){
+
+		const int grain = atoms::grain_array[atom]; // grain number
+		const int mat   = atoms::type_array[atom];  // material
 
 		// check grain is within allowable bounds
-		if((grain>=0) && (grain<grains::num_grains)){
+		if( (grain >= 0) && ( grain < grains::num_grains) ){
 			grains::grain_size_array[grain]+=1;
-			grains::x_coord_array[grain]+=atoms::x_coord_array[atom];
-			grains::y_coord_array[grain]+=atoms::y_coord_array[atom];
-			grains::z_coord_array[grain]+=atoms::z_coord_array[atom];
-			grains::sat_mag_array[grain]+=mp::material[mat].mu_s_SI;
+			grains::x_coord_array[grain] += atoms::x_coord_array[atom];
+			grains::y_coord_array[grain] += atoms::y_coord_array[atom];
+			grains::z_coord_array[grain] += atoms::z_coord_array[atom];
+			grains::sat_mag_array[grain] += mp::material[mat].mu_s_SI;
 		}
 		else{
 			terminaltextcolor(RED);
