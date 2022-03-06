@@ -234,7 +234,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization(bool head
       res.precision(vout::precision);
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
@@ -267,7 +267,7 @@ std::string magnetization_statistic_t::output_magnetization(bool header){
       res.precision(vout::precision);
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -303,12 +303,13 @@ std::string magnetization_statistic_t::output_normalized_magnetization_length(bo
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
 
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
        if(header){
-           result << name + std::to_string(mask_id) + "M_norm_l";
-       }else{
+          result << name + std::to_string(mask_id) + "M_norm_l";
+       }
+       else{
           result << magnetization[4*mask_id + 3];
        }
 
@@ -332,7 +333,7 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization(bool
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
 
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
@@ -370,7 +371,7 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization_leng
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
 
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
@@ -401,7 +402,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
 
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // check vector has correct size
    if(vec.size()!=3){
       terminaltextcolor(RED);
@@ -443,14 +444,14 @@ std::string magnetization_statistic_t::output_mean_magnetization_length(bool hea
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
 
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
        if(header){
-           result << name + std::to_string(mask_id) + "M_mean_l"; 
+           result << name + std::to_string(mask_id) + "M_mean_l";
        }else{
            result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic;
        }
@@ -474,7 +475,7 @@ std::string magnetization_statistic_t::output_mean_magnetization(bool header){
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
 
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
@@ -482,9 +483,9 @@ std::string magnetization_statistic_t::output_mean_magnetization(bool header){
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
          result << name + std::to_string(mask_id) + "M_mean_x"
-                << name + std::to_string(mask_id) + "M_mean_y" 
-                << name + std::to_string(mask_id) + "M_mean_z" 
-                << name + std::to_string(mask_id) + "M_mean_l"; 
+                << name + std::to_string(mask_id) + "M_mean_y"
+                << name + std::to_string(mask_id) + "M_mean_z"
+                << name + std::to_string(mask_id) + "M_mean_l";
       }
       else{
          result << mean_magnetization[4*mask_id + 0]*ic

@@ -26,6 +26,9 @@ namespace vout{
 
 void write_grain_file(){
 
+   // do nothing if no grain items specified
+   if(vout::grain::output_list.size() == 0) return;
+
    // check it is time to output a new data point
    if(sim::time % vout::grain::output_rate == 0){
 
@@ -36,7 +39,7 @@ void write_grain_file(){
       if(vmpi::my_rank==0){
 
          // check for open ofstream
-         if(vout::grain::output_list.size() > 0 && !zgrain.is_open()){
+         if( !zgrain.is_open() ){
             // check for checkpoint continue and append data
             if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain.txt",std::ofstream::app);
             // otherwise overwrite file
@@ -118,16 +121,17 @@ void write_grain_file(){
                   zgrain << stats::grain_specific_heat.output_mean_specific_heat(sim::temperature, header);
                   break;
                //------------------------------------------
-               } // end of case statement
 
-            } // end of output list loop
+            } // end of case statement
 
-         } // end of rank zero check
+         } // end of output list loop
 
          // Carriage return
-         if(vout::grain::output_list.size()>0) zgrain << std::endl;
+         zgrain << std::endl;
 
-      } // end of output check
+      } // end of rank zero check
+
+   } // end of output check
 
    return;
 

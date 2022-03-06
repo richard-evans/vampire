@@ -49,7 +49,7 @@ namespace vout{
    namespace grain{
 
       // internal variables
-      int output_rate; // rate of output compared to calculation
+      int output_rate = 1000; // rate of output compared to calculation
 
       // grain output list
       std::vector<grain::output_t> output_list(0);
