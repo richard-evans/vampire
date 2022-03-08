@@ -69,7 +69,7 @@ namespace hamr{
 		for(auto i=0; i<hamr::internal::bit_sequence.size(); i++){ std::cout << hamr::internal::bit_sequence[i] << " ";}
 		std::cout << std::endl;
 		std::cout << " Bits to be written: " << n_bits_per_tack*n_tracks << ", in x,y: " << n_bits_per_tack << ", " << n_tracks << std::endl;
-		zlog << zTs() << " Bits to be written: " << n_bits_per_tack*n_tracks << ", in x,y: " << n_bits_per_tack << ", " << n_tracks << std::endl;
+		zlog << zTs() << "Bits to be written: " << n_bits_per_tack*n_tracks << ", in x,y: " << n_bits_per_tack << ", " << n_tracks << std::endl;
 
 		// Print to screen hamr writing setup parameters
 		std::cout << " Head velocity: " << hamr::internal::head_speed*1e-10 << " m/s" << std::endl;
