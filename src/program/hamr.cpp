@@ -81,6 +81,9 @@ namespace program{
 		// check calling of routine if error checking is activated
 		if(err::check==true){std::cout << "program::hamr has been called" << std::endl;}
 
+			// Set partial_time (sim:time-steps-increment) to 1 to ensure good simulation
+			sim::partial_time = 1;
+
 			// Set equilibration temperature and field
 			sim::temperature=sim::Teq;
 		
@@ -101,8 +104,8 @@ namespace program{
 
 			// now enable laser
 			hamr::head_laser_on=true;
-			std::cout << " Equilibration terminated, enabling hamr simulation ..." << std::endl;
-			zlog << zTs() << " Equilibration terminated, enabling hamr simulation ..." << std::endl;
+			std::cout << " Equilibration terminated, enabling laser ..." << std::endl;
+			zlog << zTs() << "Equilibration terminated, enabling laser ..." << std::endl;
 
 			// Set system temperature as minimum temperature
 			sim::temperature=sim::Tmin;
@@ -113,25 +116,25 @@ namespace program{
 			// Perform harm continuous simulation
 			hamr::hamr_continuous();
 
-			//-------------------------------------------------------------------------//
-			// force outputting at end of simulation after laser has been switched off
-			//-------------------------------------------------------------------------//
-			// Disable laser
-			hamr::head_laser_on=false;
-			// Switch off external field 
-			sim::H_applied = 0.0;
-			// Set system temperature as minimum temperature
-			sim::temperature=sim::Tmin;
-			std::cout << " Disabling laser and external field and integrating system for 1 time-step" << std::endl;
-			zlog << zTs() << " Disabling laser and external field and integrating system for 1 time-step" << std::endl;
-			// Integrate
-			sim::integrate(sim::partial_time);
-			// Calculate magnetisation statistics
-			stats::update();
-			// Output data
-			vout::data();
-			std::cout << " Outputting system at the end of HAMR simulations\n" << std::endl;
-			zlog << zTs() << "Outputting system at the end of HAMR simulations" << std::endl;
+			// //-------------------------------------------------------------------------//
+			// // force outputting at end of simulation after laser has been switched off
+			// //-------------------------------------------------------------------------//
+			// // Disable laser
+			// hamr::head_laser_on=false;
+			// // Switch off external field 
+			// sim::H_applied = 0.0;
+			// // Set system temperature as minimum temperature
+			// sim::temperature=sim::Tmin;
+			// std::cout << " Disabling laser and external field and integrating system for 1 time-step" << std::endl;
+			// zlog << zTs() << " Disabling laser and external field and integrating system for 1 time-step" << std::endl;
+			// // Integrate
+			// sim::integrate(sim::partial_time);
+			// // Calculate magnetisation statistics
+			// stats::update();
+			// // Output data
+			// vout::data();
+			// std::cout << " Outputting system at the end of HAMR simulations\n" << std::endl;
+			// zlog << zTs() << "Outputting system at the end of HAMR simulations" << std::endl;
 
 	} // end of hamr()
 

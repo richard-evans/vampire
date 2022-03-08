@@ -149,8 +149,6 @@ void calculate_external_fields(const int start_index,const int end_index){
 					end_index,
 					sim::H_applied,
 					sim::temperature,
-					Tmin,
-					Tmax,
 					sim::H_vec[0],
 					sim::H_vec[1],
 					sim::H_vec[2],

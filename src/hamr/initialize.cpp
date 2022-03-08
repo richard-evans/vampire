@@ -30,6 +30,8 @@ namespace hamr{
    //---------------------------------------------------------------------------------
    void initialize(const double Hmin,
                    const double Hmax,
+                   const double Tmin,
+                   const double Tmax,
                    const double system_dimensions_x,
                    const double system_dimensions_y,
                    const double system_dimensions_z,
@@ -72,6 +74,8 @@ namespace hamr{
       hamr::internal::atom_type_array = atom_type_array;
       hamr::internal::Hmin = Hmin;
       hamr::internal::Hmax = Hmax;
+      hamr::internal::Tmin = Tmin;
+      hamr::internal::Tmax = Tmax;
 
       // Calibrate head region to be not larger than system size
       if(hamr::internal::H_bounds_x > hamr::internal::system_dimensions_x){ hamr::internal::H_bounds_x = hamr::internal::system_dimensions_x;}
@@ -82,8 +86,8 @@ namespace hamr{
       hamr::internal::laser_sigma_y = hamr::internal::fwhm_y * one_over_sqrt;
 
       // Calculate max number of allowed tracks and bits-per-track in the system
-      hamr::internal::num_tracks = floor((hamr::internal::system_dimensions_y-1.0)/(hamr::internal::track_size + 2.0*hamr::internal::track_padding));
-      hamr::internal::bits_per_tack = floor((hamr::internal::system_dimensions_x-1.0)/hamr::internal::bit_size);
+      hamr::internal::num_tracks = int(floor((hamr::internal::system_dimensions_y - 1.0 - 2.0*hamr::internal::track_padding)/(hamr::internal::track_size)));
+      hamr::internal::bits_per_tack = int(floor((hamr::internal::system_dimensions_x - 1.0)/hamr::internal::bit_size));
 
       // Check if need to create singletone
       hamr::internal::create_singletone_vector();

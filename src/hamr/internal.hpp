@@ -67,33 +67,35 @@ namespace hamr{
       //-----------------------------------------------------------------------------
       // Shared variables used for hamr calculation
       //-----------------------------------------------------------------------------
-      extern bool enabled; // flag set if initialised
-      extern bool initialised; // flag set if initialised
-      extern bool create_singletone;
+      extern bool enabled; /// flag set if initialised
+      extern bool initialised; /// flag set if initialised
+      extern bool create_singletone;  /// flag to create single tone
 
-      extern int num_bits;
-      extern int bits_per_tack;
-      extern int num_tracks;
+      extern int num_bits; /// total number of bits
+      extern int bits_per_tack; /// number of bits per track
+      extern int num_tracks; /// number of tracks
 
-      extern double bit_size;
-      extern double track_size;
-      extern double head_position_x;
-      extern double head_position_y;
-      extern double head_speed;
-      extern double fwhm_x;  // fwhm of Gaussian distribution
-      extern double fwhm_y;  // fwhm of Gaussian distribution
-      extern double laser_sigma_x;  // standard deviation of Gaussian distribution from fwhm/sqrt(8*log(2))
-      extern double laser_sigma_y;  // standard deviation of Gaussian distribution from fwhm/sqrt(8*log(2))
-      extern double H_bounds_x;
-      extern double H_bounds_y;
-      extern double H_ramp_time;
-      extern double NPS; // NFT to pole spacing
-      extern double track_padding;
-      extern std::vector<int> bit_sequence;
+      extern double bit_size; /// bit size 
+      extern double track_size; /// track size 
+      extern double head_position_x; /// head centre coordinate in x
+      extern double head_position_y; /// head centre coordinate in x
+      extern double head_speed; /// linear sweeping speed in Ang/s
+      extern double fwhm_x;  /// fwhm of Gaussian distribution
+      extern double fwhm_y;  /// fwhm of Gaussian distribution
+      extern double laser_sigma_x;  /// standard deviation of Gaussian distribution from fwhm/sqrt(8*log(2))
+      extern double laser_sigma_y;  /// standard deviation of Gaussian distribution from fwhm/sqrt(8*log(2))
+      extern double H_bounds_x;  /// Dimension in x-direction of box where magnetic field is applied
+      extern double H_bounds_y;  /// Dimension in y-direction of box where magnetic field is applied
+      extern double H_ramp_time;  /// Ramp time in trapezoidal time profile of external field
+      extern double NPS;  /// NFT to pole spacing
+      extern double track_padding;  ///spacing between edges of the system in y-direction and track(s)
+      extern std::vector<int> bit_sequence;  /// vector to store bits 
 
       extern int num_local_atoms;
-      extern double Hmin;
-      extern double Hmax;
+      extern double Tmin;   /// Minimum temperature of thermal profile
+      extern double Tmax;   /// Maximum temperature of thermal profile
+      extern double Hmin;   /// Minimum value of field
+      extern double Hmax;   /// Maximum value of field
       extern double system_dimensions_x; /// 
       extern double system_dimensions_y;
       extern double system_dimensions_z;

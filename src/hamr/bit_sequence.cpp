@@ -14,8 +14,6 @@
 // #include "math.h"
 
 // Vampire headers
-// #include "material.hpp"
-// #include "vmpi.hpp"
 #include "errors.hpp"
 #include "hamr.hpp"
 #include "vio.hpp"

@@ -28,8 +28,6 @@ namespace hamr{
 					const int end_index,
 					double H_applied,
 					const double temperature,
-					const double Tmin,
-					const double Tmax,
 					const double Hvecx,
 					const double Hvecy,
 					const double Hvecz,
@@ -37,20 +35,11 @@ namespace hamr{
 					std::vector<double>& y_total_external_field_array,
 					std::vector<double>& z_total_external_field_array
 					){
-		///======================================================
-		/// 		Function to calculate HAMR fields
-		///		Richard Evans 2011
-		///		Revision: Andrea Meo 2022
-		///======================================================
 
 		if(err::check==true){std::cout << "calculate_hamr_fields has been called" << std::endl;}
 
 		// Define useful variables
-		const double DeltaT = Tmax - Tmin;
-
-		// declare head-field variables hamr::internal::H_bounds_min[0]
-		// const double H_osc_amplit=hamr::internal::H_osc_amplit; 
-		// const double Hloc_parity_field=H_applied*(-1.0)*double(2*(int(hamr::internal::head_position_x/H_osc_amplit)%2)-1);
+		const double DeltaT = hamr::internal::Tmax - hamr::internal::Tmin;
 		const double Hloc_parity_field=H_applied;
 
 		// Add localised thermal field
@@ -61,25 +50,7 @@ namespace hamr{
 		if(hamr::head_laser_on){
 			
 			// Apply local temperature field
-			hamr::internal::apply_temperature_profile(start_index, end_index, Tmin, DeltaT);
-			/* for(int atom=start_index;atom<end_index;atom++){
-
-				const int imaterial=hamr::internal::atom_type_array[atom];
-			   double alpha = mp::material[imaterial].temperature_rescaling_alpha;
-			   double Tc = mp::material[imaterial].temperature_rescaling_Tc;
-				
-				// Get local temperature filed from application of heat profile
-				const double temp = hamr::internal::calculate_gaussian_profile(atom, Tmin, DeltaT);
-			   // if T<Tc T/Tc = (T/Tc)^alpha else T = T
-			   double rescaled_temperature = temp < Tc ? Tc*pow(temp/Tc,alpha) : temp;
-			   double sqrt_T=sqrt(rescaled_temperature);
-
-				const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
-
-				hamr::internal::x_field_array[atom] *= H_th_sigma;
-				hamr::internal::y_field_array[atom] *= H_th_sigma;
-				hamr::internal::z_field_array[atom] *= H_th_sigma;
-			} */
+			hamr::internal::apply_temperature_profile(start_index, end_index, hamr::internal::Tmin, DeltaT);
 
 			// Add localised applied field
 			hamr::internal::apply_field_spatial_box(start_index, end_index, 
@@ -97,8 +68,7 @@ namespace hamr{
 
 			// Calculate material temperature (with optional rescaling)
 			for(unsigned int mat=0;mat<mp::material.size();mat++){
-			   // // Check for localised temperature
-			   // if(sim::local_temperature) temperature = mp::material[mat].temperature;
+
 			   // Calculate temperature rescaling
 			   double alpha = mp::material[mat].temperature_rescaling_alpha;
 			   double Tc = mp::material[mat].temperature_rescaling_Tc;

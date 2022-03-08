@@ -32,9 +32,6 @@ namespace hamr{
                                        const double DeltaT 
                                        ){
 
-			// const double denominator = 1.0/ sqrt(8.0*log(2.0));
-			// const double laser_sigma_x = hamr::internal::fwhm_x * denominator;
-			// const double laser_sigma_y = hamr::internal::fwhm_y * denominator;
 			const double laser_sigma_x2 = hamr::internal::laser_sigma_x * hamr::internal::laser_sigma_x;
 			const double laser_sigma_y2 = hamr::internal::laser_sigma_y * hamr::internal::laser_sigma_y;
 			const double px = hamr::internal::head_position_x;
@@ -52,15 +49,20 @@ namespace hamr{
 			double exp_y =  exp(-cy2 * one_over_deny); 
 
 			double temp = Tmin + DeltaT * exp_x * exp_y;
-			// double sqrt_T = sqrt(temp);
-			// // const double sqrt_T = sqrt( Tmin + DeltaT * exp(-cx2/(2.0 * laser_sigma_x2)) * exp(-cy2/(2.0 * laser_sigma_y2)) );
 
-         // return sqrt_T;
 			return temp;
 
       }
 
 
+		/* ------------------------------------------------------------------  /
+		/  Continuous HAMR process                                             /
+		/  T(x,y,t) = (Tmax-Tmin)* exp( -(x-v*t)*(x-v*t)/(2*sigmax*sigmax) )   /
+		/                        * exp( -(y-Yc)*(y-Yc)  /(2*sigmay*sigmay) )   /
+		/                                                                      /
+		/  v=Head speed; Yc=Head y-coordinate                                  /
+		/  sigmax,sigmay = FWHM in x,y-directions                              /
+		/ ------------------------------------------------------------------- */
       void apply_temperature_profile(const int start_index, const int end_index, const double Tmin, const double DeltaT)
 		{
 			// Define constants

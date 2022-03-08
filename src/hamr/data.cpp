@@ -53,6 +53,8 @@ namespace hamr{
       std::vector<int> bit_sequence;
 
       int num_local_atoms;
+      double Tmin = 0.0;
+      double Tmax = 0.0;
       double Hmin = 0.0;
       double Hmax = 0.0;
       double system_dimensions_x;

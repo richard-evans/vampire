@@ -22,6 +22,8 @@ namespace hamr{
    //-----------------------------------------------------------------------------
    void initialize(const double Hmin,
                    const double Hmax,
+                   const double Tmin,
+                   const double Tmax,
                    const double system_dimensions_x,
                    const double system_dimensions_y,
                    const double system_dimensions_z,
@@ -38,8 +40,6 @@ namespace hamr{
 					const int end_index,
 					double H_applied,
 					const double temperature,
-					const double Tmin,
-					const double Tmax,
 					const double Hvecx,
 					const double Hvecy,
 					const double Hvecz,
@@ -47,8 +47,10 @@ namespace hamr{
 					std::vector<double>& y_total_external_field_array,
 					std::vector<double>& z_total_external_field_array);
 
+   //-----------------------------------------------------------------------------
+   // Function to run hamr continuous simulation
+   //-----------------------------------------------------------------------------
    void hamr_continuous();
-   // void hamr_pulsed();
 
    //-----------------------------------------------------------------------------
    // Function to process input file parameters for hamr settings
