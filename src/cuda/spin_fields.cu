@@ -4,6 +4,7 @@
 // GNU GPL (version 2) licence (see licence file for details).
 //
 // (c) O Arbelaez Echeverri, M A Ellis & R F L Evans 2015. All rights reserved.
+// Reviewed: Andrea Meo 2022
 //
 //------------------------------------------------------------------------------
 
@@ -38,18 +39,6 @@ namespace internal{
 void update_spin_fields ()
 {
 
-   // Find the addresses in the device address space
-   //int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
-   //cu::material_parameters_t * d_material_params = thrust::raw_pointer_cast (cu::mp::materials.data());
-
-   /*cu_real_t * d_x_spin = thrust::raw_pointer_cast(cu::atoms::x_spin_array.data());
-   cu_real_t * d_y_spin = thrust::raw_pointer_cast(cu::atoms::y_spin_array.data());
-   cu_real_t * d_z_spin = thrust::raw_pointer_cast(cu::atoms::z_spin_array.data());
-
-   cu_real_t * d_x_spin_field = thrust::raw_pointer_cast(cu::x_total_spin_field_array.data());
-   cu_real_t * d_y_spin_field = thrust::raw_pointer_cast(cu::y_total_spin_field_array.data());
-   cu_real_t * d_z_spin_field = thrust::raw_pointer_cast(cu::z_total_spin_field_array.data());
-   */
    // This exchange field zero out stuff, so they should come first
    cu::exchange::calculate_exchange_fields ();
 

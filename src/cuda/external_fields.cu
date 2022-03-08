@@ -4,6 +4,7 @@
 // GNU GPL (version 2) licence (see licence file for details).
 //
 // (c) O Arbelaez Echeverri, M A Ellis & R F L Evans 2015. All rights reserved.
+// Reviewd: Andrea Meo 2022
 //
 //------------------------------------------------------------------------------
 
@@ -129,19 +130,6 @@ namespace internal{
    //------------------------------------------------------------------------------
    void update_external_fields (){
 
-       // Find the addresses in the device address space
-      //int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
-      //cu::material_parameters_t * d_material_params = thrust::raw_pointer_cast (cu::mp::materials.data());
-
-      /*
-      cu_real_t * d_x_dip_field = thrust::raw_pointer_cast(cu::x_dipolar_field_array.data());
-      cu_real_t * d_y_dip_field = thrust::raw_pointer_cast(cu::y_dipolar_field_array.data());
-      cu_real_t * d_z_dip_field = thrust::raw_pointer_cast(cu::z_dipolar_field_array.data());
-
-      cu_real_t * d_x_ext_field = thrust::raw_pointer_cast(cu::x_total_external_field_array.data());
-      cu_real_t * d_y_ext_field = thrust::raw_pointer_cast(cu::y_total_external_field_array.data());
-      cu_real_t * d_z_ext_field = thrust::raw_pointer_cast(cu::z_total_external_field_array.data());
-      */
       // copy simulation variables to temporary constants
       const int num_atoms = ::atoms::num_atoms;
 

@@ -21,7 +21,6 @@
 #include "cuda_utils.hpp"
 #include "data.hpp"
 #include "internal.hpp"
-// #include "thermal_fields.hpp"
 #include "typedefs.hpp"
 
 // Conditional compilation of all cuda code
