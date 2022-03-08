@@ -71,7 +71,8 @@ namespace hamr{
    double get_field_bounds_y();
    double get_bit_size();
    double get_track_size();
-   double get_field_ramp_time();
+   double get_field_rise_time();
+   double get_field_fall_time();
    double get_NPS();
    double get_track_padding();
    bool get_initialisation_state();

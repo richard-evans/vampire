@@ -37,7 +37,7 @@ namespace hamr{
       if(word==test){
          double f = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 5.0e7,"input","0.1 Angstroms - 5 millimetre");
+         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 5.0e7,"input","0.0 Angstroms - 5 millimetre");
          hamr::internal::fwhm_x = f;
          hamr::internal::enabled = true;
          return true;
@@ -47,7 +47,7 @@ namespace hamr{
       if(word==test){
          double f = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 5.0e7,"input","0.1 Angstroms - 5 millimetre");
+         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 5.0e7,"input","0.0 Angstroms - 5 millimetre");
          hamr::internal::fwhm_y = f;
          hamr::internal::enabled = true;
          return true;
@@ -67,7 +67,7 @@ namespace hamr{
       if(word==test){
          double f = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
          hamr::internal::H_bounds_x = f;
          hamr::internal::enabled = true;
          return true;
@@ -77,18 +77,28 @@ namespace hamr{
       if(word==test){
          double f = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         vin::check_for_valid_value(f, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
          hamr::internal::H_bounds_y = f;
          hamr::internal::enabled = true;
          return true;
       }
       //--------------------------------------------------------------------
-      test="field-ramp-time";
+      test="field-rise-time";
       if(word==test){
          double dt = atof(value.c_str());
          // Test for valid range
          vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0,"input","0.01 attosecond - 1 second");
-         hamr::internal::H_ramp_time = dt;
+         hamr::internal::H_rise_time = dt;
+         hamr::internal::enabled = true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="field-fall-time";
+      if(word==test){
+         double dt = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0,"input","0.01 attosecond - 1 second");
+         hamr::internal::H_fall_time = dt;
          hamr::internal::enabled = true;
          return true;
       }

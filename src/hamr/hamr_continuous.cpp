@@ -54,7 +54,8 @@ namespace hamr{
 		const uint64_t total_track_time = track_time + extra_time*2; 
 		const uint64_t total_time = n_tracks * total_track_time;  
 		const uint64_t final_time = int(1.0e-11/mp::dt_SI);  // Integrate for an extra ps to allow all regions to equilibrate to Tmin
-		const uint64_t ramp_time = int(round(hamr::internal::H_ramp_time/mp::dt_SI));
+		const uint64_t rise_time = int(round(hamr::internal::H_rise_time/mp::dt_SI));
+		const uint64_t fall_time = int(round(hamr::internal::H_fall_time/mp::dt_SI));
 		const double Deltax = speed * mp::dt_SI; // speed is units of Angstrom/second
 		// Initial head position
 		const double head_position_initial = -BL*0.5 - NPS;
@@ -74,11 +75,11 @@ namespace hamr{
 		std::cout << " Head velocity: " << hamr::internal::head_speed*1e-10 << " m/s" << std::endl;
 		std::cout << " Time per bit: " << bit_time*mp::dt_SI << " s" << std::endl;
 		// Check that field ramp time < bit time
-		if(2*ramp_time >= bit_time){
+		if(rise_time+fall_time >= bit_time){
          terminaltextcolor(RED);
-			std::cerr << "Error - value for \'hamr:field-ramp-time\' " << ramp_time*mp::dt_SI << " s is too large. Make sure is less than half time per bit: " << bit_time*mp::dt_SI << " s." << std::endl;
+			std::cerr << "Error - value for \'hamr:field-rise-time\' " << rise_time*mp::dt_SI << " s or \'hamr:field-fall-time\' " << fall_time*mp::dt_SI << " s is too large. Make sure is less than half time per bit: " << bit_time*mp::dt_SI << " s." << std::endl;
          terminaltextcolor(WHITE);
-			zlog << zTs() << "Error - value for \'hamr:field-ramp-time\' " << ramp_time*mp::dt_SI << " s is too large. Make sure is less than half time per bit: " << bit_time*mp::dt_SI << " s." << std::endl;
+			zlog << zTs() << "Error - value for \'hamr:field-rise-time\' " << rise_time*mp::dt_SI << " s or \'hamr:field-fall-time\' " << fall_time*mp::dt_SI << " s is too large. Make sure is less than half time per bit: " << bit_time*mp::dt_SI << " s." << std::endl;
          err::vexit();
 		}
 		std::cout << " Time per track: " << total_track_time*mp::dt_SI << " s" << std::endl;
@@ -140,7 +141,7 @@ namespace hamr{
 					// Determine field polarisation within bit
 					const double H_app_dir = static_cast<double>(hamr::internal::bit_sequence[bit_tot]);
 					// Update applied field value depending on trapezoidal time profile
-					const double H_app_abs = fabs(sim::H_applied) + hamr::internal::update_field_time_trapz_profile(tmp_bit_time, ramp_time, bit_time);
+					const double H_app_abs = fabs(sim::H_applied) + hamr::internal::update_field_time_trapz_profile(tmp_bit_time, rise_time, fall_time, bit_time);
 					// Determine sign of applied field
 					sim::H_applied = H_app_abs * H_app_dir; 
 

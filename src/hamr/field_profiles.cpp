@@ -27,9 +27,10 @@ namespace hamr{
       //-----------------------------------------------------------------------------
       // Function to calculate the external field with trapezoidal temporal profile
       //-----------------------------------------------------------------------------
-		double update_field_time_trapz_profile(const uint64_t current_time,  
-                                          const uint64_t ramp_time,
-                                          const uint64_t bit_time
+		double update_field_time_trapz_profile(const uint64_t current_time_step,  
+                                          const uint64_t rise_time_step,
+                                          const uint64_t fall_time_step,
+                                          const uint64_t bit_time_step
                                           ){
 
 		   const double Hmax = hamr::internal::Hmax; // max field
@@ -37,16 +38,16 @@ namespace hamr{
 			double H_inc = 0.0;
 
 			// Determine max magnitude of external field during initial ramp
-			if(current_time <= ramp_time){
-				H_inc = (Hmax-Hmin) / hamr::internal::H_ramp_time * mp::dt_SI;
+			if(current_time_step <= rise_time_step){
+				H_inc = (Hmax-Hmin) / hamr::internal::H_rise_time * mp::dt_SI;
 			}
 			// In the central region the max magnitude of the field is Hmax 
-			// else if(current_time > ramp_time && current_time < bit_time-ramp_time){
+			// else if(current_time_step > rise_time_step && current_time_step < bit_time_step-fall_time_step){
 			// 	H_inc = 0.0;
 			// }
 			// Decrease field in the final region
-			else if(current_time >= bit_time-ramp_time && current_time <= bit_time){
-				H_inc = -1.0*(Hmax-Hmin) / hamr::internal::H_ramp_time * mp::dt_SI;
+			else if(current_time_step >= bit_time_step-fall_time_step && current_time_step <= bit_time_step){
+				H_inc = -1.0*(Hmax-Hmin) / hamr::internal::H_fall_time * mp::dt_SI;
 			}
 
          return H_inc; 

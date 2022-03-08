@@ -36,9 +36,7 @@ namespace hamr{
       //-----------------------------------------------------------------------------
       // Function to calculate the external field with trapezoidal temporal profile
       //-----------------------------------------------------------------------------
-      double update_field_time_trapz_profile(const uint64_t current_time,  
-                                          const uint64_t ramp_time,
-                                          const uint64_t bit_time);
+      double update_field_time_trapz_profile(const uint64_t current_time, const uint64_t rise_time, const uint64_t fall_time, const uint64_t bit_time);
 
       //-----------------------------------------------------------------------------
       // Function to apply field only to atoms within box around centre of writer coil
@@ -86,7 +84,8 @@ namespace hamr{
       extern double laser_sigma_y;  /// standard deviation of Gaussian distribution from fwhm/sqrt(8*log(2))
       extern double H_bounds_x;  /// Dimension in x-direction of box where magnetic field is applied
       extern double H_bounds_y;  /// Dimension in y-direction of box where magnetic field is applied
-      extern double H_ramp_time;  /// Ramp time in trapezoidal time profile of external field
+      extern double H_rise_time;  /// Rise time in trapezoidal time profile of external field
+      extern double H_fall_time;  /// Fall time in trapezoidal time profile of external field
       extern double NPS;  /// NFT to pole spacing
       extern double track_padding;  ///spacing between edges of the system in y-direction and track(s)
       extern std::vector<int> bit_sequence;  /// vector to store bits 

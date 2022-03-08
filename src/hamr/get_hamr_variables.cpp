@@ -98,8 +98,15 @@ namespace hamr{
    //--------------------------------------------------------------------------------
    // Function to get external field ramp time
    //--------------------------------------------------------------------------------
-   double get_field_ramp_time(){
-      return internal::H_ramp_time;
+   double get_field_rise_time(){
+      return internal::H_rise_time;
+   }
+
+   //--------------------------------------------------------------------------------
+   // Function to get external field ramp time
+   //--------------------------------------------------------------------------------
+   double get_field_fall_time(){
+      return internal::H_fall_time;
    }
 
    //--------------------------------------------------------------------------------
