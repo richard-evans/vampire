@@ -26,6 +26,7 @@
 #include "cells.hpp"
 #include "demag.hpp"
 #include "material.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 
 #include "cuda_timer.h"
@@ -56,6 +57,7 @@ namespace vcuda{
       bool __initialize_fields ();
       bool __initialize_cells ();
       bool __initialize_dipole ();
+      bool __initialize_hamr ();
       bool __initialize_materials ();
       bool __initialize_topology ();
       bool __initialize_curand ();
@@ -74,6 +76,9 @@ namespace vcuda{
       void update_external_fields ();
       void update_dipolar_fields ();
       void update_cell_magnetizations ();
+      void update_hamr_field ();
+      void update_global_thermal_field ();
+      void update_applied_fields ();
 
 
 
@@ -115,13 +120,8 @@ namespace vcuda{
             );
 
       __global__ void update_external_fields_kernel (
-            int * material,
-            material_parameters_t * material_params,
             cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
             cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
-            curandState * rand_state,
-            cu_real_t global_temperature,
-            cu_real_t Hx, cu_real_t Hy, cu_real_t Hz,
             int num_atoms
             );
 
@@ -153,6 +153,21 @@ namespace vcuda{
             cu_real_t * x_mu0H_dip_field, cu_real_t * y_mu0H_dip_field, cu_real_t * z_mu0H_dip_field,
             int * cells, int n_atoms
             );
+
+      __global__ void apply_global_temperature_kernel(
+      		cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
+      		cu_real_t temperature,
+      		curandState * rand_states,
+      		material_parameters_t * material_params,
+      		int * material,
+      		int n_atoms);
+
+      __global__ void update_applied_fields_kernel(
+            cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
+            const cu_real_t Hx, const cu_real_t Hy, const cu_real_t Hz,
+            int *  material, vcuda::internal::material_parameters_t * material_params,
+            const int n_atoms);
+      
 
       namespace stats{
          extern bool use_cpu;
