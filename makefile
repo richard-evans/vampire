@@ -138,6 +138,7 @@ include src/constants/makefile
 include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
+include src/hamr/makefile
 include src/hierarchical/makefile
 include src/ltmp/makefile
 include src/main/makefile

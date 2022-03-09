@@ -24,7 +24,7 @@
 #include "internal.hpp"
 
 namespace vin{
-	// Function to extract all variables from a string and return a vector
+	// Function to extract all variables from a string and return a vector of double
 	std::vector<double> doubles_from_string(std::string value){
 
 		// array for storing variables
@@ -56,6 +56,37 @@ namespace vin{
 		// return values to calling function
 		return array;
 
+	}
+
+	// Function to extract all variables from a string and return a vector of int
+	std::vector<int> integers_from_string(std::string value){
+
+		// array for storing variables
+		std::vector<int> array(0);
+
+		// set source for ss
+		std::istringstream source(value);
+
+		// int variable to store values
+		int temp = 0.0;
+
+		// string to store text
+		std::string field;
+
+		// loop over all comma separated values
+		while(getline(source,field,',')){
+
+			// convert string to ss
+			std::stringstream fs(field);
+
+			// read in variable
+			fs >> temp;
+
+			// push data value back to array
+			array.push_back(temp);
+		}
+		// return values to calling function
+		return array;
 	}
 
 	/// @brief Function to read in variables from a file.

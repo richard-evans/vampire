@@ -106,6 +106,17 @@ namespace vcuda{
  
       } /* cells */
 
+      namespace hamr
+      {
+         cu_real_t d_head_position_x;
+         cu_real_t d_head_position_y;
+         cu_real_t d_H_bounds_x;
+         cu_real_t d_H_bounds_y;
+         cu_real_t d_laser_sigma_x;
+         cu_real_t d_laser_sigma_y;
+         cu_real_t d_NPS;
+      } /* hamr */
+
       namespace mp
       {
          material_parameters_t *d_material_params;
@@ -130,6 +141,7 @@ namespace vcuda{
       cu_real_t *d_x_mu0H_dip_field;
       cu_real_t *d_y_mu0H_dip_field;
       cu_real_t *d_z_mu0H_dip_field;
+
 
       /*cu_real_array_t x_total_spin_field_array(0UL);
       cu_real_array_t y_total_spin_field_array(0UL);

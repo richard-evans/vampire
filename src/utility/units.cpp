@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=57;
+	const int max_units=71;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -165,6 +165,22 @@ int init(){
 		unit[54]="J/m";		conversion[54]=1.0E-10; 			type[54]="exchange";			// Joules/metres squared
     	unit[55]="erg/cm";	conversion[55]=1.0E-15; 			type[55]="exchange";			// erg/cm squared
 	 	unit[56]="erg/cm2";	conversion[56]=1.0e-23; 			type[56]="mm_energy";		// erg/cm2 squared to J/A2
+
+      // Velocity
+      unit[57]="A/s";      conversion[57]=1.0;                 type[57]="velocity";        // Angstrom per second
+      unit[58]="m/s";      conversion[58]=1.0E10;              type[58]="velocity";        // Metres per second
+      unit[59]="cm/s";     conversion[59]=1.0E8;               type[59]="velocity";        // Centimetres per second
+      unit[60]="mm/s";     conversion[60]=1.0E7;               type[60]="velocity";        // Millimetres per second
+      unit[61]="um/s";     conversion[61]=1.0E4;               type[61]="velocity";        // Micrometres per second
+      unit[62]="nm/s";     conversion[62]=1.0E1;               type[62]="velocity";        // Nanometres per second
+      unit[63]="pm/s";     conversion[63]=1.0E-3;              type[63]="velocity";        // Picometres per second
+      unit[64]="in/s";     conversion[64]=2.54E8;              type[64]="velocity";        // Imperial Inches per second
+      unit[65]="feet/s";   conversion[65]=3.12E9;              type[65]="velocity";        // Imperial Feet per second
+      unit[66]="A/ms";     conversion[66]=1.0E3;               type[66]="velocity";        // Angstrom per milliseconds
+      unit[67]="A/us";     conversion[67]=1.0E6;               type[67]="velocity";        // Angstrom per microseconds
+      unit[68]="A/ns";     conversion[68]=1.0E9;               type[68]="velocity";        // Angstrom per nanoseconds
+      unit[69]="A/ps";     conversion[69]=1.0E12;              type[69]="velocity";        // Angstrom per picoseconds
+      unit[70]="nm/ns";		conversion[70]=1.0E8;               type[70]="velocity";        // Nanometers per nanosecond
 
       //
 

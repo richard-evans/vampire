@@ -30,6 +30,13 @@ namespace config
 //------------------------------------------------------------------------------
 void output(){ // should include variables for data to be outputted, eg spins, cells etc
 
+   // ALWAYS enable output of atomic configurations at end of simulation for HAMR simulation, even if output wasn't requested
+   if (program::program == 7){
+      // overwrite these variables
+      config::internal::output_atoms_config = true;
+      config::internal::output_atoms_config_end = true;
+   }
+
    // check for data output enabled, if not no nothing
    if(config::internal::output_atoms_config == false && config::internal::output_cells_config == false) return;
 
@@ -73,110 +80,119 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    //------------------------------------------------------
    // atoms output if enabled and the time is right
    //------------------------------------------------------
-   if ((config::internal::output_atoms_config == true) && (config::internal::output_atoms_config_continuous == true) && (sim::output_rate_counter % config::internal::output_atoms_config_rate == 0))
-   {
-
-      // If using GPU acceleration then synchonise spins from device
-      gpu::config::synchronise();
-
-      // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
-      if ((program::program != 2) && (program::program != 3) && (program::program != 12))
+   if (config::internal::output_atoms_config==true){
+      // Print at the end of simulation
+      if (config::internal::output_atoms_config_end==true && (sim::time ==  sim::total_time+sim::equilibration_time))
       {
+         // If using GPU acceleration then synchonise spins from device
+         gpu::config::synchronise();
 
          //Always output coordinates the first time (re-)started, otherwise the spins coordinates won't be printed
-         if (config::internal::output_rate_counter_coords == 0){
+         if (config::internal::output_rate_counter_coords == 0)
+         {
              config::internal::atoms_coords();
              if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
           }
          config::internal::atoms(); // call function to output spins coords
          config::internal::output_rate_counter_coords++; //update the counter
-
       }
-      // for hysteresis programs
-      else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
+      // Otherwise print during simulation
+      else if (config::internal::output_atoms_config_continuous && (sim::output_rate_counter % config::internal::output_atoms_config_rate == 0))
       {
-         // output config only in range [minField_1;maxField_1] for descending branch
-         if (sim::parity < 0)
+
+         // If using GPU acceleration then synchonise spins from device
+         gpu::config::synchronise();
+
+         // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
+         if ((program::program != 2) && (program::program != 3) && (program::program != 12))
          {
-            if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1)){
-               if(config::internal::output_rate_counter_coords == 0){
-                  config::internal::atoms_coords();
-                  if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
-               }
-               config::internal::atoms();
-               config::internal::output_rate_counter_coords++;
-            }
+
+            //Always output coordinates the first time (re-)started, otherwise the spins coordinates won't be printed
+            if (config::internal::output_rate_counter_coords == 0)
+            {
+                config::internal::atoms_coords();
+                if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+             }
+            config::internal::atoms(); // call function to output spins coords
+            config::internal::output_rate_counter_coords++; //update the counter
          }
-         // output config only in range [minField_2;maxField_2] for ascending branch
-         else if (sim::parity > 0)
+         // for hysteresis programs
+         else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
          {
-            if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2)){
-               if (config::internal::output_rate_counter_coords == 0){
-                  config::internal::atoms_coords();
-                  if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+            // output config only in range [minField_1;maxField_1] for descending branch
+            if (sim::parity < 0)
+            {
+               if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1))
+               {
+                  if(config::internal::output_rate_counter_coords == 0)
+                  {
+                     config::internal::atoms_coords();
+                     if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+                  }
+                  config::internal::atoms();
+                  config::internal::output_rate_counter_coords++;
                }
-               config::internal::atoms();
-               config::internal::output_rate_counter_coords++;
+            }
+            // output config only in range [minField_2;maxField_2] for ascending branch
+            else if (sim::parity > 0)
+            {
+               if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2)){
+                  if (config::internal::output_rate_counter_coords == 0)
+                  {
+                     config::internal::atoms_coords();
+                     if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+                  }
+                  config::internal::atoms();
+                  config::internal::output_rate_counter_coords++;
+               }
             }
          }
       }
-   }
-   // Print only at the end of simulation
-   else if ((config::internal::output_atoms_config == true) && (config::internal::output_atoms_config_continuous == false) && (sim::time ==  sim::total_time+sim::equilibration_time))
-   {
-
-      // If using GPU acceleration then synchonise spins from device
-      gpu::config::synchronise();
-
-      config::internal::atoms_coords();
-      if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
-      config::internal::atoms(); // call function to output spins coords
-      config::internal::output_rate_counter_coords++; //update the counter
-
-   }
+   } // if for atoms output
 
    //------------------------------------------------------
    // cells output if enabled and the time is right
    //------------------------------------------------------
-   if ((config::internal::output_cells_config == true) && (config::internal::output_cells_config_continuous == true)  && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
-   {
-      // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
-      if ((program::program != 2) && (program::program != 3) && (program::program != 12))
+   if (config::internal::output_cells_config){
+      // Print only at the end of simulation
+      if(config::internal::output_cells_config_end && (sim::time ==  sim::total_time+sim::equilibration_time))
       {
-         if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+         config::internal::legacy_cells_coords();
          config::internal::legacy_cells();
       }
-      // for hysteresis programs
-      else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
+      // Otherwise print cells configurations during simulation
+      else if (config::internal::output_cells_config_continuous  && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
       {
-         // output config only in range [minField_1;maxField_1] for decreasing field
-         if (sim::parity < 0)
+         // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
+         if ((program::program != 2) && (program::program != 3) && (program::program != 12))
          {
-            if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1))
-            {
-               if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
-               config::internal::legacy_cells();
-            }
+            if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+            config::internal::legacy_cells();
          }
-         // output config only in range [minField_2;maxField_2] for increasing field
-         else if (sim::parity > 0)
+         // for hysteresis programs
+         else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
          {
-            if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2))
+            // output config only in range [minField_1;maxField_1] for decreasing field
+            if (sim::parity < 0)
             {
-               if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
-               config::internal::legacy_cells();
+               if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1))
+               {
+                  if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+                  config::internal::legacy_cells();
+               }
+            }
+            // output config only in range [minField_2;maxField_2] for increasing field
+            else if (sim::parity > 0)
+            {
+               if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2))
+               {
+                  if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+                  config::internal::legacy_cells();
+               }
             }
          }
       }
-   }
-   // Print only at the end of simulation
-   else if ((config::internal::output_cells_config == true) && (config::internal::output_cells_config_continuous == false) && (sim::time ==  sim::total_time+sim::equilibration_time))
-   {
-
-   	config::internal::legacy_cells_coords();
-   	config::internal::legacy_cells();
-
-   }
+   } //end output of cells
 
    // increment rate counter
    sim::output_rate_counter++;

@@ -38,19 +38,22 @@ namespace config{
           test="end";
           if(value==test){
               internal::output_atoms_config=true; // Save atomic configuration
-              internal::output_atoms_config_continuous=false; // do not save atomic configuration at the end of simulation
+              internal::output_atoms_config_continuous=false; // do not save atomic configurations during simulation
+              internal::output_atoms_config_end=true; // save atomic configurations at the end of simulation
               return EXIT_SUCCESS;
           }
           test="continuous";
           if(value==test){
               internal::output_atoms_config=true; // Save atomic configuration
-              internal::output_atoms_config_continuous=true; // save atomic configuration during simulation
+              internal::output_atoms_config_continuous=true; // save atomic configurations during simulation
+              internal::output_atoms_config_end=false; // do not save atomic configurations at the end of simulation
               return EXIT_SUCCESS;
           }
           test="";
           if(value==test){
               internal::output_atoms_config=true; // Save atomic configuration
-              internal::output_atoms_config_continuous=true; // save atomic configuration during simulation
+              internal::output_atoms_config_continuous=true; // save atomic configurations during simulation
+              internal::output_atoms_config_end=false; // do not save atomic configurations at the end of simulation
               return EXIT_SUCCESS;
           }
           else{
@@ -198,18 +201,21 @@ namespace config{
           if(value==test){
               internal::output_cells_config=true; // Save atomic configuration
               internal::output_cells_config_continuous=false; // do not save atomic configuration at the end of simulation
+              internal::output_cells_config_end=true; // save cells configurations at the end of simulation
               return EXIT_SUCCESS;
           }
           test="continuous";
           if(value==test){
               internal::output_cells_config=true; // Save atomic configuration
               internal::output_cells_config_continuous=true; // save atomic configuration during simulation
+              internal::output_cells_config_end=false; // do not save cells configurations at the end of simulation
               return EXIT_SUCCESS;
           }
           test="";
           if(value==test){
               internal::output_cells_config=true; // Save atomic configuration
               internal::output_cells_config_continuous=true; // save atomic configuration during simulation
+              internal::output_cells_config_end=false; // do not save cells configurations at the end of simulation
               return EXIT_SUCCESS;
           }
           else{

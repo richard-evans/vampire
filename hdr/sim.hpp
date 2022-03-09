@@ -131,9 +131,9 @@ namespace sim{
 	// Monte Carlo variables
    extern int num_monte_carlo_preconditioning_steps;
 
-	extern double head_position[2];
-	extern double head_speed;
-	extern bool   head_laser_on;
+	// extern double head_position[2];
+	// extern double head_speed;
+	// extern bool   head_laser_on;
 
 	extern double cooling_time;
 	extern int cooling_function_flag;

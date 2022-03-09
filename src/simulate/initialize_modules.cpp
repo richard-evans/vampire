@@ -17,6 +17,7 @@
 #include "cells.hpp"
 #include "create.hpp"
 #include "dipole.hpp"
+#include "hamr.hpp"
 #include "ltmp.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
@@ -136,6 +137,23 @@ void initialize_modules(){
                               material_alpha_array,
                               is_magnetic_material,
                               cs::non_magnetic_atoms_array);
+
+   //----------------------------------------
+   // Initialise hamr module 
+   //----------------------------------------
+	hamr::initialize(sim::Hmin,
+				      sim::Hmax,
+				      sim::Tmin,
+				      sim::Tmax,
+				      cs::system_dimensions[0],
+				      cs::system_dimensions[1],
+				      cs::system_dimensions[2],
+				      atoms::x_coord_array,
+				      atoms::y_coord_array,
+				      atoms::z_coord_array,
+				      atoms::type_array,
+				      atoms::num_atoms
+					   );
 
    return;
 
