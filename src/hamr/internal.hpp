@@ -70,7 +70,7 @@ namespace hamr{
       extern bool create_singletone;  /// flag to create single tone
 
       extern int num_bits; /// total number of bits
-      extern int bits_per_tack; /// number of bits per track
+      extern int bits_per_track; /// number of bits per track
       extern int num_tracks; /// number of tracks
 
       extern double bit_size; /// bit size 

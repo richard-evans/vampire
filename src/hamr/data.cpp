@@ -33,7 +33,7 @@ namespace hamr{
       bool create_singletone = false;
 
       int num_bits = 0;
-      int bits_per_tack = 0;
+      int bits_per_track = 0;
       int num_tracks = 0;
 
       double bit_size = 0.0;
