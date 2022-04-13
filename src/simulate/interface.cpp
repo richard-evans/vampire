@@ -322,6 +322,18 @@ namespace sim{
          sim::internal::mp[super_index].sot_asm.set(sotasm);
          return true;
       }
+      //------------------------------------------------------------
+      test  = "voltage-controlled-magnetic-anisotropy-coefficient";
+      test2 = "vcma-coefficient";
+      // voltage dependent anisotropy (Joules / Volt == Coulombs) for vcma
+      if( word == test || word == test2 ){
+         double vcmak = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(vcmak, word, line, prefix, unit, "", -1.0e-15, 1.0e-15,"input","0 - 1e-21");
+         sim::internal::mp[super_index].vcmak.set(vcmak);
+         sim::internal::enable_vcma_fields = true; // enable vcma fields
+         return true;
+      }
       //--------------------------------------------------------------------
       // keyword not found
       //--------------------------------------------------------------------

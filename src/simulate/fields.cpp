@@ -117,7 +117,10 @@ void calculate_spin_fields(const int start_index,const int end_index){
 	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
 
 	// Add spin torque fields
-	if(sim::internal::enable_spin_torque_fields == true) calculate_full_spin_fields(start_index,end_index);
+	if( sim::internal::enable_spin_torque_fields == true ||
+		 sim::internal::enable_vcma_fields        == true ){
+		calculate_full_spin_fields(start_index,end_index);
+	}
 
 	return;
 
@@ -142,7 +145,7 @@ void calculate_external_fields(const int start_index,const int end_index){
 	fill (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index,0.0);
 	fill (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index,0.0);
 
-	if(program::program==7){ 
+	if(program::program==7){
 
 		// Calculate thermal field and applied field due to HAMR process
 		hamr::fields(start_index,
@@ -481,7 +484,7 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double sz = atoms::z_spin_array[atom];
 
 		// get material parameter
-		const int material=atoms::type_array[atom];
+		const int material = atoms::type_array[atom];
 
 		const double alpha = mp::material[material].alpha;
 		//----------------------------------------------------------------------------------
@@ -525,11 +528,17 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		hz += sot_factor * ( (sotrj-alpha*sotpj)*(sx*sotpy - sy*sotpx) + (sotpj+alpha*sotrj)*sotpz );
 
 		//----------------------------------------------------------------------------------
+		// VCMA field
+		//----------------------------------------------------------------------------------
+		const double vcma = program::fractional_electric_field_strength * spin_transport::get_voltage() * sim::internal::vcmak[material];
+		hz += 2.0 * vcma * sz;
+
+		//----------------------------------------------------------------------------------
 		// save field to spin field array
 		//----------------------------------------------------------------------------------
-		atoms::x_total_spin_field_array[atom]+=hx;
-		atoms::y_total_spin_field_array[atom]+=hy;
-		atoms::z_total_spin_field_array[atom]+=hz;
+		atoms::x_total_spin_field_array[atom] += hx;
+		atoms::y_total_spin_field_array[atom] += hy;
+		atoms::z_total_spin_field_array[atom] += hz;
 
 	}
 

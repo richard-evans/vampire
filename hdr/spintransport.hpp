@@ -75,6 +75,11 @@ namespace spin_transport{
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
+   //---------------------------------------------------------------------------
+   // Function to get applied voltage
+   //---------------------------------------------------------------------------
+   double get_voltage();
+
 } // end of spin_transport namespace
 
 #endif //SPINTRANSPORT_H_

@@ -78,6 +78,7 @@ namespace sim{
       // Shared variables used within sim module
       //----------------------------------------------------------------------------
       bool enable_spin_torque_fields = false; // flag to enable spin torque fields
+      bool enable_vcma_fields        = false; // flag to enable voltage-controlled anisotropy fields
 
       std::vector<sim::internal::mp_t> mp; // array of material properties
 
@@ -87,9 +88,11 @@ namespace sim{
       std::vector<double> stt_polarization_unit_vector(3,0.0); // stt spin polarization direction
 
       std::vector<double> sot_asm; // array of spin orbit torque asymmetry
-      std::vector<double> sot_rj; // array of adiabatic spin torques
-      std::vector<double> sot_pj; // array of non-adiabatic spin torques
+      std::vector<double> sot_rj;  // array of adiabatic spin torques
+      std::vector<double> sot_pj;  // array of non-adiabatic spin torques
       std::vector<double> sot_polarization_unit_vector(3,0.0); // sot spin polarization direction
+
+      std::vector<double> vcmak;   // voltage controlled anisotropy coefficient
 
    } // end of internal namespace
 

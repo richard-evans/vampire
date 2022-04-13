@@ -54,12 +54,14 @@ namespace sim{
          set_double_t sot_asm; // spin orbit torque asymmetry
          set_double_t sot_rj;  // spin orbit relaxation torque
          set_double_t sot_pj;  // spin orbit precession torque
+         set_double_t vcmak;   // voltage controlled anisotropy coefficient
       };
 
       //-----------------------------------------------------------------------------
       // Internal shared variables used for the simulation
       //-----------------------------------------------------------------------------
       extern bool enable_spin_torque_fields; // flag to enable spin torque fields
+      extern bool enable_vcma_fields;        // flag to enable voltage-controlled anisotropy fields
 
       extern std::vector<sim::internal::mp_t> mp; // array of material properties
 
@@ -72,6 +74,8 @@ namespace sim{
       extern std::vector<double> sot_rj; // array of adiabatic spin torques
       extern std::vector<double> sot_pj; // array of non-adiabatic spin torques
       extern std::vector<double> sot_polarization_unit_vector; // sot spin polarization direction
+
+      extern std::vector<double> vcmak;   // voltage controlled anisotropy coefficient
 
       // shared Functions
       void llg_quantum_step();

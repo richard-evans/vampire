@@ -10,7 +10,8 @@ initialize.o \
 interface.o \
 magnetization.o \
 resistance.o \
-update.o
+update.o \
+voltage.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/spintransport/,$(spintransport_objects))

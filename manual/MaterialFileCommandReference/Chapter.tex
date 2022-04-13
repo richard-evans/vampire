@@ -33,13 +33,13 @@ negative values representing anti ferromagnetic coupling. For a ferromagnet with
 
 {\zicf material:exchange-matrix-(4th-10th)-nn[index] = float [default 0.0 J/link]}\phantomsection\addcontentsline{toc}{subsection}{material:exchange-matrix-4th-nn} Defines the pairwise exchange energy between atoms of type index and neighbour-index for the fourth nearest neighbour shell when using the built in exchange functions. See 2nd neighbour description for more details on using this feature.
 
-{\zicf material:biquadratic-exchange-matrix[index] = float [default 0.0 J/link]}\phantomsection\addcontentsline{toc}{subsection}{material:biquadratic-exchange-matrix} Defines the pairwise biquadratic exchange energy between atoms of type index and neighbour-index. The pair wise exchange energy is independent of the coordination number, and so the total exchange integral will depend on the number of neighbours for the crystal lattice. The exchange energy must be defined between all material pairs in the simulation, with positive values representing ferromagnetic coupling, and negative values representing anti ferromagnetic coupling. The biquadratic exchange Hamiltonian is given by the expression 
+{\zicf material:biquadratic-exchange-matrix[index] = float [default 0.0 J/link]}\phantomsection\addcontentsline{toc}{subsection}{material:biquadratic-exchange-matrix} Defines the pairwise biquadratic exchange energy between atoms of type index and neighbour-index. The pair wise exchange energy is independent of the coordination number, and so the total exchange integral will depend on the number of neighbours for the crystal lattice. The exchange energy must be defined between all material pairs in the simulation, with positive values representing ferromagnetic coupling, and negative values representing anti ferromagnetic coupling. The biquadratic exchange Hamiltonian is given by the expression
 
 \begin{equation*}
 E^{\mathrm{BQ}} = \sum_{i<j} \Jij^{\mathrm{BQ}} \left( \sms_i \cdot \sms_j \right)^2
 \end{equation*}
 
-\noindent where $\Jij^{\mathrm{BQ}}$ is the biquadratic exchange energy. 
+\noindent where $\Jij^{\mathrm{BQ}}$ is the biquadratic exchange energy.
 %{\zicf material:total-exchange-matrix[j] = float [default 12x5.6 J/link]}
 
 {\zicf material:atomic-spin-moment = float [0.01+ \muB, default 1.72 \muB]}\phantomsection\addcontentsline{toc}{subsection}{material:atomic-spin-moment} Defines the local effective spin moment for each atomic site. Atomic moments can be found from ab-initio calculations or derived from low temperature measurements of the saturation magnetisation. The atomic spin moments are related to the macroscopic magnetisation by the expression:
@@ -66,7 +66,8 @@ E_i = -\kuu (\sms_i \cdot \ei)^2
 {\zicf material:fourth-order-uniaxial-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-uniaxial-anisotropy-constant} Implements fourth order uniaxial anisotropy as implemented with spherical
 harmonics.
 
-{\zicf material:cubic-anisotropy-constant = float [default 0.0 J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:cubic-anisotropy-constant} Defines the local cubic magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
+{\zicf material:cubic-anisotropy-constant = float [default 0.0 J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:cubic-anisotropy-constant}
+Defines the local cubic magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
 
 \begin{equation*}
 E_i = +\frac{\kc}{2} (S_x^4 + S_y^4 + S_z^4)
@@ -118,6 +119,14 @@ Defines anisotropy arising from temperature dependent lattice expansion such as 
 
 {\zicf lattice-anisotropy-file = string}\phantomsection\addcontentsline{toc}{subsection}{material:lattice-anisotropy-file} Defines a file containing the temperature dependence of anisotropy arising from lattice expansion. The first line of the file specifies the number of points, followed by a list of pairs indicating the temperature (in $K$) and normalised lattice anisotropy, typically of order 1 at $T = 0 K$. The specified points are
 linearly interpolated by the code and so excessively high resolution is not required for high accuracy, and 1 K resolution is typically sufficient for most problems.
+
+{\zicf voltage-controlled-magnetic-anisotropy-coefficient = float [default 0.0 J/V]}
+\phantomsection\addcontentsline{toc}{subsection}{material:voltage-controlled-magnetic-anisotropy-coefficient}
+Defines the material-dependent magnetic anisotropy induced by an applied voltage.
+Here the easy axis is always assumed along z, and so a positive coefficient will
+add uniaxial anisotropy along the z-direction. The coefficient is multiplied by
+spin-transport:applied-voltage and so has units of J/V (or Coulombs), with typical
+values in the range $0.1-10 \times 10^{-21}$ J / volt.
 
 %To be implemented
 %sixth-order-uniaxial-anisotropy-constant

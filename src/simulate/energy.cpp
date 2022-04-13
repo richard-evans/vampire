@@ -57,12 +57,16 @@
 #include "exchange.hpp"
 #include "material.hpp"
 #include "errors.hpp"
-//#include "demag.hpp"
 #include "dipole.hpp"
+#include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintransport.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+
+// sim module header
+#include "internal.hpp"
 
 namespace sim{
 
@@ -169,6 +173,10 @@ double calculate_spin_energy(const int atom){
 
 	energy+=spin_applied_field_energy(Sx, Sy, Sz);
 	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);
+
+	// vcma energy
+	const double vcma = program::fractional_electric_field_strength * spin_transport::get_voltage() * sim::internal::vcmak[imaterial];
+	energy -= vcma * Sz * Sz;
 
 	return energy; // Tesla
 }
