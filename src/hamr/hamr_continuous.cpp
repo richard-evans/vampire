@@ -37,14 +37,14 @@ namespace hamr{
 		// std::cout << "Performing HAMR continuous simulation" << std::endl;
 		// zlog << zTs() << "Performing HAMR continuous simulation" << std::endl;
 
-		const double Tmin = hamr::internal::Tmin;
+		//const double Tmin = hamr::internal::Tmin;
 		// Determine times in terms of integration steps
 		const double BL = hamr::internal::bit_size;
 		const double TW = hamr::internal::track_size;
 		const double speed = hamr::internal::head_speed;
 		const double NPS = hamr::internal::NPS;
 		const double padding = hamr::internal::track_padding;
-		const int n_bits = hamr::internal::num_bits;
+		//const int n_bits = hamr::internal::num_bits;
 		const int n_bits_per_track = hamr::internal::bits_per_track;
 		const int n_tracks = hamr::internal::num_tracks;
 		const uint64_t NPS_time   = int(round((NPS/speed)/mp::dt_SI)); // time to cover extra sweeping due to NPS
@@ -66,7 +66,7 @@ namespace hamr{
 		std::cout << " Setting initial field magnitude to: " << sim::H_applied << " T" << std::endl;
 
 		std::cout << " Bit sequence to be written: ";
-		for(auto i=0; i<hamr::internal::bit_sequence.size(); i++){ std::cout << hamr::internal::bit_sequence[i] << " ";}
+		for(int i=0; i<hamr::internal::bit_sequence.size(); i++){ std::cout << hamr::internal::bit_sequence[i] << " ";}
 		std::cout << std::endl;
 		std::cout << " Bits to be written: " << n_bits_per_track*n_tracks << ", in x,y: " << n_bits_per_track << ", " << n_tracks << std::endl;
 		zlog << zTs() << "Bits to be written: " << n_bits_per_track*n_tracks << ", in x,y: " << n_bits_per_track << ", " << n_tracks << std::endl;

@@ -19,21 +19,21 @@
 namespace hamr{
 
    //--------------------------------------------------------------------------------
-   // Function to get head position along x-direction (downtrack) 
+   // Function to get head position along x-direction (downtrack)
    //--------------------------------------------------------------------------------
    double get_head_position_x(){
       return internal::head_position_x;
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get head position along y-direction (crosstrack) 
+   // Function to get head position along y-direction (crosstrack)
    //--------------------------------------------------------------------------------
    double get_head_position_y(){
       return internal::head_position_y;
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get head speed  
+   // Function to get head speed
    //--------------------------------------------------------------------------------
    double get_head_speed(){
       return internal::head_speed;

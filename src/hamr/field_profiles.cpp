@@ -3,7 +3,7 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) Andrea Meo 2022. 
+// (c) Andrea Meo 2022.
 //
 // All rights reserved.
 //
@@ -27,7 +27,7 @@ namespace hamr{
       //-----------------------------------------------------------------------------
       // Function to calculate the external field with trapezoidal temporal profile
       //-----------------------------------------------------------------------------
-		double update_field_time_trapz_profile(const uint64_t current_time_step,  
+		double update_field_time_trapz_profile(const uint64_t current_time_step,
                                           const uint64_t rise_time_step,
                                           const uint64_t fall_time_step,
                                           const uint64_t bit_time_step
@@ -41,7 +41,7 @@ namespace hamr{
 			if(current_time_step <= rise_time_step){
 				H_inc = (Hmax-Hmin) / hamr::internal::H_rise_time * mp::dt_SI;
 			}
-			// In the central region the max magnitude of the field is Hmax 
+			// In the central region the max magnitude of the field is Hmax
 			// else if(current_time_step > rise_time_step && current_time_step < bit_time_step-fall_time_step){
 			// 	H_inc = 0.0;
 			// }
@@ -50,7 +50,7 @@ namespace hamr{
 				H_inc = -1.0*(Hmax-Hmin) / hamr::internal::H_fall_time * mp::dt_SI;
 			}
 
-         return H_inc; 
+         return H_inc;
       } // end of trapezoidal profile
 
 

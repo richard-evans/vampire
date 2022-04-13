@@ -39,7 +39,7 @@ namespace hamr{
 			zlog << zTs() << "Creating singletone bit sequence ..." << std::endl;
 
 			hamr::internal::bit_sequence.clear();
-			for(auto i=0; i<hamr::internal::num_bits; ++i){
+			for(int i=0; i<hamr::internal::num_bits; ++i){
 				int bit = i%2;
 				if(bit==0){ bit=-1;}
 				hamr::internal::bit_sequence.push_back(bit);

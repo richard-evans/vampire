@@ -27,9 +27,9 @@ namespace hamr{
       //-----------------------------------------------------------------------------
       // Function to calculate Gaussian temperature profile
       //-----------------------------------------------------------------------------
-      double calculate_gaussian_profile(const int atom, 
-                                       const double Tmin, 
-                                       const double DeltaT); 
+      double calculate_gaussian_profile(const int atom,
+                                       const double Tmin,
+                                       const double DeltaT);
 
       void apply_temperature_profile(const int start_index, const int end_index, const double Tmin, const double DeltaT);
 
@@ -52,7 +52,7 @@ namespace hamr{
 					                  std::vector<double>& z_total_external_field_array);
 
       //-----------------------------------------------------------------------------
-      // Function to create singletone bit sequence 
+      // Function to create singletone bit sequence
       //-----------------------------------------------------------------------------
 		void create_singletone_vector();
 
@@ -73,8 +73,8 @@ namespace hamr{
       extern int bits_per_track; /// number of bits per track
       extern int num_tracks; /// number of tracks
 
-      extern double bit_size; /// bit size 
-      extern double track_size; /// track size 
+      extern double bit_size; /// bit size
+      extern double track_size; /// track size
       extern double head_position_x; /// head centre coordinate in x
       extern double head_position_y; /// head centre coordinate in x
       extern double head_speed; /// linear sweeping speed in Ang/s
@@ -88,17 +88,17 @@ namespace hamr{
       extern double H_fall_time;  /// Fall time in trapezoidal time profile of external field
       extern double NPS;  /// NFT to pole spacing
       extern double track_padding;  ///spacing between edges of the system in y-direction and track(s)
-      extern std::vector<int> bit_sequence;  /// vector to store bits 
+      extern std::vector<int> bit_sequence;  /// vector to store bits
 
       extern int num_local_atoms;
       extern double Tmin;   /// Minimum temperature of thermal profile
       extern double Tmax;   /// Maximum temperature of thermal profile
       extern double Hmin;   /// Minimum value of field
       extern double Hmax;   /// Maximum value of field
-      extern double system_dimensions_x; /// 
+      extern double system_dimensions_x; ///
       extern double system_dimensions_y;
       extern double system_dimensions_z;
-      extern std::vector<double> atom_coords_x; /// 
+      extern std::vector<double> atom_coords_x; ///
       extern std::vector<double> atom_coords_y;
       extern std::vector<double> atom_coords_z;
       extern std::vector<int> atom_type_array;

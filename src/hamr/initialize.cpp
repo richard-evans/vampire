@@ -41,8 +41,8 @@ namespace hamr{
                    const std::vector<int>& atom_type_array,
                    const int num_local_atoms
                   ){
-   
-		// If program:hamr-simulation not requested, then stop 
+
+		// If program:hamr-simulation not requested, then stop
       if(!hamr::internal::enabled){
          return;
       }
@@ -89,10 +89,10 @@ namespace hamr{
       hamr::internal::num_tracks = int(floor((hamr::internal::system_dimensions_y - 1.0 - 2.0*hamr::internal::track_padding)/(hamr::internal::track_size)));
       hamr::internal::bits_per_track = int(floor((hamr::internal::system_dimensions_x - 1.0)/hamr::internal::bit_size));
 
-      // If number of tracks determined by the requested number of bits is less than the maximum number of tracks allowed, 
-      // update the number of tracks to be written 
+      // If number of tracks determined by the requested number of bits is less than the maximum number of tracks allowed,
+      // update the number of tracks to be written
       const int num_tracks_try = int(round(1.0*hamr::internal::num_bits/(1.0*hamr::internal::bits_per_track)));
-      if(num_tracks_try < hamr::internal::num_tracks){ 
+      if(num_tracks_try < hamr::internal::num_tracks){
          std::cout << "Warning: Reducing number of track(s) from " << hamr::internal::num_tracks << " to " << num_tracks_try << std::endl;
          zlog << zTs() << "Warning: Reducing number of track(s) from " << hamr::internal::num_tracks << " to " << num_tracks_try << std::endl;
          hamr::internal::num_tracks = num_tracks_try;
@@ -109,5 +109,5 @@ namespace hamr{
 
       return;
    }
-   
+
 } // end of hamr namespace

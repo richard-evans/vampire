@@ -39,14 +39,14 @@ namespace hamr{
       double bit_size = 0.0;
       double track_size = 0.0;
       double head_position_x = 0.0;
-      double head_position_y = 0.0;  
+      double head_position_y = 0.0;
       double head_speed = 30.0e10; // A/s
       double fwhm_x = 200.0; // A
       double fwhm_y = 200.0; // A
-      double laser_sigma_x = fwhm_x/sqrt(8.0*log(2.0)); 
+      double laser_sigma_x = fwhm_x/sqrt(8.0*log(2.0));
       double laser_sigma_y = fwhm_y/sqrt(8.0*log(2.0));
-      double H_bounds_x = 200.0; // 
-      double H_bounds_y = 200.0; // 
+      double H_bounds_x = 200.0; //
+      double H_bounds_y = 200.0; //
       double H_rise_time = 1.0e-12;
       double H_fall_time = 1.0e-12;
       double NPS = 0.0; // NFT to pole spacing
@@ -71,4 +71,3 @@ namespace hamr{
 
    } // end of internal namespace
 } // end of hamr namespace
-
