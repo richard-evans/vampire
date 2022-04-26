@@ -1197,6 +1197,24 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
+        test="binder-cumulant";
+        if(word==test){
+            // Set flags for calculations of binder cumulant and magnetization
+            stats::calculate_system_binder_cumulant=true;
+            stats::calculate_system_magnetization=true;
+            output_list.push_back(998);
+            return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
+        test="material-binder-cumulant";
+        if(word==test){
+            // Set flags for calculations of binder cumulant and magnetization
+            stats::calculate_material_binder_cumulant=true;
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(997);
+            return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
         test="electron-temperature"; // identical to temperature
         if(word==test){
             output_list.push_back(2);

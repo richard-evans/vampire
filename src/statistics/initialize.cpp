@@ -219,6 +219,12 @@ namespace stats{
       if(stats::calculate_grain_susceptibility)    stats::grain_susceptibility.initialize(stats::grain_magnetization);
       if(stats::calculate_material_susceptibility) stats::material_susceptibility.initialize(stats::material_magnetization);
 
+      //------------------------------------------------------------------------
+      // binder cumulant
+      //------------------------------------------------------------------------
+      if(stats::calculate_system_binder_cumulant) stats::system_binder_cumulant.initialize(stats::system_magnetization);
+      if(stats::calculate_material_binder_cumulant) stats::material_binder_cumulant.initialize(stats::material_magnetization);
+
       return;
 
    }
