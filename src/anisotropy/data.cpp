@@ -38,10 +38,13 @@ namespace anisotropy{
       bool enable_lattice_anisotropy  = false; // Flag to turn on lattice anisotropy calculation
       bool enable_random_anisotropy   = false; // Flag to enable random anisitropy initialisation
 
+      // Flags for spherical-harmonic decomposition of magnetocrystalline anisotropy
       bool enable_uniaxial_second_order = false; // Flag to enable calculation of second order anisotropy
+      bool enable_rotational_2_2_order = false; // Flag to enable calculation of second-order-theta-second-order-phi anisotropy
       bool enable_uniaxial_fourth_order = false; // Flag to enable calculation of fourth order anisotropy
-      bool enable_biaxial_fourth_order_simple = false; // Flag to enable calculation of the simple version of the fourth order anisotropy
       bool enable_uniaxial_sixth_order  = false; // Flag to enable calculation of sixth order anisotropy
+
+      bool enable_biaxial_fourth_order_simple = false; // Flag to enable calculation of the simple version of the fourth order anisotropy
 
       bool enable_fourth_order_rotational = false; // Flag to enable 4th order rotational anisotropy
 
@@ -67,6 +70,8 @@ namespace anisotropy{
 
       // unrolled arrays for storing easy axes for each material
       std::vector<evec_t> ku_vector(0); // 001 easy axis direction
+      std::vector<evec_t> kr_vector(0); // 100 rotational axis direction
+      std::vector<evec_t> kl_vector(0); // 010 last axis direction
 
       std::vector<evec_t> u1_vector(0); // Unit vector along [110]
       std::vector<evec_t> u2_vector(0); // Unit vector along [1-10]

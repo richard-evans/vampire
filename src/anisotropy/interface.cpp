@@ -120,7 +120,17 @@ namespace anisotropy{
          internal::enable_uniaxial_second_order = true; // Switch on second order tensor calculation for all spins
          return true;
       }
-
+      
+      // Second order theta second order phi anisotropy constant
+      test = "2-2-order-anisotropy-constant";
+      test2 = "second-order-theta-second-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
+         double k2r2 = atof(value.c_str());
+         vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k2r2 = k2r2;
+         internal::enable_rotational_2_2_order = true;
+         return true;
+      }
     //  Triaxial anisotropy in second and fourth order
       test="second-order-triaxial-anisotropy-vector";
       if(word == test){
@@ -409,6 +419,35 @@ namespace anisotropy{
          }
          return true;
       }
+      //------------------------------------------------------------
+      test = "rotational-anisotropy-direction";
+      if(word == test){
+         // temporary storage container
+         std::vector<double> r(3);
+         // read values from string
+         r = vin::doubles_from_string(value);
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(r, word, line, prefix, "material");
+         // copy sanitised unit vector to material
+         internal::mp[super_index].kr_vector = r;
+         return true;
+         
+      }
+      //------------------------------------------------------------
+      test = "last-anisotropy-direction";
+      if(word == test){
+         // temporary storage container
+         std::vector<double> l(3);
+         // read values from string
+         l = vin::doubles_from_string(value);
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(l, word, line, prefix, "material");
+         // copy sanitised unit vector to material
+         internal::mp[super_index].kl_vector = l;
+         return true;
+
+      }
+      
       //--------------------------------------
       // Direction 1
       //--------------------------------------

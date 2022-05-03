@@ -88,6 +88,13 @@ namespace anisotropy{
             double ku4; // fourth order uniaxial anisotropy constant (Ku2)
             double ku6; // sixth order uniaxial anisotropy constant  (Ku3)
 
+            double k2r2; // second order theta second order phi anisotropy constant
+            double k4r2; // fourth order theta second order phi anisotropy constant
+            double k4r4; // fourth order theta fourth order phi anisotropy constant
+            double k6r2; // sixth order theta second order phi anisotropy constant
+            double k6r4; // sixth order theta second order phi anisotropy constant
+            double k6r6; // sixth order theta sixth order phi anisotropy constant
+
             double kc4; // fourth order cubic anisotropy constant (Kc1)
             double kc6; // sixth order cubic anisotropy constant (Kc2)
 
@@ -98,6 +105,8 @@ namespace anisotropy{
             std::vector<double> kij; // surface/Neel anisotropy pair constant
 
             std::vector<double> ku_vector; // unit vector defining axis for uniaxial anisotropy
+            std::vector<double> kr_vector; // unit vector defining axis for rotational anisotropy
+            std::vector<double> kl_vector; // last unit vector perpendicular to kr_vector and ku_vector
 
             std::vector<double> u1_vector; // unit vector defining axis for uniaxial anisotropy
             std::vector<double> u2_vector; // unit vector defining axis for uniaxial anisotropy                        
@@ -119,6 +128,14 @@ namespace anisotropy{
             	ku2(0.0), // set initial value of ku2 to zero
                ku4(0.0), // set initial value of ku4 to zero
                ku6(0.0), // set initial value of ku6 to zero
+
+               k2r2(0.0), // set initial value of k2r2 to zero
+               k4r2(0.0), // set intital value of k4r2 to zero
+               k4r4(0.0), // set initial value of k4r4 to zero
+               k6r2(0.0), // set initial value of k6r2 to zero
+               k6r4(0.0), // set initial value of k6r4 to zero
+               k6r6(0.0), // set initial value of k6r6 to zero
+
                kc4(0.0), // set initial value of kc4 to zero
                kc6(0.0), // set initial value of kc6 to zero
                k4r(0.0), // set initial value of k4r to zero
@@ -135,6 +152,20 @@ namespace anisotropy{
                ku_vector[0] = 0.0; // set direction along [0,0,1]
                ku_vector[1] = 0.0;
                ku_vector[2] = 1.0;
+
+               // set default axis from which rotational angle phi is measured
+               kr_vector.resize(3); // resize to three elements
+               
+               kr_vector[0] = 1.0; // set direction along [1,0,0]
+               kr_vector[1] = 0.0;
+               kr_vector[2] = 0.0;
+
+               // set default (y) axis perpendicular to both ku_vector and kr_vector
+               kl_vector.resize(3);
+
+               kl_vector[0] = 0.0;
+               kl_vector[1] = 1.0;
+               kl_vector[2] = 0.0;
 
                const double oneosqrt2 = 1.0/sqrt(2.0);
 
@@ -186,6 +217,7 @@ namespace anisotropy{
       extern bool enable_uniaxial_fourth_order; // Flag to enable calculation of fourth order uniaxial anisotropy
       extern bool enable_biaxial_fourth_order_simple; // Flag to enable calculation of simplified fourth order biaxial anisotropy
       extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
+      extern bool enable_rotational_2_2_order;  // Flag to enable calculation of second order theta second order phi anisotropy
 
       extern bool enable_cubic_fourth_order;    // Flag to enable calculation of fourth order cubic anisotropy
       extern bool enable_cubic_sixth_order;     // Flag to enable calculation of sixth order cubic  anisotropy
@@ -209,12 +241,15 @@ namespace anisotropy{
       extern std::vector<double> ku2;
       extern std::vector<double> ku4;
       extern std::vector<double> ku6;
+      extern std::vector<double> k2r2;
       extern std::vector<double> kc4;
       extern std::vector<double> kc6;
       extern std::vector<double> k4r;
 
       // unrolled arrays for storing easy axes for each material
       extern std::vector<evec_t> ku_vector; // 001 easy axis direction
+      extern std::vector<evec_t> kr_vector; // 100 phi = 0 direction
+      extern std::vector<evec_t> kl_vector; // 010 phi = 90 direction
 
       extern bool native_neel_anisotropy_threshold;  // enables site-dependent surface threshold
       extern unsigned int neel_anisotropy_threshold; // global threshold for surface atoms
@@ -276,6 +311,15 @@ namespace anisotropy{
                                         const int start_index,
                                         const int end_index);
 
+      void second_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
+                                                      std::vector<double>& spin_array_y,
+                                                      std::vector<double>& spin_array_z,
+                                                      std::vector<int>&    atom_material_array,
+                                                      std::vector<double>& field_array_x,
+                                                      std::vector<double>& field_array_y,
+                                                      std::vector<double>& field_array_z,
+                                                      const int start_index,
+                                                      const int end_index);
 
       void triaxial_second_order_fields_fixed_basis(std::vector<double>& spin_array_x,
                                                      std::vector<double>& spin_array_y,
@@ -413,6 +457,12 @@ namespace anisotropy{
                                            const double sx,
                                            const double sy,
                                            const double sz);
+      
+      double second_order_theta_second_order_phi_energy( const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz);
 
       double triaxial_second_order_energy_fixed_basis(const int atom,
                                                       const int mat,
