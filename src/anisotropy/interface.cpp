@@ -283,6 +283,16 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      test = "4-2-order-anisotropy-constant";
+      test2 = "fourth-order-theta-second-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
+         double k4r2 = atof(value.c_str());
+         vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r2 = k4r2;
+         internal::enable_rotational_4_2_order = true;
+         return true;
+      }
+      //------------------------------------------------------------
       //Implementation of biaxial fourth-order anisotropy (simple version)
       test = "fourth-order-biaxial-anisotropy-constant";
       if( word == test ){
@@ -431,7 +441,7 @@ namespace anisotropy{
          // copy sanitised unit vector to material
          internal::mp[super_index].kr_vector = r;
          return true;
-         
+
       }
       //------------------------------------------------------------
       test = "last-anisotropy-direction";
@@ -447,7 +457,6 @@ namespace anisotropy{
          return true;
 
       }
-      
       //--------------------------------------
       // Direction 1
       //--------------------------------------

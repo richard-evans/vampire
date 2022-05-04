@@ -67,6 +67,11 @@ namespace anisotropy{
          internal::ku2.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku2[m] = internal::mp[m].ku2 * inverse_mu_s[m];
       }
+      // Second order theta second order phi rotational
+      if(internal::enable_rotational_2_2_order){
+         internal::k2r2.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k2r2[m] = internal::mp[m].k2r2 * inverse_mu_s[m];
+      }
       // Fourth order uniaxial
       if(internal::enable_uniaxial_fourth_order){
          internal::ku4.resize(num_materials);
@@ -348,6 +353,8 @@ namespace anisotropy{
       // initialise axes for each material
       //---------------------------------------------------------------------
       internal::ku_vector.resize(num_materials);
+      internal::kr_vector.resize(num_materials);
+      internal::kl_vector.resize(num_materials);
 
       for(int m = 0; m < num_materials; m++){
 
@@ -355,6 +362,16 @@ namespace anisotropy{
          internal::ku_vector[m].x = internal::mp[m].ku_vector[0];
          internal::ku_vector[m].y = internal::mp[m].ku_vector[1];
          internal::ku_vector[m].z = internal::mp[m].ku_vector[2];
+
+         // unroll rotational axes
+         internal::kr_vector[m].x = internal::mp[m].kr_vector[0];
+         internal::kr_vector[m].y = internal::mp[m].kr_vector[1];
+         internal::kr_vector[m].z = internal::mp[m].kr_vector[2];
+
+         // unroll last axes
+         internal::kl_vector[m].x = internal::mp[m].kl_vector[0];
+         internal::kl_vector[m].y = internal::mp[m].kl_vector[1];
+         internal::kl_vector[m].z = internal::mp[m].kl_vector[2];
 
       }
 

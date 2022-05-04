@@ -213,23 +213,31 @@ namespace anisotropy{
 
       extern bool initialised; // check module has been initialised
 
+      // Flags for spherical-harmonic expansion anisotorpy terms 
       extern bool enable_uniaxial_second_order; // Flag to enable calculation of second order uniaxial anisotropy
-      extern bool enable_uniaxial_fourth_order; // Flag to enable calculation of fourth order uniaxial anisotropy
-      extern bool enable_biaxial_fourth_order_simple; // Flag to enable calculation of simplified fourth order biaxial anisotropy
-      extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
       extern bool enable_rotational_2_2_order;  // Flag to enable calculation of second order theta second order phi anisotropy
+      extern bool enable_uniaxial_fourth_order; // Flag to enable calculation of fourth order uniaxial anisotropy
+      extern bool enable_rotational_4_2_order;  // Flag to enable calculation of fourth order theta second order phi anisotropy
+      extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
 
+      // Flags for biaxial anisotropy terms
+      extern bool enable_biaxial_fourth_order_simple; // Flag to enable calculation of simplified fourth order biaxial anisotropy
+
+      // Flags for cubic anisotropy terms
       extern bool enable_cubic_fourth_order;    // Flag to enable calculation of fourth order cubic anisotropy
       extern bool enable_cubic_sixth_order;     // Flag to enable calculation of sixth order cubic  anisotropy
       extern bool enable_cubic_fourth_order_rotation; // Flag to enable calculation of rotated cubic anisotropy
 
+      // Flags for some ad-hoc rotational anisotropy terms
       extern bool enable_fourth_order_rotational; // Flag to enable 4th order rotational anisotropy
 
+      // Flags for triaxial anisotropy
       extern bool enable_triaxial_anisotropy_rotated;
       extern bool enable_triaxial_fourth_order_rotated;
       extern bool enable_triaxial_anisotropy;
       extern bool enable_triaxial_fourth_order;
 
+      // Flags for other anisotropies
       extern bool enable_neel_anisotropy; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
       extern bool enable_lattice_anisotropy; // Flag to turn on lattice anisotropy calculation
       extern bool enable_random_anisotropy; // Flag to enable random anisitropy initialisation
@@ -237,13 +245,16 @@ namespace anisotropy{
       // arrays for storing 1D collapsed Neel tensor
       extern std::vector<double> neel_tensor;
 
-      // arrays for storing unrolled anisotropy constants in Tesla
+      // arrays for storing unrolled spherical-harmonic anisotropy constants in Tesla
       extern std::vector<double> ku2;
-      extern std::vector<double> ku4;
-      extern std::vector<double> ku6;
       extern std::vector<double> k2r2;
+      extern std::vector<double> ku4;
+      extern std::vector<double> k4r2;
+      extern std::vector<double> ku6;
       extern std::vector<double> kc4;
       extern std::vector<double> kc6;
+      
+      // array for a fourth order rotational consant
       extern std::vector<double> k4r;
 
       // unrolled arrays for storing easy axes for each material
@@ -362,6 +373,16 @@ namespace anisotropy{
                                         const int end_index);
 
       void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+
+      void fourth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
                                         std::vector<int>&    atom_material_array,
@@ -490,6 +511,12 @@ namespace anisotropy{
 
 
       double uniaxial_fourth_order_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double fourth_order_theta_second_order_phi_energy(const int atom,
                                           const int mat,
                                           const double sx,
                                           const double sy,

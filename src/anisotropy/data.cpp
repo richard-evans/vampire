@@ -40,8 +40,9 @@ namespace anisotropy{
 
       // Flags for spherical-harmonic decomposition of magnetocrystalline anisotropy
       bool enable_uniaxial_second_order = false; // Flag to enable calculation of second order anisotropy
-      bool enable_rotational_2_2_order = false; // Flag to enable calculation of second-order-theta-second-order-phi anisotropy
+      bool enable_rotational_2_2_order = false; // Flag to enable calculation of second order theta second order phi anisotropy
       bool enable_uniaxial_fourth_order = false; // Flag to enable calculation of fourth order anisotropy
+      bool enable_rotational_4_2_order = false; // Flag to enable calculation of fourth order theta second order phi anisotorpy
       bool enable_uniaxial_sixth_order  = false; // Flag to enable calculation of sixth order anisotropy
 
       bool enable_biaxial_fourth_order_simple = false; // Flag to enable calculation of the simple version of the fourth order anisotropy
@@ -62,6 +63,7 @@ namespace anisotropy{
 
       // arrays for storing unrolled anisotropy constants in Tesla
       std::vector<double> ku2(0);
+      std::vector<double> k2r2(0);
       std::vector<double> ku4(0);
       std::vector<double> ku6(0);
       std::vector<double> kc4(0);

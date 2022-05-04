@@ -41,13 +41,13 @@ namespace anisotropy{
       // of the highest order term with an abritrary shift so that E(0) = 0.
       //
       // The rotational term here is given by
-      // E_{22} = -k_{22}sin^2{theta}cos{2phi}
+      // E_{42} = -k_{42}sin^2{theta}(cos^2{theta} - 1/7)cos{2phi}
       // 
       // The field is found by taking the negative gradient w.r.t. the magnetic moment 
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
-      void second_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
+      void fourth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
                                         std::vector<int>&    atom_material_array,
@@ -58,7 +58,13 @@ namespace anisotropy{
                                         const int end_index){
 
          // if not enabled then do nothing
-         if(!internal::enable_rotational_2_2_order) return;
+         if(!internal::enable_rotational_4_2_order) return;
+
+         // const used 12/7
+         const double twelveoverseven = 12/7;
+
+         // get reduced anisotropy constant ku/mu_s
+         const double k4r2 = internal::k4r2[mat];
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -78,28 +84,33 @@ namespace anisotropy{
             const double gy = internal::kl_vector[mat].y;
             const double gz = internal::kl_vector[mat].z;
 
-            // calculate S_x
+            // calculate S_x and S_x^3 parts
             const double Sx = sx*fx + sy*fy + sz*fz;
+            const double Sxpart = twelveoverseven*Sx;
             
-            // calculate S_y
+            const double Sx3 = Sx*Sx*Sx;
+            const double Sx3part = 4*Sx3;
+
+            // calculate S_y and S_y^3 parts
             const double Sy = sx*gx + sy*gy + sz*gz;
+            const double Sypart = twelveoverseven*Sx;
+            
+            const double Sy3 = Sy*Sy*Sy;
+            const double Sy3part = 4*Sy3;
 
-            // get reduced anisotropy constant ku/mu_s
-            const double k2r2 = internal::k2r2[mat];
-
-            // calculate field terms
-            const double full_Sx = 2*k2r2*Sx;
-            const double full_Sy = 2*k2r2*Sy;
+            // calculate full form to add to field
+            const double fullSx = k4r2*(Sx3part - Sxpart);
+            const double fullSy = k4r2*(Sy3part - Sypart);
 
             // sum x-component of field, where x-direction is represented by fx, fy, fz
-            field_array_x[atom] += full_Sx*fx;
-            field_array_y[atom] += full_Sx*fy;
-            field_array_z[atom] += full_Sx*fz;
+            field_array_x[atom] -= fullSx*fx;
+            field_array_y[atom] -= fullSx*fy;
+            field_array_z[atom] -= fullSx*fz;
 
             // sum y-component of field, where y-direction is represented by gx, gy, gz
-            field_array_x[atom] -= full_Sy*gx;
-            field_array_y[atom] -= full_Sy*gy;
-            field_array_z[atom] -= full_Sy*gz;
+            field_array_x[atom] += fullSy*gx;
+            field_array_y[atom] += fullSy*gy;
+            field_array_z[atom] += fullSy*gz;
 
          }
 
@@ -111,16 +122,20 @@ namespace anisotropy{
       // Function to add 2-theta-2-phi anisotropy
       //---------------------------------------------------------------------------------
 
-      double second_order_theta_second_order_phi_energy(const int atom,
+      double fourth_order_theta_second_order_phi_energy(const int atom,
                                           const int mat,
                                           const double sx,
                                           const double sy,
                                           const double sz){
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
-         const double k2r2 = internal::k2r2[mat];
+         const double k4r2 = internal::k4r2[mat];
 
-         const double fx = internal::kr_vector[mat].x;
+         const double ex = internal::ku_vector[mat].x;
+         const double ey = internal::ku_vector[mat].y;
+         const double ez = internal::ku_vector[mat].z;
+
+         const double fx = internal::kr_vecter[mat].x;
          const double fy = internal::kr_vector[mat].y;
          const double fz = internal::kr_vector[mat].z;
 
@@ -128,12 +143,16 @@ namespace anisotropy{
          const double gy = internal::kl_vector[mat].y;
          const double gz = internal::kl_vector[mat].z;
 
+         // calculate cos^2{theta} = S_z
+         const double costheta = sx*ex + sy*ey + sz*ez;
+         const double costheta2 = costheta*costheta;
+
          // calculate sin^2{theta}cos{2phi} = sin^2{theta}cos^2{phi} - sin^2{theta}sin^2{phi} = S_x^2 - S_y^2
          const double Sx = sx*fx + sy*fy + sz*fz;
          const double Sy = sx*gx + sy*gy + sz*gz;
          const double sintheta2cos2phi = Sx*Sx - Sy*Sy;
 
-         return -k2r2*sintheta2cos2phi;
+         return -k4r2*(costheta2 - 1/7)*sintheta2cos2phi;
 
       }
    }

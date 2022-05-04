@@ -57,11 +57,14 @@ namespace anisotropy
    //-----------------------------------------------------------------------------
    double get_anisotropy_constant(const int material);
    double get_ku2(const int material);
+   double get_k2r2(const int material);
    double get_ku4(const int material);
    double get_ku6(const int material);
    double get_kc4(const int material);
    double get_kc6(const int material);
    std::vector<double> get_ku_vector(const int material);
+   std::vector<double> get_kr_vector(const int material);
+   std::vector<double> get_kl_vector(const int material);
 
    //-----------------------------------------------------------------------------
    // function to identify surface atoms
