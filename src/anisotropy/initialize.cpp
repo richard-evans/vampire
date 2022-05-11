@@ -77,6 +77,11 @@ namespace anisotropy{
          internal::ku4.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
       }
+      // Fourth order theta second order phi rotational
+      if(internal::enable_rotational_4_2_order){
+         internal::k4r2.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r2[m] = internal::mp[m].k4r2 * inverse_mu_s[m];
+      }
       // Fourth order biaxial (simple version)
       if(internal::enable_biaxial_fourth_order_simple){
          internal::ku4.resize(num_materials);

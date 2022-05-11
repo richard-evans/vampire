@@ -34,6 +34,10 @@ namespace anisotropy{
       return internal::mp[material].ku2;
    }
 
+   //--------------------------------------------------------------------------------
+   // Function to get second order theta second order phi anisotropy constant for a 
+   // given material
+   //--------------------------------------------------------------------------------
    double get_k2r2(const int material){
       return internal::mp[material].k2r2;
    }
@@ -43,6 +47,14 @@ namespace anisotropy{
    //--------------------------------------------------------------------------------
    double get_ku4(const int material){
       return internal::mp[material].ku4;
+   }
+
+   //--------------------------------------------------------------------------------
+   // Function to get fourth order theta second order phi anisotropy constant for a 
+   // given material
+   //--------------------------------------------------------------------------------
+   double get_k4r2(const int material){
+      return internal::mp[material].k4r2;
    }
 
    //--------------------------------------------------------------------------------
@@ -67,7 +79,8 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get unit vector defining axis for uniaxial anisotropy for a material
+   // Function to get unit vector defining axis for uniaxial anisotropy for a
+   // material
    //--------------------------------------------------------------------------------
    std::vector<double> get_ku_vector(const int material){
       return internal::mp[material].ku_vector;

@@ -65,6 +65,7 @@ namespace anisotropy{
       std::vector<double> ku2(0);
       std::vector<double> k2r2(0);
       std::vector<double> ku4(0);
+      std::vector<double> k4r2(0);
       std::vector<double> ku6(0);
       std::vector<double> kc4(0);
       std::vector<double> kc6(0);

@@ -88,8 +88,8 @@ namespace anisotropy{
             const double k2r2 = internal::k2r2[mat];
 
             // calculate field terms
-            const double full_Sx = 2*k2r2*Sx;
-            const double full_Sy = 2*k2r2*Sy;
+            const double full_Sx = 2.0*k2r2*Sx;
+            const double full_Sy = 2.0*k2r2*Sy;
 
             // sum x-component of field, where x-direction is represented by fx, fy, fz
             field_array_x[atom] += full_Sx*fx;

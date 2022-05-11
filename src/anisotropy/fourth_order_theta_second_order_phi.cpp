@@ -61,10 +61,7 @@ namespace anisotropy{
          if(!internal::enable_rotational_4_2_order) return;
 
          // const used 12/7
-         const double twelveoverseven = 12/7;
-
-         // get reduced anisotropy constant ku/mu_s
-         const double k4r2 = internal::k4r2[mat];
+         const double twelveoverseven = 12.0/7.0;
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -88,21 +85,21 @@ namespace anisotropy{
             const double Sx = sx*fx + sy*fy + sz*fz;
             const double Sxpart = twelveoverseven*Sx;
             
-            const double Sx3 = Sx*Sx*Sx;
-            const double Sx3part = 4*Sx3;
+            const double Sx3part = 4*Sx*Sx*Sx;
 
             // calculate S_y and S_y^3 parts
             const double Sy = sx*gx + sy*gy + sz*gz;
-            const double Sypart = twelveoverseven*Sx;
+            const double Sypart = twelveoverseven*Sy;
             
-            const double Sy3 = Sy*Sy*Sy;
-            const double Sy3part = 4*Sy3;
+            const double Sy3part = 4*Sy*Sy*Sy;
+
+            // get reduced anisotropy constant ku/mu_s
+            const double k4r2 = internal::k4r2[mat];
 
             // calculate full form to add to field
             const double fullSx = k4r2*(Sx3part - Sxpart);
             const double fullSy = k4r2*(Sy3part - Sypart);
-
-            // sum x-component of field, where x-direction is represented by fx, fy, fz
+            
             field_array_x[atom] -= fullSx*fx;
             field_array_y[atom] -= fullSx*fy;
             field_array_z[atom] -= fullSx*fz;
@@ -119,7 +116,7 @@ namespace anisotropy{
       }
 
       //---------------------------------------------------------------------------------
-      // Function to add 2-theta-2-phi anisotropy
+      // Function to add 4-theta-2-phi anisotropy
       //---------------------------------------------------------------------------------
 
       double fourth_order_theta_second_order_phi_energy(const int atom,
@@ -135,7 +132,7 @@ namespace anisotropy{
          const double ey = internal::ku_vector[mat].y;
          const double ez = internal::ku_vector[mat].z;
 
-         const double fx = internal::kr_vecter[mat].x;
+         const double fx = internal::kr_vector[mat].x;
          const double fy = internal::kr_vector[mat].y;
          const double fz = internal::kr_vector[mat].z;
 
