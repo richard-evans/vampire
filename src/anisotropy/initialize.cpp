@@ -97,6 +97,11 @@ namespace anisotropy{
          internal::ku6.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku6[m] = internal::mp[m].ku6 * inverse_mu_s[m];
       }
+      // Sixth order theta second order phi rotational
+      if(internal::enable_rotational_6_2_order){
+         internal::k6r2.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r2[m] = internal::mp[m].k6r2 * inverse_mu_s[m];
+      }
       // Fourth order cubic
       if(internal::enable_cubic_fourth_order || internal::enable_cubic_fourth_order_rotation){
          internal::kc4.resize(num_materials);

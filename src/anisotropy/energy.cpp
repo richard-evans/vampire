@@ -41,6 +41,7 @@ namespace anisotropy{
       if(internal::enable_rotational_4_4_order)          energy += internal::fourth_order_theta_fourth_order_phi_energy(atom, mat, sx, sy, sz);
       if(internal::enable_biaxial_fourth_order_simple)   energy += internal::biaxial_fourth_order_simple_energy(atom, mat, sx, sy, sz);
       if(internal::enable_uniaxial_sixth_order)          energy += internal::uniaxial_sixth_order_energy (atom, mat, sx, sy, sz);
+      if(internal::enable_rotational_6_2_order)          energy += internal::sixth_order_theta_second_order_phi_energy(atom, mat, sx, sy, sz);
 
       if(internal::enable_cubic_fourth_order)            energy += internal::cubic_fourth_order_energy(atom, mat, sx, sy, sz);
       if(internal::enable_cubic_fourth_order_rotation)   energy += internal::cubic_fourth_order_rotation_energy(atom, mat, sx, sy, sz);

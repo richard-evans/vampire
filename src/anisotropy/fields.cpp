@@ -84,6 +84,9 @@ namespace anisotropy{
       // sixth order cubic anisotropy
       internal::cubic_sixth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
+      // Sixth order theta second order phi anisotropy
+      internal::sixth_order_theta_second_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
       // Neel anisotropy
       internal::neel_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 

@@ -39,12 +39,13 @@ namespace anisotropy{
       bool enable_random_anisotropy   = false; // Flag to enable random anisitropy initialisation
 
       // Flags for spherical-harmonic decomposition of magnetocrystalline anisotropy
-      bool enable_uniaxial_second_order = false; // Flag to enable calculation of second order anisotropy
-      bool enable_rotational_2_2_order = false; // Flag to enable calculation of second order theta second order phi anisotropy
-      bool enable_uniaxial_fourth_order = false; // Flag to enable calculation of fourth order anisotropy
-      bool enable_rotational_4_2_order = false; // Flag to enable calculation of fourth order theta second order phi anisotorpy
-      bool enable_rotational_4_4_order = false; // Flag to enable calculation of fourth order theta fourth order phi anisotropy
-      bool enable_uniaxial_sixth_order  = false; // Flag to enable calculation of sixth order anisotropy
+      bool enable_uniaxial_second_order   = false; // Flag to enable calculation of second order anisotropy
+      bool enable_rotational_2_2_order    = false; // Flag to enable calculation of second order theta second order phi anisotropy
+      bool enable_uniaxial_fourth_order   = false; // Flag to enable calculation of fourth order anisotropy
+      bool enable_rotational_4_2_order    = false; // Flag to enable calculation of fourth order theta second order phi anisotorpy
+      bool enable_rotational_4_4_order    = false; // Flag to enable calculation of fourth order theta fourth order phi anisotropy
+      bool enable_uniaxial_sixth_order    = false; // Flag to enable calculation of sixth order anisotropy
+      bool enable_rotational_6_2_order    = false; // Flag to enable calculation of sixth order theta second order phi anisotropy
 
       bool enable_biaxial_fourth_order_simple = false; // Flag to enable calculation of the simple version of the fourth order anisotropy
 
@@ -69,6 +70,7 @@ namespace anisotropy{
       std::vector<double> k4r2(0);
       std::vector<double> k4r4(0);
       std::vector<double> ku6(0);
+      std::vector<double> k6r2(0);
       std::vector<double> kc4(0);
       std::vector<double> kc6(0);
       std::vector<double> k4r(0);

@@ -219,6 +219,7 @@ namespace anisotropy{
       extern bool enable_uniaxial_fourth_order; // Flag to enable calculation of fourth order uniaxial anisotropy
       extern bool enable_rotational_4_2_order;  // Flag to enable calculation of fourth order theta second order phi anisotropy
       extern bool enable_rotational_4_4_order;  // Flag to enable calculation of fourth order theta fourth order phi anisotropy
+      extern bool enable_rotational_6_2_order;  // Flag to enable calculation of sixth order theta second order phi anisotropy
       extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
 
       // Flags for biaxial anisotropy terms
@@ -253,6 +254,7 @@ namespace anisotropy{
       extern std::vector<double> k4r2;
       extern std::vector<double> k4r4;
       extern std::vector<double> ku6;
+      extern std::vector<double> k6r2;
       extern std::vector<double> kc4;
       extern std::vector<double> kc6;
       
@@ -423,6 +425,16 @@ namespace anisotropy{
                                         std::vector<double>& field_array_z,
                                         const int start_index,
                                         const int end_index);
+      
+      void sixth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
 
       void rotational_fourth_order_fields_fixed_basis( std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
@@ -546,6 +558,12 @@ namespace anisotropy{
                                           const double sz);                                          
 
       double uniaxial_sixth_order_energy( const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double sixth_order_theta_second_order_phi_energy(const int atom,
                                           const int mat,
                                           const double sx,
                                           const double sy,
