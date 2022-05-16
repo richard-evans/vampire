@@ -58,6 +58,14 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get fourth order theta fourth order phi anisotropy constant for a 
+   // given material
+   //--------------------------------------------------------------------------------
+   double get_k4r4(const int material){
+      return internal::mp[material].k4r4;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get sixth order uniaxial anisotropy constant for a given material
    //--------------------------------------------------------------------------------
    double get_ku6(const int material){

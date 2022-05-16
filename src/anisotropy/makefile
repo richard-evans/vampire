@@ -22,6 +22,7 @@ uniaxial_second_order.o \
 second_order_theta_second_order_phi.o \
 uniaxial_fourth_order.o \
 fourth_order_theta_second_order_phi.o \
+fourth_order_theta_fourth_order_phi.o \
 biaxial_fourth_order_simple.o \
 uniaxial_sixth_order.o \
 triaxial_fixed_basis.o \
