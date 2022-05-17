@@ -115,7 +115,7 @@ namespace anisotropy{
       // Function to add 6-theta-6-phi anisotropy
       //---------------------------------------------------------------------------------
 
-      double sixth_order_theta_fourth_order_phi_energy(const int atom,
+      double sixth_order_theta_sixth_order_phi_energy(const int atom,
                                           const int mat,
                                           const double sx,
                                           const double sy,
