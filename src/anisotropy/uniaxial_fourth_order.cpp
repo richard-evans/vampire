@@ -89,7 +89,7 @@ namespace anisotropy{
             const double sdote3 = sdote*sdote*sdote;
 
             // calculate field (double negative from scale factor and negative derivative)
-            const double k4 = -ku4*(4.0*sdote3 - sixtyothirtyfive*sdote);
+            const double k4 = ku4*(4.0*sdote3 - sixtyothirtyfive*sdote);
 
             field_array_x[atom] += ex*k4;
             field_array_y[atom] += ey*k4;
@@ -125,7 +125,7 @@ namespace anisotropy{
          const double sdote  = (sx*ex + sy*ey + sz*ez);
          const double sdote2 = sdote*sdote;
 
-         return ku4*(sdote2*sdote2 - thirtyothirtyfive*sdote2 - fiveothirtyfive);
+         return -ku4*(sdote2*sdote2 - thirtyothirtyfive*sdote2 - fiveothirtyfive);
 
       }
 
