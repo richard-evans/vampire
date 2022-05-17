@@ -62,12 +62,6 @@ namespace anisotropy{
          // if not enabled then do nothing
          if(!internal::enable_uniaxial_sixth_order) return;
 
-         // constant factors
-         const double oneo16 = 1.0/16.0;
-
-         // rescaling prefactor
-         const double scale = oneo16 * 2.0/3.0; // Factor to rescale anisotropies to usual scale
-
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
 
@@ -82,18 +76,18 @@ namespace anisotropy{
             const double ey = internal::ku_vector[mat].y;
             const double ez = internal::ku_vector[mat].z;
 
+            const double sdote  = (sx*ex + sy*ey + sz*ez);
+            const double sdote2 = sdote*sdote;
+            const double sdote4 = sdote2*sdote2;
+
             // get reduced anisotropy constant ku/mu_s
             const double ku6 = internal::ku6[mat];
 
-            const double sdote  = (sx*ex + sy*ey + sz*ez);
-            const double sdote3 = sdote*sdote*sdote;
-            const double sdote5 = sdote3*sdote*sdote;
+            const double fullz = 22.0 * ku6 * sdote * (33.0 * sdote4 + 30.0*sdote2 + 5.0);
 
-            const double k6 = scale*ku6*(1386.0*sdote5 - 1260.0*sdote3 + 210.0*sdote);
-
-            field_array_x[atom] += ex*k6;
-            field_array_y[atom] += ey*k6;
-            field_array_z[atom] += ez*k6;
+            field_array_x[atom] += ex*fullz;
+            field_array_y[atom] += ey*fullz;
+            field_array_z[atom] += ez*fullz;
 
          }
 
@@ -103,7 +97,7 @@ namespace anisotropy{
 
       //---------------------------------------------------------------------------------
       // Function to add sixth order uniaxial anisotropy
-      // E = 2/3 * - (1/16) * (231sz^6 - 315*sz^4 + 105sz^2 - 5)
+      // E = -ku6(cos^6{theta} - (15/11)cos^4{theta} + (5/11)cos^2{theta})
       //---------------------------------------------------------------------------------
       double uniaxial_sixth_order_energy(const int atom,
                                          const int mat,
@@ -118,11 +112,14 @@ namespace anisotropy{
          const double ey = internal::ku_vector[mat].y;
          const double ez = internal::ku_vector[mat].z;
 
-         const double sdote  = (sx*ex + sy*ey + sz*ez);
+         const double sdote  = sx*ex + sy*ey + sz*ez;
          const double sdote2 = sdote*sdote;
+         const double sdote4 = sdote2*sdote2;
 
-         // factor = 2/3 * -1/16 = -1/6 = -0.04166666666
-         return -0.04166666666*ku6*(231.0*sdote2*sdote2*sdote2 - 315.0*sdote2*sdote2 + 105.0*sdote2);
+         // define useful constants
+         const double eleven = 11.0;
+
+         return - (ku6 / eleven) * (eleven * sdote2 * sdote4 - 15.0 * sdote4 + 5.0 * sdote2);
 
       }
 
