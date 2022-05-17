@@ -54,9 +54,18 @@ namespace anisotropy{
       // fourth order theta fourth order phi anisotropy
       internal::fourth_order_theta_fourth_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
+      // sixth order uniaxial anisotropy
+      internal::uniaxial_sixth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
+      // Sixth order theta second order phi anisotropy
+      internal::sixth_order_theta_second_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
+      // sixth order theta fourth order phi anisotropy
+      internal::sixth_order_theta_fourth_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
       // fourth order biaxial anisotropy (simple version)
       internal::biaxial_fourth_order_simple_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
-
+      
       //triaxial anisotropy variable basis
       internal::triaxial_second_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
@@ -69,23 +78,14 @@ namespace anisotropy{
       // triaxial fourth order anisotropy fixed basis
       internal::triaxial_fourth_order_fields_fixed_basis(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
-      // sixth order uniaxial anisotropy
-      internal::uniaxial_sixth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
-
-      // sixth order cubic anisotropy
-      internal::cubic_sixth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
-
-      // Sixth order theta second order phi anisotropy
-      internal::sixth_order_theta_second_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
-
-      // sixth order theta fourth order phi anisotropy
-      internal::sixth_order_theta_fourth_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
-
       // fourth order rotational anisotropy
       internal::rotational_fourth_order_fields_fixed_basis(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
       // fourth order cubic anisotropy
       internal::cubic_fourth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
+      // sixth order cubic anisotropy
+      internal::cubic_sixth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
       // fourth order cubic anisotropy (rotated basis)
       internal::cubic_fourth_order_rotation_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);

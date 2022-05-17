@@ -218,9 +218,10 @@ namespace anisotropy{
       extern bool enable_uniaxial_fourth_order; // Flag to enable calculation of fourth order uniaxial anisotropy
       extern bool enable_rotational_4_2_order;  // Flag to enable calculation of fourth order theta second order phi anisotropy
       extern bool enable_rotational_4_4_order;  // Flag to enable calculation of fourth order theta fourth order phi anisotropy
+      extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
       extern bool enable_rotational_6_2_order;  // Flag to enable calculation of sixth order theta second order phi anisotropy
       extern bool enable_rotational_6_4_order;  // Flag to enable calculation of sixth order theta fourth order phi anisotropy
-      extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
+      extern bool enable_rotational_6_6_order;  // Flag to enable calculation of sixth order theta fourth order phi anisotropy
 
       // Flags for biaxial anisotropy terms
       extern bool enable_biaxial_fourth_order_simple; // Flag to enable calculation of simplified fourth order biaxial anisotropy
@@ -256,6 +257,7 @@ namespace anisotropy{
       extern std::vector<double> ku6;
       extern std::vector<double> k6r2;
       extern std::vector<double> k6r4;
+      extern std::vector<double> k6r6;
 
       extern std::vector<double> kc4;
       extern std::vector<double> kc6;
@@ -318,6 +320,8 @@ namespace anisotropy{
       //-------------------------------------------------------------------------
       // internal function declarations
       //-------------------------------------------------------------------------
+      
+      // Fields
       void uniaxial_second_order_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -389,6 +393,16 @@ namespace anisotropy{
                                         const int end_index);
       
       void sixth_order_theta_fourth_order_phi_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+
+      void sixth_order_theta_sixth_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
                                         std::vector<int>&    atom_material_array,
@@ -509,6 +523,8 @@ namespace anisotropy{
                           const int end_index,
                           const double temperature);
 
+      // Energies
+
       double uniaxial_second_order_energy( const int atom,
                                            const int mat,
                                            const double sx,
@@ -552,6 +568,12 @@ namespace anisotropy{
                                           const double sz);
 
       double sixth_order_theta_fourth_order_phi_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+      
+      double sixth_order_theta_sixth_order_phi_energy(const int atom,
                                           const int mat,
                                           const double sx,
                                           const double sy,
