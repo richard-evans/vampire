@@ -87,11 +87,6 @@ namespace anisotropy{
          internal::k4r4.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k4r4[m] = internal::mp[m].k4r4 * inverse_mu_s[m];
       }
-      // Fourth order biaxial (simple version)
-      if(internal::enable_biaxial_fourth_order_simple){
-         internal::ku4.resize(num_materials);
-         for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
-      }     
       // Sixth order uniaxial
       if(internal::enable_uniaxial_sixth_order){
          internal::ku6.resize(num_materials);
@@ -102,6 +97,16 @@ namespace anisotropy{
          internal::k6r2.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k6r2[m] = internal::mp[m].k6r2 * inverse_mu_s[m];
       }
+      // Sixth order theta fourth order phi rotational
+      if(internal::enable_rotational_6_4_order){
+         internal::k6r4.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r4[m] = internal::mp[m].k6r4 * inverse_mu_s[m];
+      }
+      // Fourth order biaxial (simple version)
+      if(internal::enable_biaxial_fourth_order_simple){
+         internal::ku4.resize(num_materials);
+         for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
+      }     
       // Fourth order cubic
       if(internal::enable_cubic_fourth_order || internal::enable_cubic_fourth_order_rotation){
          internal::kc4.resize(num_materials);

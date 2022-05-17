@@ -84,16 +84,15 @@ namespace anisotropy{
          public:
 
             // variables
-            double ku2; // second order uniaxial anisotropy constant (Ku1)
-            double ku4; // fourth order uniaxial anisotropy constant (Ku2)
-            double ku6; // sixth order uniaxial anisotropy constant  (Ku3)
-
-            double k2r2; // second order theta second order phi anisotropy constant
-            double k4r2; // fourth order theta second order phi anisotropy constant
-            double k4r4; // fourth order theta fourth order phi anisotropy constant
-            double k6r2; // sixth order theta second order phi anisotropy constant
-            double k6r4; // sixth order theta second order phi anisotropy constant
-            double k6r6; // sixth order theta sixth order phi anisotropy constant
+            double ku2;    // second order uniaxial anisotropy constant (Ku1)
+            double k2r2;   // second order theta second order phi anisotropy constant
+            double ku4;    // fourth order uniaxial anisotropy constant (Ku2)
+            double k4r2;   // fourth order theta second order phi anisotropy constant
+            double k4r4;   // fourth order theta fourth order phi anisotropy constant
+            double ku6;    // sixth order uniaxial anisotropy constant  (Ku3)
+            double k6r2;   // sixth order theta second order phi anisotropy constant
+            double k6r4;   // sixth order theta second order phi anisotropy constant
+            double k6r6;   // sixth order theta sixth order phi anisotropy constant
 
             double kc4; // fourth order cubic anisotropy constant (Kc1)
             double kc6; // sixth order cubic anisotropy constant (Kc2)
@@ -125,20 +124,20 @@ namespace anisotropy{
 
             // constructor
             mp_t (const unsigned int max_materials = 100):
-            	ku2(0.0), // set initial value of ku2 to zero
-               ku4(0.0), // set initial value of ku4 to zero
-               ku6(0.0), // set initial value of ku6 to zero
-
-               k2r2(0.0), // set initial value of k2r2 to zero
-               k4r2(0.0), // set intital value of k4r2 to zero
-               k4r4(0.0), // set initial value of k4r4 to zero
-               k6r2(0.0), // set initial value of k6r2 to zero
-               k6r4(0.0), // set initial value of k6r4 to zero
-               k6r6(0.0), // set initial value of k6r6 to zero
+            	ku2(0.0),   // set initial value of ku2 to zero
+               k2r2(0.0),  // set initial value of k2r2 to zero
+               ku4(0.0),   // set initial value of ku4 to zero
+               k4r2(0.0),  // set intital value of k4r2 to zero
+               k4r4(0.0),  // set initial value of k4r4 to zero
+               ku6(0.0),   // set initial value of ku6 to zero
+               k6r2(0.0),  // set initial value of k6r2 to zero
+               k6r4(0.0),  // set initial value of k6r4 to zero
+               k6r6(0.0),  // set initial value of k6r6 to zero
 
                kc4(0.0), // set initial value of kc4 to zero
                kc6(0.0), // set initial value of kc6 to zero
                k4r(0.0), // set initial value of k4r to zero
+               
                k_lattice(0.0), // set initial value of k_lattice to zero
                random_anisotropy(false), // disable random anisotropy
                random_grain_anisotropy(false) // disable random grain anisotropy
@@ -220,6 +219,7 @@ namespace anisotropy{
       extern bool enable_rotational_4_2_order;  // Flag to enable calculation of fourth order theta second order phi anisotropy
       extern bool enable_rotational_4_4_order;  // Flag to enable calculation of fourth order theta fourth order phi anisotropy
       extern bool enable_rotational_6_2_order;  // Flag to enable calculation of sixth order theta second order phi anisotropy
+      extern bool enable_rotational_6_4_order;  // Flag to enable calculation of sixth order theta fourth order phi anisotropy
       extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
 
       // Flags for biaxial anisotropy terms
@@ -255,6 +255,8 @@ namespace anisotropy{
       extern std::vector<double> k4r4;
       extern std::vector<double> ku6;
       extern std::vector<double> k6r2;
+      extern std::vector<double> k6r4;
+
       extern std::vector<double> kc4;
       extern std::vector<double> kc6;
       
@@ -336,6 +338,66 @@ namespace anisotropy{
                                                       const int start_index,
                                                       const int end_index);
 
+      void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+
+      void fourth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+
+      void fourth_order_theta_fourth_order_phi_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+      
+      void uniaxial_sixth_order_fields( std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+      
+      void sixth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+      
+      void sixth_order_theta_fourth_order_phi_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+
       void triaxial_second_order_fields_fixed_basis(std::vector<double>& spin_array_x,
                                                      std::vector<double>& spin_array_y,
                                                      std::vector<double>& spin_array_z,
@@ -376,36 +438,6 @@ namespace anisotropy{
                                         const int start_index,
                                         const int end_index);
 
-      void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
-                                        std::vector<double>& spin_array_y,
-                                        std::vector<double>& spin_array_z,
-                                        std::vector<int>&    atom_material_array,
-                                        std::vector<double>& field_array_x,
-                                        std::vector<double>& field_array_y,
-                                        std::vector<double>& field_array_z,
-                                        const int start_index,
-                                        const int end_index);
-
-      void fourth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
-                                        std::vector<double>& spin_array_y,
-                                        std::vector<double>& spin_array_z,
-                                        std::vector<int>&    atom_material_array,
-                                        std::vector<double>& field_array_x,
-                                        std::vector<double>& field_array_y,
-                                        std::vector<double>& field_array_z,
-                                        const int start_index,
-                                        const int end_index);
-
-      void fourth_order_theta_fourth_order_phi_fields(std::vector<double>& spin_array_x,
-                                        std::vector<double>& spin_array_y,
-                                        std::vector<double>& spin_array_z,
-                                        std::vector<int>&    atom_material_array,
-                                        std::vector<double>& field_array_x,
-                                        std::vector<double>& field_array_y,
-                                        std::vector<double>& field_array_z,
-                                        const int start_index,
-                                        const int end_index);
-
       void biaxial_fourth_order_simple_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -415,26 +447,6 @@ namespace anisotropy{
                                         std::vector<double>& field_array_z,
                                         const int start_index,
                                         const int end_index);                                        
-
-      void uniaxial_sixth_order_fields( std::vector<double>& spin_array_x,
-                                        std::vector<double>& spin_array_y,
-                                        std::vector<double>& spin_array_z,
-                                        std::vector<int>&    atom_material_array,
-                                        std::vector<double>& field_array_x,
-                                        std::vector<double>& field_array_y,
-                                        std::vector<double>& field_array_z,
-                                        const int start_index,
-                                        const int end_index);
-      
-      void sixth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
-                                        std::vector<double>& spin_array_y,
-                                        std::vector<double>& spin_array_z,
-                                        std::vector<int>&    atom_material_array,
-                                        std::vector<double>& field_array_x,
-                                        std::vector<double>& field_array_y,
-                                        std::vector<double>& field_array_z,
-                                        const int start_index,
-                                        const int end_index);
 
       void rotational_fourth_order_fields_fixed_basis( std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
@@ -508,6 +520,42 @@ namespace anisotropy{
                                                          const double sx,
                                                          const double sy,
                                                          const double sz);
+      
+      double uniaxial_fourth_order_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double fourth_order_theta_second_order_phi_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+      
+      double fourth_order_theta_fourth_order_phi_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double uniaxial_sixth_order_energy( const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double sixth_order_theta_second_order_phi_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double sixth_order_theta_fourth_order_phi_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
 
       double triaxial_second_order_energy_fixed_basis(const int atom,
                                                       const int mat,
@@ -533,41 +581,11 @@ namespace anisotropy{
                                           const double sy,
                                           const double sz);
 
-      double uniaxial_fourth_order_energy(const int atom,
-                                          const int mat,
-                                          const double sx,
-                                          const double sy,
-                                          const double sz);
-
-      double fourth_order_theta_second_order_phi_energy(const int atom,
-                                          const int mat,
-                                          const double sx,
-                                          const double sy,
-                                          const double sz);
-      
-      double fourth_order_theta_fourth_order_phi_energy(const int atom,
-                                          const int mat,
-                                          const double sx,
-                                          const double sy,
-                                          const double sz);
-
       double biaxial_fourth_order_simple_energy(const int atom,
                                           const int mat,
                                           const double sx,
                                           const double sy,
                                           const double sz);                                          
-
-      double uniaxial_sixth_order_energy( const int atom,
-                                          const int mat,
-                                          const double sx,
-                                          const double sy,
-                                          const double sz);
-
-      double sixth_order_theta_second_order_phi_energy(const int atom,
-                                          const int mat,
-                                          const double sx,
-                                          const double sy,
-                                          const double sz);
 
       double rotational_fourth_order_energy_fixed_basis( const int atom,
                                                          const int mat,

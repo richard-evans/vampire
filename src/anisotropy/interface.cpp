@@ -333,6 +333,16 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      test = "6-4-order-anisotropy-constant";
+      test2 = "sixth-order-theta-fourth-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
+         double k6r4 = atof(value.c_str());
+         vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r4 = k6r4;
+         internal::enable_rotational_6_4_order = true;
+         return true;
+      }
+      //------------------------------------------------------------
       //Minimal orthogonality
       test = "fourth-order-cubic-anisotropy-constant"; // new form (preferred)
       test2  = "cubic-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
