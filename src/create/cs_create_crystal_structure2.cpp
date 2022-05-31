@@ -83,7 +83,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	cs::local_num_unit_cells[1]=max_bounds[1]-min_bounds[1];
 	cs::local_num_unit_cells[2]=max_bounds[2]-min_bounds[2];
 
-	int num_atoms=cs::local_num_unit_cells[0]*cs::local_num_unit_cells[1]*cs::local_num_unit_cells[2]*unit_cell.atom.size();
+	int64_t num_atoms=cs::local_num_unit_cells[0]*cs::local_num_unit_cells[1]*cs::local_num_unit_cells[2]*unit_cell.atom.size();
 
 	// set catom_array size
 	catom_array.reserve(num_atoms);
