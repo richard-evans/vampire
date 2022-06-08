@@ -24,6 +24,7 @@ honeycomb.o \
 honeycomb-a.o \
 kagome.o \
 rocksalt.o \
+rutile.o \
 spinel.o \
 spinel-layered.o \
 NdFeB.o\
