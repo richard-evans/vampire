@@ -197,7 +197,10 @@ namespace micromagnetic{
                                          std::vector<double>& z_array,
                                          std::vector<double>& x_total_external_field_array,
                                          std::vector<double>& y_total_external_field_array,
-                                         std::vector<double>& z_total_external_field_array);
+                                         std::vector<double>& z_total_external_field_array,
+                                         std::vector<double>& thermal_x_field,
+                                         std::vector<double>& thermal_y_field,
+                                         std::vector<double>& thermal_z_field);
 
       void calculate_llg_spin_fields(const double temperature,
                                      const int num_cells,

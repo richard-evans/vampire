@@ -131,6 +131,10 @@ namespace vcuda
       extern cu_real_t *d_y_external_field;
       extern cu_real_t *d_z_external_field;
 
+      extern cu_real_t *d_thermal_x_field;
+      extern cu_real_t *d_thermal_y_field;
+      extern cu_real_t *d_thermal_z_field;
+
       extern cu_real_t *d_x_dip_field;
       extern cu_real_t *d_y_dip_field;
       extern cu_real_t *d_z_dip_field;

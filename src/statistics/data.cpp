@@ -39,6 +39,8 @@ namespace stats{
    bool calculate_system_susceptibility         = false;
    bool calculate_grain_susceptibility          = false;
    bool calculate_material_susceptibility       = false;
+   bool calculate_system_spin_temperature       = false;
+   bool calculate_material_spin_temperature     = false;
 
    energy_statistic_t system_energy("s");
    energy_statistic_t grain_energy("g");
@@ -63,6 +65,9 @@ namespace stats{
    susceptibility_statistic_t system_susceptibility("s");
    susceptibility_statistic_t grain_susceptibility("g");
    susceptibility_statistic_t material_susceptibility("m");
+
+   spin_temperature_statistic_t system_spin_temperature("s"); 
+   spin_temperature_statistic_t material_spin_temperature("m"); 
 
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation

@@ -16,6 +16,8 @@
 #include <vector>
 #include <string>
 
+#include "atoms.hpp"
+
 namespace stats
 //==========================================================
 // Namespace statistics
@@ -86,6 +88,26 @@ namespace stats
 	class specific_heat_statistic_t;
 
 	class standard_deviation_statistic_t;
+   // Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
+   extern bool calculate_system_energy;
+   extern bool calculate_material_energy;
+   extern bool calculate_system_magnetization;
+   extern bool calculate_material_magnetization;
+   extern bool calculate_height_magnetization;
+   extern bool calculate_material_height_magnetization;
+   extern bool calculate_system_specific_heat;
+   extern bool calculate_material_specific_heat;
+   extern bool calculate_material_standard_deviation;// AJN
+   extern bool calculate_system_susceptibility;
+   extern bool calculate_material_susceptibility;
+   extern bool calculate_system_spin_temperature;
+   extern bool calculate_material_spin_temperature;
+
+   // forward declaration of friend classes
+   class susceptibility_statistic_t;
+   class specific_heat_statistic_t;
+
+   class standard_deviation_statistic_t;
    //----------------------------------
    // Energy class definition
    //----------------------------------
@@ -156,6 +178,7 @@ namespace stats
 
       friend class susceptibility_statistic_t;
       friend class standard_deviation_statistic_t;
+      friend class spin_temperature_statistic_t;
       public:
          magnetization_statistic_t (std::string n):initialized(false){
            name = n;
@@ -166,6 +189,10 @@ namespace stats
          void calculate_magnetization(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
          void set_magnetization(std::vector<double>& magnetization, std::vector<double>& mean_magnetization, long counter);
          void reset_magnetization_averages();
+         const std::vector<int>& get_mask_only();
+         const int get_mask_size();
+         const double get_system_magnetization_length();
+         const int get_mask_length();
          const std::vector<double>& get_magnetization();
          std::string output_magnetization(bool header);
          std::string output_normalized_magnetization(bool header);
@@ -252,6 +279,39 @@ namespace stats
          std:: string name;
 
    };
+    //----------------------------------
+   //Spin_Temperature_Class_Definition
+   //----------------------------------
+
+   class spin_temperature_statistic_t{
+
+      public:
+         spin_temperature_statistic_t(std::string n):initialized(false) {
+            name = n;
+         };
+         void calculate(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& sm,
+         const std::vector<double>& Hx_int, const std::vector<double>& Hy_int,const std::vector<double>& Hz_int,
+         const std::vector<double>& Hx_ext, const std::vector<double>& Hy_ext, const std::vector<double>& Hz_ext);
+         void set_mask(const int mask_length, const std::vector<int>& mag_mask);
+         std::string output_spin_temperature(bool header);
+         std::string output_mean_spin_temperature(bool header);
+         void reset();
+
+      private:
+         bool initialized;
+         int mask_size; //how many different materials
+         int num_atoms; //total number of atoms
+       
+         std::string name;
+         std::vector<int> zero_list;
+         std::vector<int> mask; 
+         std::vector <double> total_spin_temperature;
+         std::vector<double> spin_temperature_top;
+         std::vector<double> spin_temperature_bottom;
+         std::vector<double> mean_spin_temperature;
+         std::vector<double> mean_spin_counter;
+
+   };
 
    //----------------------------------
    // Susceptibility Class definition
@@ -335,6 +395,8 @@ namespace stats
 
    extern standard_deviation_statistic_t material_standard_deviation;
 
+    extern spin_temperature_statistic_t system_spin_temperature;
+    extern spin_temperature_statistic_t material_spin_temperature;
 }
 
 #endif /*STATS_H_*/

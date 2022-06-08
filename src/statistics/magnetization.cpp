@@ -127,7 +127,13 @@ void magnetization_statistic_t::get_mask(std::vector<int>& out_mask, std::vector
    return;
 
 }
+//--------------------------------------------------------
+//Function to get mask_id values only for spin-temperature
+//--------------------------------------------------------
+const std::vector<int>& magnetization_statistic_t::get_mask_only() {
 
+   return mask;
+}
 //------------------------------------------------------------------------------------------------------
 // Function to calculate magnetisation of spins given a mask and place result in a magnetization array
 //------------------------------------------------------------------------------------------------------
@@ -188,6 +194,21 @@ const std::vector<double>& magnetization_statistic_t::get_magnetization(){
 
 }
 
+const double magnetization_statistic_t::get_system_magnetization_length() {
+
+   const double magnetization_value = magnetization[3];
+   return magnetization_value;
+}
+
+const int magnetization_statistic_t::get_mask_size() {
+
+   return mask.size();
+}
+
+const int magnetization_statistic_t::get_mask_length() {
+
+   return mask_size;
+}
 //------------------------------------------------------------------------------------------------------
 // Function to get magnetisation data
 //------------------------------------------------------------------------------------------------------

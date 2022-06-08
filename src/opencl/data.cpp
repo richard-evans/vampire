@@ -98,6 +98,8 @@ namespace vopencl
 
       vcl::Buffer3D total_external_field_array;
 
+      vcl::Buffer3D thermal_field_array;
+
       vcl::Buffer3D dipolar_field_array;
 
       namespace llg

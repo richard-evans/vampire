@@ -386,6 +386,13 @@ namespace vopencl
                                                          ::atoms::y_total_external_field_array,
                                                          ::atoms::z_total_external_field_array);
 
+         //Allocate device memory and initialize thermal fields
+         vcl::thermal_field_array = vcl::Buffer3D(vcl::context, vcl::queue,
+                                                         CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
+                                                         ::atoms::thermal_x_field,
+                                                         ::atoms::thermal_y_field,
+                                                         ::atoms::thermal_z_field);
+
          // Allocate device memory and initialize for dipolar field
          vcl::dipolar_field_array = vcl::Buffer3D(vcl::context, vcl::queue,
                                                   CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,

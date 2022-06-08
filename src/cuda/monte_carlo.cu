@@ -255,6 +255,7 @@ namespace vcuda
                     int * accepted,
                     cu_real_t * spin3n,
                     cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+                     cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
                     int *csr_rows, int* csr_cols, cu_real_t *vals,
                     const cu_real_t step_size, const cu_real_t global_temperature, const int N, const int Natoms,
                     ::montecarlo::algorithm_t algorithm, cu_real_t adaptive_sigma){
@@ -495,6 +496,7 @@ namespace vcuda
                     //y_ext_field[atom] = hy;
                     //z_ext_field[atom] = hz;
 
+                    // cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
 
                 }
             }
@@ -538,6 +540,7 @@ namespace vcuda
                             d_accepted,
                             ::cu::atoms::d_spin,
                             ::cu::d_x_external_field, ::cu::d_y_external_field, ::cu::d_z_external_field,
+                            ::cu::d_thermal_x_field, ::cu::d_y_thermal_field, ::cu::d_z_thermal_field,
                             ::vcuda::internal::exchange::d_csr_rows, ::vcuda::internal::exchange::d_coo_cols, ::vcuda::internal::exchange::d_coo_vals,
                             step_size, sim::temperature, colour_list[i].size(), ::atoms::num_atoms,
                             ::montecarlo::algorithm, (cu_real_t)::montecarlo::internal::adaptive_sigma );
