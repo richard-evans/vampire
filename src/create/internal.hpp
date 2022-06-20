@@ -39,6 +39,20 @@ namespace create{
          double radius;
       };
 
+      // simple struct storing 2d points
+      struct points_t{
+
+         double x;
+         double y;
+
+         // simple constructor fpr struct
+         points_t(double xi = 0.0, double yi = 0.0){
+            x = xi;
+            y = yi;
+         }
+
+      };
+
       // simple class for slave material properties
       class slave_material_t{
 
@@ -75,6 +89,9 @@ namespace create{
          int unit_cell_category; // association of material to unit cell id
          double min; // minimum material height
          double max; // maximum material height
+
+         bool geometry = false; // define geometry for material
+   		std::vector<points_t> geometry_points; // array of geometry coordinates
 
          // constructor
          mp_t ():
@@ -132,6 +149,7 @@ namespace create{
       //-----------------------------------------------------------------------------
       void set_atom_vars(std::vector<cs::catom_t> &, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
 
+      bool point_in_polygon2(const create::internal::points_t test, std::vector<create::internal::points_t>& points);
 
       extern void alloy(std::vector<cs::catom_t> & catom_array);
       extern void layers(std::vector<cs::catom_t> & catom_array);

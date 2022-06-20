@@ -736,6 +736,71 @@ namespace create{
          Away from the nulceation height the voronoi grain size is reduced according to
          size = (1-x/max)**radius.
       */
+      //--------------------------------------------------------------------
+      test="geometry-file";
+      if( word == test ){
+
+         //------------------------------------------------------------------
+         // Open geometry file
+         //------------------------------------------------------------------
+         std::stringstream gfile;
+         gfile.str( vin::get_string(value.c_str(), "material", line) );
+
+         //------------------------------------------------------------------
+         // read in number of points in geometry file
+         //------------------------------------------------------------------
+         int num_points = 0; // number of points in geometry file
+         gfile >> num_points;
+
+
+         //------------------------------------------------------------------
+         // check for a sensible number of points
+         //------------------------------------------------------------------
+         if( (num_points < 3) || (num_points > 1000) ){
+            std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
+            err::vexit();
+         }
+
+         //------------------------------------------------------------------
+         // reserve memory for points
+         //------------------------------------------------------------------
+         create::internal::mp[super_index].geometry_points.reserve(num_points);
+
+         //------------------------------------------------------------------
+         // Process points in file
+         //------------------------------------------------------------------
+         for( int c = 0; c < num_points; c++){
+
+            double pts[2] = { 0.0, 0.0 }; // temporary variables for points
+            // read one coordinate at a time
+            for( int xy = 0 ; xy < 2 ; xy++ ){
+               double var;
+               gfile >> var;
+               // check for no end of file
+               if(gfile.eof()){
+                  std::cerr << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates" << std::endl;
+                  err::vexit();
+               }
+               // check for sensible coordinate
+               if((var<0.0) || (var > 1.0)){
+                  std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
+                  err::vexit();
+               }
+               // now save sanitised input
+               pts[xy] = var;
+            }
+            // save points in materials class using constructor
+            create::internal::mp[super_index].geometry_points.emplace_back(pts[0],pts[1]);
+
+         }
+
+         // enable geometry
+         create::internal::mp[super_index].geometry = true;
+
+         return true;
+
+      }
+      //--------------------------------------------------------------------
       test="voronoi-grain-substructure-nucleation-height";
       if(word==test){
          double nh=atof(value.c_str());
@@ -743,6 +808,7 @@ namespace create{
          create::internal::mp[super_index].voronoi_grain_substructure_nucleation_height = nh;
          return true;
       }
+      //--------------------------------------------------------------------
       /*
          integer to associate the material to a particular material within the unit cell.
          Default is 0 but can be overidden with this parameter.

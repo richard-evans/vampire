@@ -17,7 +17,6 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 
-
 // create module headers
 #include "internal.hpp"
 
@@ -44,8 +43,8 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
    // Check for any geometry in material parameters
    //-----------------------------------------------
 	bool cut=false;
-	for(int mat=0; mat<mp::num_materials; mat++){
-		if(mp::material[mat].geometry>0) cut=true;
+	for(int mat=0; mat < mp::num_materials; mat++){
+		if( create::internal::mp[mat].geometry ) cut=true;
 	}
 
 	// Return from function if no geometry is defined.
@@ -61,13 +60,14 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
    //-----------------------------------------------
    if( !create::internal::select_material_by_geometry ){
 
-		// loop over all atoms
-      // c++11 style range loop with auto reference to class variable
-      // for(unsigned int atom=0; atom < catom_array.size(); atom++){
+		// loop over all atoms in c++11 style range loop with auto reference to class variable
       for(auto& atom : catom_array){
 
+         // get atom material type
+         const int mat = atom.material;
+
 			// check for geometry information
-			const int geo = mp::material[atom.material].geometry;
+			const int geo = create::internal::mp[mat].geometry_points.size();
 
 			// if exists, then remove atoms outside polygon
 			if( geo > 0 ){
@@ -75,11 +75,13 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
 				double y = atom.y;
 				std::vector<double> px(geo);
 				std::vector<double> py(geo);
+
 				// Initialise polygon points
 				for(int p=0;p<geo;p++){
-					px[p]=mp::material[atom.material].geometry_coords[p][0]*cs::system_dimensions[0];
-					py[p]=mp::material[atom.material].geometry_coords[p][1]*cs::system_dimensions[1];
+					px[p]=create::internal::mp[mat].geometry_points[p].x * cs::system_dimensions[0];
+					py[p]=create::internal::mp[mat].geometry_points[p].y * cs::system_dimensions[1];
 				}
+
 				// check if point is outside of polygon, if so delete it
 				if( !vmath::point_in_polygon2(x,y,px,py,geo) ) atom.include = false;
 
@@ -117,7 +119,7 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
 		for(int mat=0;mat<mp::num_materials;mat++){
 
 			// check for geometry information
-			const int geo=mp::material[mat].geometry;
+			const int geo = create::internal::mp[mat].geometry_points.size();
 
 			// if geometry information exists, then include atoms inside polygon and within material height
 			if(geo!=0){
@@ -127,17 +129,20 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
 				std::vector<double> py(geo);
 				// Initialise polygon points
 				for(int p=0;p<geo;p++){
-					px[p]=mp::material[mat].geometry_coords[p][0]*cs::system_dimensions[0];
-					py[p]=mp::material[mat].geometry_coords[p][1]*cs::system_dimensions[1];
+					px[p]=create::internal::mp[mat].geometry_points[p].x * cs::system_dimensions[0];
+					py[p]=create::internal::mp[mat].geometry_points[p].y * cs::system_dimensions[1];
 				}
 
+            // loop over all atoms to see if they are within a geometry
 				for(unsigned int atom=0;atom<catom_array.size();atom++){
 					double x = catom_array[atom].x;
 					double y = catom_array[atom].y;
-					const double z = catom_array[atom].z;
-                  if((z>=mat_min[mat]) && (z<mat_max[mat]) && (vmath::point_in_polygon2(x,y,px,py,geo)==true)){
-						catom_array[atom].material=mat;
-						catom_array[atom].include=true;
+					double z = catom_array[atom].z;
+               // make sure atoms are within their material heights, is in the polygon, and has the same unit cell category as the corresponding atom
+               if(z >= mat_min[mat] && z <  mat_max[mat] && vmath::point_in_polygon2(x,y,px,py,geo) &&
+                  catom_array[atom].uc_id == create::internal::mp[mat].unit_cell_category){
+                     catom_array[atom].material=mat;
+                     catom_array[atom].include=true;
 					}
 				}
 			}

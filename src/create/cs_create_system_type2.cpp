@@ -122,10 +122,6 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	// call intermixing function - must be before alloy function
 	intermixing(catom_array);
 
-	// call surface roughness function
-	// Formally called here but now moved to crystal structure generation
-	//roughness(catom_array);
-
 	// call alloy function
 	create::internal::alloy(catom_array);
 

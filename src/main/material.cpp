@@ -34,7 +34,6 @@ materials_t::materials_t ():
 	magnetisation(0.0),
 	gamma_rel(1.0),
 	random_spins(false),
-	geometry(0),
 	core_shell_size(1.0),
 	interface_roughness(0.0),
 	density(1.0),
@@ -64,10 +63,6 @@ materials_t::materials_t ():
 
 	//std::cout << "constructor " << anis_flag << "\t" << ianis_flag << std::endl;
 	// derived parameters
-	for(int i=0;i<100;i++){
-		geometry_coords[i][0]=0.0;
-		geometry_coords[i][1]=0.0;
-	}
 
 	SAF.resize(mp::max_materials);
 	enable_SAF = false;
@@ -91,7 +86,7 @@ materials_t::materials_t ():
 	applied_field_unit_vector.at(2)=1.0;
 
 	pinning_field_unit_vector.resize(3,0.0);
-	
+
 	// FMR field direction default initialisation
 	fmr_field_unit_vector.at(0)=0.0;
 	fmr_field_unit_vector.at(1)=0.0;

@@ -1788,52 +1788,6 @@ namespace vin{
                 }
             }
             //--------------------------------------------------------------------
-            else
-            test="geometry-file";
-            if(word==test){
-
-               // Open geometry file
-               std::stringstream gfile;
-          		gfile.str( vin::get_string(value.c_str(), "material", line) );
-
-                gfile >> read_material[super_index].geometry;
-                if((read_material[super_index].geometry<3) || (read_material[super_index].geometry>100)){
-                    terminaltextcolor(RED);
-                std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
-                    terminaltextcolor(WHITE);
-                return EXIT_FAILURE;
-                }
-                //std::cout << "ngp " << read_material[super_index].geometry << std::endl;
-                for(int c=0;c<read_material[super_index].geometry;c++){
-                    for(int xy=0;xy<2;xy++){
-                        double var;
-                        gfile >> var;
-                        if(gfile.eof()){
-                    terminaltextcolor(RED);
-                            std::cerr << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates" << std::endl;
-                            terminaltextcolor(WHITE);
-                    return EXIT_FAILURE;
-                        }
-                        if((var<0.0) || (var > 1.0)){
-                    terminaltextcolor(RED);
-                            std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
-                            terminaltextcolor(WHITE);
-                    return EXIT_FAILURE;
-                        }
-                        else read_material[super_index].geometry_coords[c][xy]=var;
-                    }
-                    //std::cout << read_material[super_index].geometry_coords[c][0] << "\t" << read_material[super_index].geometry_coords[c][1] << std::endl;
-                }
-                //double min=atof(value.c_str());
-                //if((min<-0.11) || (min > 1.11)){
-                //	std::cerr << "Error in input file - material[" << super_index << "]:min is outside of valid range (0.0-1.0)" << std::endl;
-                //	return EXIT_FAILURE;}
-                //else{
-                //	read_material[super_index].min=min;
-                    return EXIT_SUCCESS;
-                //}
-            }
-            //--------------------------------------------------------------------
             test="core-shell-size";
             if(word==test){
                 double css=atof(value.c_str());
