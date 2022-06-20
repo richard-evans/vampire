@@ -18,9 +18,9 @@ export OMPI_CXX=g++ -std=c++11
 #export FFTLIBS= -lfftw3_omp -lfftw3
 
 # Compilers
-ICC=icc -std=c++0x -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
+ICC=icc -std=c++11 -DCOMP='"Intel C++ Compiler"'
+GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
+LLVM=g++ -std=c++11 -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
