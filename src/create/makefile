@@ -21,6 +21,7 @@ data.o \
 ellipse.o \
 ellipsoid.o \
 faceted.o \
+geometry.o \
 get_material_height.o \
 hexagonal_array.o \
 initialize.o \

@@ -59,7 +59,6 @@ namespace create{
 
    int intermixing(std::vector<cs::catom_t> &);
    void dilute(std::vector<cs::catom_t> &);
-   void geometry(std::vector<cs::catom_t> &);
    void fill(std::vector<cs::catom_t> &);
    void roughness(std::vector<cs::catom_t> &);
 
@@ -118,7 +117,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	fill(catom_array);
 
 	// call geometry function
-	geometry(catom_array);
+	internal::geometry(catom_array);
 
 	// call intermixing function - must be before alloy function
 	intermixing(catom_array);
@@ -340,108 +339,6 @@ void dilute (std::vector<cs::catom_t> & catom_array){
    }
 
    return;
-}
-
-void geometry (std::vector<cs::catom_t> & catom_array){
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::geometry has been called" << std::endl;}
-
-	// Check for any geometry
-	bool cut=false;
-
-	for(int mat=0; mat<mp::num_materials; mat++){
-		if(mp::material[mat].geometry>0) cut=true;
-	}
-
-	// Return from function if no geometry is defined.
-	if(cut==false) return;
-
-	// Otherwise proceed
-	zlog << zTs() << "Cutting materials within defined geometry." << std::endl;
-
-	// Check for force material type by geometry
-	if(cs::SelectMaterialByGeometry==false){
-
-		// loop over all atoms
-		for(unsigned int atom=0;atom<catom_array.size();atom++){
-
-			// check for geometry information
-			const int geo=mp::material[catom_array[atom].material].geometry;
-
-			// if exists, then remove atoms outside polygon
-			if(geo!=0){
-				double x = catom_array[atom].x;
-				double y = catom_array[atom].y;
-				std::vector<double> px(geo);
-				std::vector<double> py(geo);
-				// Initialise polygon points
-				for(int p=0;p<geo;p++){
-					px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
-					py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
-				}
-				// check if point is outside of polygon, if so delete it
-				if(vmath::point_in_polygon2(x,y,px,py,geo)==false){
-					catom_array[atom].include=false;
-				}
-			}
-
-		}
-
-	}
-	else{
-
-		// Re-identify all atoms as material 0 and exclude by default
-		for(unsigned int atom=0;atom<catom_array.size();atom++){
-			catom_array[atom].material=0;
-			catom_array[atom].include=false;
-		}
-
-		// loop over all materials and include according to geometry
-
-		// determine z-bounds for materials
-		std::vector<double> mat_min(mp::num_materials);
-		std::vector<double> mat_max(mp::num_materials);
-
-		// initialise array to hold z-bound information in real space
-		for(int mat=0;mat<mp::num_materials;mat++){
-			mat_min[mat]=create::internal::mp[mat].min*cs::system_dimensions[2];
-			mat_max[mat]=create::internal::mp[mat].max*cs::system_dimensions[2];
-			// alloys generally are not defined by height, and so have max = 0.0
-			if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
-		}
-
-		// Loop over all materials
-		for(int mat=0;mat<mp::num_materials;mat++){
-
-			// check for geometry information
-			const int geo=mp::material[mat].geometry;
-
-			// if geometry information exists, then include atoms inside polygon and within material height
-			if(geo!=0){
-
-				// create array to store geoemtric points
-				std::vector<double> px(geo);
-				std::vector<double> py(geo);
-				// Initialise polygon points
-				for(int p=0;p<geo;p++){
-					px[p]=mp::material[mat].geometry_coords[p][0]*cs::system_dimensions[0];
-					py[p]=mp::material[mat].geometry_coords[p][1]*cs::system_dimensions[1];
-				}
-
-				for(unsigned int atom=0;atom<catom_array.size();atom++){
-					double x = catom_array[atom].x;
-					double y = catom_array[atom].y;
-					const double z = catom_array[atom].z;
-                  if((z>=mat_min[mat]) && (z<mat_max[mat]) && (vmath::point_in_polygon2(x,y,px,py,geo)==true)){
-						catom_array[atom].material=mat;
-						catom_array[atom].include=true;
-					}
-				}
-			}
-		}
-	}
-
-	return;
 }
 
 //-----------------------------------------------------------

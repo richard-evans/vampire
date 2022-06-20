@@ -124,6 +124,7 @@ namespace create{
 
       extern bool grain_poission;
 
+      extern bool select_material_by_geometry;	// Toggle override of input material type by geometry
       extern bool select_material_by_z_height;
 
       //-----------------------------------------------------------------------------
@@ -143,6 +144,7 @@ namespace create{
       extern void ellipse(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain);
       extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void geometry(std::vector<cs::catom_t>& catom_array);
       extern void sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void teardrop(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);

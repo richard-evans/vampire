@@ -243,11 +243,11 @@ namespace create{
         else
         test="select-material-by-geometry";
         if(word==test){
-            cs::SelectMaterialByGeometry=true; // default
+            create::internal::select_material_by_geometry = true; // default
             // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::SelectMaterialByGeometry=false;
+            std::string vfalse="false";
+            if(value == vfalse){
+               create::internal::select_material_by_geometry = false;
             }
             return true;
         }
