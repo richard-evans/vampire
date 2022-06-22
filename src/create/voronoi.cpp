@@ -1,28 +1,16 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Sarah Jenkins and Richard F L Evans 2022. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 
+// C++ standard library headers
 #include <random>
 #include <cmath>
 #include <list>
@@ -30,6 +18,7 @@
 #include <fstream>
 #include <sstream>
 
+// Vampire headers
 #include "create.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
@@ -42,7 +31,7 @@
 #include "voronoi.hpp"
 #include <algorithm>
 
-
+// create module headers
 #include "internal.hpp"
 
 namespace create_voronoi{
@@ -63,23 +52,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
       std::cerr << "cs::voronoi_film has been called" << std::endl;
       terminaltextcolor(WHITE);
    }
-	//====================================================================================
-	//
-	//														voronoi
-	//
-	//				Subroutine to create granular system using qhull voronoi generator
-	//
-	//							Version 1.0 R Evans 16/07/2009
-	//
-	//====================================================================================
-	//
-	//		Locally allocated variables: 	init_grain_coord_array
-	//												init_grain_pointx_array
-	//												init_grain_pointy_array
-	//												init_num_assoc_vertices_array
-	//
-	//=====================================================================================
-
 
 	//---------------------------------------------------
 	// Local constants
@@ -116,7 +88,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	int vp=int(create_voronoi::parity);
    int grain = 0;
-	// ----------------------- poisson distribution -------------------------------------
+	// --------------------------------------------------------------------------
+	// poisson distribution
+	// --------------------------------------------------------------------------
 
 	if (create::internal::grain_poission){
 
@@ -357,38 +331,46 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	std::ofstream file4;
 	std::vector <double > R_med;
-	file4.open("grains4.txt");
-	double sumR = 0;
-	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
-		const int nv = grain_vertices_array[grain].size();
-		// Exclude grains with zero vertices
-		if(nv!=0){
-			double sum = 0.0;
-			for(int vertex=0;vertex<nv;vertex++){
-				double vx = grain_vertices_array[grain][vertex][0];
-				double vy = grain_vertices_array[grain][vertex][1];
-				double ab = sqrt(vx*vx + vy*vy);
-				sum = sum + ab;
-			//	std::cout << area <<std::endl;
-			}
-			double av = sum/nv;
-			if (av >0.1){
-				file4<< grain << '\t' << av << std::endl;
-				sumR = sumR + av ;
-				R_med.push_back(av);
+
+	//--------------------------------------------------
+	// output grain coordinates to disk on root process
+	//--------------------------------------------------
+	if( vmpi::my_rank == 0 ){
+
+		file4.open("grains4.txt");
+		double sumR = 0;
+		for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
+			const int nv = grain_vertices_array[grain].size();
+			// Exclude grains with zero vertices
+			if(nv!=0){
+				double sum = 0.0;
+				for(int vertex=0;vertex<nv;vertex++){
+					double vx = grain_vertices_array[grain][vertex][0];
+					double vy = grain_vertices_array[grain][vertex][1];
+					double ab = sqrt(vx*vx + vy*vy);
+					sum = sum + ab;
+					//	std::cout << area <<std::endl;
+				}
+				double av = sum/nv;
+				if (av >0.1){
+					file4 << grain << '\t' << av << std::endl;
+					sumR = sumR + av ;
+					R_med.push_back(av);
+				}
 			}
 		}
-	}
 
-	//------------------------------------------------------------------------
-	// output grain properties to screen
-	//------------------------------------------------------------------------
-	//double avR = sumR/R_med.size();
-	//std::sort(R_med.begin(),R_med.end());
-	//int index = R_med.size()/2;
-	//std::cout<< "Median temperature: " << (R_med[index-1] + R_med[index])/2 << std::endl;
-	//std::cout<< "Mean temperature: " << avR << std::endl;
-	//------------------------------------------------------------------------
+		//------------------------------------------------------------------------
+		// output grain properties to screen
+		//------------------------------------------------------------------------
+		//double avR = sumR/R_med.size();
+		//std::sort(R_med.begin(),R_med.end());
+		//int index = R_med.size()/2;
+		//std::cout<< "Median temperature: " << (R_med[index-1] + R_med[index])/2 << std::endl;
+		//std::cout<< "Mean temperature: " << avR << std::endl;
+		//------------------------------------------------------------------------
+
+	}
 
 	// Create a 2D supercell array of atom numbers to improve performance for systems with many grains
 	std::vector < std::vector < std::vector < int > > > supercell_array;
@@ -428,8 +410,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
    // sort by increasing radius
    material_order.sort(create::internal::compare_radius);
 
-	std::cout <<"Generating Voronoi Grains";
-	zlog << zTs() << "Generating Voronoi Grains";
+	std::cout <<"Generating Voronoi Grains" << std::flush;
+	zlog << zTs() << "Generating Voronoi Grains" << std::flush;
 
    // arrays to store list of grain vertices
    double tmp_grain_pointx_array[max_vertices];

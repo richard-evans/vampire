@@ -134,7 +134,7 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
    std::stringstream vertices_file;
 
    // fill input file stream with contents of file opened on master process
-   vertices_file.str( vin::get_string(voronoi_filec, "input", -1) );
+   vertices_file.str( vin::get_string(voronoi_filec, "voronoi", -1) );
 
 	vertices_file >> dimensions;
 	vertices_file >> num_vertices >> num_points >> one;
