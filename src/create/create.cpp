@@ -40,7 +40,6 @@ namespace cs{
 	double system_dimensions[3]={77.0,77.0,77.0};	/// Size of system (A)
 	bool pbc[3]={false,false,false};						/// Periodic boundary conditions
 
-	bool SelectMaterialByGeometry=false;					/// Toggle override of input material type by geometry
 	unsigned int total_num_unit_cells[3]={0,0,0};	/// Unit cells for entire system (x,y,z)
 	unsigned int local_num_unit_cells[3]={0,0,0};	/// Unit cells on local processor (x,y,z)
 
