@@ -64,6 +64,7 @@ namespace stats
 	extern bool calculate_system_magnetization;
 	extern bool calculate_grain_magnetization;
 	extern bool calculate_material_magnetization;
+	extern bool calculate_material_grain_magnetization;
 	extern bool calculate_height_magnetization;
 	extern bool calculate_material_height_magnetization;
 
@@ -318,6 +319,7 @@ namespace stats
    extern magnetization_statistic_t system_magnetization;
 	extern magnetization_statistic_t grain_magnetization;
 	extern magnetization_statistic_t material_magnetization;
+	extern magnetization_statistic_t material_grain_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
 

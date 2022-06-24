@@ -114,6 +114,25 @@ namespace stats{
       }
 
       //------------------------------------------------------------------------
+      // material grain magnetization
+      //------------------------------------------------------------------------
+      if(stats::calculate_material_grain_magnetization){
+         // store as blocks of material magnetisation for each grain [ m1x m1y m1z m1m m2x m2y m2z 2m2 ] [ m1x m1y m1z m1m m2x m2y m2z 2m2 ] ...
+         // num masks = num_materials*num_grains
+
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            int grain = grain_array[atom];
+            int mat = material_type_array[atom];
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = (num_grains)*num_materials+mat;
+            else mask[atom] = num_materials * grain + mat;
+         }
+
+         stats::material_grain_magnetization.set_mask(num_materials*(num_grains+1)+1,mask,magnetic_moment_array);
+
+      }
+
+      //------------------------------------------------------------------------
       // height magnetization
       //------------------------------------------------------------------------
       if(stats::calculate_height_magnetization){

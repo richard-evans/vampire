@@ -37,6 +37,7 @@ namespace stats{
          if(stats::calculate_system_magnetization)          stats::system_magnetization.reset_magnetization_averages();
          if(stats::calculate_grain_magnetization)           stats::grain_magnetization.reset_magnetization_averages();
          if(stats::calculate_material_magnetization)        stats::material_magnetization.reset_magnetization_averages();
+         if(stats::calculate_material_grain_magnetization)  stats::material_grain_magnetization.reset_magnetization_averages();
          if(stats::calculate_height_magnetization)          stats::height_magnetization.reset_magnetization_averages();
          if(stats::calculate_material_height_magnetization) stats::material_height_magnetization.reset_magnetization_averages();
 
