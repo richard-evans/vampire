@@ -95,10 +95,18 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
    //-------------------------------------------------
 	else{
 
-		// Re-identify all atoms as material 0 and exclude by default
-		for(unsigned int atom=0;atom<catom_array.size();atom++){
-			catom_array[atom].material=0;
-			catom_array[atom].include=false;
+		// Re-identify all atoms defined by geometry as material 0 and exclude by default
+		for(auto& atom : catom_array){
+
+         // get atom material type
+         const int mat = atom.material;
+
+			// if geometry is defined for this material, then reset atoms as material 0
+			if(create::internal::mp[mat].geometry){
+				atom.material = 0;
+				atom.include  = false;
+			}
+
 		}
 
 		// loop over all materials and include according to geometry
@@ -139,10 +147,13 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
 					double y = catom_array[atom].y;
 					double z = catom_array[atom].z;
                // make sure atoms are within their material heights, is in the polygon, and has the same unit cell category as the corresponding atom
-               if(z >= mat_min[mat] && z <  mat_max[mat] && vmath::point_in_polygon2(x,y,px,py,geo) &&
-                  catom_array[atom].uc_id == create::internal::mp[mat].unit_cell_category){
-                     catom_array[atom].material=mat;
-                     catom_array[atom].include=true;
+               if(z >= mat_min[mat] && z <  mat_max[mat] &&
+						vmath::point_in_polygon2(x,y,px,py,geo) &&
+                  catom_array[atom].uc_id == create::internal::mp[mat].unit_cell_category && // make sure unit cell category is preserved
+						create::internal::mp[mat].geometry // define by geometry
+					){
+                  catom_array[atom].material=mat;
+                  catom_array[atom].include=true;
 					}
 				}
 			}
