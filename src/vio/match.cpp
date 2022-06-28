@@ -2073,7 +2073,7 @@ namespace vin{
                 string str="field";
                 if(unit_type==str){
                     // Test for valid range
-                    if((H>=0.0) && (H<1.0E5)){
+                    if((H>=-1.0E5) && (H<1.0E5)){
                         read_material[super_index].applied_field_strength=H;
                         // set local applied field flag
                         sim::local_applied_field=true;
@@ -2081,14 +2081,14 @@ namespace vin{
                     }
                     else{
                         terminaltextcolor(RED);
-                        std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+                        std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range -1.0e5 - +1.0e5" << std::endl;
                         terminaltextcolor(WHITE);
                         err::vexit();
                     }
                 }
                 else{
                     terminaltextcolor(RED);
-                    std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+                    std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << std::endl;
                     terminaltextcolor(WHITE);
                     err::vexit();
                 }
