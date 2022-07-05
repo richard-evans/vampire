@@ -329,6 +329,9 @@ tidy:
 	@rm -f src/*~
 	@rm -f src/*/*~
 
+tests:
+	$(MAKE) -C util/autotests/
+
 vdc:
 	$(MAKE) -C util/vdc/
 
