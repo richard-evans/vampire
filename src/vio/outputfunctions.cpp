@@ -189,6 +189,11 @@ namespace vout{
       stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature,header);
    }
 
+    // Output Function 998 - with Header
+   void system_binder_cumulant(std::ostream& stream, bool header){
+      stream << stats::system_binder_cumulant.output_binder_cumulant(header);
+   }
+
    // Output Function 999 - with Header
    void standard_deviation(std::ostream& stream, bool header){
       stream << stats::material_standard_deviation.output_standard_deviation(header);
@@ -373,6 +378,11 @@ namespace vout{
    void mean_material_susceptibility(std::ostream& stream, bool header){
 		stream << stats::material_susceptibility.output_mean_susceptibility(sim::temperature,header);
 	}
+
+   // Output Function 997 - with Header
+   void material_binder_cumulant(std::ostream& stream, bool header){
+		stream << stats::material_binder_cumulant.output_binder_cumulant(header);
+   }
 
 	// Output Function 51 - with Header
    void mean_height_magnetisation_length(std::ostream& stream, bool header){

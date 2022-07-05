@@ -77,6 +77,10 @@ namespace stats{
             if(stats::calculate_system_susceptibility)        stats::system_susceptibility.calculate(stats::system_magnetization.get_magnetization());
             if(stats::calculate_grain_susceptibility)         stats::grain_susceptibility.calculate(stats::grain_magnetization.get_magnetization());
             if(stats::calculate_material_susceptibility)      stats::material_susceptibility.calculate(stats::material_magnetization.get_magnetization());
+            
+            // update binder cumulant statistics
+            if(stats::calculate_system_binder_cumulant)         stats::system_binder_cumulant.calculate(stats::system_magnetization.get_magnetization());
+            if(stats::calculate_material_binder_cumulant)       stats::material_binder_cumulant.calculate(stats::material_magnetization.get_magnetization());
 
          }
 

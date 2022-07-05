@@ -82,9 +82,13 @@ namespace stats
 	extern bool calculate_grain_susceptibility;
 	extern bool calculate_material_susceptibility;
 
+        extern bool calculate_system_binder_cumulant;
+        extern bool calculate_material_binder_cumulant;
+
 	// forward declaration of friend classes
 	class susceptibility_statistic_t;
 	class specific_heat_statistic_t;
+        class binder_cumulant_statistic_t;
 
 	class standard_deviation_statistic_t;
    //----------------------------------
@@ -157,6 +161,7 @@ namespace stats
 
       friend class susceptibility_statistic_t;
       friend class standard_deviation_statistic_t;
+      friend class binder_cumulant_statistic_t;
       public:
          magnetization_statistic_t (std::string n):initialized(false){
            name = n;
@@ -307,7 +312,29 @@ namespace stats
          std::string name;
 
    };
+   //----------------------------------
+   // Binder cumulant Class definition
+   //----------------------------------
+   class binder_cumulant_statistic_t{
 
+      public:
+         binder_cumulant_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
+         void initialize(magnetization_statistic_t& mag_stat);
+         void calculate(const std::vector<double>& magnetization);
+         void reset_averages();
+         std::string output_binder_cumulant(bool header);
+
+      private:
+         bool initialized;
+         int num_elements;
+         double mean_counter;
+         std::vector<double> binder_cumulant_squared;
+         std::vector<double> binder_cumulant_fourth_power;
+         std::string name;
+
+   };
 
    //----------------------------------
 	// Statistics class instantiations
@@ -336,6 +363,9 @@ namespace stats
    extern susceptibility_statistic_t material_susceptibility;
 
    extern standard_deviation_statistic_t material_standard_deviation;
+
+   extern binder_cumulant_statistic_t system_binder_cumulant;
+   extern binder_cumulant_statistic_t material_binder_cumulant;
 
 }
 

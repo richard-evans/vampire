@@ -59,6 +59,10 @@ namespace stats{
          if(stats::calculate_grain_susceptibility)    stats::grain_susceptibility.reset_averages();
          if(stats::calculate_material_susceptibility) stats::material_susceptibility.reset_averages();
 
+         // reset binder cumulant statistics
+         if(stats::calculate_system_binder_cumulant)   stats::system_binder_cumulant.reset_averages();
+         if(stats::calculate_material_binder_cumulant) stats::material_binder_cumulant.reset_averages();
+
       }
 
       return;
