@@ -48,9 +48,9 @@ namespace dipole{
          tensor         = 1, // new macrocell with tensor including local corrections
          //multipole    = 2, // bare macrocell but with multipole expansion
          hierarchical   = 3, // new macrocell with tensor including local corrections and nearfield multipole
-         atomistic      = 4, // new macrocell with tensor including local corrections and nearfield multipole
-         fft            = 5, // atomistic dipole dipole (too slow for anything over 1000 atoms)
-         atomisticfft  = 6 // atomistic dipole dipole with fft
+         atomistic      = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
+         fft            = 5, // fft method wit tranlational invariance
+         atomisticfft   = 6   // atomistic dipole dipole with fft
       };
       extern std::vector < int > cell_dx;
       extern std::vector < int > cell_dy;
