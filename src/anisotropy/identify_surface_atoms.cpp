@@ -134,7 +134,7 @@ namespace anisotropy{
 
       // Track total number of surface atoms and total nearest neighbour interactions
       unsigned int num_surface_atoms=0;
-      unsigned int total_num_surface_nn=0;
+      //unsigned int total_num_surface_nn=0;
 
       // Resize surface atoms mask and initialise to false
       atoms::surface_array.resize(atoms::num_atoms, false);
@@ -160,7 +160,7 @@ namespace anisotropy{
             if(nnn_int<surface_anisotropy_threshold_array.at(atom)){
                atoms::surface_array[atom]=true;
                num_surface_atoms++;
-               total_num_surface_nn+=nnn_int;
+               //total_num_surface_nn+=nnn_int;
             }
          }
       }
