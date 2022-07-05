@@ -77,8 +77,9 @@ mm_output
 #----------------------------------------------
 vampire-serial
 vampire-parallel
-vdc.x
+vdc
 vampire*
+test/integration/integration_tests
 
 #----------------------------------------------
 # Obsolete
