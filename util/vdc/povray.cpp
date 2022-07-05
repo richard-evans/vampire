@@ -269,7 +269,10 @@ void output_povray_file(){
    pfile << "#end\n" << std::endl;
 
    pfile << "// alternative colour schemes" << std::endl;
-   pfile << "//#include \"povray_colours_jet.inc\"\n" << std::endl;
+   pfile << "//#include \"util/povray_colours/jet.inc\"" << std::endl;
+   pfile << "//#include \"util/povray_colours/purple_white.inc\"" << std::endl;
+   pfile << "//#include \"util/povray_colours/blue_gold.inc\"" << std::endl;
+   pfile << "//#include \"util/povray_colours/color_wheel.inc\"\n" << std::endl;
 
    //---------------------------------------------------------------------------
    // Determine non-magnetic materials looping over all non-magnetic atoms
