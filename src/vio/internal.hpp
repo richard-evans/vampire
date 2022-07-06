@@ -54,6 +54,15 @@ namespace vin{
 
 namespace vout{
 
+   extern std::string zLogProgramName; /// Program Name
+   extern std::string zLogHostName; /// Host Name
+   extern bool        zLogInitialised; /// Initialised flag
+   #ifdef WIN_COMPILE
+   	extern int      zLogPid; /// Process ID
+   #else
+   	extern pid_t    zLogPid; /// Process ID
+   #endif
+
    // namespaced io lists (to avoid collisions)
    namespace grain{
       // defined enumerated types
