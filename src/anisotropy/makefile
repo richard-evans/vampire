@@ -18,15 +18,15 @@ interface.o \
 lattice.o \
 neel.o \
 rotational_fixed_basis.o \
-uniaxial_second_order.o \
-second_order_theta_second_order_phi.o \
-uniaxial_fourth_order.o \
-fourth_order_theta_second_order_phi.o \
-fourth_order_theta_fourth_order_phi.o \
-uniaxial_sixth_order.o \
-sixth_order_theta_second_order_phi.o \
-sixth_order_theta_fourth_order_phi.o \
-sixth_order_theta_sixth_order_phi.o \
+uniaxial_order_2.o \
+rotational_order_2_2.o \
+uniaxial_order_4.o \
+rotational_order_4_2.o \
+rotational_order_4_4.o \
+uniaxial_order_6.o \
+rotational_order_6_2.o \
+rotational_order_6_4.o \
+rotational_order_6_6.o \
 biaxial_fourth_order_simple.o \
 triaxial_fixed_basis.o \
 triaxial_rotational.o
