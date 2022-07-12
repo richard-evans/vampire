@@ -73,338 +73,343 @@ namespace create{
          return true;
       }
 
-        // cs::system_creation_flags needs refactoring for readability and bug resistance
-        test="full";
-        if(word==test){
-            cs::system_creation_flags[1]=0;
-            return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="cube";
-        if(word==test){
-            cs::system_creation_flags[1]=1;
-            return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="cylinder";
-        if(word==test){
-            cs::system_creation_flags[1]=2;
-            return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="ellipsoid";
-        if(word==test){
-            cs::system_creation_flags[1]=3;
-            return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="sphere";
-        if(word==test){
-            cs::system_creation_flags[1]=4;
-            return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="truncated-octahedron";
-        if(word==test){
-            cs::system_creation_flags[1]=5;
-            return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="tear-drop";
-        if(word==test){
-            cs::system_creation_flags[1]=6;
-            return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        // system_creation_flags[2] - Set system type
-        //-------------------------------------------------------------------
-        test="particle";
-        if(word==test){
-            cs::system_creation_flags[2]=0;
-            return true;
-        }
-        else
-        test="particle-array";
-        if(word==test){
-            cs::system_creation_flags[2]=1;
-            return true;
-        }
-        else
-        test="hexagonal-particle-array";
-        if(word==test){
-            cs::system_creation_flags[2]=2;
-            return true;
-        }
-        else
-        test="voronoi-film";
-        if(word==test){
-            cs::system_creation_flags[2]=3;
-            return true;
-        }
-        else
+      // cs::system_creation_flags needs refactoring for readability and bug resistance
+      test="full";
+      if(word==test){
+         cs::system_creation_flags[1]=0;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="cube";
+      if(word==test){
+         cs::system_creation_flags[1]=1;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="cylinder";
+      if(word==test){
+         cs::system_creation_flags[1]=2;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="ellipsoid";
+      if(word==test){
+         cs::system_creation_flags[1]=3;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="sphere";
+      if(word==test){
+         cs::system_creation_flags[1]=4;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="truncated-octahedron";
+      if(word==test){
+         cs::system_creation_flags[1]=5;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="tear-drop";
+      if(word==test){
+         cs::system_creation_flags[1]=6;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      // system_creation_flags[2] - Set system type
+      //-------------------------------------------------------------------
+      test="particle";
+      if(word==test){
+         cs::system_creation_flags[2]=0;
+         return true;
+      }
+      else
+      test="particle-array";
+      if(word==test){
+         cs::system_creation_flags[2]=1;
+         return true;
+      }
+      else
+      test="hexagonal-particle-array";
+      if(word==test){
+         cs::system_creation_flags[2]=2;
+         return true;
+      }
+      else
+      test="voronoi-film";
+      if(word==test){
+         cs::system_creation_flags[2]=3;
+         return true;
+      }
       test="voronoi-grain-substructure";
       if(word==test){
          create::internal::generate_voronoi_substructure = true;
          return true;
       }
-        ///-------------------------------------------------------------------
-        /// system_creation_flags[1] - Set system particle shape
-        ///-------------------------------------------------------------------
+      ///-------------------------------------------------------------------
+      /// system_creation_flags[1] - Set system particle shape
+      ///-------------------------------------------------------------------
 
-        //--------------------------------------------------------------------
-        else
-        test="voronoi-size-variance";
-        if(word==test){
-            double vsd=atof(value.c_str());
-            vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-            create_voronoi::voronoi_sd=vsd;
+      //--------------------------------------------------------------------
+      test="voronoi-size-variance";
+      if(word==test){
+         double vsd=atof(value.c_str());
+         vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         create_voronoi::voronoi_sd=vsd;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="voronoi-row-offset";
+      if(word==test){
+         create_voronoi::parity=1;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="voronoi-random-seed";
+      if(word==test){
+         int vs=atoi(value.c_str());
+         vin::check_for_valid_int(vs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         mtrandom::voronoi_seed=vs;
+         return true;
+      }
+      test="voronoi-rounded-grains";
+      if(word==test){
+         create_voronoi::rounded=true;
+         return true;
+      }
+      test="voronoi-include-boundary-grains";
+      if(word==test){
+         create_voronoi::include_boundary_grains_real=true;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="voronoi-rounded-grains-area";
+      if(word==test){
+         double vsd=atof(value.c_str());
+         vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         create_voronoi::area_cutoff=vsd;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="particle-centre-offset"; //parity
+      if(word==test){
+         cs::particle_creation_parity=1;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="single-spin";
+      if(word==test){
+         cs::single_spin=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="periodic-boundaries";
+      if( word == test ){
+         // set PBC for all directions
+         if(value == ""){
+            cs::pbc[0] = true;
+            cs::pbc[1] = true;
+            cs::pbc[2] = true;
+         }
+         // search for x,y,z in value
+         std::string strs[3] = { "x", "y", "z" };
+         for(int i=0; i<3; i++){
+            if (value.find(strs[i]) != std::string::npos) cs::pbc[i] = true;
+         }
+         // check for unknown junk in value
+         if( value.find_first_not_of("xyz,") != std::string::npos){
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'create:" << word << "\' must be a combination of x,y,z only" << std::endl;
+            zlog << zTs() << "Error - value for \'create:" << word << "\' must be a combination of x,y,z only" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+            return false;
+         }
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="periodic-boundaries-x";
+      if(word==test){
+         cs::pbc[0]=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="periodic-boundaries-y";
+      if(word==test){
+         cs::pbc[1]=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="periodic-boundaries-z";
+      if(word==test){
+         cs::pbc[2]=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="select-material-by-geometry";
+      if(word==test){
+         create::internal::select_material_by_geometry = true; // default
+         // also check for value
+         std::string vfalse="false";
+         if(value == vfalse){
+            create::internal::select_material_by_geometry = false;
+         }
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="fill-core-shell-particles";
+      if(word==test){
+         cs::fill_core_shell=true; // default
+         // also check for value
+         std::string VFalse="false";
+         if(value==VFalse){
+            cs::fill_core_shell=false;
+         }
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness";
+      if(word==test){
+         cs::interfacial_roughness=true; // default
+         // also check for value
+         std::string VFalse="false";
+         if(value==VFalse){
+            cs::interfacial_roughness=false;
+         }
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="material-interfacial-roughness";
+      if(word==test){
+         cs::interfacial_roughness_local_height_field=true; // default
+         // also check for value
+         std::string VFalse="false";
+         if(value==VFalse){
+            cs::interfacial_roughness_local_height_field=false;
+         }
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-random-seed";
+      if(word==test){
+         unsigned int vs=atoi(value.c_str());
+         cs::interfacial_roughness_random_seed=vs;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-number-of-seed-points";
+      if(word==test){
+         int sc=atoi(value.c_str());
+         vin::check_for_valid_int(sc, word, line, prefix, 0, 100000,"input","0 - 100,000");
+         cs::interfacial_roughness_seed_count=sc;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-type";
+      if(word==test){
+         std::string loctest="peaks";
+         if(value==loctest){
+            cs::interfacial_roughness_type=1;
             return true;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="voronoi-row-offset";
-        if(word==test){
-            create_voronoi::parity=1;
+         }
+         else
+         loctest="troughs";
+         if(value==loctest){
+            cs::interfacial_roughness_type=-1;
             return true;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="voronoi-random-seed";
-        if(word==test){
-            int vs=atoi(value.c_str());
-            vin::check_for_valid_int(vs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-            mtrandom::voronoi_seed=vs;
-                return true;
-        }
-        else
-        test="voronoi-rounded-grains";
-        if(word==test){
-            create_voronoi::rounded=true;
+         }
+         else{
+            cs::interfacial_roughness_type=0;
             return true;
-        }
-        else
-        test="voronoi-include-boundary-grains";
-        if(word==test){
-            create_voronoi::include_boundary_grains_real=true;
+         }
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-seed-radius";
+      if(word==test){
+         double irsr=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(irsr, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 1 micrometre");
+         cs::interfacial_roughness_mean_seed_radius=irsr;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-seed-radius-variance";
+      if(word==test){
+         double irsrv=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(irsrv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         cs::interfacial_roughness_seed_radius_variance=irsrv;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-mean-height";
+      if(word==test){
+         double irmh=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(irmh, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+         cs::interfacial_roughness_mean_seed_height=irmh;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-maximum-height";
+      if(word==test){
+         double shm=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(shm, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+         cs::interfacial_roughness_seed_height_max=shm;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interfacial-roughness-height-field-resolution";
+      if(word==test){
+         double irhfr=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(irhfr, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+         cs::interfacial_roughness_height_field_resolution=irhfr;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="multilayers";
+      if(word==test){
+         int nmul=atoi(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_int(nmul, word, line, prefix, 1, 100,"input","1 - 100, specifying the number of multilayers to be generated");
+         cs::multilayers = true;
+         cs::num_multilayers = nmul;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="grains-poission"; //parity
+      if(word==test){
+         create::internal::grain_poission=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="height-categorization";
+      if(word==test){
+         // Test for different options
+         test="default";
+         if(value==test){
+            // do nothing
             return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="voronoi-rounded-grains-area";
-        if(word==test){
-            double vsd=atof(value.c_str());
-            vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-            create_voronoi::area_cutoff=vsd;
+         }
+         test="multilayers";
+         if(value==test){
+            cs::multilayer_height_category = true;
             return true;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="particle-centre-offset"; //parity
-        if(word==test){
-            cs::particle_creation_parity=1;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="single-spin";
-        if(word==test){
-            cs::single_spin=true;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="periodic-boundaries-x";
-        if(word==test){
-            cs::pbc[0]=true;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="periodic-boundaries-y";
-        if(word==test){
-            cs::pbc[1]=true;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="periodic-boundaries-z";
-        if(word==test){
-            cs::pbc[2]=true;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="select-material-by-geometry";
-        if(word==test){
-            create::internal::select_material_by_geometry = true; // default
-            // also check for value
-            std::string vfalse="false";
-            if(value == vfalse){
-               create::internal::select_material_by_geometry = false;
-            }
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="fill-core-shell-particles";
-        if(word==test){
-            cs::fill_core_shell=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::fill_core_shell=false;
-            }
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness";
-        if(word==test){
-            cs::interfacial_roughness=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::interfacial_roughness=false;
-            }
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="material-interfacial-roughness";
-        if(word==test){
-            cs::interfacial_roughness_local_height_field=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::interfacial_roughness_local_height_field=false;
-            }
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-random-seed";
-        if(word==test){
-            unsigned int vs=atoi(value.c_str());
-            cs::interfacial_roughness_random_seed=vs;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-number-of-seed-points";
-        if(word==test){
-            int sc=atoi(value.c_str());
-            vin::check_for_valid_int(sc, word, line, prefix, 0, 100000,"input","0 - 100,000");
-            cs::interfacial_roughness_seed_count=sc;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-type";
-        if(word==test){
-            std::string loctest="peaks";
-            if(value==loctest){
-                cs::interfacial_roughness_type=1;
-                return true;
-            }
-            else
-            loctest="troughs";
-            if(value==loctest){
-                cs::interfacial_roughness_type=-1;
-                return true;
-            }
-            else{
-                cs::interfacial_roughness_type=0;
-                return true;
-            }
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-seed-radius";
-        if(word==test){
-            double irsr=atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(irsr, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 1 micrometre");
-            cs::interfacial_roughness_mean_seed_radius=irsr;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-seed-radius-variance";
-        if(word==test){
-            double irsrv=atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(irsrv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-            cs::interfacial_roughness_seed_radius_variance=irsrv;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-mean-height";
-        if(word==test){
-            double irmh=atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(irmh, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-            cs::interfacial_roughness_mean_seed_height=irmh;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-maximum-height";
-        if(word==test){
-            double shm=atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(shm, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-            cs::interfacial_roughness_seed_height_max=shm;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-height-field-resolution";
-        if(word==test){
-            double irhfr=atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(irhfr, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-            cs::interfacial_roughness_height_field_resolution=irhfr;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="multilayers";
-        if(word==test){
-            int nmul=atoi(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_int(nmul, word, line, prefix, 1, 100,"input","1 - 100, specifying the number of multilayers to be generated");
-            cs::multilayers = true;
-            cs::num_multilayers = nmul;
-            return true;
-        }
-        //--------------------------------------------------------------------
-        test="grains-poission"; //parity
-        if(word==test){
-           create::internal::grain_poission=true;
-           return true;
-        }
-        //--------------------------------------------------------------------
-        test="height-categorization";
-        if(word==test){
-            // Test for different options
-            test="default";
-            if(value==test){
-                // do nothing
-                return true;
-            }
-            test="multilayers";
-            if(value==test){
-                cs::multilayer_height_category = true;
-                return true;
-            }
-            else{
-                terminaltextcolor(RED);
-                std::cerr << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"default\"" << std::endl;
-                std::cerr << "\t\"multilayers\"" << std::endl;
-                zlog << zTs() << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
-                zlog << zTs() << "\t\"default\"" << std::endl;
-                zlog << zTs() << "\t\"multilayers\"" << std::endl;
-                terminaltextcolor(WHITE);
-                err::vexit();
-            }
-        }
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"default\"" << std::endl;
+            std::cerr << "\t\"multilayers\"" << std::endl;
+            zlog << zTs() << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
+            zlog << zTs() << "\t\"default\"" << std::endl;
+            zlog << zTs() << "\t\"multilayers\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
       //--------------------------------------------------------------------
       test="voronoi-grain-substructure-crystallization-radius";
       if(word==test){
@@ -443,7 +448,7 @@ namespace create{
       if(word==test){
          cs::system_creation_flags[1]=8;
          return true;
-		}
+      }
       // check for truncation factor
       test="cone-angle";
       if(word == test){
@@ -451,19 +456,19 @@ namespace create{
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.1,44.9 ,"input","0.1 - 44.9");
          create::internal::cone_angle=angle;
          return true;
-		}
+      }
       //--------------------------------------------------------------------
       test="bubble";
       if(word==test){
          cs::system_creation_flags[1]=9;
          return true;
-		}
+      }
       //--------------------------------------------------------------------
       test="ellipse";
       if(word==test){
          cs::system_creation_flags[1] = 10;
          return true;
-		}
+      }
       //--------------------------------------------------------------------
       test="bubble-radius";
       if(word==test){
@@ -471,7 +476,7 @@ namespace create{
          vin::check_for_valid_value(r, word, line, prefix, unit, "none", 0.0,1.0 ,"input","0.0 - 1.0");
          create::internal::bubble_radius=r;
          return true;
-		}
+      }
       //--------------------------------------------------------------------
       test="bubble-nucleation-height";
       if(word==test){
@@ -483,13 +488,13 @@ namespace create{
       //--------------------------------------------------------------------
       test="select-material-by-height";
       if(word==test){
-          create::internal::select_material_by_z_height = true; // default
-          // also check for value
-          std::string VFalse="false";
-          if(value==VFalse){
-             create::internal::select_material_by_z_height = false; // default
-          }
-          return true;
+         create::internal::select_material_by_z_height = true; // default
+         // also check for value
+         std::string VFalse="false";
+         if(value==VFalse){
+            create::internal::select_material_by_z_height = false; // default
+         }
+         return true;
       }
       //--------------------------------------------------------------------
       test="alloy-random-seed";

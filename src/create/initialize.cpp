@@ -56,6 +56,19 @@ namespace create{
          mp::material[mat].pinning_field_unit_vector[2] *= mp::material[mat].pinning_field_strength;
       }
 
+      //------------------------------------------------------------------------
+      // output informative message on periodic boundaries to log file
+      //------------------------------------------------------------------------
+      std::string xstr = cs::pbc[0] ? (cs::pbc[1] || cs::pbc[2] ? "x," : "x") : "";
+      std::string ystr = cs::pbc[1] ? (cs::pbc[2]               ? "y," : "y") : "";
+      std::string zstr = cs::pbc[2] ? "z" : "";
+      // set plural only if at least two directions are set
+      std::string plural = (cs::pbc[0] && cs::pbc[1]) || (cs::pbc[0] && cs::pbc[2]) || (cs::pbc[1] && cs::pbc[2]) ? "s" : "";
+      // only if sirections set output message to user
+      if(cs::pbc[0] || cs::pbc[1] || cs::pbc[2] ) zlog << zTs() << "Setting periodic boundary conditions in " << xstr << ystr << zstr << " direction" << plural << std::endl;
+
+
+
       return;
    }
 

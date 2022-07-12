@@ -53,6 +53,12 @@ cell (bcc, bcc110, fcc, hpc, and kagome) will allocate each atom in the unit cel
 
 {\zicf create:periodic-boundaries-z flag}\phantomsection\addcontentsline{toc}{subsection}{create:periodic-boundaries-z} Creates periodic boundaries along the $z$-direction.
 
+{\zicf create:periodic-boundaries flag}\phantomsection\addcontentsline{toc}{subsection}{create:periodic-boundaries}
+Creates periodic boundaries along user-defined directions. If left empty this sets
+periodic boundaries along the $xyz$-directions. If set to any combination of $x,y,z$
+it sets the commensurate directions. For example \textit{create:periodic-boundaries = yz}
+will set the periodic boundary conditions along the $y$ and $z$ directions.
+
 {\zicf create:select-material-by-height}\phantomsection\addcontentsline{toc}{subsection}{create:select-material-by-height} Specifies that materials are preferentially assigned by their height specification.
 
 {\zicf create:select-material-by-geometry}\phantomsection\addcontentsline{toc}{subsection}{create:select-material-by-geometry} Specifies that materials are preferentially assigned by their geometric specification (eg in core-shell systems).
@@ -87,15 +93,11 @@ cell (bcc, bcc110, fcc, hpc, and kagome) will allocate each atom in the unit cel
 
 {\zicf create:intermixing-random-seed integer [default 100181363]}\phantomsection\addcontentsline{toc}{subsection}{create:intermixing-random-seed} Sets the random seed for the psuedo random number generator for calculating intermixing of materials. A different seed will lead to a different realization of a dilute material. Note that different numbers of cores will change the structure that is generated.
 
-<<<<<<< HEAD
 {\zicf create:spin-initialisation-random-seed = integer [default 123456]}
 \addcontentsline{toc}{subsection}{create:spin-initialisation-random-seed}
 Sets the random seed for the psuedo random number generator for initialising
 spin directions. Note that different numbers of cores will change the
 spin positions that are generated.\\
-=======
-{\zicf create:spin-initialisation-random-seed = integer [default 123456]}\phantomsection\addcontentsline{toc}{subsection}{create:intermixing-random-seed} Sets the random seed for the psuedo random number generator for initialising spin directions. Note that different numbers of cores will change the spin positions that are generated.
->>>>>>> vdc
 
 \section*{System dimensions}\phantomsection\addcontentsline{toc}{section}{System dimensions} The commands here determine the dimensions of the generated system.
 
@@ -187,15 +189,15 @@ Declares the solver to be used for the dipole calculation. Available options are
 
 \section*{HAMR calculation}
 {\zicf hamr:laser-FWHM-x = float [default $20.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:laser-FWHM-x}
-Defines the full width at half maximum of the Gaussian temperature profile in x-direction 
+Defines the full width at half maximum of the Gaussian temperature profile in x-direction
 in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 20 nm.
 
 {\zicf hamr:laser-FWHM-y = float [default $20.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:laser-FWHM-y}
-Defines the full width at half maximum of the Gaussian temperature profile in y-direction 
+Defines the full width at half maximum of the Gaussian temperature profile in y-direction
 in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 20 nm.
 
 {\zicf hamr:head-speed = float [default $30.0$ m/s]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:head-speed}
-Defines the speed of the head sweeping over the medium 
+Defines the speed of the head sweeping over the medium
 in the program \textit{hamr-simulation} with default units of Angstrom/second and a default value of 30 m/s.
 
 {\zicf hamr:head-field-x = float [default $20.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:head-field-x}
@@ -214,25 +216,25 @@ Defines the field linear fall time in the program \textit{hamr-simulation} with 
 
 {\zicf hamr:NPS = float [default $0.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:NPS}
 Defines the shift between the centre of the temperature pulse and the centre of the box defined by \textit{hamr:head-field-x} and \textit{hamr:head-field-y}
-in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm. 
+in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm.
 The parameter can be also parsed via the key \textit{hamr:NFT-to-pole-spacing}.
 
 {\zicf hamr:bit-size = float [default $0.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:bit-size}
 Defines the size of the bit along x (down-track)
-in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm. 
+in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm.
 The parameter can be also parsed via the key \textit{hamr:bit-length}.
 
 {\zicf hamr:track-size = float [default $0.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:track-size}
 Defines the size of the bit along y (cross-track), i.e. the track size of the bit pattern,
-in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm. 
+in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm.
 The parameter can be also parsed via the key \textit{hamr:track-width}.
 
 {\zicf hamr:track-padding = float [default $0.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:track-padding}
 Defines the spacing between the edges of the system along y (cross-track) and the written bit pattern
-in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm. 
+in the program \textit{hamr-simulation} with default units of Angstrom and a default value of 0 nm.
 
 {\zicf hamr:number-of-bits = int [default $0$]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:number-of-bits}
-Defines the number of bits to be written in total in the program \textit{hamr-simulation} with default value of 0. 
+Defines the number of bits to be written in total in the program \textit{hamr-simulation} with default value of 0.
 If the system it too small for the number of bits requested, the sequence is truncated to adapt it to the system.
 
 {\zicf hamr:bit-sequence-type =  exclusive string [default text]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:bit-sequence-type}
@@ -244,7 +246,7 @@ Specifies the format type of bit sequence to be simulated in the program \textit
 If ``single-tone-predefined'' is given, a single tone adapted to the system size will be generated and \textit{ hamr:bit-sequence} is ignored.
 
 {\zicf hamr:bit-sequence = int vector}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:single-tone-predefined}
-Specifies the bit sequence to be simulated in the program \textit{hamr-simulation}. 
+Specifies the bit sequence to be simulated in the program \textit{hamr-simulation}.
 Acceptable values are -1 (opposite to field direction), 0 (zero field) and 1 (along field direction) and by default the vector is empty.
 
 \section*{Simulation Control}
@@ -308,14 +310,14 @@ Simulates a heat assisted magnetic recording (HAMR) writing process with a head 
 defined by the input parameter \textit{hamr:head-speed}, generating an external magnetic field of maximum magnitude
 \textit{sim:maximum-applied-field-strength} with rise time \textit{hamr:field-rise-time} and fall time \textit{hamr:field-fall-time}
 within the region underneath the head defined by the parameters \textit{hamr:head-field-x} and \textit{hamr:head-field-y}.
-The head also generates a heat pulse with Gaussian profile in the \textit{xy}--plane and uniform along \textit{z}  
-defined by FWHM in x and y direction \textit{hamr:laser-FWHM-x} and \textit{hamr:laser-FWHM-y} respectively, 
+The head also generates a heat pulse with Gaussian profile in the \textit{xy}--plane and uniform along \textit{z}
+defined by FWHM in x and y direction \textit{hamr:laser-FWHM-x} and \textit{hamr:laser-FWHM-y} respectively,
 minimum and maximum values of the Gaussian \textit{sim:minimum-temperature} and \textit{sim:maximum-temperature}, respectively.
 The desired number of bits to be written and bit sequence are defined via
 \textit{hamr:number-of-bits}, \textit{hamr:bit-sequence-type} and \textit{hamr:bit-sequence} parameters, whereas
 \textit{hamr:bit-size}/\textit{hamr:bit-length} and \textit{hamr:track-size}/\textit{hamr:track-width} set the bit
-dimension in down-track and cross-track respectively. 
-The margin between the edge of the system and the written tracks in cross-track is specified via 
+dimension in down-track and cross-track respectively.
+The margin between the edge of the system and the written tracks in cross-track is specified via
 \textit{hamr:track-padding}, while \textit{hamr:NPS}/\textit{hamr:NFT-to-pole-spacing}
 set the shift between the centre of application of the external field and temperature pulse.
 
