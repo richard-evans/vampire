@@ -47,6 +47,7 @@ namespace unitcell{
       else if(uc::internal::crystal_structure == "honeycomb"      ) uc::internal::build_honeycomb(              unit_cell );
       else if(uc::internal::crystal_structure == "alpha-honeycomb") uc::internal::build_honeycomb_alpha(        unit_cell );
       else if(uc::internal::crystal_structure == "kagome"         ) uc::internal::build_kagome(                 unit_cell );
+      else if(uc::internal::crystal_structure == "mn2au"          ) uc::internal::build_mn2au(                  unit_cell );
       else if(uc::internal::crystal_structure == "NdFeB"          ) uc::internal::build_NdFeB(                  unit_cell );
       else if(uc::internal::crystal_structure == "rocksalt"       ) uc::internal::build_rock_salt(              unit_cell );
       else if(uc::internal::crystal_structure == "spinel"         ) uc::internal::build_spinel(                 unit_cell );

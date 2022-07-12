@@ -24,6 +24,7 @@ heusler.o \
 honeycomb.o \
 honeycomb-a.o \
 kagome.o \
+mn2au.o \
 nd2fe14b.o\
 rocksalt.o \
 smfe12n.o\
