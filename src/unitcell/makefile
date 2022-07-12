@@ -18,6 +18,7 @@ sc.o \
 bcc.o \
 bcc110.o \
 fcc.o \
+fcc111.o \
 hcp.o \
 heusler.o \
 honeycomb.o \
