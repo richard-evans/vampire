@@ -23,11 +23,11 @@ heusler.o \
 honeycomb.o \
 honeycomb-a.o \
 kagome.o \
+nd2fe14b.o\
 rocksalt.o \
+smfe12n.o\
 spinel.o \
 spinel-layered.o \
-NdFeB.o\
-SmFeN.o\
 verify.o
 
 # Append module objects to global tree
