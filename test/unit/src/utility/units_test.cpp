@@ -80,13 +80,13 @@ int test_units(const bool verbose){
 
    int ec = 0; // error counter
 
-   //-----------------------------------------------------
+   //-----------------------------------------------------------------------------------------
    // Testing units::convert(std::string input_unit, double& value, std::string& type);
-   //-----------------------------------------------------
-   ec += convert_test("meV",1.0,1.602176634e-22,"","energy",precision);
-   ec += convert_test("T",1.0,1.0,"","field",precision);
-   ec += convert_test("A/m",1.0,1.0,"","magnetisation",precision);
-   ec += convert_test("",1.0,1.0,"","none",precision); // test no unit
+   //-----------------------------------------------------------------------------------------
+   ec += convert_test("meV", 1.0, 1.602176634e-22, "","energy",precision);
+   ec += convert_test("T",   1.0, 1.0,             "","field",precision);
+   ec += convert_test("A/m", 1.0, 1.0,             "","magnetisation",precision);
+   ec += convert_test("",    1.0, 1.0,             "","none",precision); // test no unit
 
 
    return ec;
