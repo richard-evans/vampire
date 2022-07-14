@@ -56,10 +56,10 @@ namespace vdc{
 
    // simple struct to store material parameters
    struct material_t{
-      int id;
-      double moment;
-      std::string name;
-      std::string element;
+      int id = 0;
+      double moment = 1.0;
+      std::string name = "material";
+      std::string element = "H";
    };
 
    // struct to hold input parameters, value and line in input file for error check
