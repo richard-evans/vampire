@@ -59,7 +59,7 @@ namespace internal{
       //std::ofstream ofile("kitaev.txt");
 
       //	Loop over all atoms i
-      for(unsigned int i=0; i < atoms::num_atoms; i++){
+      for(uint64_t i=0; i < static_cast<uint64_t>(atoms::num_atoms); i++){
 
          // get material id for atom
          const unsigned int imat = atoms::type_array[i];

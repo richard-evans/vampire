@@ -163,7 +163,7 @@ double legacy_atoms(){
 
    // Everyone now outputs their atom list
    cfg_file_ofstr << local_output_atom_list.size() << std::endl;
-   for (int i = 0; i < local_output_atom_list.size(); i++)
+   for (size_t i = 0; i < local_output_atom_list.size(); i++)
    {
       const int atom = local_output_atom_list[i];
       cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
@@ -281,7 +281,7 @@ double legacy_atoms_coords()
 
    // Everyone now outputs their atom list
    cfg_file_ofstr << local_output_atom_list.size() << std::endl;
-   for (int i = 0; i < local_output_atom_list.size(); i++)
+   for (size_t i = 0; i < local_output_atom_list.size(); i++)
    {
       const int atom = local_output_atom_list[i];
       cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" << atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";

@@ -54,7 +54,7 @@ namespace neighbours{
       // generate neighbour list from interaction template and list of atoms
       void generate(std::vector<cs::catom_t>& atoms,
                     unitcell::exchange_template_t& exchange,
-                    const int num_atoms_in_unit_cell,
+                    const unsigned int num_atoms_in_unit_cell,
                     double ucdx, double ucdy, double ucdz);
 
       // release neighbour list

@@ -35,10 +35,10 @@ namespace exchange{
       // report detailed info in the log file
       zlog << zTs() << "Error! Non-symmetric " << descriptor << "exchange interactions for materials " << i+1 << " and " << j+1 << " in shell " << s+1 << std::endl;
       zlog << zTs() << "\tmaterial[" << i+1 << "]:" << descriptor << "-exchange-matrix-" << s+1 << "-nn[" << j+1 << "] = ";
-         for(int vi = 0; vi < Jij.size(); vi++) zlog << Jij[vi] << "\t";
+         for(size_t vi = 0; vi < Jij.size(); vi++) zlog << Jij[vi] << "\t";
          zlog << std::endl;
       zlog << zTs() << "\tmaterial[" << j+1 << "]:" << descriptor << "-exchange-matrix-" << s+1 << "-nn[" << i+1 << "] = ";
-         for(int vi = 0; vi < Jji.size(); vi++) zlog << Jji[vi] << "\t";
+         for(size_t vi = 0; vi < Jji.size(); vi++) zlog << Jji[vi] << "\t";
          zlog << std::endl;
       zlog << zTs() << "\tThe definition of " << descriptor << " exchange requires that there are the same number of values and that these values are the same. Exiting." << std::endl;
 
@@ -94,7 +94,7 @@ namespace exchange{
                if( Jij.size() != Jji.size() ) exchange_error(i, j, s, Jij, Jji, "");
 
                // check for rational values for all elements
-               for(int v = 0 ; v < Jij.size() ; v++){
+               for(size_t v = 0 ; v < Jij.size() ; v++){
 
                   // Check for non-zero value (avoids divide by zero)
                   if(fabs( Jji[v] ) > 0.0){
@@ -132,7 +132,7 @@ namespace exchange{
                if( Jij.size() != Jji.size() ) exchange_error(i, j, s, Jij, Jji, "biquadratic");
 
                // check for rational values for all elements
-               for(int v = 0 ; v < Jij.size() ; v++){
+               for(size_t v = 0 ; v < Jij.size() ; v++){
 
                   // Check for non-zero value (avoids divide by zero)
                   if(fabs( Jji[v] ) > 0.0){
@@ -168,7 +168,7 @@ namespace exchange{
    	//-------------------------------------------------
    	uint64_t counter = 0; // number of exchange interactions
 
-   	for(uint64_t atom = 0; atom < atoms::num_atoms; atom++){
+   	for(uint64_t atom = 0; atom < static_cast<uint64_t>(atoms::num_atoms); atom++){
    		counter += bilinear[atom].size();
    	}
 
@@ -184,11 +184,11 @@ namespace exchange{
 
    	//	Populate 1D neighbourlist and index arrays
    	counter = 0;
-   	for(uint64_t atom=0; atom < atoms::num_atoms; atom++){
+   	for(uint64_t atom=0; atom < static_cast<uint64_t>(atoms::num_atoms); atom++){
    		//std::cout << atom << ": ";
    		// Set start index
    		atoms::neighbour_list_start_index[atom]=counter;
-   		for(unsigned int nn=0;nn<bilinear[atom].size();nn++){
+   		for(size_t nn=0;nn<bilinear[atom].size();nn++){
 
             // save atom number to 1D interaction list
    			atoms::neighbour_list_array[counter] = bilinear[atom][nn].nn;
@@ -223,7 +223,7 @@ namespace exchange{
 
          // determine total number of biquadratic exchange interactions
          counter = 0;
-         for(uint64_t atom = 0; atom < atoms::num_atoms; atom++){
+         for(uint64_t atom = 0; atom < static_cast<uint64_t>(atoms::num_atoms); atom++){
       		counter += biquadratic[atom].size();
       	}
 

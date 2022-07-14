@@ -207,7 +207,7 @@ namespace vout{
    void material_temperature(std::ostream& stream, bool header){
       std::ostringstream res;
       vout::fixed_width_output result(res,vout::fw_size);
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(size_t mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_Temp";
          }
@@ -222,7 +222,7 @@ namespace vout{
    void material_applied_field_strength(std::ostream& stream, bool header){
       std::ostringstream res;
       vout::fixed_width_output result(res,vout::fw_size);
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(size_t mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_H";
          }
@@ -240,7 +240,7 @@ namespace vout{
 
       const double real_time=sim::time*mp::dt_SI;
 
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(size_t mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_fmr_H";
          }

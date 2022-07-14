@@ -337,7 +337,7 @@ namespace vin{
        // Check for valid unit
        //---------------------------------------------------------------------------
 
-       for(int idx=0; idx<u.size(); idx++){
+       for(size_t idx=0; idx<u.size(); idx++){
 
           double value = u.at(idx);
 
@@ -403,7 +403,7 @@ namespace vin{
        // Check for valid unit
        //---------------------------------------------------------------------------
 
-       for(int idx=0; idx<u.size(); ++idx){
+       for(size_t idx=0; idx<u.size(); ++idx){
 
           double value = u.at(idx);
           double minvalue = range_min.at(idx);
@@ -471,7 +471,7 @@ namespace vin{
                                 std::string range_text) /// customised text
    {
 
-      for(int idx=0; idx<u.size(); ++idx){
+      for(size_t idx=0; idx<u.size(); ++idx){
 
          int value = u.at(idx);
          int minvalue = range_min;

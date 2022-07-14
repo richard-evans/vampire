@@ -133,7 +133,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		double PI = 3.14159265;
 		file << initial_grain_pos_x << '\t' << initial_grain_pos_y << '\t' << initial_grain_r << std::endl;
 		for (int attempt = 0; attempt < maxattempts1; attempt ++){
-			for (int g =0; g < grains_x.size() ; g++){
+			for (size_t g =0; g < grains_x.size() ; g++){
 				double r = d(gen)/2.0;
 			//	std::cout << r << "\t" << grain_cell_size_x+ grain_sd*grain_cell_size_x << "\t" << grain_cell_size_x << std::endl;
 				while (r > grain_cell_size_x + grain_sd*grain_cell_size_x || r < grain_cell_size_x - grain_sd*grain_cell_size_x){
@@ -166,7 +166,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			      double y = grains_y[i] + d*dy + min_distance*dy;
 					if (x <= 2*sdx && y <= 2*sdy & x >= 0  - 2*grain_cell_size_x && y >= 0 - 2*grain_cell_size_y){
 						int within =0;
-				       for (int grain = 0; grain < grains_x.size(); grain ++ ){
+				       for (size_t grain = 0; grain < grains_x.size(); grain ++ ){
 				   		double dx2 = grains_x[grain] - x;
 				   		double dy2 = grains_y[grain] - y;
 				   		double dist = sqrt(dx2*dx2 + dy2*dy2);
@@ -183,7 +183,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							while (xmove || ymove){
 								if (x > sdx/2.0)	tempx = tempx - 1;
 								else tempx = tempx + 1;
-								for (int grain2 = 0; grain2 < grains_x.size(); grain2 ++ ){
+								for (size_t grain2 = 0; grain2 < grains_x.size(); grain2 ++ ){
 								  double dx2 = grains_x[grain2] - tempx;
 								  double dy2 = grains_y[grain2] - tempy;
 								  double dist = sqrt(dx2*dx2 + dy2*dy2);
@@ -194,7 +194,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							  }
 								if (y > sdy/2.0)	tempy = tempy - 1;
   								else tempy = tempy + 1;
-  								for (int grain2 = 0; grain2 < grains_x.size(); grain2 ++ ){
+  								for (size_t grain2 = 0; grain2 < grains_x.size(); grain2 ++ ){
   								  double dx2 = grains_x[grain2] - tempx;
   								  double dy2 = grains_y[grain2] - tempy;
   								  double dist = sqrt(dx2*dx2 + dy2*dy2);
@@ -228,7 +228,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		}
 		double sumV = 0;
 		double sumR = 0;
-		for (int i = 0; i < grains_x.size(); i ++){
+		for (size_t i = 0; i < grains_x.size(); i ++){
 			double r = grains_r[i];
 			double V = 3.14*r*r;
 			sumV = sumV +V;
@@ -251,7 +251,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		frac = frac + (grain_cell_size_x/2.0 - avR)/grain_cell_size_x;
 	 	//	std::cout << sumV << '\t' << totalV << '\t' << frac  << "\t" << grains_x.size() << '\t'<<  grain_coord_array.size() << std::endl;
 
-		for (int i = 0; i < grain_coord_array.size(); i ++){
+		for (size_t i = 0; i < grain_coord_array.size(); i ++){
 		//	double r = grains_r[i];
 		grain_coord_array[i][0] = grain_coord_array[i][0]* frac;
 		grain_coord_array[i][1] = grain_coord_array[i][1]* frac;

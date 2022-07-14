@@ -49,7 +49,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // Resize material-exchange-nn-cutoff tensor
    unsigned int num_uc_materials = 0;
-   for (int i = 0; i < unit_cell.atom.size(); ++i){
+   for (size_t i = 0; i < unit_cell.atom.size(); ++i){
          if (unit_cell.atom[i].mat > num_uc_materials) num_uc_materials = unit_cell.atom[i].mat;
       }
    ++num_uc_materials; // since unit cell category has the -1 shift
@@ -62,8 +62,8 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // Set nn and interaction ranges using cutoff factors
    double max_rcut = 0; // Max rcut used to find number of unit cells to get all interactions/nearest neighbours
-   for (int i = 0; i < num_uc_materials; ++i){
-      for (int j = 0; j < num_uc_materials; ++j){
+   for (unsigned int i = 0; i < num_uc_materials; ++i){
+      for (unsigned int j = 0; j < num_uc_materials; ++j){
          nn_cutoff_range[i][j] *= 1.000001*unit_cell.cutoff_radius;
          interaction_cutoff_range[i][j] *= nn_cutoff_range[i][j]*exchange_interaction_range;
          double tmp_r = std::max(nn_cutoff_range[i][j], interaction_cutoff_range[i][j]);
@@ -82,7 +82,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
    unit_cell.biquadratic.num_unit_cell_atoms = unit_cell.atom.size();
 
    // set number of interactions per atom used for exchange normalisation
-   for (int i = 0; i < unit_cell.atom.size(); ++i){
+   for (size_t i = 0; i < unit_cell.atom.size(); ++i){
       unit_cell.bilinear.ni.push_back(unit_cell.atom[i].ni);
       unit_cell.biquadratic.ni.push_back(unit_cell.atom[i].ni);
    }
@@ -101,7 +101,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
    for(int x = 0; x < nx; ++x){
       for(int y = 0; y < ny; ++y){
          for(int z = 0; z < nz; ++z){
-            for(int a=0; a < unit_cell.atom.size(); ++a){
+            for(size_t a=0; a < unit_cell.atom.size(); ++a){
                local::atom_t tmp;
                tmp.mat = unit_cell.atom[a].mat;
                tmp.x = (unit_cell.atom[a].x + double(x))*ucsx;
@@ -126,13 +126,13 @@ void calculate_interactions(unit_cell_t& unit_cell){
    //const double nnrcut_sq = unit_cell.cutoff_radius*unit_cell.cutoff_radius*1.001*1.001; // nearest neighbour cutoff radius
 
    // loop over all i atoms
-   for(int i=0; i < ratoms.size(); ++i){
+   for(size_t i=0; i < ratoms.size(); ++i){
 
       // check for i atoms only in central cell
       if( (ratoms[i].idx == mid_cell_x) && (ratoms[i].idy == mid_cell_y) && (ratoms[i].idz == mid_cell_z) ){
 
          // loop over all j atoms
-         for(int j=0; j < ratoms.size(); ++j){
+         for(size_t j=0; j < ratoms.size(); ++j){
 
             // calculate interatomic radius_sq
             const double rx = ratoms[j].x - ratoms[i].x;
@@ -190,7 +190,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // Set calculated interactions range
    int interaction_range=0;
-   for(int i=0; i<unit_cell.bilinear.interaction.size(); i++){
+   for(size_t i=0; i<unit_cell.bilinear.interaction.size(); i++){
       if(abs(unit_cell.bilinear.interaction[i].dx)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dx);
       if(abs(unit_cell.bilinear.interaction[i].dy)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dy);
       if(abs(unit_cell.bilinear.interaction[i].dz)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dz);

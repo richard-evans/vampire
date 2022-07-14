@@ -550,19 +550,19 @@ void regression(std::vector<double>& x, std::vector<double>& y, double& m, doubl
 
 	// calculate mean x value
 	double sum_x = 0.0;
-	for(int i=0; i < x.size(); i++) sum_x += x[i];
+	for(unsigned int i=0; i < x.size(); i++) sum_x += x[i];
 
 	// calculate mean y value
 	double sum_y = 0.0;
-	for(int i=0; i < y.size(); i++) sum_y += y[i];
+	for(unsigned int i=0; i < y.size(); i++) sum_y += y[i];
 
 	// determine sum of squares of x-deviations
 	double sum_xx = 0.0;
-	for(int i=0; i< x.size(); i++) sum_xx += x[i]*x[i];
+	for(unsigned int i=0; i< x.size(); i++) sum_xx += x[i]*x[i];
 
 	// determine sum of squares of xy-deviations
 	double sum_xy	= 0.0;
-	for(int i=0; i< x.size(); i++) sum_xy += x[i]*y[i];
+	for(unsigned int i=0; i< x.size(); i++) sum_xy += x[i]*y[i];
 
 	// compute gradient
 	m = (num_points * sum_xy - sum_x * sum_y) / ( num_points * sum_xx - sum_x * sum_x );

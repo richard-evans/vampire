@@ -110,7 +110,7 @@ void mc_uniform(std::vector<double>& new_spin){
    const double r = 1.0/sqrt (new_spin[0]*new_spin[0]+new_spin[1]*new_spin[1]+new_spin[2]*new_spin[2]);
 
    // Apply normalisation
-   for (int i=0; i < new_spin.size(); i++) {
+   for (size_t i=0; i < new_spin.size(); i++) {
       new_spin[i]*=r;
    }
 

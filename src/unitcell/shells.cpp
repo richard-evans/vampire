@@ -49,7 +49,7 @@ void unitcell::exchange_template_t::find_shells(){
    std::vector<shell_t> interaction_list;
 
    // load in computed interactions
-   for(int i=0; i<interaction.size(); i++){
+   for(size_t i=0; i<interaction.size(); i++){
       shell_t tmp;
       tmp.id = i;
       tmp.range = interaction[i].rij;
@@ -72,7 +72,7 @@ void unitcell::exchange_template_t::find_shells(){
    std::vector<double> shell_range(1,interaction_list[0].range); // list of number of neighbours in each shell
 
    // check atom at roughly the same range, and if so lump into the same shell
-   for(int i=0; i<interaction.size(); i++){
+   for(size_t i=0; i<interaction.size(); i++){
       if(interaction_list[i].range < current_range + tolerance){
          interaction_list[i].shell = shell;
          shell_count[shell]++; // increment shell counter
@@ -89,7 +89,7 @@ void unitcell::exchange_template_t::find_shells(){
    }
 
    // Save shell numbers in interaction list
-   for(int i=0; i<interaction_list.size(); i++){
+   for(size_t i=0; i<interaction_list.size(); i++){
       int id = interaction_list[i].id;
       interaction[id].shell = interaction_list[i].shell;
    }
@@ -104,7 +104,7 @@ void unitcell::exchange_template_t::find_shells(){
    zlog << zTs() << "   Shell \tNumber \tRange \t Cumulative" << std::endl;
    int cumulative = 0;
    const int num_atoms = num_unit_cell_atoms;
-   for(int i=0; i < shell_count.size(); i++){
+   for(size_t i=0; i < shell_count.size(); i++){
       cumulative += shell_count[i];
       zlog << zTs() << "     " << i+1 << "   \t" << shell_count[i]/num_atoms << "\t" << shell_range[i] << " \t" << cumulative/num_atoms << std::endl;
    }

@@ -48,7 +48,7 @@ namespace neighbours{
 //----------------------------------------------------------------------------------
 void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atoms (as reference for speed)
                unitcell::exchange_template_t& exchange, // exchange template to calculate neighbour list
-               const int num_atoms_in_unit_cell,        // number of atoms in each cell to estimate interaction numbers
+               const unsigned int num_atoms_in_unit_cell,        // number of atoms in each cell to estimate interaction numbers
                const double ucdx,                       // unit cell size
                const double ucdy,
                const double ucdz
@@ -148,10 +148,10 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
    zlog << zTs() << "\tAllocating memory done"<< std::endl;
 
 	// declare 1D cell array to loop over
-	const int64_t num_cells = d[0]*d[1]*d[2];
+	const uint64_t num_cells = d[0]*d[1]*d[2];
 	std::vector< std::vector <int> > cell_coord_array;
 	cell_coord_array.reserve(num_cells);
-	for(int64_t i=0; i < num_cells; i++){
+	for(uint64_t i=0; i < num_cells; i++){
 		cell_coord_array.push_back(std::vector<int>());
 		cell_coord_array[i].resize(3);
 	}

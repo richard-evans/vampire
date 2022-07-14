@@ -89,7 +89,7 @@ void remix_grain_numbers(){
 	}
 
 	// now generate new numbers based on index of old_grain_numbers array
-	for(int grain = 0; grain < old_grain_numbers.size(); grain++){
+	for(unsigned int grain = 0; grain < old_grain_numbers.size(); grain++){
 
 		const int old_grain_number = old_grain_numbers[grain];
 		const int new_grain_number = grain;

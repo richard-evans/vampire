@@ -302,10 +302,10 @@ void exchange_stiffness(){
 	std::cout << "---------------------------------------------------------------" << std::endl;
 
 	// loop over all temperatures
-	for(int j = 0; j < temperatures.size(); j++){
+	for(size_t j = 0; j < temperatures.size(); j++){
 
 		// populate 1D data for fitting
-		for(int i = 0; i < torque_data.size(); i++) torque1D[i] = torque_data[i][j];
+		for(size_t i = 0; i < torque_data.size(); i++) torque1D[i] = torque_data[i][j];
 
 		double m = 0.0;
 		double c = 0.0;
@@ -450,7 +450,7 @@ void calculate_torque(const std::vector<int>& mask,
 	double tt[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 	double counter[2] = { 0.0, 0.0 };
 
-	for(int atom = 0; atom < mask.size(); atom++){
+	for(size_t atom = 0; atom < mask.size(); atom++){
 
 		const int mask_id = mask[atom];
 

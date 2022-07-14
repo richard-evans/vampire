@@ -43,7 +43,7 @@ namespace st{
          for(int i=0; i<mp::num_materials; ++i) st::internal::magx_mat[i]=0.0;
          for(int i=0; i<mp::num_materials; ++i) st::internal::magy_mat[i]=0.0;
          for(int i=0; i<mp::num_materials; ++i) st::internal::magz_mat[i]=0.0;
-         for(int i=0; i<num_elements; ++i) st::internal::m[i]=0.0;
+         for(unsigned int i=0; i<num_elements; ++i) st::internal::m[i]=0.0;
 
          // calculate total moment in each cell
          for(int atom=0; atom<st::internal::num_local_atoms; ++atom) {

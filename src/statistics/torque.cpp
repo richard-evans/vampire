@@ -190,8 +190,8 @@ void torque_statistic_t::set_torque(std::vector<double>& new_torque, std::vector
    // copy torque vector
    torque = new_torque;
 
-   const unsigned int array_size = mean_torque.size();
-   for(int i=0; i< array_size; ++i){
+   const size_t array_size = mean_torque.size();
+   for(size_t i=0; i< array_size; ++i){
       mean_torque[i] += new_mean_torque[i];
    }
 

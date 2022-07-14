@@ -197,8 +197,8 @@ void magnetization_statistic_t::set_magnetization(std::vector<double>& new_magne
    magnetization = new_magnetization;
    //magnetisation.swap(new_magnetization); fatsre but too dangerous?
 
-   const unsigned int array_size = mean_magnetization.size();
-   for(int i=0; i< array_size; ++i){
+   const size_t array_size = mean_magnetization.size();
+   for(size_t i=0; i< array_size; ++i){
       mean_magnetization[i] += new_mean_magnetization[i];
    }
 
