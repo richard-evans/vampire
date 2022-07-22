@@ -162,9 +162,6 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		tmp_catom_array.resize(0);
 	}
 
-   // assign materials by layer
-   create::internal::layers(catom_array);
-
 	// Check to see if any atoms have been generated
 	if(atom==0){
 		terminaltextcolor(RED);

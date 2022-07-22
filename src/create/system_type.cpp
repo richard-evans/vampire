@@ -66,9 +66,32 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	// Local variables
 	//----------------------------------------
 
-	//----------------------------------------------------------------------------------
-	// Choose which system type to create
-	//----------------------------------------------------------------------------------
+   // Check for selection of materials by z-hright
+   if(create::internal::select_material_by_z_height){
+
+      // Check for interfacial roughness and call custom material assignment routine
+      if(cs::interfacial_roughness) create::internal::roughness(catom_array);
+      // Check for multilayer system and if required generate multilayers
+      else if(cs::multilayers) cs::generate_multilayers(catom_array);
+      // otherwise use standard layer algorithm
+      else create::internal::layers(catom_array);
+
+      // now add in fill atoms
+      for( auto& atom : catom_array ){
+         if(mp::material[atom.material].fill) atom.include = true;
+      }
+
+   }
+
+   // Delete unneeded atoms from layers for CSG operations
+   internal::clear_atoms(catom_array);
+
+   // Now unselect all atoms by default for particle shape cutting
+   for( auto& atom : catom_array ) atom.include = false;
+
+   //----------------------------------------------------------------------------------
+   // Choose which system type to create
+   //----------------------------------------------------------------------------------
 	switch(cs::system_creation_flags[2]){
 		case 0: // Isolated particle
 			internal::particle(catom_array);
