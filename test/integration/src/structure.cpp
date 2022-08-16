@@ -16,18 +16,18 @@
 #include "internal.hpp"
 
 //------------------------------------------------------------------------------
-// Test to verify consistent time evolution for different integrators
-//     Note: this is a regression test rather than absolute as some tests
-//           are stochastic in nature
+// Test to verify consistent generation of different systems like particles,
+// core-shell systems, multilayers etc, tested against number of atoms for each
+// material
 //------------------------------------------------------------------------------
-bool integrator_test(const std::string dir, double rx, double ry, double rz, const std::string executable){
+bool material_atoms_test(const std::string dir, int n1, int n2, int n3, int n4, const std::string executable){
 
    // get root directory
    std::string path = std::filesystem::current_path();
 
    // fixed-width output for prettiness
    std::stringstream test_name;
-   test_name << "Testing integrator for " << dir;
+   test_name << "Testing structure for " << dir;
    std::cout << std::setw(60) << std::left << test_name.str() << " : " << std::flush;
 
    // change directory
@@ -42,38 +42,49 @@ bool integrator_test(const std::string dir, double rx, double ry, double rz, con
 
    std::string line;
 
+   // create temporary file for material numbers
+   std::string cmd = "grep Material log | awk '{print $14}' > nums.txt";
+   system(cmd.c_str());
+
    // open output file
    std::ifstream ifile;
-   ifile.open("output");
+   ifile.open("nums.txt");
 
-   // read value after header
-   for(int i=0; i<982; i++) getline(ifile, line);
-   std::stringstream liness(line);
-   double v1 = 0.0;
-   double vx = 0.0;
-   double vy = 0.0;
-   double vz = 0.0;
-   double vm = 0.0;
+   int v1 = 0;
+   int v2 = 0;
+   int v3 = 0;
+   int v4 = 0;
 
-   liness >> v1 >> vx >> vy >> vz >> vm;
+   getline(ifile, line);
+   std::stringstream liness1(line);
+   liness1 >> v1;
+
+   getline(ifile, line);
+   std::stringstream liness2(line);
+   liness2 >> v2;
+
+   getline(ifile, line);
+   std::stringstream liness3(line);
+   liness3 >> v3;
+
+   getline(ifile, line);
+   std::stringstream liness4(line);
+   liness4 >> v4;
 
    // cleanup
-   vt::system("rm output log");
+   vt::system("rm output log nums.txt");
 
    // return to parent directory
    if( !vt::chdir(path) ) return false;
 
    // now test value obtained from code
-   const double ratiox = vx/rx;
-   const double ratioy = vy/ry;
-   const double ratioz = vz/rz;
 
-   if(ratiox >0.99999 && ratiox < 1.00001 && ratioy >0.99999 && ratioy < 1.00001 && ratioz >0.99999 && ratioz < 1.00001){
+   if( n1 == v1 && n2 == v2 && n3 == v3 && n4 == v4){
       std::cout << "OK" << std::endl;
       return true;
    }
    else{
-      std::cout << "FAIL | expected: " << rx << "\t" << ry << "\t" << rz << "\t" << "\tobtained:  " << vx << "\t" << vy << "\t" << vz << "\t" << "\t" << line << std::endl;
+      std::cout << "FAIL | expected: " << n1 << "\t" << n2 << "\t" << n3 << "\t" << n4 << "\t" << "\tobtained:  " << v1 << "\t" << v2 << "\t" << v3 << "\t" << v4 << "\t" << line << std::endl;
       return false;
    }
 

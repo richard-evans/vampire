@@ -18,9 +18,9 @@ if [ "$all" = true ]; then
 fi
 
 if [ "$integration" = true ]; then
-    echo "****************************************"
+    echo "====================================================================="
     echo "      Running integration tests"
-    echo "****************************************"
+    echo "====================================================================="
     cd test/integration/
     time ./integration_tests
     cd ../../
@@ -28,4 +28,3 @@ fi
 if [ "$unit" = true ]; then
     echo "Running unit tests"
 fi
-

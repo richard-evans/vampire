@@ -330,7 +330,8 @@ tidy:
 	@rm -f src/*/*~
 
 tests:
-	$(MAKE) -C util/autotests/
+	$(MAKE) -C test/integration/
+	$(MAKE) -C test/unit/
 
 vdc:
 	$(MAKE) -C util/vdc/

@@ -23,7 +23,10 @@ bool exchange_test(std::string dir, double result, std::string executable){
    // get root directory
    std::string path = std::filesystem::current_path();
 
-   std::cout << "Testing exchange energy for " << dir << "    : " << std::flush;
+   // fixed-width output for prettiness
+   std::stringstream test_name;
+   test_name << "Testing exchange energy for " << dir;
+   std::cout << std::setw(60) << std::left << test_name.str() << " : " << std::flush;
 
    // change directory
    if( !vt::chdir(path+"/data/"+dir) ) return false;

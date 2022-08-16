@@ -17,9 +17,9 @@
 
 int main(){
 
-   std::cout << "--------------------------------------------------" << std::endl;
+   std::cout << "---------------------------------------------------------------------" << std::endl;
    std::cout << "    Running system test suite for vampire code" << std::endl;
-   std::cout << "--------------------------------------------------" << std::endl;
+   std::cout << "---------------------------------------------------------------------" << std::endl;
 
    // Get vampire path and command
    //std::string path = std::filesystem::current_path();
@@ -44,15 +44,18 @@ int main(){
    // Integrator tests
    if( !integrator_test("dynamics/heun",-0.106813,-0.337996,0.935067, exe ) ) fail += 1;
 
+   // Structure tests
+   if( !material_atoms_test("structure/core-shell", 3474, 485, 0, 0, exe ) ) fail += 1;
+
    // Summary
-   std::cout << "--------------------------------------------------" << std::endl;
+   std::cout << "---------------------------------------------------------------------" << std::endl;
    if(fail >0){
       std::cout << "Failed " << fail << " tests : OVERALL FAIL" << std::endl;
    }
    else{
       std::cout << "Failed " << fail << " tests : OVERALL PASS" <<	std::endl;
    }
-   std::cout << "--------------------------------------------------" << std::endl;
+   std::cout << "---------------------------------------------------------------------" << std::endl;
 
    return 0;
 

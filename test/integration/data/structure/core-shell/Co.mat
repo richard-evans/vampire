@@ -1,0 +1,22 @@
+#===================================================
+# Sample vampire material file V5
+#===================================================
+
+#----------------------------
+materials:num-materials = 2
+#----------------------------
+material[1]:exchange-matrix[1] = 3.0e-21
+material[1]:exchange-matrix[2] = 1.0e-21
+material[1]:atomic-spin-moment = 2.0 !muB
+material[1]:damping-constant = 1.0
+material[1]:uniaxial-anisotropy-constant = 1.0e-24
+material[1]:material-element = Fe
+#----------------------------
+material[2]:exchange-matrix[1] = 1.0e-21
+material[2]:exchange-matrix[2] = 2.0e-21
+material[2]:atomic-spin-moment = 3.0 !muB
+material[2]:damping-constant = 1.0
+material[2]:uniaxial-anisotropy-constant = 1.0e-23
+material[1]:core-shell-size = 1.0
+material[2]:core-shell-size = 0.5
+

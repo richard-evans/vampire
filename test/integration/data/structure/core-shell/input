@@ -1,0 +1,36 @@
+#------------------------------------------
+# Sample vampire input file to perform
+# benchmark calculation for v4.0
+#
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 7.7 !nm
+dimensions:system-size-y = 7.7 !nm
+dimensions:system-size-z = 7.7 !nm
+
+create:sphere
+
+dimensions:particle-size = 7 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file = Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:temperature = 0.0
+sim:time-steps-increment = 1
+sim:total-time-steps = 1
+sim:time-step = 1 !fs
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program = benchmark
+sim:integrator = llg-heun
