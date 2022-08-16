@@ -81,10 +81,10 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
          if(mp::material[atom.material].fill) atom.include = true;
       }
 
-   }
+      // Delete unneeded atoms from layers for CSG operations
+      internal::clear_atoms(catom_array);
 
-   // Delete unneeded atoms from layers for CSG operations
-   internal::clear_atoms(catom_array);
+   }
 
    // Now unselect all atoms by default for particle shape cutting
    for( auto& atom : catom_array ) atom.include = false;
