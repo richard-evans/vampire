@@ -33,7 +33,7 @@ namespace internal
 {
 
    // enumerated integers for option selection
-   enum format_t{ binary = 0, text = 1};
+   enum format_t{ binary = 0, text = 1, text_sld=2};
    enum mode_t{ legacy = 0, mpi_io = 1, fpprocess = 2, fpnode = 3};
 
    //-------------------------------------------------------------------------
@@ -49,6 +49,10 @@ namespace internal
    extern bool output_atoms_config_continuous; // flag to enable continuous output of atomic configurations
    extern bool output_atoms_config_end; // flag to enable output of atomic configurations at end of simulation
    extern int output_atoms_config_rate; // rate to output atoms
+   
+   //for Spin-lattice simulations - Modified by M. Strungaru 2022
+   extern bool sld_format; //flag to enable dynamic positions
+
 
    extern bool output_cells_config; // flag to enable cells output
    extern bool output_cells_config_continuous; // flag to enable continuous output of cells configurations
@@ -77,6 +81,9 @@ namespace internal
 
    // Data buffers for parallel i/o
    extern std::vector<double> local_buffer;
+   //for Spin-lattice simulations - Modified by Mara Strungaru 2022
+   extern std::vector<double> local_buffer_sld;
+
    extern std::vector<double> collated_buffer;
 
    // variables for collated data output
@@ -107,6 +114,8 @@ namespace internal
 
    void atoms();
    void atoms_coords();
+   void atoms_coords_sld();
+
    void atoms_non_magnetic();
 
    double legacy_atoms();
@@ -122,7 +131,17 @@ namespace internal
                             const std::vector<double> &z,
                             const std::vector<uint64_t> &mask,
                             std::vector<double> &buffer);
-
+   /*
+   //for Spin-lattice simulations - Modified by Mara Strungaru 2022
+   void copy_data_to_buffer_sld(const std::vector<double> &x, // vector data
+                            const std::vector<double> &y,
+                            const std::vector<double> &z,
+                            const std::vector<double> &vx, // vector data
+                            const std::vector<double> &vy,
+                            const std::vector<double> &vz,
+                            const std::vector<uint64_t> &mask,
+                            std::vector<double> &buffer);
+  */
    void write_coordinate_meta();
    void write_non_magnetic_meta(const uint64_t num_data);
    void write_meta(const double simulation_time, // time (seconds)

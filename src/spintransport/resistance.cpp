@@ -153,8 +153,8 @@ void calculate_magnetoresistance(){
    #endif
 
    // save total resistance and current
-   st::total_resistance = 1.0 / sum_inv_resistance;
-   st::total_current = program::fractional_electric_field_strength * st::internal::voltage / st::total_resistance;
+   st::total_resistance =1.0 / sum_inv_resistance;
+   st::total_current =program::fractional_electric_field_strength * st::internal::voltage / st::total_resistance;
 
    return;
 

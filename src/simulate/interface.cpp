@@ -17,6 +17,7 @@
 
 // Internal sim header
 #include "internal.hpp"
+#include "sld.hpp"
 
 namespace sim{
 
@@ -144,6 +145,12 @@ namespace sim{
             sim::integrator = sim::llg_quantum;
             return true;
          }
+         test="spin-lattice";
+         if( value == test ){
+            sim::integrator = sim::suzuki_trotter;
+            return true;
+         }
+         //
          //--------------------------------------------------------------------
          else{
             terminaltextcolor(RED);

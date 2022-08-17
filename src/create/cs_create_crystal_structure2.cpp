@@ -95,11 +95,11 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
    unsigned int maxlh=0;
    for(unsigned int uca=0;uca<unit_cell.atom.size();uca++) if(unit_cell.atom[uca].hc > maxlh) maxlh = unit_cell.atom[uca].hc;
    maxlh+=1;
-
+   //this has been modified by Mara Strungaru to go from x to z, rather than z to x
 	// Duplicate unit cell
-	for(int z=min_bounds[2];z<max_bounds[2];z++){
+	for(int x=min_bounds[0];x<max_bounds[0];x++){
 		for(int y=min_bounds[1];y<max_bounds[1];y++){
-			for(int x=min_bounds[0];x<max_bounds[0];x++){
+			for(int z=min_bounds[2];z<max_bounds[2];z++){
 
 				// need to change this to accept non-orthogonal lattices
 				// Loop over atoms in unit cell

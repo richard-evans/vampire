@@ -71,7 +71,7 @@ namespace sim{
 
 	// enumerated list for integrators
 	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
-							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5};
+							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5, suzuki_trotter = 6};
 
 	extern std::ofstream mag_file;
 	extern uint64_t time;
@@ -194,6 +194,7 @@ namespace sim{
 	extern int LLG_Midpoint();
 	extern int LLG_Midpoint_mpi();
 	extern int LLG_Midpoint_cuda();
+	//extern int suzuki_trotter();
 
 
 	// Integrator initialisers

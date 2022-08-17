@@ -22,6 +22,7 @@
 #include "sim.hpp"
 #include "micromagnetic.hpp"
 #include "spintransport.hpp"
+#include "sld.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -469,5 +470,38 @@ namespace vout{
    void fractional_electric_field_strength(std::ostream& stream, bool header){
       stream << generic_output_double("frac_voltage", program::fractional_electric_field_strength, header);
    }
+//
+
+   // Output Function 73
+   void spin_temperature(std::ostream& stream, bool header){
+      stream << generic_output_double("spin-temperature",  sld::spin_temperature, header);
+      //stream << generic_output_double("spin-temperature", spin_transport::total_resistance, header);
+   }
+
+   // Output Function 74
+   void lattice_temperature(std::ostream& stream, bool header){
+      stream << generic_output_double("lattice-temperature", sld::lattice_temperature, header);
+   }
+//
+
+   // Output Function 75
+   void potential_energy(std::ostream& stream, bool header){
+      stream << generic_output_double("potential-energy",  sld::potential_energy, header);
+      //stream << generic_output_double("spin-temperature", spin_transport::total_resistance, header);
+   }
+
+   // Output Function 76
+   void kinetic_energy(std::ostream& stream, bool header){
+      stream << generic_output_double("kinetic-energy", sld::kinetic_energy, header);
+   }
+   // Output Function 77
+   void sld_exchange_energy(std::ostream& stream, bool header){
+      stream << generic_output_double("sld-exchange-energy", sld::sld_exchange_energy, header);
+   }
+   // Output Function 78
+   void sld_coupling_energy(std::ostream& stream, bool header){
+      stream << generic_output_double("sld-coupling-energy", sld::sld_coupling_energy, header);
+   }
+
 
 }

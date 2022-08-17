@@ -41,6 +41,9 @@ namespace config{
       bool output_atoms_config_end = false; // flag to enable atoms output at the end of simulation
       int output_atoms_config_rate = 1000; // rate to output atoms
 
+      //for Spin-lattice simulations - Modified by M. Strungaru 2022
+      bool sld_format = false;
+
       bool output_cells_config = false; // flag to enable cells output
       bool output_cells_config_continuous = false; // flag to enable cells output
       bool output_cells_config_end = false; // flag to enable cells output at the end of simulation
@@ -68,6 +71,9 @@ namespace config{
 
       // Data buffers for parallel i/o
       std::vector<double> local_buffer(0);
+      //for Spin-lattice simulations - Modified by Mara Strungaru 2022
+      //std::vector<double> local_buffer_sld(0);
+
       std::vector<double> collated_buffer(0);
 
       // variables for collated data output

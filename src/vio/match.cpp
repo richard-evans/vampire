@@ -41,6 +41,7 @@
 #include "spintransport.hpp"
 #include "unitcell.hpp"
 #include "micromagnetic.hpp"
+#include "sld.hpp"
 // vio module headers
 #include "internal.hpp"
 #include "../create/internal.hpp"
@@ -92,6 +93,8 @@ namespace vin{
         else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(hamr::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(sld::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -1435,7 +1438,45 @@ namespace vin{
            output_list.push_back(72);
            return EXIT_SUCCESS;
         }
+//
+         //--------------------------------------------------------------------
+         test="spin-temperature";
+         if(word==test){
+           output_list.push_back(73);
+           return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="lattice-temperature";
+         if(word==test){
+           output_list.push_back(74);
+           return EXIT_SUCCESS;
+         }
         //--------------------------------------------------------------------
+        test="potential-energy";
+        if(word==test){
+          output_list.push_back(75);
+          return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="kinetic-energy";
+        if(word==test){
+          output_list.push_back(76);
+          return EXIT_SUCCESS;
+        }
+      //--------------------------------------------------------------------
+      //--------------------------------------------------------------------
+      test="sld-exchange-energy";
+      if(word==test){
+       output_list.push_back(77);
+       return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
+      test="sld-coupling-energy";
+      if(word==test){
+       output_list.push_back(78);
+       return EXIT_SUCCESS;
+      }
+   //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;
@@ -2271,6 +2312,7 @@ namespace vin{
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(sld::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found

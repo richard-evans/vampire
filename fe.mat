@@ -1,0 +1,26 @@
+#===================================================
+# Sample vampire material file V5
+#===================================================
+
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=1
+#---------------------------------------------------
+# Material 1 Cobalt Generic
+#---------------------------------------------------
+material[1]:material-name=Co
+material[1]:damping-constant=0.1
+material[1]:atomic-spin-moment=2.22 !muB
+material[1]:initial-spin-direction=0,0,1
+
+#material[1]:uniaxial-anisotropy-constant=1.0e-24
+
+material[1]:mass=5.7915e-3
+material[1]:damping-constant-lattice=0.6
+material[1]:exchange-J0=0.904 !eV
+material[1]:harmonic-potential-V0=0.15 !eV
+material[1]:coupling-C0=0.5
+
+#material[1]:initial-position-dr=0.01
+#material[1]:initial-thermal-velocities=10

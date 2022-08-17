@@ -52,6 +52,41 @@ namespace config {
 
       }
 
+     //for Spin-lattice simulations - Modified by Mara Strungaru 2022
+     /*
+      void copy_data_to_buffer_sld(const std::vector<double> &x, // vector data
+                               const std::vector<double> &y,
+                               const std::vector<double> &z,
+                               const std::vector<double> &vx, // vector data
+                               const std::vector<double> &vy,
+                               const std::vector<double> &vz,
+                               const std::vector<uint64_t> &mask,
+                               std::vector<double> &buffer){
+
+         // copy total number of output data to const for compiler
+         const unsigned int data_size = mask.size();
+
+         // loop over all atoms to be output
+         for (unsigned int id = 0; id < data_size; ++id){
+
+            // determine next datum to be output
+            const unsigned int index = mask[id];
+
+            // copy data to be output to main output buffer
+            buffer[3 * id + 0] = x[index];
+            buffer[3 * id + 1] = y[index];
+            buffer[3 * id + 2] = z[index];
+            buffer[3 * id + 3] = vx[index];
+            buffer[3 * id + 4] = vy[index];
+            buffer[3 * id + 5] = vz[index];
+
+         }
+
+         return;
+
+      }
+      */
+
    } // end of internal namespace
 
 } // end of config namespace

@@ -54,6 +54,15 @@ namespace vin{
 
 namespace vout{
 
+   extern std::string zLogProgramName; /// Program Name
+   extern std::string zLogHostName; /// Host Name
+   extern bool        zLogInitialised; /// Initialised flag
+   #ifdef WIN_COMPILE
+   	extern int      zLogPid; /// Process ID
+   #else
+   	extern pid_t    zLogPid; /// Process ID
+   #endif
+
    // namespaced io lists (to avoid collisions)
    namespace grain{
       // defined enumerated types
@@ -121,6 +130,7 @@ namespace vout{
    void material_torque(std::ostream& stream, bool header);
    void standard_deviation(std::ostream& stream,bool header);
    void mean_system_susceptibility(std::ostream& stream,bool header);
+   void system_binder_cumulant(std::ostream& stream,bool header);
    void phonon_temperature(std::ostream& stream,bool header);
    void material_temperature(std::ostream& stream,bool header);
    void material_applied_field_strength(std::ostream& stream,bool header);
@@ -154,6 +164,7 @@ namespace vout{
 	void mean_mvec(std::ostream& stream,bool header);
 	void mat_mean_mvec(std::ostream& stream,bool header);
    void mean_material_susceptibility(std::ostream& stream,bool header);
+   void material_binder_cumulant(std::ostream& stream,bool header);
    void mean_height_magnetisation_length(std::ostream& stream,bool header);
    void mean_height_magnetisation(std::ostream& stream,bool header);
 
@@ -166,6 +177,12 @@ namespace vout{
    void current(std::ostream& stream, bool header);
    void domain_wall_position(std::ostream& stream,bool header);
    void MRresistance(std::ostream& stream, bool header);
+   void spin_temperature(std::ostream& stream, bool header);
+   void lattice_temperature(std::ostream& stream, bool header);
+   void potential_energy(std::ostream& stream, bool header);
+   void kinetic_energy(std::ostream& stream, bool header);
+   void sld_exchange_energy(std::ostream& stream, bool header);
+   void sld_coupling_energy(std::ostream& stream, bool header);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp

@@ -60,7 +60,7 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
+LLVM_CFLAGS= -Wall -pedantic -O0 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
 LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
 GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++0x
@@ -129,6 +129,7 @@ obj/qvoronoi/usermem.o\
 obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
+
 # Include supplementary makefiles
 include src/anisotropy/makefile
 include src/cells/makefile
@@ -153,6 +154,8 @@ include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
 include src/environment/makefile
+include src/spinlattice/makefile
+
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile

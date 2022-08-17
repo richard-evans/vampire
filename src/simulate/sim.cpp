@@ -68,6 +68,7 @@
 #include "vmpi.hpp"
 #include "vutil.hpp"
 #include "micromagnetic.hpp"
+#include "sld.hpp"
 
 // sim module headers
 #include "internal.hpp"
@@ -714,8 +715,15 @@ void integrate_serial(uint64_t n_steps){
 				sim::internal::increment_time();
 			}
 			break;
-
-		default:{
+//
+		case 6: // spin-lattice Dynamics
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sld::suzuki_trotter();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+				default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
          err::vexit();
 		}
@@ -841,6 +849,11 @@ int integrate_mpi(uint64_t n_steps){
 
 } // Namespace sim
 
+void spin_lattice_simulation(){
+			sld::suzuki_trotter();
+			sim::internal::increment_time();
+
+}
 
 void multiscale_simulation_steps(int n_steps){
 

@@ -54,16 +54,17 @@ namespace config{
             const double cc[3] = {atoms::x_coord_array[atom], atoms::y_coord_array[atom], atoms::z_coord_array[atom]};
 
             // check atom within output bounds
+            /*
             if ((cc[0] >= minB[0]) && (cc[0] <= maxB[0]))
             {
                if ((cc[1] >= minB[1]) && (cc[1] <= maxB[1]))
                {
                   if ((cc[2] >= minB[2]) && (cc[2] <= maxB[2]))
-                  {
+                  {*/
                      config::internal::local_output_atom_list.push_back(atom);
-                  }
-               }
-            }
+                  //}
+               //}
+            //}
 
          }
 
@@ -85,6 +86,9 @@ namespace config{
 
          // Resize local buffer
          config::internal::local_buffer.resize(3 * local_output_atom_list.size());
+         //for Spin-lattice simulations - Modified by Mara Strungaru 2022
+         //config::internal::local_buffer_sld.resize(6 * local_output_atom_list.size());
+
 
          // set number of io_processors to num processors for for file per process mode
          #ifdef MPICF

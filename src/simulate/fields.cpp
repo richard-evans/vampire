@@ -47,6 +47,7 @@
 #include "spintransport.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
+#include "sld.hpp"
 #include "../micromagnetic/internal.hpp"
 
 // sim module header
@@ -113,6 +114,7 @@ void calculate_spin_fields(const int start_index,const int end_index){
                       atoms::x_total_spin_field_array, atoms::y_total_spin_field_array, atoms::z_total_spin_field_array,
                       start_index, end_index, sim::temperature);
 
+							
 	// Spin Dependent Extra Fields
 	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
 

@@ -17,7 +17,8 @@ match_grain_list.o \
 nullify.o \
 outputfunctions.o \
 read.o \
-string_to_x.o
+string_to_x.o\
+timestamp.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/vio/,$(vio_objects))

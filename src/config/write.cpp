@@ -30,6 +30,7 @@ namespace internal
 
 // Forward function declarations
 double write_data_text(std::string filename, const std::vector<double> &buffer);
+double write_data_text_sld(std::string filename, const std::vector<double> &buffer_sld);
 double write_data_binary(std::string filename, const std::vector<double> &buffer);
 
 //--------------------------------------------------------------------------------------------------------
@@ -86,6 +87,10 @@ double write_data(std::string filename, const std::vector<double> &buffer){
 
       case config::internal::text:
          io_time = write_data_text(filename, buffer);
+
+      //case config::internal::text_sld:
+      // io_time = write_data_text_sld(filename, buffer);
+
          break;
 
    }
@@ -135,6 +140,49 @@ double write_data_text(std::string filename, const std::vector<double> &buffer){
    return timer.elapsed_time();
 
 }
+   /*
+   //for Spin-lattice simulations - Modified by Mara Strungaru 2022
+   double write_data_text_sld(std::string filename, const std::vector<double> &buffer){
+
+      // Declare and open output file
+      std::ofstream ofile;
+      ofile.open(filename.c_str());
+
+      // determine number of data to output
+      const uint64_t data_size = buffer.size() / 3;
+
+      // output number of data
+      ofile << data_size << "\n";
+
+      // instantiate timer
+      vutil::vtimer_t timer;
+
+      // start timer
+      timer.start();
+
+      // output buffer to disk
+      for(unsigned int index = 0; index < data_size; ++index){
+
+         ofile << buffer[6 * index + 0] << "\t"
+               << buffer[6 * index + 1] << "\t"
+               << buffer[6 * index + 2] << "\t"
+               << buffer[6 * index + 3] << "\t"
+               << buffer[6 * index + 4] << "\t"
+               << buffer[6 * index + 5] << "\n";
+
+      }
+
+      // end timer
+      timer.stop();
+
+      // close output file
+      ofile.close();
+
+      // return bandwidth
+      return timer.elapsed_time();
+
+   }
+   */
 
 //----------------------------------------------------------------------------------------------------
 // Function to output spin data in binary format

@@ -200,5 +200,64 @@ namespace config{
 
       }
 
+/*
+      //
+      //---------------------------------------------------------------------
+      // Function to write meta data for each configuration with enabled sld simulations
+      //---------------------------------------------------------------------
+      void write_meta_sld(const double simulation_time, // time (seconds)
+                      const double temperature, // system temperature (Kelvin)
+                      const double x_coord_array, // applied field components (Tesla)
+                      const double y_coord_array,
+                      const double z_coord_array,
+                      const double applied_field_mag,
+                      const double magnetization_x, // magnetization components (normalized)
+                      const double magnetization_y,
+                      const double magnetization_z){
+
+         // determine file name
+         std::stringstream filename;
+         filename << "spins-";
+         filename << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
+         filename << ".meta";
+
+         // Get system date
+         time_t rawtime = time(NULL);
+         struct tm * timeinfo = localtime(&rawtime);
+
+         // Declare and open output file
+         std::ofstream ofile;
+         ofile.open (filename.str());
+
+         ofile << "#------------------------------------------------------"<< "\n";
+         ofile << "# Atomistic spin configuration file for vampire v5+"<< "\n";
+         ofile << "#------------------------------------------------------"<< "\n";
+         ofile << "# Date: "<< asctime(timeinfo);
+         ofile << "#------------------------------------------------------"<< "\n";
+         ofile << "Time: " << simulation_time << "\n";
+         ofile << "Field: " << applied_field_x*applied_field_mag << "\t" << applied_field_y*applied_field_mag << "\t" << applied_field_z*applied_field_mag << "\n";
+         ofile << "Temperature: "<< temperature << "\n";
+         ofile << "Magnetisation: " << magnetization_x << "\t" << magnetization_y << "\t" << magnetization_z << "\n";
+         ofile << "#------------------------------------------------------" << "\n";
+         ofile << "Number of spin files: " << config::internal::num_io_groups << "\n"; //vmpi::num_processors-1 << "\n";
+
+         // set simple file name for single file output
+         if(config::internal::num_io_groups == 1) ofile << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".data" << std::endl;
+         // otherwise set indexed files
+         else{
+            for(int fid = 0; fid < config::internal::num_io_groups; fid++){
+               ofile << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << "-" << std::setfill('0') << std::setw(6) << fid << ".data" << "\n";
+            }
+            // flush data to disk
+            ofile << std::flush;
+         }
+
+         ofile << "#------------------------------------------------------"<< "\n";
+
+         return;
+
+      }
+      */
+
    } // end of namespace internal
 } // end of namespace config

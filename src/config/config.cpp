@@ -91,7 +91,9 @@ void output(){ // should include variables for data to be outputted, eg spins, c
          if (config::internal::output_rate_counter_coords == 0)
          {
              config::internal::atoms_coords();
+
              if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+
           }
          config::internal::atoms(); // call function to output spins coords
          config::internal::output_rate_counter_coords++; //update the counter
@@ -114,6 +116,9 @@ void output(){ // should include variables for data to be outputted, eg spins, c
                 if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
              }
             config::internal::atoms(); // call function to output spins coords
+
+            //for Spin-lattice simulations - Modified by Mara Strungaru 2022
+            if (config::internal::sld_format)config::internal::atoms_coords_sld();// call function to output coords for dynamic lattice calc
             config::internal::output_rate_counter_coords++; //update the counter
          }
          // for hysteresis programs
