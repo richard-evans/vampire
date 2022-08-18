@@ -517,7 +517,8 @@ namespace sld{
                   atoms::z_spin_array,
                   sld::internal::fields_array_x,
                   sld::internal::fields_array_y,
-                  sld::internal::fields_array_z);
+                  sld::internal::fields_array_z,
+                  mp::mu_s_array);
       //
       sld::lattice_temperature= sld::compute_lattice_temperature(0,atoms::num_atoms,
                   atoms::type_array,

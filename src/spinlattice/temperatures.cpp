@@ -36,7 +36,8 @@ namespace sld{
                std::vector<double>& z_spin_array,
                std::vector<double>& fields_array_x, //  vectors for fields
                std::vector<double>& fields_array_y,
-               std::vector<double>& fields_array_z){
+               std::vector<double>& fields_array_z,
+               std::vector <double>& mu_s_array){
 
                 double SxH2=0.0;
                 double SH=0.0;
@@ -55,8 +56,7 @@ namespace sld{
                      SH  = SH +  Sx * Hx + Sy * Hy + Sz*Hz;
 
                 }
-
-               double T_spin=0.5* mp::material[0].mu_s_SI /constants::kB * SxH2 / SH;
+               double T_spin=0.5* mu_s_array[0]*constants::muB /constants::kB * SxH2 / SH;
 
       return T_spin;
 

@@ -58,13 +58,13 @@ int floaterror(const double value, const double expected_value, const double pre
                   std::vector<double>& fields_array_y,
                   std::vector<double>& fields_array_z)*/
                   //	int convert(std::string input_unit, double& value, std::string& type)
-      int spin_temperature_test(const int test_start_index, const int test_end_index, const std::vector<int>& test_type_array, std::vector<double>& test_x_spin_array, std::vector<double>& test_y_spin_array, std::vector<double>& test_z_spin_array, std::vector<double>& test_fields_array_x, std::vector<double>& test_fields_array_y, std::vector<double>& test_fields_array_z, const double expected_value, const double precision){
+      int spin_temperature_test(const int test_start_index, const int test_end_index, const std::vector<int>& test_type_array, std::vector<double>& test_x_spin_array, std::vector<double>& test_y_spin_array, std::vector<double>& test_z_spin_array, std::vector<double>& test_fields_array_x, std::vector<double>& test_fields_array_y, std::vector<double>& test_fields_array_z, std::vector<double>& test_mu_s_array, const double expected_value, const double precision){
 
          int ec = 0; // error count increment
 
          // call function to be tested
          //convert is from vampire
-         double test_value=sld::compute_spin_temperature(test_start_index, test_end_index, test_type_array,  test_x_spin_array, test_y_spin_array, test_z_spin_array,  test_fields_array_x,  test_fields_array_y,  test_fields_array_z);
+         double test_value=sld::compute_spin_temperature(test_start_index, test_end_index, test_type_array,  test_x_spin_array, test_y_spin_array, test_z_spin_array,  test_fields_array_x,  test_fields_array_y,  test_fields_array_z, test_mu_s_array);
          // check for numerical error
          ec += ut::floaterror(test_value, expected_value, precision, "sld::compute_spin_temperature");
 
@@ -111,7 +111,10 @@ int test_spin_temperature(const bool verbose){
    std::vector<int> type_array;
    type_array.resize(2,0);
 
-   ec += spin_temperature_test(0,2,type_array,x_spin_array,y_spin_array,z_spin_array,fields_array_x,fields_array_y,fields_array_z,expected_value,precision);
+   std::vector<double> mu_s_array;
+   mu_s_array.resize(2,2.22);
+
+   ec += spin_temperature_test(0,2,type_array,x_spin_array,y_spin_array,z_spin_array,fields_array_x,fields_array_y,fields_array_z, mu_s_array, expected_value,precision);
 
    return ec;
 

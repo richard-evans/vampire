@@ -110,7 +110,8 @@ namespace sld{
                std::vector<double>& z_spin_array,
                std::vector<double>& fields_array_x, //  vectors for fields
                std::vector<double>& fields_array_y,
-               std::vector<double>& fields_array_z);
+               std::vector<double>& fields_array_z,
+               std::vector<double>& mu_s_array);
 
    double compute_lattice_temperature(const int start_index, // first atom for exchange interactions to be calculated
                const int end_index,
