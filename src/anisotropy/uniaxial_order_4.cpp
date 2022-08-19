@@ -52,6 +52,11 @@ namespace anisotropy{
       //  simultaneously.
       //
       //--------------------------------------------------------------------------------------------------------------
+      
+      // Define useful constants
+      const double sixtyothirtyfive = 60.0 / 35.0;
+      const double four = 4.0;
+      
       void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -65,11 +70,8 @@ namespace anisotropy{
          // if not enabled then do nothing
          if(!internal::enable_uniaxial_fourth_order) return;
 
-         // constant factors
-         const double sixtyothirtyfive = 60.0/35.0;
-
          // Loop over all atoms between start and end index
-         for(int atom = start_index; atom < end_index; atom++){
+         for(int atom = start_index; atom < end_index; ++atom){
 
             // get atom material
             const int mat = atom_material_array[atom];
@@ -85,15 +87,15 @@ namespace anisotropy{
             // get reduced anisotropy constant ku/mu_s
             const double ku4 = internal::ku4[mat];
 
-            const double sdote  = (sx*ex + sy*ey + sz*ez);
-            const double sdote3 = sdote*sdote*sdote;
+            const double sdote  = sx * ex + sy * ey + sz * ez;
+            const double sdote3 = sdote * sdote * sdote;
 
             // calculate field (double negative from scale factor and negative derivative)
-            const double k4 = ku4*(4.0*sdote3 - sixtyothirtyfive*sdote);
+            const double k4 = ku4 * (four * sdote3 - sixtyothirtyfive * sdote);
 
-            field_array_x[atom] += ex*k4;
-            field_array_y[atom] += ey*k4;
-            field_array_z[atom] += ez*k4;
+            field_array_x[atom] += ex * k4;
+            field_array_y[atom] += ey * k4;
+            field_array_z[atom] += ez * k4;
 
          }
 
@@ -104,7 +106,8 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add fourth order uniaxial anisotropy
       //---------------------------------------------------------------------------------
-      // file scope constant
+      
+      // Define useful constants
       const double fiveothirtyfive  = 5.0  / 35.0;
       const double thirtyothirtyfive = 30.0 / 35.0;
 
@@ -122,10 +125,10 @@ namespace anisotropy{
          const double ey = internal::ku_vector[mat].y;
          const double ez = internal::ku_vector[mat].z;
 
-         const double sdote  = (sx*ex + sy*ey + sz*ez);
-         const double sdote2 = sdote*sdote;
+         const double sdote  = (sx * ex + sy * ey + sz * ez);
+         const double sdote2 = sdote * sdote;
 
-         return -ku4*(sdote2*sdote2 - thirtyothirtyfive*sdote2 - fiveothirtyfive);
+         return - ku4 * (sdote2 * sdote2 - thirtyothirtyfive * sdote2 - fiveothirtyfive);
 
       }
 

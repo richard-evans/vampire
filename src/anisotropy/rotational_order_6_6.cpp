@@ -47,6 +47,12 @@ namespace anisotropy{
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
+      
+      // Define useful constants
+      const double ten = 10.0;
+      const double five = 5.0;
+      const double six = 6.0;
+      
       void sixth_order_theta_sixth_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -60,12 +66,8 @@ namespace anisotropy{
          // if not enabled then do nothing
          if(!internal::enable_rotational_6_6_order) return;
 
-         // define useful consts
-         const double ten = 10.0;
-         const double five = 5.0;
-
          // Loop over all atoms between start and end index
-         for(int atom = start_index; atom < end_index; atom++){
+         for(int atom = start_index; atom < end_index; ++atom){
 
             // get atom material
             const int mat = atom_material_array[atom];
@@ -83,23 +85,23 @@ namespace anisotropy{
             const double gz = internal::kl_vector[mat].z;
 
             // calculate S_x and S_x^3 parts
-            const double Sx = sx*fx + sy*fy + sz*fz;
-            const double Sx2 = Sx*Sx;
-            const double Sx4 = Sx2*Sx2;
+            const double Sx = sx * fx + sy * fy + sz * fz;
+            const double Sx2 = Sx * Sx;
+            const double Sx4 = Sx2 * Sx2;
             
             // calculate S_y and S_y^3 parts
-            const double Sy = sx*gx + sy*gy + sz*gz;
-            const double Sy2 = Sy*Sy;
-            const double Sy4 = Sy2*Sy2;
+            const double Sy = sx * gx + sy * gy + sz * gz;
+            const double Sy2 = Sy * Sy;
+            const double Sy4 = Sy2 * Sy2;
             
             const double Sx2Sy2 = Sx2 * Sy2;
 
             // get reduced anisotropy constant ku/mu_s
-            const double k6r6 = internal::k6r4[mat];
+            const double six_k6r6 = six * internal::k6r4[mat];
 
             // calculate full form to add to field
-            const double fullx = 6 * k6r6 * Sx * (Sx4 - ten * Sx2Sy2 + five * Sy4);
-            const double fully = - 6 * k6r6 * Sy * (Sy4 - ten * Sx2Sy2 + five * Sx4);
+            const double fullx = six_k6r6 * Sx * (Sx4 - ten * Sx2Sy2 + five * Sy4);
+            const double fully = - six_k6r6 * Sy * (Sy4 - ten * Sx2Sy2 + five * Sx4);
             
             field_array_x[atom] += fullx*fx + fully * gx;
             field_array_y[atom] += fullx*fy + fully * gy;
@@ -114,6 +116,9 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add 6-theta-6-phi anisotropy
       //---------------------------------------------------------------------------------
+
+      // Define useful constant
+      const double fifteen = 15.0;
 
       double sixth_order_theta_sixth_order_phi_energy(const int atom,
                                           const int mat,
@@ -134,21 +139,18 @@ namespace anisotropy{
          //          = 32 * Sx^6 - 48 * (Sx^2 + Sy^2) * Sx^4 + 18 * (Sx^2 + Sy^2)^2 * Sx^2 - (Sx^2 + Sy^2)^3
          //          = Sx^6 - 15 * Sx^4 * Sy^2 + 15 * Sx^2 * Sy^4 - Sy^6 
 
-         const double Sx = sx*fx + sy*fy + sz*fz;
+         const double Sx = sx * fx + sy * fy + sz * fz;
          const double Sx2 = Sx * Sx;
          const double Sx4 = Sx2 * Sx2;
 
-         const double Sy = sx*gx + sy*gy + sz*gz;
-         const double Sy2 = Sy*Sy;
+         const double Sy = sx * gx + sy * gy + sz * gz;
+         const double Sy2 = Sy * Sy;
          const double Sy4 = Sy2 * Sy2;
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
          const double k6r6 = internal::k6r6[mat];
 
-         // get useful const
-         const double fifteen = 15.0;
-
-         return - k6r6 * (Sx4*Sx2 - fifteen * Sx4*Sy2 + fifteen * Sx2 * Sy4 - Sy4 * Sy2);
+         return - k6r6 * (Sx4 * Sx2 - fifteen * Sx4 * Sy2 + fifteen * Sx2 * Sy4 - Sy4 * Sy2);
 
       }
    }

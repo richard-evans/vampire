@@ -47,6 +47,10 @@ namespace anisotropy{
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
+      
+      // Define useful constants
+      const double two = 2.0;
+      
       void second_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -61,7 +65,7 @@ namespace anisotropy{
          if(!internal::enable_rotational_2_2_order) return;
 
          // Loop over all atoms between start and end index
-         for(int atom = start_index; atom < end_index; atom++){
+         for(int atom = start_index; atom < end_index; ++atom){
 
             // get atom material
             const int mat = atom_material_array[atom];
@@ -79,27 +83,27 @@ namespace anisotropy{
             const double gz = internal::kl_vector[mat].z;
 
             // calculate S_x
-            const double Sx = sx*fx + sy*fy + sz*fz;
+            const double Sx = sx * fx + sy * fy + sz * fz;
             
             // calculate S_y
-            const double Sy = sx*gx + sy*gy + sz*gz;
+            const double Sy = sx * gx + sy * gy + sz * gz;
 
             // get reduced anisotropy constant ku/mu_s
-            const double k2r2 = internal::k2r2[mat];
+            const double twok2r2 = two * internal::k2r2[mat];
 
             // calculate field terms
-            const double full_Sx = 2.0*k2r2*Sx;
-            const double full_Sy = 2.0*k2r2*Sy;
+            const double full_Sx = twok2r2 * Sx;
+            const double full_Sy = twok2r2 * Sy;
 
             // sum x-component of field, where x-direction is represented by fx, fy, fz
-            field_array_x[atom] += full_Sx*fx;
-            field_array_y[atom] += full_Sx*fy;
-            field_array_z[atom] += full_Sx*fz;
+            field_array_x[atom] += full_Sx * fx;
+            field_array_y[atom] += full_Sx * fy;
+            field_array_z[atom] += full_Sx * fz;
 
             // sum y-component of field, where y-direction is represented by gx, gy, gz
-            field_array_x[atom] -= full_Sy*gx;
-            field_array_y[atom] -= full_Sy*gy;
-            field_array_z[atom] -= full_Sy*gz;
+            field_array_x[atom] -= full_Sy * gx;
+            field_array_y[atom] -= full_Sy * gy;
+            field_array_z[atom] -= full_Sy * gz;
 
          }
 
@@ -117,9 +121,6 @@ namespace anisotropy{
                                           const double sy,
                                           const double sz){
 
-         // get reduced anisotropy constant ku/mu_s (Tesla)
-         const double k2r2 = internal::k2r2[mat];
-
          const double fx = internal::kr_vector[mat].x;
          const double fy = internal::kr_vector[mat].y;
          const double fz = internal::kr_vector[mat].z;
@@ -129,11 +130,14 @@ namespace anisotropy{
          const double gz = internal::kl_vector[mat].z;
 
          // calculate sin^2{theta}cos{2phi} = sin^2{theta}cos^2{phi} - sin^2{theta}sin^2{phi} = S_x^2 - S_y^2
-         const double Sx = sx*fx + sy*fy + sz*fz;
-         const double Sy = sx*gx + sy*gy + sz*gz;
-         const double sintheta2cos2phi = Sx*Sx - Sy*Sy;
+         const double Sx = sx * fx + sy * fy + sz * fz;
+         const double Sy = sx * gx + sy * gy + sz * gz;
+         const double sintheta2cos2phi = Sx * Sx - Sy * Sy;
 
-         return -k2r2*sintheta2cos2phi;
+         // get reduced anisotropy constant ku/mu_s (Tesla)
+         const double k2r2 = internal::k2r2[mat];
+
+         return - k2r2 * sintheta2cos2phi;
 
       }
    }

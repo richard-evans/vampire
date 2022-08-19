@@ -47,6 +47,8 @@ namespace anisotropy{
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
+      //Define useful constants
+      const double four = 4.0;
       void fourth_order_theta_fourth_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -61,14 +63,14 @@ namespace anisotropy{
          if(!internal::enable_rotational_4_4_order) return;
 
          // Loop over all atoms between start and end index
-         for(int atom = start_index; atom < end_index; atom++){
-
-            // get atom material
-            const int mat = atom_material_array[atom];
+         for(int atom = start_index; atom < end_index; ++atom){
 
             const double sx = spin_array_x[atom]; // store spin direction in temporary variables
             const double sy = spin_array_y[atom];
             const double sz = spin_array_z[atom];
+
+            // get atom material
+            const int mat = atom_material_array[atom];
 
             const double fx = internal::kr_vector[mat].x;
             const double fy = internal::kr_vector[mat].y;
@@ -79,28 +81,28 @@ namespace anisotropy{
             const double gz = internal::kl_vector[mat].z;
 
             // calculate S_x and S_x^3 parts
-            const double Sx = sx*fx + sy*fy + sz*fz;
-            const double Sx2 = Sx*Sx;
+            const double Sx = sx * fx + sy * fy + sz * fz;
+            const double Sx2 = Sx * Sx;
             
             // calculate S_y and S_y^3 parts
-            const double Sy = sx*gx + sy*gy + sz*gz;
-            const double Sy2 = Sy*Sy;
+            const double Sy = sx * gx + sy * gy + sz * gz;
+            const double Sy2 = Sy * Sy;
             
             // get reduced anisotropy constant ku/mu_s
-            const double k4r4 = internal::k4r4[mat];
+            const double four_k4r4 = four * internal::k4r4[mat];
 
             // calculate full form to add to field
-            const double fullx = 4*k4r4*Sx*(Sx2 - 3*Sy2);
-            const double fully = 4*k4r4*Sy*(Sy2 - 3*Sx2);
+            const double fullx = four_k4r4 * Sx * (Sx2 - 3 * Sy2);
+            const double fully = four_k4r4 * Sy * (Sy2 - 3 * Sx2);
             
-            field_array_x[atom] += fullx*fx;
-            field_array_y[atom] += fullx*fy;
-            field_array_z[atom] += fullx*fz;
+            field_array_x[atom] += fullx * fx;
+            field_array_y[atom] += fullx * fy;
+            field_array_z[atom] += fullx * fz;
 
             // sum y-component of field, where y-direction is represented by gx, gy, gz
-            field_array_x[atom] += fully*gx;
-            field_array_y[atom] += fully*gy;
-            field_array_z[atom] += fully*gz;
+            field_array_x[atom] += fully * gx;
+            field_array_y[atom] += fully * gy;
+            field_array_z[atom] += fully * gz;
 
          }
 
@@ -111,6 +113,8 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add 6-theta-2-phi anisotropy
       //---------------------------------------------------------------------------------
+      // Define useful constants
+      const double eight = 8.0;
 
       double fourth_order_theta_fourth_order_phi_energy(const int atom,
                                           const int mat,
@@ -131,15 +135,15 @@ namespace anisotropy{
 
          // calculate sin^4{theta}cos{4phi} = sin^4{theta}(8cos^4{phi} - 8cos^2{phi} + 1)
          //                                 = 8Sx^4 - 8sin^2{theta}Sx^2 + sin^4{theta}
-         const double Sx = sx*fx + sy*fy + sz*fz;
+         const double Sx = sx * fx + sy * fy + sz * fz;
          const double Sx2 = Sx * Sx;
          
-         const double Sy = sx*gx + sy*gy + sz*gz;
-         const double Sy2 = Sy*Sy;
+         const double Sy = sx * gx + sy * gy + sz * gz;
+         const double Sy2 = Sy * Sy;
 
          const double sintheta2 = Sx2 + Sy2;
 
-         return - k4r4 * (8 * Sx2 * Sx2 - 8 * Sx2 * sintheta2 + sintheta2*sintheta2);
+         return - k4r4 * (eight * Sx2 * Sx2 - eight * Sx2 * sintheta2 + sintheta2 * sintheta2);
 
       }
    }
