@@ -60,6 +60,9 @@ int bmark(){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
 
+	// Output data
+	vout::data();
+
 	// Simulate system
 	while(sim::time<sim::total_time){
 		sim::integrate(sim::partial_time);
