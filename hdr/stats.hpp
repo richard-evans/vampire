@@ -67,6 +67,7 @@ namespace stats
 	extern bool calculate_material_grain_magnetization;
 	extern bool calculate_height_magnetization;
 	extern bool calculate_material_height_magnetization;
+	extern bool calculate_material_grain_height_magnetization;
 
 	extern bool calculate_system_torque;
 	extern bool calculate_grain_torque;
@@ -82,8 +83,8 @@ namespace stats
 	extern bool calculate_grain_susceptibility;
 	extern bool calculate_material_susceptibility;
 
-        extern bool calculate_system_binder_cumulant;
-        extern bool calculate_material_binder_cumulant;
+	extern bool calculate_system_binder_cumulant;
+	extern bool calculate_material_binder_cumulant;
 
 	// forward declaration of friend classes
 	class susceptibility_statistic_t;
@@ -349,6 +350,7 @@ namespace stats
 	extern magnetization_statistic_t material_grain_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
+   extern magnetization_statistic_t material_grain_height_magnetization;
 
 	extern torque_statistic_t system_torque;
 	extern torque_statistic_t grain_torque;

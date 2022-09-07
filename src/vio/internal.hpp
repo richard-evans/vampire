@@ -78,6 +78,7 @@ namespace vout{
          constraint_theta,
          magnetisation,
          material_magnetisation,
+         material_height_magnetisation,
          mean_magnetisation_length,
          mean_specific_heat,
          mean_susceptibility,

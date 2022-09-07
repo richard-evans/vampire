@@ -133,6 +133,47 @@ namespace stats{
       }
 
       //------------------------------------------------------------------------
+      // material grain height magnetization
+      //------------------------------------------------------------------------
+      if(stats::calculate_material_grain_height_magnetization){
+         // store as blocks of material magnetisation for each grain and height
+         // g1h1 [ m1x m1y m1z m1m m2x m2y m2z 2m2 ]
+         // g1h2 [ m1x m1y m1z m1m m2x m2y m2z 2m2 ] ...
+         // num masks = num_materials*num_grains*num_heights
+
+         //-----------------------------------------
+         // work out maximum height across all CPUs
+         //-----------------------------------------
+         int max_height=0;
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            int hc = height_category_array[atom];
+            if(hc>max_height) max_height=hc;
+         }
+         // Reduce maximum height on all CPUS
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &max_height, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+         #endif
+
+         // calculate num masks
+         const int num_heights = max_height+1;
+         int num_masks = num_materials*num_heights*num_grains;
+
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            int grain = grain_array[atom];
+            int mat = material_type_array[atom];
+            int height = height_category_array[atom];
+            int mask_id = height * num_grains * num_materials + grain * num_materials + mat;
+            int nm_mask_id = num_masks+mat; // group all non-magnetic materials together
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = nm_mask_id;
+            else mask[atom] = mask_id;
+         }
+
+         stats::material_grain_height_magnetization.set_mask(1+num_masks+num_materials,mask,magnetic_moment_array);
+
+      }
+
+      //------------------------------------------------------------------------
       // height magnetization
       //------------------------------------------------------------------------
       if(stats::calculate_height_magnetization){

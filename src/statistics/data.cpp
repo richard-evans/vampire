@@ -26,6 +26,7 @@ namespace stats{
    bool calculate_material_grain_magnetization  = false;
    bool calculate_height_magnetization          = false;
    bool calculate_material_height_magnetization = false;
+   bool calculate_material_grain_height_magnetization = false;
 
    bool calculate_system_torque                 = false;
    bool calculate_grain_torque                  = false;
@@ -54,6 +55,7 @@ namespace stats{
    magnetization_statistic_t material_grain_magnetization("mg");
    magnetization_statistic_t height_magnetization("h");
    magnetization_statistic_t material_height_magnetization("mh");
+   magnetization_statistic_t material_grain_height_magnetization("mgh");
 
    torque_statistic_t system_torque("s");
    torque_statistic_t grain_torque("g");
@@ -69,8 +71,8 @@ namespace stats{
    susceptibility_statistic_t grain_susceptibility("g");
    susceptibility_statistic_t material_susceptibility("m");
 
-   binder_cumulant_statistic_t system_binder_cumulant("s");
-   binder_cumulant_statistic_t material_binder_cumulant("s");
+   binder_cumulant_statistic_t system_binder_cumulant("bc");
+   binder_cumulant_statistic_t material_binder_cumulant("mbc");
 
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation

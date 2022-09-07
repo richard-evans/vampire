@@ -102,6 +102,11 @@ void write_grain_file(){
                   zgrain << stats::material_grain_magnetization.output_magnetization(header);
                   break;
                //------------------------------------------
+               case grain::material_height_magnetisation:
+                  // inline function to output grain data
+                  zgrain << stats::material_grain_height_magnetization.output_normalized_magnetization(header);
+                  break;
+               //------------------------------------------
                case grain::mean_torque:
                   // inline function to output grain data
                   zgrain << stats::grain_torque.output_mean_torque(header);
