@@ -137,7 +137,7 @@ namespace create{
       }
       else
       test="voronoi-film";
-      if(word==test){
+      if(word==test || word == "grains" || word == "granular-film"){
          cs::system_creation_flags[2]=3;
          return true;
       }
@@ -152,7 +152,7 @@ namespace create{
 
       //--------------------------------------------------------------------
       test="voronoi-size-variance";
-      if(word==test){
+      if(word==test || word == "grain-size-variance"){
          double vsd=atof(value.c_str());
          vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
          create_voronoi::voronoi_sd=vsd;
@@ -173,18 +173,18 @@ namespace create{
          return true;
       }
       test="voronoi-rounded-grains";
-      if(word==test){
+      if(word==test || word == "rounded-grains"){
          create_voronoi::rounded=true;
          return true;
       }
       test="voronoi-include-boundary-grains";
-      if(word==test){
+      if(word==test || word == "include-boundary-grains"){
          create_voronoi::include_boundary_grains_real=true;
          return true;
       }
       //-------------------------------------------------------------------
       test="voronoi-rounded-grains-area";
-      if(word==test){
+      if(word==test || word == "rounded-grains-area"){
          double vsd=atof(value.c_str());
          vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
          create_voronoi::area_cutoff=vsd;
