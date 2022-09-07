@@ -23,6 +23,7 @@
 // ----------------------------------------------------------------------------
 //
 #include "atoms.hpp"
+#include "constants.hpp"
 #include "grains.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -210,8 +211,31 @@ int set_properties(){
 	}
 
 
+
 	//std::cout << "Grain sizes:\n";
 	//for(int i=0; i<grains::num_grains; i++) std::cout << "\t" << i << "\t" << grains::grain_size_array[i] << std::endl;
+
+	//--------------------------------------------------
+	// output grain coordinates to disk on root process
+	//--------------------------------------------------
+	if( vmpi::my_rank == 0 && grains::num_grains > 0){
+
+		std::ofstream file4;
+		file4.open("grain-coordinates.txt");
+		file4 << "#-----------------------------------------------------------------------" << std::endl;
+		file4 << "# Grain coordinate file for vampire" << std::endl;
+		file4 << "# Number of grains: " << grains::num_grains << std::endl;
+		file4 << "# Format: grainID x, y, num_atoms, Ms (muB)" << std::endl;
+		file4 << "#-----------------------------------------------------------------------" << std::endl;
+		for(unsigned int grain=0;grain < grains::x_coord_array.size(); grain++){
+			file4 << grain << "\t" << grains::x_coord_array[grain] << "\t" <<
+											  grains::y_coord_array[grain] << "\t" <<
+											  grains::grain_size_array[grain] << "\t" <<
+											  grains::sat_mag_array[grain]/constants::muB << std::endl;
+		}
+		file4.close();
+
+	}
 
 	return EXIT_SUCCESS;
 

@@ -280,6 +280,32 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 				}
 			}
 		}
+
+		//-------------------------------------------------------
+		// centre system on grain nearest the centre
+		//-------------------------------------------------------
+		// const double mpx = cs::system_dimensions[0] * 0.5;
+		// const double mpy = cs::system_dimensions[1] * 0.5;
+		// int nearest_grain = 0;
+		// double nearest_distance = 1.0e99;
+		// for(int grain = 0; grain < grain_coord_array[grain].size(); grain++){
+		// 	double rx = grain_coord_array[grain][0];
+		// 	double ry = grain_coord_array[grain][1];
+		// 	double r2 = rx*rx + ry*ry;
+		// 	// check for new nearest grain
+		// 	if(r2 < nearest_distance){
+		// 		nearest_distance = r2;
+		// 		nearest_grain = grain;
+		// 	}
+		// }
+		// // now shift all coordinates so that nearest grain is in the middle of the system
+		// const double sx = mpx - grain_coord_array[nearest_grain][0];
+		// const double sy = mpy - grain_coord_array[nearest_grain][1];
+		// for(int grain = 0; grain < grain_coord_array[grain].size(); grain++){
+		// 	grain_coord_array[grain][0] = grain_coord_array[grain][0]+sx;
+		// 	grain_coord_array[grain][1] = grain_coord_array[grain][1]+sy;
+		// }
+
 	}
 
 
@@ -328,49 +354,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
    // round grains if necessary
 	if(create_voronoi::rounded) create::internal::voronoi_grain_rounding(grain_coord_array, grain_vertices_array);
 
-
-	std::ofstream file4;
 	std::vector <double > R_med;
-
-	//--------------------------------------------------
-	// output grain coordinates to disk on root process
-	//--------------------------------------------------
-	if( vmpi::my_rank == 0 ){
-
-		file4.open("grains4.txt");
-		double sumR = 0;
-		for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
-			const int nv = grain_vertices_array[grain].size();
-			// Exclude grains with zero vertices
-			if(nv!=0){
-				double sum = 0.0;
-				for(int vertex=0;vertex<nv;vertex++){
-					double vx = grain_vertices_array[grain][vertex][0];
-					double vy = grain_vertices_array[grain][vertex][1];
-					double ab = sqrt(vx*vx + vy*vy);
-					sum = sum + ab;
-					//	std::cout << area <<std::endl;
-				}
-				double av = sum/nv;
-				if (av >0.1){
-					file4 << grain << '\t' << av << std::endl;
-					sumR = sumR + av ;
-					R_med.push_back(av);
-				}
-			}
-		}
-
-		//------------------------------------------------------------------------
-		// output grain properties to screen
-		//------------------------------------------------------------------------
-		//double avR = sumR/R_med.size();
-		//std::sort(R_med.begin(),R_med.end());
-		//int index = R_med.size()/2;
-		//std::cout<< "Median temperature: " << (R_med[index-1] + R_med[index])/2 << std::endl;
-		//std::cout<< "Mean temperature: " << avR << std::endl;
-		//------------------------------------------------------------------------
-
-	}
 
 	// Create a 2D supercell array of atom numbers to improve performance for systems with many grains
 	std::vector < std::vector < std::vector < int > > > supercell_array;
@@ -525,6 +509,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 // 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
 // 		file1<< "h"<< grain << '\t' << grain_coord_array[grain][0] << '\t' << grain_coord_array[grain][1] << "\t" << delta_particle_x << std::endl;
 // }
+
+
+
 
 	return EXIT_SUCCESS;
 }
