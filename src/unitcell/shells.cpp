@@ -16,6 +16,7 @@
 #include <iostream>
 
 // Vampire headers
+#include "errors.hpp"
 #include "unitcell.hpp"
 #include "vio.hpp"
 
@@ -66,7 +67,12 @@ void unitcell::exchange_template_t::find_shells(){
    //-------------------------------------------
    unsigned int shell = 0; // initial shell
    const double tolerance = 0.001; // fractions of unit cell
-   double current_range = interaction_list[0].range; // updating value of shell range
+   double current_range = 0.0;
+   if(interaction_list.size() > 0) current_range = interaction_list[0].range; // updating value of shell range
+   else{
+      std::cerr << "Programmer error!: Interaction list contains no atoms causing seg fault in shell calculation!" << std::endl;
+      err::vexit();
+   }
 
    std::vector<int> shell_count(1,0); // list of number of neighbours in each shell
    std::vector<double> shell_range(1,interaction_list[0].range); // list of number of neighbours in each shell

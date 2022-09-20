@@ -23,6 +23,7 @@ hcp.o \
 heusler.o \
 honeycomb.o \
 honeycomb-a.o \
+honeycomb-b.o \
 kagome.o \
 mn2au.o \
 nd2fe14b.o\

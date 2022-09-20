@@ -71,6 +71,7 @@ namespace unitcell{
       void build_hexagonal_close_packed(unitcell::unit_cell_t& unit_cell);
       void build_honeycomb(unitcell::unit_cell_t& unit_cell);
       void build_honeycomb_alpha(unitcell::unit_cell_t& unit_cell);
+      void build_honeycomb_beta(unitcell::unit_cell_t& unit_cell);
       void build_kagome(unitcell::unit_cell_t& unit_cell);
       void build_heusler(unitcell::unit_cell_t& unit_cell);
       void build_mn2au(unitcell::unit_cell_t& unit_cell);
