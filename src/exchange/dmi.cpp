@@ -57,7 +57,11 @@ namespace internal{
       // get cutoff range
       const double cutoff_sq = internal::dmi_cutoff_range*internal::dmi_cutoff_range;
 
+      // counter for number of interactions i-j
       unsigned int counter = 0;
+
+      // counter for total number of interactions
+      unsigned int total_counter = 0;
 
       //std::ofstream ofile("dmi.txt");
 
@@ -108,14 +112,9 @@ namespace internal{
                      double ejk[3]={eik[0] - eij[0], eik[1] - eij[1], eik[2] - eij[2]};
                      const double mod_ejk_sq = ejk[0]*ejk[0] + ejk[1]*ejk[1] + ejk[2]*ejk[2];
 
-                   //  ofile << i << "\t" << nj << "\t" << nk << std::endl <<
-                     //         "\t\teik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << std::endl <<
-                       //       "\t\teij: " << eij[0] << "\t" << eij[1] << "\t" << eij[2] << std::endl <<
-                         //     "\t\tejk: " << ejk[0] << "\t" << ejk[1] << "\t" << ejk[2] << std::endl;
-
                      // check if both ik and jk are closer than cutoff range and i != j
                      // before computing DMI
-                     if( mod_eik_sq <= cutoff_sq && mod_ejk_sq <= cutoff_sq){
+                     if( mod_eik_sq <= cutoff_sq && mod_ejk_sq <= cutoff_sq ){
 
                         // normalise to unit vector
                         const double inv_rik=1.0/sqrt(mod_eik_sq);
@@ -135,6 +134,15 @@ namespace internal{
                         const double Dx = eik[1]*ejk[2] - eik[2]*ejk[1];
                         const double Dy = eik[2]*ejk[0] - eik[0]*ejk[2];
                         const double Dz = eik[0]*ejk[1] - eik[1]*ejk[0];
+
+                        //ofile << i << "\t" << nj << "\t" << nk << "\t" << sqrt(mod_eik_sq) << "\t" << sqrt(mod_ejk_sq) << std::endl <<
+                        //           "\t\teik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << std::endl <<
+                        //           "\t\teij: " << eij[0] << "\t" << eij[1] << "\t" << eij[2] << std::endl <<
+                        //           "\t\tejk: " << ejk[0] << "\t" << ejk[1] << "\t" << ejk[2] << std::endl;
+                        //ofile << i << "\t" << nj << "\t" << nk << "\t" << sqrt(mod_eik_sq) << "\t" << sqrt(mod_ejk_sq) << "\t" << Dx << "\t" << Dy << "\t" << Dz << std::endl;
+
+                        // increment total interaction counter
+                        total_counter++;
 
                         //---------------------------------------------------------------
                         //        Expression of DMI within the exchange tensor
@@ -174,13 +182,13 @@ namespace internal{
                         tmp_tensor[6] -= Dij * +Dy; // Jzx
                         tmp_tensor[7] -= Dij * -Dx; // Jzy
 
-                  /*      std::cout << i << "\t" << nj << "\t" << nk << "\t|\t" << Dx << "\t" << Dy << "\t" << Dz << "\t" << Dij << "\t|\t" <<
-                                 " eik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << "\t|\t" <<
-                                 " ejk: " << ejk[0] << "\t" << ejk[1] << "\t" << ejk[2] << "\t|\t" <<
-                                 tmp_tensor [0] << "\t" << Dij * +Dz      << "\t" << Dij * -Dy << "\t" <<
-                                 Dij * -Dz      << "\t" << tmp_tensor [4] << "\t" << Dij * +Dx << "\t" <<
-                                 Dij * +Dy << "\t" << Dij * -Dx << "\t" << tmp_tensor [8] << "\n" << std::flush;
-*/
+                        //std::cout << i << "\t" << nj << "\t" << nk << "\t|\t" << Dx << "\t" << Dy << "\t" << Dz << "\t" << Dij << "\t|\t" <<
+                        //   " eik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << "\t|\t" <<
+                        //   " ejk: " << ejk[0] << "\t" << ejk[1] << "\t" << ejk[2] << "\t|\t" <<
+                        //   tmp_tensor [0] << "\t" << Dij * +Dz      << "\t" << Dij * -Dy << "\t" <<
+                        //   Dij * -Dz      << "\t" << tmp_tensor [4] << "\t" << Dij * +Dx << "\t" <<
+                        //   Dij * +Dy << "\t" << Dij * -Dx << "\t" << tmp_tensor [8] << "\n" << std::flush;
+
                      } // end of cutoff range if
 
                   } // end of k != j if
@@ -189,11 +197,19 @@ namespace internal{
 
             } // end of i!= j if
 
-            //ofile << "-------------------" << std::endl;
-          // std::cout << i << "\t" << nj << "\t" << imat << '\t' << jmat << '\t'<<
+            // zero almost zero components for symmetry
+            for(int i=0 ; i<9; i++){
+               if(fabs(tmp_tensor[i]) < 1.0e-12) tmp_tensor[i] = 0.0;
+            }
+
+            // dmi exchange tensor for each atom pair
+            //ofile << i << "\t" << nj << "\t" << imat << '\t' << jmat << '\t'<<
             //         tmp_tensor [0] << "\t" << tmp_tensor [1] << "\t" << tmp_tensor [2] << "\t" <<
-              //       tmp_tensor [3] << "\t" << tmp_tensor [4] << "\t" << tmp_tensor [5] << "\t" <<
-                //     tmp_tensor [6] << "\t" << tmp_tensor [7] << "\t" << tmp_tensor [8] << "\n" << std::endl;
+            //         tmp_tensor [3] << "\t" << tmp_tensor [4] << "\t" << tmp_tensor [5] << "\t" <<
+            //         tmp_tensor [6] << "\t" << tmp_tensor [7] << "\t" << tmp_tensor [8] << "\t" << std::endl;
+
+            // net DMI vectors for each atom pair
+            //ofile << i << "\t" << nj << "\t" << imat << '\t' << jmat << '\t'<< tmp_tensor [5] << "\t" << tmp_tensor [6] << "\t" << tmp_tensor [1] << std::endl;
 
             // save tensor for interaction i-j
             atoms::t_exchange_list[counter].Jij[0][0] += tmp_tensor [0];
@@ -215,6 +231,13 @@ namespace internal{
       } // end of atom loop
 
       //ofile.close();
+
+      zlog << zTs() << "Generated " << total_counter << " dmi interactions with an average of " << double(total_counter) / double(atoms::num_atoms) << " interactions per atom" << std::endl;
+
+      if(total_counter == 0){
+         std::cerr << "Warning! DMI is enabled but not interactions were found. The built-in DMI is therefore not working - try increasing the dmi interaction range." << std::endl;
+         zlog << zTs() << "Warning! DMI is enabled but not interactions were found. The built-in DMI is therefore not working - try increasing the dmi interaction range." << std::endl;
+      }
 
       return;
 
