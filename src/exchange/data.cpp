@@ -40,6 +40,7 @@ namespace exchange{
 
       double dmi_cutoff_range = 2.6; // cutoff range for DMI calculation (Ångstroms)
       double kitaev_cutoff_range = 2.6; // cutoff range for Kitaev calculation (Ångstroms)
+      double exchange_factor = 1.0; // scaling factor for exchange constants (usually to correct for ab-initio)
 
       exchange_t exchange_type = isotropic; // exchange type to use in simulation
       exchange_t biquadratic_exchange_type = isotropic; // biquadratic exchange type to use in simulation
