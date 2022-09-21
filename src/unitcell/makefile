@@ -19,6 +19,7 @@ bcc.o \
 bcc110.o \
 fcc.o \
 fcc111.o \
+file.o \
 hcp.o \
 heusler.o \
 honeycomb.o \

@@ -92,6 +92,8 @@ namespace unitcell{
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
       double exchange(double range, double cutoff, int mat_i, int mat_j);
 
+      void write_unit_cell_file(unit_cell_t & uc);
+
    } // end of internal namespace
 
 } // end of unitcell namespace
