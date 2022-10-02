@@ -122,11 +122,6 @@ namespace anisotropy{
          internal::kc6.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::kc6[m] = internal::mp[m].kc6 * inverse_mu_s[m];
       }
-      // Fourth order rotational
-      if(internal::enable_fourth_order_rotational){
-         internal::k4r.resize(num_materials);
-         for(int m = 0; m < num_materials; m++) internal::k4r[m] = internal::mp[m].k4r * inverse_mu_s[m];
-      }
 
       //------------------------------------------------------------------------
       // 4th order triaxial

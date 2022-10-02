@@ -3,7 +3,8 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Jack B. Collings (2022), Sam Westmoreland and Richard Evans 2017.
+//   All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -85,6 +86,14 @@ namespace anisotropy{
    // given material
    //--------------------------------------------------------------------------------
    double get_k6r4(const int material){
+      return internal::mp[material].k6r4;
+   }
+
+   //--------------------------------------------------------------------------------
+   // Function to get sixth order theta sixth order phi anisotropy constant for a
+   // given material
+   //--------------------------------------------------------------------------------
+   double get_k6r6(const int material){
       return internal::mp[material].k6r4;
    }
 
