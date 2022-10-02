@@ -17,7 +17,6 @@ initialize_neel.o \
 interface.o \
 lattice.o \
 neel.o \
-rotational_fixed_basis.o \
 uniaxial_order_2.o \
 rotational_order_2_2.o \
 uniaxial_order_4.o \

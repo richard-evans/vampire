@@ -295,6 +295,7 @@ namespace anisotropy{
       //------------------------------------------------------------
       test = "4-4-order-anisotropy-constant";
       test2 = "fourth-order-theta-fourth-order-phi-anisotropy-constant";
+      std::string test3 = "fourth-order-rotational-anisotropy-constant";
       if( (word == test) || (word == test2) ){
          double k4r4 = atof(value.c_str());
          vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
@@ -345,7 +346,8 @@ namespace anisotropy{
       //------------------------------------------------------------
       test = "6-6-order-anisotropy-constant";
       test2 = "sixth-order-theta-sixth-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
+      test3 = "sixth-order-rotational-anisotropy-constant";
+      if( (word == test) || (word == test2) || word == test3 ){
          double k6r6 = atof(value.c_str());
          vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6 = k6r6;
@@ -531,18 +533,6 @@ namespace anisotropy{
          // enable rotated anisotropy and disable normal anisotropy
          internal::enable_cubic_fourth_order_rotation = true;
          internal::enable_cubic_fourth_order = false;
-         return true;
-      }
-      //------------------------------------------------------------
-      // Fourth order rotational anisotropy
-      //------------------------------------------------------------
-      test = "fourth-order-rotational-anisotropy-constant";
-      if(word == test){
-         double k4r = atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(k4r, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
-         internal::mp[super_index].k4r = k4r;
-         internal::enable_fourth_order_rotational = true;
          return true;
       }
       //------------------------------------------------------------
