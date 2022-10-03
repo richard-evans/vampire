@@ -19,14 +19,14 @@
 #include "internal.hpp"
 
 namespace anisotropy{
-   
+
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
 
    namespace internal{
       //---------------------------------------------------------------------------------
-      // Function to add second order magnetocrystalline second order rotational 
+      // Function to add second order magnetocrystalline second order rotational
       // anisotropy based on vector e for the easy/hard/z axis and another vector for the
       // x axis.
       //
@@ -42,8 +42,8 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{44} = -k_{4r4}sin^4{theta}cos{4phi}
-      // 
-      // The field is found by taking the negative gradient w.r.t. the magnetic moment 
+      //
+      // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
@@ -83,18 +83,18 @@ namespace anisotropy{
             // calculate S_x and S_x^3 parts
             const double Sx = sx * fx + sy * fy + sz * fz;
             const double Sx2 = Sx * Sx;
-            
+
             // calculate S_y and S_y^3 parts
             const double Sy = sx * gx + sy * gy + sz * gz;
             const double Sy2 = Sy * Sy;
-            
+
             // get reduced anisotropy constant ku/mu_s
             const double four_k4r4 = four * internal::k4r4[mat];
 
             // calculate full form to add to field
             const double fullx = four_k4r4 * Sx * (Sx2 - 3 * Sy2);
             const double fully = four_k4r4 * Sy * (Sy2 - 3 * Sx2);
-            
+
             field_array_x[atom] += fullx * fx;
             field_array_y[atom] += fullx * fy;
             field_array_z[atom] += fullx * fz;
@@ -137,7 +137,7 @@ namespace anisotropy{
          //                                 = 8Sx^4 - 8sin^2{theta}Sx^2 + sin^4{theta}
          const double Sx = sx * fx + sy * fy + sz * fz;
          const double Sx2 = Sx * Sx;
-         
+
          const double Sy = sx * gx + sy * gy + sz * gz;
          const double Sy2 = Sy * Sy;
 
@@ -148,4 +148,3 @@ namespace anisotropy{
       }
    }
 }
-

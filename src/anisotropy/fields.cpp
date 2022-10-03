@@ -65,7 +65,7 @@ namespace anisotropy{
 
       // fourth order biaxial anisotropy (simple version)
       internal::biaxial_fourth_order_simple_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
-      
+
       //triaxial anisotropy variable basis
       internal::triaxial_second_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 

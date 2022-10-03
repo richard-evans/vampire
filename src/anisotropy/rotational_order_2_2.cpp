@@ -19,14 +19,14 @@
 #include "internal.hpp"
 
 namespace anisotropy{
-   
+
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
 
    namespace internal{
       //---------------------------------------------------------------------------------
-      // Function to add second order magnetocrystalline second order rotational 
+      // Function to add second order magnetocrystalline second order rotational
       // anisotropy based on vector e for the easy/hard/z axis and another vector for the
       // x axis.
       //
@@ -42,15 +42,15 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{22} = -k_{22}sin^2{theta}cos{2phi}
-      // 
-      // The field is found by taking the negative gradient w.r.t. the magnetic moment 
+      //
+      // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double two = 2.0;
-      
+
       void second_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -84,7 +84,7 @@ namespace anisotropy{
 
             // calculate S_x
             const double Sx = sx * fx + sy * fy + sz * fz;
-            
+
             // calculate S_y
             const double Sy = sx * gx + sy * gy + sz * gz;
 
@@ -142,4 +142,3 @@ namespace anisotropy{
       }
    }
 }
-

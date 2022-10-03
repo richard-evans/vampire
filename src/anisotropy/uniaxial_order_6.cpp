@@ -49,7 +49,7 @@ namespace anisotropy{
       //  direction is shared with the other uniaxial anisotropy coefficients.
       //
       //---------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double twentytwo = 22.0;
       const double thirtythree = 33.0;
@@ -106,11 +106,11 @@ namespace anisotropy{
       // Function to add sixth order uniaxial anisotropy
       // E = -ku6(cos^6{theta} - (15/11)cos^4{theta} + (5/11)cos^2{theta})
       //---------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double fiveoeleven = five / 11.0;
       const double fifteenoeleven = 3.0 * fiveoeleven;
-      
+
       double uniaxial_sixth_order_energy(const int atom,
                                          const int mat,
                                          const double sx,

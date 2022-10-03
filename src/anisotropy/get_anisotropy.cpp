@@ -35,7 +35,7 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get second order theta second order phi anisotropy constant for a 
+   // Function to get second order theta second order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
    double get_k2r2(const int material){
@@ -50,7 +50,7 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get fourth order theta second order phi anisotropy constant for a 
+   // Function to get fourth order theta second order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
    double get_k4r2(const int material){
@@ -58,7 +58,7 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get fourth order theta fourth order phi anisotropy constant for a 
+   // Function to get fourth order theta fourth order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
    double get_k4r4(const int material){
@@ -73,7 +73,7 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get sixth order theta second order phi anisotropy constant for a 
+   // Function to get sixth order theta second order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
    double get_k6r2(const int material){
@@ -81,7 +81,7 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
-   // Function to get sixth order theta fourth order phi anisotropy constant for a 
+   // Function to get sixth order theta fourth order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
    double get_k6r4(const int material){

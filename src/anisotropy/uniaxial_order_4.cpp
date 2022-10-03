@@ -52,11 +52,11 @@ namespace anisotropy{
       //  simultaneously.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double sixtyothirtyfive = 60.0 / 35.0;
       const double four = 4.0;
-      
+
       void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -106,7 +106,7 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add fourth order uniaxial anisotropy
       //---------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double fiveothirtyfive  = 5.0  / 35.0;
       const double thirtyothirtyfive = 30.0 / 35.0;

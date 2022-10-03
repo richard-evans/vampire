@@ -120,7 +120,7 @@ namespace anisotropy{
          internal::enable_uniaxial_second_order = true; // Switch on second order tensor calculation for all spins
          return true;
       }
-      
+
       // Second order theta second order phi anisotropy constant
       test = "2-2-order-anisotropy-constant";
       test2 = "second-order-theta-second-order-phi-anisotropy-constant";
@@ -312,7 +312,7 @@ namespace anisotropy{
          internal::enable_biaxial_fourth_order_simple = true;
          return true;
       }
-      //------------------------------------------------------------      
+      //------------------------------------------------------------
       //Minimal orthogonality
       test = "sixth-order-uniaxial-anisotropy-constant";
       if( word == test ){

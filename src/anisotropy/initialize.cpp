@@ -111,7 +111,7 @@ namespace anisotropy{
       if(internal::enable_biaxial_fourth_order_simple){
          internal::ku4.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
-      }     
+      }
       // Fourth order cubic
       if(internal::enable_cubic_fourth_order || internal::enable_cubic_fourth_order_rotation){
          internal::kc4.resize(num_materials);

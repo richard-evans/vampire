@@ -19,14 +19,14 @@
 #include "internal.hpp"
 
 namespace anisotropy{
-   
+
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
 
    namespace internal{
       //---------------------------------------------------------------------------------
-      // Function to add second order magnetocrystalline second order rotational 
+      // Function to add second order magnetocrystalline second order rotational
       // anisotropy based on vector e for the easy/hard/z axis and another vector for the
       // x axis.
       //
@@ -42,18 +42,18 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{62} = -k_{6r2}sin^2{theta}(cos^4{theta} - (9/11)cos^2{theta} + (1/33))cos{2phi}
-      // 
+      //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment 
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
+
       // define useful consts
       const double thirtytwooeleven = 32.0 / 11.0;
       const double sixteenothirtythree = 16.0 / 33.0;
       const double two = 2.0;
       const double three = 3.0;
-      
+
       void sixth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -88,11 +88,11 @@ namespace anisotropy{
             // calculate S_x and S_x^3 parts
             const double Sx = sx * fx + sy * fy + sz * fz;
             const double Sx2 = Sx * Sx;
-            
+
             // calculate S_y and S_y^3 parts
             const double Sy = sx * gx + sy * gy + sz * gz;
             const double Sy2 = Sy * Sy;
-            
+
             const double Sx2pSy2 = Sx2 + Sy2;
 
             // get reduced anisotropy constant ku/mu_s
@@ -101,7 +101,7 @@ namespace anisotropy{
             // calculate full form to add to field
             const double fullx = two_k6r2 * (Sx * Sx2pSy2 * (Sx2 - three * Sy2) - Sx * (thirtytwooeleven * Sx2 - sixteenothirtythree));
             const double fully = two_k6r2 * (Sy * Sx2pSy2 * (three * Sx2 - Sy2) + Sy * (thirtytwooeleven * Sy2 - sixteenothirtythree));
-            
+
             field_array_x[atom] += fullx * fx + fully * gx;
             field_array_y[atom] += fullx * fy + fully * gy;
             field_array_z[atom] += fullx * fz + fully * gz;
@@ -115,7 +115,7 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add 6-theta-2-phi anisotropy
       //---------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double sixteenoeleven = 16.0 / 11.0;
       const double one = 1.0;
@@ -153,4 +153,3 @@ namespace anisotropy{
       }
    }
 }
-

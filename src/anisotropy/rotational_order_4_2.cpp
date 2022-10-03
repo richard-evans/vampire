@@ -19,14 +19,14 @@
 #include "internal.hpp"
 
 namespace anisotropy{
-   
+
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
 
    namespace internal{
       //---------------------------------------------------------------------------------
-      // Function to add second order magnetocrystalline second order rotational 
+      // Function to add second order magnetocrystalline second order rotational
       // anisotropy based on vector e for the easy/hard/z axis and another vector for the
       // x axis.
       //
@@ -42,16 +42,16 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{42} = -k_{42}sin^2{theta}(cos^2{theta} - 1/7)cos{2phi}
-      // 
-      // The field is found by taking the negative gradient w.r.t. the magnetic moment 
+      //
+      // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis and is detailed in an as yet unpublished paper.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double twelve_o_seven = 12.0/7.0;
       const double four = 4.0;
-      
+
       void fourth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
@@ -86,13 +86,13 @@ namespace anisotropy{
             // calculate S_x and S_x^3 parts
             const double Sx = sx * fx + sy * fy + sz * fz;
             const double Sxpart = twelve_o_seven * Sx;
-            
+
             const double Sx3part = four * Sx * Sx * Sx;
 
             // calculate S_y and S_y^3 parts
             const double Sy = sx * gx + sy * gy + sz * gz;
             const double Sypart = twelve_o_seven * Sy;
-            
+
             const double Sy3part = four * Sy * Sy * Sy;
 
             // get reduced anisotropy constant ku/mu_s
@@ -101,7 +101,7 @@ namespace anisotropy{
             // calculate full form to add to field
             const double fullSx = k4r2 * (Sx3part - Sxpart);
             const double fullSy = k4r2 * (Sy3part - Sypart);
-            
+
             field_array_x[atom] += - fullSx * fx + fullSy * gx;
             field_array_y[atom] += - fullSx * fy + fullSy * gy;
             field_array_z[atom] += - fullSx * fz + fullSy * gz;
@@ -154,4 +154,3 @@ namespace anisotropy{
       }
    }
 }
-
