@@ -3,7 +3,8 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Jack Collings (2022), Sam Westmoreland and Richard Evans 2017. All
+//   rights reserved.
 //
 //   Email: sw766@york.ac.uk
 //
@@ -24,7 +25,59 @@
 namespace anisotropy{
 
    //----------------------------------------------------------------------------
-   // function to initialize anisotropy module
+   // Function to take in two anisotropy basis vectors, check orthogonality,
+   // normalise them, and generate the last basis vector
+   //----------------------------------------------------------------------------
+
+   void set_anisotropy_vectors(  std::vector<double>& v1,
+                                 std::vector<double>& v2,
+                                 std::vector<double>& v3,
+                                 int mat){
+      
+      // Set primary axis
+      double e1[3] = {v1[0], v1[1], v1[2]};
+      // Set secondary axis
+      double e2[3] = {v2[0], v2[1], v2[2]};
+      
+      // Check that vectors are orthogonal
+      double e1dote2 = e1[0] * e2[0] + e1[1] * e2[1] + e1[2] * e2[2];
+      if (e1dote2 > 1e-9 || e1dote2 < -1e-9){
+         std::cerr << "Anisotropy basis vectors for material " << mat << " are not orthogonal. Exiting." << std::endl;
+         zlog << zTs() << "Anisotropy basis vectors for material " << mat << " are not orthogonal. Exiting" << std::endl;
+         err::vexit();
+      }
+      
+      // Set final axis as cross product e1 ^ e2
+      double e3[3] = {e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]};
+
+      // Check for zero vectors
+      double mode1 = e1[0] * e1[0] + e1[1] * e1[1] + e1[2] * e1[2];
+      double mode2 = e2[0] * e2[0] + e2[1] * e2[1] + e2[2] * e2[2];
+      double mode3 = e3[0] * e3[0] + e3[1] * e3[1] + e3[2] * e3[2];
+      
+      if (mode1 < 1e-9 || mode2 < 1e-9 || mode3 < 1e-9){
+         std::cerr << "Anisotropy basis vectors for material " << mat << " are too small. Exiting." << std::endl;
+         zlog << zTs() << "Anisotropy basis vectors for material " << mat << " are too small. Exiting" << std::endl;
+         err::vexit();
+      }
+
+      // Normalise vectors to unit length
+      v1[0] = e1[0] / mode1;
+      v1[1] = e1[1] / mode1;
+      v1[2] = e1[2] / mode1;
+
+      v2[0] = e2[0] / mode2;
+      v2[1] = e2[1] / mode2;
+      v2[2] = e2[2] / mode2;
+
+      v3[0] = e3[0] / mode3;
+      v3[1] = e3[1] / mode3;
+      v3[2] = e3[2] / mode3;
+
+   }
+
+   //----------------------------------------------------------------------------
+   // Function to initialize anisotropy module
    //----------------------------------------------------------------------------
    void initialize (const unsigned int   num_atoms, // number of atoms
                     std::vector<int>&    atom_material_array, // atoms::atom_type_array
@@ -370,25 +423,32 @@ namespace anisotropy{
       }
 
       //---------------------------------------------------------------------
-      // initialise axes for each material
+      // Initialise anisotropy basis axes for each material
       //---------------------------------------------------------------------
+      
       internal::ku_vector.resize(num_materials);
       internal::kr_vector.resize(num_materials);
       internal::kl_vector.resize(num_materials);
 
-      for(int m = 0; m < num_materials; m++){
+      // Loop through all materials
+      for(int m = 0; m < num_materials; ++m){
 
-         // unroll uniaxial easy axes
+         // Vectors defining the anisotropy basis directions
+
+         // Check orthogonality, set orthonormality and generate the last anisotropy vector
+         set_anisotropy_vectors(internal::mp[m].ku_vector, internal::mp[m].kr_vector, internal::mp[m].kl_vector, m);
+         
+         // Uniaxial easy/hard [0,0,1] (z) axis
          internal::ku_vector[m].x = internal::mp[m].ku_vector[0];
          internal::ku_vector[m].y = internal::mp[m].ku_vector[1];
          internal::ku_vector[m].z = internal::mp[m].ku_vector[2];
 
-         // unroll rotational axes
+         // Rotational [1,0,0] (x) axis
          internal::kr_vector[m].x = internal::mp[m].kr_vector[0];
          internal::kr_vector[m].y = internal::mp[m].kr_vector[1];
          internal::kr_vector[m].z = internal::mp[m].kr_vector[2];
 
-         // unroll last axes
+         // Last axis [0,1,0] (y) axis
          internal::kl_vector[m].x = internal::mp[m].kl_vector[0];
          internal::kl_vector[m].y = internal::mp[m].kl_vector[1];
          internal::kl_vector[m].z = internal::mp[m].kl_vector[2];
@@ -396,49 +456,13 @@ namespace anisotropy{
       }
 
       //---------------------------------------------------------------------
-      // initialise rotated axis directions for each material
+      // Initialise cubic anisotropy basis axes for each material
       //---------------------------------------------------------------------
 
-      for(int mat = 0; mat < num_materials; mat++){
+      for(int mat = 0; mat < num_materials; ++mat){
 
-         // Vectors defining the easy axis in cubic anisotropy (Roberto was here)
-         double e1[3] = { internal::mp[mat].kc_vector1[0],
-                          internal::mp[mat].kc_vector1[1],
-                          internal::mp[mat].kc_vector1[2] };
-
-         double e2[3] = { internal::mp[mat].kc_vector2[0],
-                          internal::mp[mat].kc_vector2[1],
-                          internal::mp[mat].kc_vector2[2] };
-
-         // calculate e3 as vector product e1 ^ e2
-         double e3[3] = { (internal::mp[mat].kc_vector1[1]*internal::mp[mat].kc_vector2[2] - internal::mp[mat].kc_vector1[2]*internal::mp[mat].kc_vector2[1]),
-                          (internal::mp[mat].kc_vector1[2]*internal::mp[mat].kc_vector2[0] - internal::mp[mat].kc_vector1[0]*internal::mp[mat].kc_vector2[2]),
-                          (internal::mp[mat].kc_vector1[0]*internal::mp[mat].kc_vector2[1] - internal::mp[mat].kc_vector1[1]*internal::mp[mat].kc_vector2[0])};
-
-         // Calculate vector lengths
-         double mod_e1 = sqrt(e1[0]*e1[0] + e1[1]*e1[1] + e1[2]*e1[2]);
-         double mod_e2 = sqrt(e2[0]*e2[0] + e2[1]*e2[1] + e2[2]*e2[2]);
-         double mod_e3 = sqrt(e3[0]*e3[0] + e3[1]*e3[1] + e3[2]*e3[2]);
-
-         // check for zero vectors and exit with error
-         if(mod_e1 < 1e-9 || mod_e2 < 1e-9 || mod_e3 < 1e-9){
-            std::cerr << "Error! Rotated cubic anisotropy vectors for material " << mat << " are not orthogonal. Exiting" << std::endl;
-            zlog << zTs() << "Error! Rotated cubic anisotropy vectors for material " << mat << " are not orthogonal. Exiting" << std::endl;
-            err::vexit();
-         }
-
-         // normalise vectors to unit length
-         internal::mp[mat].kc_vector1[0] = e1[0] / mod_e1;
-         internal::mp[mat].kc_vector1[1] = e1[1] / mod_e1;
-         internal::mp[mat].kc_vector1[2] = e1[2] / mod_e1;
-
-         internal::mp[mat].kc_vector2[0] = e2[0] / mod_e2;
-         internal::mp[mat].kc_vector2[1] = e2[1] / mod_e2;
-         internal::mp[mat].kc_vector2[2] = e2[2] / mod_e2;
-
-         internal::mp[mat].kc_vector3[0] = e3[0] / mod_e3;
-         internal::mp[mat].kc_vector3[1] = e3[1] / mod_e3;
-         internal::mp[mat].kc_vector3[2] = e3[2] / mod_e3;
+         // Check orthogonality, set orthonormality, and generate the last anisotropy vector
+         set_anisotropy_vectors(internal::mp[mat].kc_vector1, internal::mp[mat].kc_vector2, internal::mp[mat].kc_vector3, mat);
 
       }
 

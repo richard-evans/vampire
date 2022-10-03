@@ -27,6 +27,15 @@
 namespace anisotropy
 {
    //-----------------------------------------------------------------------------
+   // Function to check orthogonality, set orthonormality and generate last
+   // last anisotropy vector
+   //-----------------------------------------------------------------------------
+   void set_anisotropy_vectors(  std::vector<double>& v1, 
+                                 std::vector<double>& v2,
+                                 std::vector<double>& v3,
+                                 int mat);
+
+   //-----------------------------------------------------------------------------
    // function to initialize anisotropy module
    //-----------------------------------------------------------------------------
    void initialize(const unsigned int num_atoms,

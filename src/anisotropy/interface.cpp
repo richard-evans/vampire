@@ -485,20 +485,6 @@ namespace anisotropy{
          return true;
 
       }
-      //------------------------------------------------------------
-      test = "last-anisotropy-direction";
-      if(word == test){
-         // temporary storage container
-         std::vector<double> l(3);
-         // read values from string
-         l = vin::doubles_from_string(value);
-         // check for sane input and normalise if necessary
-         vin::check_for_valid_unit_vector(l, word, line, prefix, "material");
-         // copy sanitised unit vector to material
-         internal::mp[super_index].kl_vector = l;
-         return true;
-
-      }
       //--------------------------------------
       // Direction 1
       //--------------------------------------
