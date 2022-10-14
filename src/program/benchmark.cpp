@@ -60,6 +60,9 @@ int bmark(){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
 
+	// Calculate magnetisation statistics
+	stats::update();
+	
 	// Output data
 	vout::data();
 

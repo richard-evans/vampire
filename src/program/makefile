@@ -4,7 +4,7 @@
 
 # List module object filenames
 program_objects =\
-bmark.o \
+benchmark.o \
 cmc_anisotropy.o \
 curie_temperature.o \
 data.o \
