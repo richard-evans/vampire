@@ -32,6 +32,10 @@ namespace spin_transport{
    extern double total_resistance;
    extern double total_current;
 
+   // extern std::vector <double> x_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
+   // extern std::vector <double> y_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
+   // extern std::vector <double> z_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
+
    //-----------------------------------------------------------------------------
    // Function to initialise spintransport module
    //-----------------------------------------------------------------------------

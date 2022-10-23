@@ -8,9 +8,9 @@
 # Creation attributes:
 #------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
-dimensions:system-size-z = 7.7 !nm
+dimensions:system-size-x = 3.54 !nm
+dimensions:system-size-y = 3.54 !nm
+dimensions:system-size-z = 3.54 !A
 
 #------------------------------------------
 # Material Files:
@@ -24,6 +24,9 @@ sim:temperature = 300.0
 sim:time-steps-increment = 1000
 sim:total-time-steps = 10000
 sim:time-step = 1 !fs
+
+spin-transport:update-rate = 1000
+spin-transport:spin-pumping-atomistic
 
 #------------------------------------------
 # Program and integrator details

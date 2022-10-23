@@ -13,6 +13,7 @@
 // C++ standard library headers
 #include <iostream>
 #include <fstream>
+#include "vio.hpp"
 
 // Vampire headers
 #include "spintransport.hpp"
@@ -46,7 +47,10 @@ void update(const unsigned int num_local_atoms,            // number of local at
       return;
    }
    // otherwise reset counter and continue
-   else{ st::internal::time_counter = 1; }
+   else{ 
+      st::internal::time_counter = 1; 
+      st::internal::config_counter += 1; 
+   }
 
    //---------------------------------------------------------------------------------------------------------
    // update cell magnetizations
@@ -79,6 +83,19 @@ void update(const unsigned int num_local_atoms,            // number of local at
    //             st::internal::cell_spin_resistance[i] << std::endl;
    // }
    // ofile.close();
+
+   // If enabled, output calculated atomistic coordinates and moments (passing local values)
+   if(st::internal::output_atomistic_spin_current_flag) {
+
+      // Get previous spin configuration
+	   const std::vector <double> atoms_x_old_spin_array = st::internal::get_old_spins_x(num_local_atoms);
+	   const std::vector <double> atoms_y_old_spin_array = st::internal::get_old_spins_y(num_local_atoms);
+	   const std::vector <double> atoms_z_old_spin_array = st::internal::get_old_spins_z(num_local_atoms);
+      st::internal::calculate_spin_cross_spin_time_derivative(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
+                                                         atoms_z_spin_array, atoms_x_old_spin_array, atoms_y_old_spin_array, atoms_z_old_spin_array, atoms_m_spin_array);
+      const uint64_t tmp_counter = st::internal::config_counter-1;
+      st::internal::output_atomistic_spin_current(tmp_counter);
+   }
 
    return;
 

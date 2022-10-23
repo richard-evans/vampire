@@ -67,6 +67,11 @@ class uvec_t{
 namespace atoms
 {
 	//--------------------------
+	// Functions
+	//--------------------------
+	void initialise_old_spins();	// 
+	void store_old_spins();			// 
+	//--------------------------
 	// Single Variables
 	//--------------------------
 	extern int num_atoms;			/// Number of atoms in simulation
@@ -94,6 +99,10 @@ namespace atoms
 	extern std::vector <double> y_spin_array;
 	extern std::vector <double> z_spin_array;
    extern std::vector <double> m_spin_array; /// Array of atomic spin moments
+
+	extern std::vector <double> x_old_spin_array; 	// Arrays to store previous step spins
+	extern std::vector <double> y_old_spin_array;
+	extern std::vector <double> z_old_spin_array;
 
 	extern std::vector <double> x_total_spin_field_array;		/// Total spin dependent fields
 	extern std::vector <double> y_total_spin_field_array;		/// Total spin dependent fields

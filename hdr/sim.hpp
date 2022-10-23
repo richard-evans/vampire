@@ -162,6 +162,8 @@ namespace sim{
 	extern bool local_applied_field; /// flag to enable material specific applied field
 	extern bool local_fmr_field; /// flag to enable material specific fmr field
 
+	extern bool compute_time_derivative; // Flag to store spins from previous step
+
    // Checkpoint flags and variables
    extern bool checkpoint_loaded_flag;  // Flag to determine if it is first step after loading checkpoint (true).
    extern bool load_checkpoint_flag; // Load spin configurations

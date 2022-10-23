@@ -87,6 +87,7 @@ OPTIONS=
 OBJECTS= \
 obj/data/atoms.o \
 obj/data/category.o \
+obj/data/functions.o \
 obj/data/grains.o \
 obj/random/mtrand.o \
 obj/random/random.o \

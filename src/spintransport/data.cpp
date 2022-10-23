@@ -32,9 +32,11 @@ namespace spin_transport{
       // Shared variables inside spintransport module
       //------------------------------------------------------------------------
       bool enabled = false; // bool to enable spin transport calculation
+      bool output_atomistic_spin_current_flag; // flag to toggle output of atomic resolution spin current
 
       unsigned int update_rate  = 100;  // number of timesteps between updates
       unsigned int time_counter = 100;  // number of timesteps since last update (initially set to same as update rate to ensure calculation at start)
+      uint64_t config_counter = 0;  // counter for update of spin pumping configs to file
 
       std::vector<internal::mp_t> mp; // array of material properties
 
@@ -76,6 +78,10 @@ namespace spin_transport{
 
       // array to store which cell each atom is in
       std::vector <unsigned int> atom_in_cell;
+
+      std::vector <double> x_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
+      std::vector <double> y_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
+      std::vector <double> z_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
 
    } // end of internal namespace
 
