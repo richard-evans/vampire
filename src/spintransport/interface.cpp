@@ -16,7 +16,7 @@
 // Vampire headers
 #include "spintransport.hpp"
 #include "errors.hpp"
-#include "sim.hpp"
+// #include "sim.hpp"
 #include "vio.hpp"
 
 // spintransport module headers
@@ -176,14 +176,6 @@ namespace spin_transport{
           return true;
       }
       // channel length
-      //------------------------------------------------------------------------
-      test = "spin-pumping-atomistic";
-      if( word == test ){
-          // Set resistivity for environment (cells with no atoms)
-          sim::compute_time_derivative = true;
-          st::internal::output_atomistic_spin_current_flag = true;
-          return true;
-      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

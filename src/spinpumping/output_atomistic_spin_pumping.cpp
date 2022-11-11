@@ -13,7 +13,7 @@
 #include <iostream>
 
 // Vampire headers
-#include "spintransport.hpp"
+#include "spinpumping.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
@@ -22,14 +22,15 @@
 // internal module headers
 #include "internal.hpp"
 
-namespace spin_transport{
+namespace spin_pumping{
 
    namespace internal{
 
       //------------------------------------------------------------------------
       // file-local storage variables
       //------------------------------------------------------------------------
-      bool output_atomistic_spin_current_initialised = false; // bool to determine if storage has been allocated
+      bool output_atomistic_spin_pumping_initialised = false; // bool to determine if storage has been allocated
+      bool output_cells_spin_pumping_initialised = false; // bool to determine if storage has been allocated
 
       std::vector<double> data_from_all_atoms(0);   // 3N array to store atomic position/spin_current from all processors
       std::vector<double> data_from_local_atoms(0); // 3N array to store atomic position/spin_current on local processor
@@ -89,7 +90,7 @@ namespace spin_transport{
             std::ofstream ofile;
             std::stringstream filename;
             filename << "atomistic-spin-current-positions.cfg";
-            zlog << zTs() << "Outputting atomistic coordinates to file " << filename.str() << std::endl;
+            zlog << zTs() << "Outputting atomistic coordinates for spin pumping to file " << filename.str() << std::endl;
             ofile.open(std::string(filename.str()).c_str());
 
             for(uint64_t atom = 0; atom < total_num_atoms; atom++){
@@ -110,7 +111,7 @@ namespace spin_transport{
          vmpi::counts_and_displacements(data_from_local_atoms, data_from_all_atoms, counts, displacements); // set up counts and displacements
 
          // set initialised variable to true
-         output_atomistic_spin_current_initialised = true;
+         output_atomistic_spin_pumping_initialised = true;
 
          return;
 
@@ -120,11 +121,11 @@ namespace spin_transport{
       //------------------------------------------------------------------------
       // Function to output calculated atomistic coords on root process
       //------------------------------------------------------------------------
-      void output_atomistic_spin_current(const uint64_t config_file_counter){
+      void output_atomistic_spin_pumping(const uint64_t config_file_counter){
 
          // check for initialised data structures
-         if(!output_atomistic_spin_current_initialised){
-            std::cerr << "Programmer error : spin_transport::output_atomistic_spin_current_initialised() called before initialisation" << std::endl;
+         if(!output_atomistic_spin_pumping_initialised){
+            std::cerr << "Programmer error : spin_pumping::output_atomistic_spin_current_initialised() called before initialisation" << std::endl;
             err::vexit();
          }
 
@@ -136,9 +137,9 @@ namespace spin_transport{
 
          // copy local  data to local array
          for(uint64_t atom = 0; atom < local_num_atoms; atom++){
-            data_from_local_atoms[ 3 * atom + 0 ] = spin_transport::internal::x_s_cross_dsdt_array[atom];
-            data_from_local_atoms[ 3 * atom + 1 ] = spin_transport::internal::y_s_cross_dsdt_array[atom];
-            data_from_local_atoms[ 3 * atom + 2 ] = spin_transport::internal::z_s_cross_dsdt_array[atom];
+            data_from_local_atoms[ 3 * atom + 0 ] = spin_pumping::internal::x_atom_spin_pumping_array[atom];
+            data_from_local_atoms[ 3 * atom + 1 ] = spin_pumping::internal::y_atom_spin_pumping_array[atom];
+            data_from_local_atoms[ 3 * atom + 2 ] = spin_pumping::internal::z_atom_spin_pumping_array[atom];
          }
 
          // collate global data on master
@@ -163,7 +164,14 @@ namespace spin_transport{
 
          return;
 
-      }
+      } // end function output_atomistic_spin_pumping
+
+
+      //------------------------------------------------------------------------
+      // Function to output calculated atomistic coords on root process
+      //------------------------------------------------------------------------
+      void output_cells_spin_pumping(const uint64_t config_file_counter){
+      } // end function output_cells_spin_pumping
 
 } // end of namespace internal
 } // end of namespace spin_current

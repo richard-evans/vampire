@@ -89,11 +89,9 @@ namespace spin_transport{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool enabled; // bool to enable spin transport calculation
-      extern bool output_atomistic_spin_current_flag; // flag to toggle output of atomic resolution spin current
 
       extern unsigned int update_rate;  // number of timesteps between updates
       extern unsigned int time_counter; // number of timesteps since last update
-      extern uint64_t config_counter; // counter for update of spin pumping configs to file
 
       extern std::vector<internal::mp_t> mp; // array of material properties
 
@@ -140,9 +138,6 @@ namespace spin_transport{
       // array to store which cell each atom is in
       extern std::vector <unsigned int> atom_in_cell;
 
-      extern std::vector <double> x_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
-      extern std::vector <double> y_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
-      extern std::vector <double> z_s_cross_dsdt_array;        // arrays to store cross product between spin and time derivative of spins
 
       //-------------------------------------------------------------------------
       // Internal function declarations
@@ -162,39 +157,9 @@ namespace spin_transport{
                            std::vector<double>& atoms_z_field_array       // z-field of atoms
       );
 
-      //-------------------------------------------------------------------------
-      // Functions to exctract spin array belonging to previous time step
-      //-------------------------------------------------------------------------
-      std::vector<double> get_old_spins_x(const unsigned num_atoms);
-      std::vector<double> get_old_spins_y(const unsigned num_atoms);
-      std::vector<double> get_old_spins_z(const unsigned num_atoms);
 
-      //---------------------------------------------------------------------------
-      // Function to compute atomistic s_i x ds_i/dt
-      //---------------------------------------------------------------------------
-      void calculate_spin_cross_spin_time_derivative(const unsigned int num_local_atoms,            // number of local atoms
-                           const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
-                           const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
-                           const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
-                           const std::vector<double>& atoms_x_old_spin_array, // old x-spin vector of atoms
-                           const std::vector<double>& atoms_y_old_spin_array, // old y-spin vector of atoms
-                           const std::vector<double>& atoms_z_old_spin_array, // old z-spin-vector of atoms
-                           const std::vector<double>& atoms_m_spin_array  // moment of atoms
-      );
 
-      //-----------------------------------------------------------------
-      // Function to initialise atomic resolution output of coordinates
-      //-----------------------------------------------------------------
-      void output_atomistic_coordinates(const int num_atoms,                      // number of atoms (only correct in serial)
-                                        const std::vector<double>& x_coord_array, // atomic coordinates (angstroms)
-                                        const std::vector<double>& y_coord_array,
-                                        const std::vector<double>& z_coord_array,
-                                        const std::vector<double>& moments_array);
 
-      //-----------------------------------------------------------------
-      // Function to output atomic resolution dipole field
-      //-----------------------------------------------------------------
-       void output_atomistic_spin_current(const uint64_t config_file_counter);
    } // end of internal namespace
 
 } // end of spin_transport namespace

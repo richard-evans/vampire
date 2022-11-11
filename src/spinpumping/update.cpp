@@ -3,9 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2019. All rights reserved.
-//
-//   Email: richard.evans@york.ac.uk
+//   (c) Andrea Meo and Richard Evans 2022. All rights reserved.
 //
 //------------------------------------------------------------------------------
 //
@@ -13,14 +11,15 @@
 // C++ standard library headers
 #include <iostream>
 #include <fstream>
+#include "vio.hpp"
 
 // Vampire headers
-#include "spintransport.hpp"
+#include "spinpumping.hpp"
 
 // spintransport module headers
 #include "internal.hpp"
 
-namespace spin_transport{
+namespace spin_pumping{
 
 //---------------------------------------------------------------------------------------------------------
 // Function to update spin torque field
@@ -35,56 +34,52 @@ void update(const unsigned int num_local_atoms,            // number of local at
    //-------------------------------------------------------------------------
    // check that module is needed - if not do nothing
    //-------------------------------------------------------------------------
-   if( st::internal::enabled == false ) return;
+   if( spin_pumping::internal::enabled == false ) return;
 
    //-------------------------------------------------------------------------
    // check that it is time to update
    //-------------------------------------------------------------------------
-   if(st::internal::time_counter != st::internal::update_rate){
+   if(spin_pumping::internal::time_counter != spin_pumping::internal::update_rate){
       // if not increment counter and do nothing
-      st::internal::time_counter++;
+      spin_pumping::internal::time_counter++;
       return;
    }
    // otherwise reset counter and continue
    else{ 
-      st::internal::time_counter = 1; 
+      spin_pumping::internal::time_counter = 1; 
+      spin_pumping::internal::config_counter += 1; 
    }
 
    //---------------------------------------------------------------------------------------------------------
-   // update cell magnetizations
+   // calculate atomistic spin pumping
    //---------------------------------------------------------------------------------------------------------
-   st::internal::calculate_cell_magnetization(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
-                                                               atoms_z_spin_array, atoms_m_spin_array);
+   // If enabled, output calculated atomistic coordinates and moments (passing local values)
+
+   // Get previous spin configuration
+   const std::vector <double> atoms_x_old_spin_array = spin_pumping::internal::get_old_spins_x(num_local_atoms);
+   const std::vector <double> atoms_y_old_spin_array = spin_pumping::internal::get_old_spins_y(num_local_atoms);
+   const std::vector <double> atoms_z_old_spin_array = spin_pumping::internal::get_old_spins_z(num_local_atoms);
+   spin_pumping::internal::calculate_spin_pumping(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
+                                                   atoms_z_spin_array, atoms_x_old_spin_array, atoms_y_old_spin_array,
+                                                   atoms_z_old_spin_array, atoms_m_spin_array);
+
 
    //---------------------------------------------------------------------------------------------------------
-   // calculate magnetoresistance
+   // calculate cells spin pumping
    //---------------------------------------------------------------------------------------------------------
-   st::internal::calculate_magnetoresistance();
+   // spin_pumping::internal::calculate_cell_magnetization(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
+   //                                                             atoms_z_spin_array, atoms_m_spin_array);
+   // spin_pumping::internal::calculate_cells_spin_pumping();
 
-   //---------------------------------------------------------------------------------------------------------
-   // test output of cell-level spin transport data
-   //---------------------------------------------------------------------------------------------------------
-
-   // std::ofstream ofile("stdata.txt");
-   // for(int i =0; i< st::internal::total_num_cells; i++){
-   //    const double isat = st::internal::cell_isaturation[i];
-   //    ofile << st::internal::cell_position[3*i+0] << "\t" <<
-   //             st::internal::cell_position[3*i+1] << "\t" <<
-   //             st::internal::cell_position[3*i+2] << "\t" <<
-   //             st::internal::cell_magnetization[3*i+0] * isat << "\t" <<
-   //             st::internal::cell_magnetization[3*i+1] * isat << "\t" <<
-   //             st::internal::cell_magnetization[3*i+2] * isat << "\t" <<
-   //             st::internal::cell_spin_torque_fields[3*i+0] << "\t" <<
-   //             st::internal::cell_spin_torque_fields[3*i+1] << "\t" <<
-   //             st::internal::cell_spin_torque_fields[3*i+2] << "\t" <<
-   //             st::internal::cell_resistance[i] << "\t" <<
-   //             st::internal::cell_spin_resistance[i] << std::endl;
-   // }
-   // ofile.close();
-
+   // update counter for spin pumping output
+   const uint64_t tmp_counter = spin_pumping::internal::config_counter-1;
+   // Output atoms only
+   if(spin_pumping::internal::output_atomistic_spin_pumping_flag){ spin_pumping::internal::output_atomistic_spin_pumping(tmp_counter);}
+   // Output cells only
+   if(spin_pumping::internal::output_cells_spin_pumping_flag){ spin_pumping::internal::output_atomistic_spin_pumping(tmp_counter);}
 
    return;
 
 }
 
-} // end of spin_transport namespace
+} // end of spin_pumping namespace

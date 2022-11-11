@@ -20,6 +20,7 @@
 #include "hamr.hpp"
 #include "ltmp.hpp"
 #include "sim.hpp"
+#include "spinpumping.hpp"
 #include "spintorque.hpp"
 #include "spintransport.hpp"
 #include "unitcell.hpp"
@@ -125,6 +126,23 @@ void initialize_modules(){
    }
 
    spin_transport::initialize(cs::system_dimensions[0],
+                              cs::system_dimensions[1],
+                              cs::system_dimensions[2],
+                              mp::num_materials,
+                              num_local_atoms,
+                              atoms::type_array,
+                              atoms::x_coord_array,
+                              atoms::y_coord_array,
+                              atoms::z_coord_array,
+                              atoms::m_spin_array,
+                              material_alpha_array,
+                              is_magnetic_material,
+                              cs::non_magnetic_atoms_array);
+
+   //---------------------------------------------------------------------------
+   // Spin pumping module
+   //---------------------------------------------------------------------------
+   spin_pumping::initialize(cs::system_dimensions[0],
                               cs::system_dimensions[1],
                               cs::system_dimensions[2],
                               mp::num_materials,

@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=71;
+	const int max_units=72;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -181,6 +181,9 @@ int init(){
       unit[68]="A/ns";     conversion[68]=1.0E9;               type[68]="velocity";        // Angstrom per nanoseconds
       unit[69]="A/ps";     conversion[69]=1.0E12;              type[69]="velocity";        // Angstrom per picoseconds
       unit[70]="nm/ns";		conversion[70]=1.0E8;               type[70]="velocity";        // Nanometers per nanosecond
+
+      // Spin mixing conductance
+      unit[71]="1/(Ohm-m2)";      conversion[57]=1.0;                 type[57]="spin_mixing_conductance";        // One per Ohm per meter squared
 
       //
 

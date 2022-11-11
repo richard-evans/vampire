@@ -548,20 +548,6 @@ namespace spin_transport{
          ofile.close();
       }
 
-      // If enabled, output calculated atomistic coordinates and moments (passing local values)
-      if(st::internal::output_atomistic_spin_current_flag) {
-         // Inform user that module is initializing
-         zlog << zTs() << "Outputting atomistic coordinates for atomistic calculation of spin pumping" << std::endl;
-
-         st::internal::output_atomistic_coordinates(num_atoms, atoms_x_coord_array, atoms_y_coord_array, atoms_z_coord_array, atoms_m_spin_array);
-
-         // Inform user that module is initializing
-         zlog << zTs() << "Initializing structures for atomistic calculation of spin pumping" << std::endl;
-         // Resize arrays to store cross product spin with time derivative of spin
-         st::internal::x_s_cross_dsdt_array.resize(num_atoms, 0.0);
-         st::internal::y_s_cross_dsdt_array.resize(num_atoms, 0.0);
-         st::internal::z_s_cross_dsdt_array.resize(num_atoms, 0.0);
-      }
       return;
 
    }

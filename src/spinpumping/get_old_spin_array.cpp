@@ -12,12 +12,12 @@
 
 // Vampire headers
 #include "atoms.hpp"
-#include "spintransport.hpp"
+#include "spinpumping.hpp"
 
 // anisotropy module headers
 #include "internal.hpp"
 
-namespace spin_transport{
+namespace spin_pumping{
 	namespace internal{
    	//--------------------------------------------------------------------------------
    	// Function to recover old spin configuration x component

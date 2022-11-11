@@ -149,6 +149,7 @@ include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
 include src/simulate/makefile
+include src/spinpumping/makefile
 include src/spintransport/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
