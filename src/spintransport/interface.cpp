@@ -16,6 +16,7 @@
 // Vampire headers
 #include "spintransport.hpp"
 #include "errors.hpp"
+// #include "sim.hpp"
 #include "vio.hpp"
 
 // spintransport module headers

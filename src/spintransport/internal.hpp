@@ -138,6 +138,7 @@ namespace spin_transport{
       // array to store which cell each atom is in
       extern std::vector <unsigned int> atom_in_cell;
 
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
@@ -155,6 +156,9 @@ namespace spin_transport{
                            std::vector<double>& atoms_y_field_array,      // y-field of atoms
                            std::vector<double>& atoms_z_field_array       // z-field of atoms
       );
+
+
+
 
    } // end of internal namespace
 

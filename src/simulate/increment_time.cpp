@@ -16,6 +16,7 @@
 #include "atoms.hpp"
 #include "dipole.hpp"
 #include "sim.hpp"
+#include "spinpumping.hpp"
 #include "spintorque.hpp"
 #include "spintransport.hpp"
 #include "unitcell.hpp"
@@ -60,6 +61,12 @@ void increment_time(){
    #endif
 
    spin_transport::update(num_local_atoms,
+                          atoms::x_spin_array,
+                          atoms::y_spin_array,
+                          atoms::z_spin_array,
+                          atoms::m_spin_array);
+
+   spin_pumping::update(num_local_atoms,
                           atoms::x_spin_array,
                           atoms::y_spin_array,
                           atoms::z_spin_array,

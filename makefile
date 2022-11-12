@@ -87,6 +87,7 @@ OPTIONS=
 OBJECTS= \
 obj/data/atoms.o \
 obj/data/category.o \
+obj/data/functions.o \
 obj/data/grains.o \
 obj/random/mtrand.o \
 obj/random/random.o \
@@ -148,6 +149,7 @@ include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
 include src/simulate/makefile
+include src/spinpumping/makefile
 include src/spintransport/makefile
 include src/statistics/makefile
 include src/unitcell/makefile

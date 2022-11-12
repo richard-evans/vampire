@@ -58,6 +58,10 @@ namespace atoms{
 	std::vector <double> z_spin_array(0);
     std::vector <double> m_spin_array(0);
 
+	std::vector <double> x_old_spin_array(0);
+	std::vector <double> y_old_spin_array(0);
+	std::vector <double> z_old_spin_array(0);
+
 	std::vector <double> x_total_spin_field_array(0);		/// Total spin dependent fields
 	std::vector <double> y_total_spin_field_array(0);		/// Total spin dependent fields
 	std::vector <double> z_total_spin_field_array(0);		/// Total spin dependent fields

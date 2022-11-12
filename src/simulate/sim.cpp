@@ -160,6 +160,8 @@ namespace sim{
 	bool local_applied_field=false; /// flag to enable material specific applied field
 	bool local_fmr_field=false; /// flag to enable material specific fmr field
 
+	bool compute_time_derivative; // Flag to store spins from previous step
+
    // Checkpoint flags and variables
    bool checkpoint_loaded_flag=false;  // Flag to determine if it is first step after loading checkpoint (true).
    bool load_checkpoint_flag=false; // Load spin configurations
@@ -291,8 +293,8 @@ int run(){
                      atoms::num_atoms
    );
 
-
-
+   // Store old spin configuration if computation of spin-pumping enabled
+   if(sim::compute_time_derivative) atoms::initialise_old_spins();
 
 	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
 
@@ -658,6 +660,10 @@ void integrate_serial(uint64_t n_steps){
 
       case 0: // LLG Heun
          for(uint64_t ti=0;ti<n_steps;ti++){
+
+            // Store old spin configuration if computation of spin-pumping enabled
+            if(sim::compute_time_derivative) atoms::store_old_spins();
+
             // Optionally select GPU accelerated version
             if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
@@ -763,6 +769,10 @@ int integrate_mpi(uint64_t n_steps){
 	switch(sim::integrator){
 		case 0: // LLG Heun
 			for(uint64_t ti=0;ti<n_steps;ti++){
+						  
+            // Store old spin configuration if computation of spin-pumping enabled
+            if(sim::compute_time_derivative) atoms::store_old_spins();
+
 			#ifdef MPICF
 				// Select CUDA version if supported
 				#ifdef CUDA
