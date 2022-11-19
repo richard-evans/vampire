@@ -183,7 +183,7 @@ int init(){
       unit[70]="nm/ns";		conversion[70]=1.0E8;               type[70]="velocity";        // Nanometers per nanosecond
 
       // Spin mixing conductance
-      unit[71]="1/(Ohm-m2)";      conversion[57]=1.0;                 type[57]="spin_mixing_conductance";        // One per Ohm per meter squared
+      unit[71]="1/(Ohm-m2)";      conversion[71]=1.0;                 type[71]="spin_mixing_conductance";        // One per Ohm per meter squared
 
       //
 
