@@ -661,9 +661,6 @@ void integrate_serial(uint64_t n_steps){
       case 0: // LLG Heun
          for(uint64_t ti=0;ti<n_steps;ti++){
 
-            // Store old spin configuration if computation of spin-pumping enabled
-            if(sim::compute_time_derivative) atoms::store_old_spins();
-
             // Optionally select GPU accelerated version
             if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
@@ -770,9 +767,6 @@ int integrate_mpi(uint64_t n_steps){
 		case 0: // LLG Heun
 			for(uint64_t ti=0;ti<n_steps;ti++){
 						  
-            // Store old spin configuration if computation of spin-pumping enabled
-            if(sim::compute_time_derivative) atoms::store_old_spins();
-
 			#ifdef MPICF
 				// Select CUDA version if supported
 				#ifdef CUDA
