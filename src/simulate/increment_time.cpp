@@ -67,10 +67,14 @@ void increment_time(){
                           atoms::m_spin_array);
 
    spin_pumping::update(num_local_atoms,
+                          sim::time,
                           atoms::x_spin_array,
                           atoms::y_spin_array,
                           atoms::z_spin_array,
                           atoms::m_spin_array);
+
+	// If spin-pumping enabled, Store old spin configuration 
+	if(sim::compute_time_derivative) atoms::store_old_spins();
 
    return;
 

@@ -85,11 +85,10 @@ namespace spin_pumping{
          mean_y = mean_y / double (total_num_atoms);
          mean_z = mean_z / double (total_num_atoms);
 
-         // output data to file atomistic_spin_current_positions.txt
          if(vmpi::master){
             std::ofstream ofile;
             std::stringstream filename;
-            filename << "atomistic-spin-current-positions.cfg";
+            filename << "atomistic-spin-pumping-positions.cfg";
             zlog << zTs() << "Outputting atomistic coordinates for spin pumping to file " << filename.str() << std::endl;
             ofile.open(std::string(filename.str()).c_str());
 
@@ -125,7 +124,7 @@ namespace spin_pumping{
 
          // check for initialised data structures
          if(!output_atomistic_spin_pumping_initialised){
-            std::cerr << "Programmer error : spin_pumping::output_atomistic_spin_current_initialised() called before initialisation" << std::endl;
+            std::cerr << "Programmer error : spin_pumping::output_atomistic_spin_pumping_initialised() called before initialisation" << std::endl;
             err::vexit();
          }
 
@@ -145,15 +144,13 @@ namespace spin_pumping{
          // collate global data on master
          vmpi::fast_collate(data_from_local_atoms, data_from_all_atoms, counts, displacements);
 
-         // output data to file atomistic_spin_current_field.txt
          if(vmpi::master){
             std::ofstream ofile;
             std::stringstream filename;
-            filename << "atomistic-spin-current-" << std::setfill ('0') << std::setw (8) << config_file_counter << ".cfg";
+            filename << "atomistic-spin-pumping-" << std::setfill ('0') << std::setw (8) << config_file_counter << ".cfg";
             zlog << zTs() << "Outputting spin pumping data to file " << filename.str() << std::endl;
             ofile.open(std::string(filename.str()).c_str());
 
-            // ofile.open("atomistic_spin_current.txt");
             for(int atom = 0; atom < total_num_atoms; atom++){
                ofile << data_from_all_atoms[ 3 * atom + 0 ] << "\t" <<
                         data_from_all_atoms[ 3 * atom + 1 ] << "\t" <<

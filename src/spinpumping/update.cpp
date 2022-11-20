@@ -25,6 +25,7 @@ namespace spin_pumping{
 // Function to update spin torque field
 //---------------------------------------------------------------------------------------------------------
 void update(const unsigned int num_local_atoms,            // number of local atoms
+            const uint64_t time_sim,                       // simulation time 
             const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
             const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
             const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
@@ -59,10 +60,9 @@ void update(const unsigned int num_local_atoms,            // number of local at
    const std::vector <double> atoms_x_old_spin_array = spin_pumping::internal::get_old_spins_x(num_local_atoms);
    const std::vector <double> atoms_y_old_spin_array = spin_pumping::internal::get_old_spins_y(num_local_atoms);
    const std::vector <double> atoms_z_old_spin_array = spin_pumping::internal::get_old_spins_z(num_local_atoms);
-   spin_pumping::internal::calculate_spin_pumping(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
+   spin_pumping::internal::calculate_spin_pumping(num_local_atoms, time_sim, atoms_x_spin_array, atoms_y_spin_array,
                                                    atoms_z_spin_array, atoms_x_old_spin_array, atoms_y_old_spin_array,
                                                    atoms_z_old_spin_array, atoms_m_spin_array);
-
 
    //---------------------------------------------------------------------------------------------------------
    // calculate cells spin pumping

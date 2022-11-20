@@ -27,6 +27,7 @@ namespace spin_pumping{
    	// Function to compute atomistic spin pumping as: s_i x ds_i/dt
    	//---------------------------------------------------------------------------
 		void calculate_spin_pumping(const unsigned int num_local_atoms,            // number of local atoms
+		                                  const uint64_t time_sim, 						// simulation time 
 		                                  const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
 		                                  const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
 		                                  const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
@@ -35,6 +36,12 @@ namespace spin_pumping{
 		                                  const std::vector<double>& atoms_z_old_spin_array, // old z-spin-vector of atoms
 		                                  const std::vector<double>& atoms_m_spin_array  // moment of atoms
 		                               ){
+
+				//-------------------------------------------------------------------------
+				// check that is not first step - if not do nothing
+				//-------------------------------------------------------------------------
+				if( time_sim-1<1 ){return;}
+
 				// Arrays to store calculation ds/dt
 				std::vector <double> x_dsdt_array(num_local_atoms,0.0);
 				std::vector <double> y_dsdt_array(num_local_atoms,0.0);
