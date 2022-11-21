@@ -36,16 +36,16 @@ material:unit-cell-file = L10FePt.ucf
 sim:minimum-temperature = 0.0
 sim:maximum-temperature = 800.0
 sim:temperature-increment = 40.0
-#sim:temperature=300.0
+#sim:temperature=500.0
 sim:time-steps-increment = 1
 
 #sim:temperature=0
 #sim:equilibration-temperature=0
 
-sim:time-step = 1e-16
-#sim:equilibration-time-steps = 1000
-#sim:loop-time-steps = 5000
-sim:total-time-steps = 10000
+sim:time-step = 1e-15
+#sim:equilibration-time-steps = 2000
+#sim:loop-time-steps = 10000
+sim:total-time-steps = 100000
 
 #------------------------------------------
 # Program and integrator details
@@ -53,7 +53,6 @@ sim:total-time-steps = 10000
 sim:program = curie-temperature
 #sim:program = time-series
 sim:integrator = lsf
-#montecarlo:algorithm = adaptive
 
 #------------------------------------------
 # Data output

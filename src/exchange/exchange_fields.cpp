@@ -63,6 +63,7 @@ namespace internal{
 
                //double m = sqrt(spin_array_x[atom]*spin_array_x[atom] + spin_array_y[atom]*spin_array_y[atom] + spin_array_z[atom]*spin_array_z[atom]);
                double m=1.0;
+
                // loop over all neighbours
    				for(int nn = start; nn < end; ++nn){
 

@@ -16,7 +16,7 @@ material:num-materials=1
 
 #properties for material 2
 material[1]:material-name=Pt
-material[1]:lsf-second-order-coefficient=4.60446e-21
+material[1]:lsf-second-order-coefficient=4.5512e-21
 material[1]:lsf-fourth-order-coefficient=0
 material[1]:lsf-sixth-order-coefficient=0
 material[1]:atomic-spin-moment=0.36 !muB
@@ -24,5 +24,5 @@ material[1]:damping-constant=0.1
 #material[1]:uniaxial-anisotropy-constant=2.2832e-22
 #material[2]:unit-cell-category=2
 #material[1]:exchange-matrix[1]=2.832e-23
-#material[1]:exchange-matrix[1]=1e-21
+#material[1]:exchange-matrix[1]=3e-21
 #material[2]:non-magnetic=remove
