@@ -34,6 +34,11 @@ namespace sim{
 
       sim::internal::vcmak.resize(num_materials, 0.0);
 
+      // Unroll LSF coefficient arrays
+      sim::internal::lsf_second_order_coefficient.resize(num_materials,0.0);
+      sim::internal::lsf_fourth_order_coefficient.resize(num_materials,0.0);
+      sim::internal::lsf_sixth_order_coefficient.resize(num_materials,0.0);
+
       // loop over materials set by user
       for(unsigned int m=0; m < sim::internal::mp.size(); ++m){
          // copy values set by user to arrays
@@ -50,6 +55,11 @@ namespace sim{
             const double imu_s = 1.0 / mp::material[m].mu_s_SI; // calculate inverse moment
             sim::internal::vcmak[m] = imu_s * sim::internal::mp[m].vcmak.get();
          }
+
+         // Assign Landau coefficients based on material
+         if(sim::internal::mp[m].lsf_second_order_coefficient.is_set()) sim::internal::lsf_second_order_coefficient[m] = sim::internal::mp[m].lsf_second_order_coefficient.get();
+         if(sim::internal::mp[m].lsf_fourth_order_coefficient.is_set()) sim::internal::lsf_fourth_order_coefficient[m] = sim::internal::mp[m].lsf_fourth_order_coefficient.get();
+         if(sim::internal::mp[m].lsf_sixth_order_coefficient.is_set()) sim::internal::lsf_sixth_order_coefficient[m] = sim::internal::mp[m].lsf_sixth_order_coefficient.get();
 
       }
 

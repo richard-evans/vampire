@@ -547,7 +547,7 @@ int run(){
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
    //------------------------------------------------
-   if(sim::integrator == sim::monte_carlo){
+   if(sim::integrator == sim::monte_carlo || sim::integrator == sim::lsf_mc){
       std::cout << "Monte Carlo statistics:" << std::endl;
       std::cout << "\tTotal moves: " << long(sim::mc_statistics_moves) << std::endl;
       std::cout << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
@@ -710,6 +710,22 @@ void integrate_serial(uint64_t n_steps){
 		case sim::llg_quantum: // LLG quantum noise
 			for(uint64_t ti=0;ti<n_steps;ti++){
 				sim::internal::llg_quantum_step();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case sim::lsf: // LSF
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sim::internal::lsf_step();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case 7: // LSF Monte Carlo
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				montecarlo::lsf_mc_step();
 				// increment time
 				sim::internal::increment_time();
 			}

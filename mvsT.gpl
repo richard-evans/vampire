@@ -1,0 +1,84 @@
+#!/bin/bash
+#-------------------------------------------------------------------------------
+#      Sample gnuplot template for plotting magnetization m(T) curve
+#
+#                (c) R F L Evans 2016. All rights reserved.
+#
+#-------------------------------------------------------------------------------
+# Load styles
+load "../../journals/nature.journal"
+load "../../colours/bluegold-sl.colour"
+
+# Set output file base name
+ofile="mvsT"
+
+# Set axis labels
+set xlabel "Temperature (K)"
+# For y-label use italics for variables and offset from axis
+set ylabel "Magnetisation ({/Helvetica-Oblique m}/{/Helvetica-Oblique m}_s)" offset 0.5,0
+
+# Set axis number formatting
+set format y "%3.1f"
+
+# Set '0' line as guide to the eye
+set xzeroaxis
+
+# Set key properties
+set key top right maxrows 5 spacing 1.2
+
+#-------------------------------------------------------------------------------
+# Fitting function  m(T) = (1 - T/Tc) ^ beta
+# For T > Tc equation is not valid, so use a ternary operator
+# (bool) ? value_if_true : value_if_false
+m(T)= T<Tc ? (1-(T/Tc)**alpha)**beta : 0.0
+f(T)= T<TcI ? (1-(T/TcI)**alphaI)**betaI : 0.0
+n(T)= T<TcII ? (1-(T/TcII)**alphaII)**betaII : 0.0
+y(T)= T<TcIII ? (1-(T/TcIII)**alphaIII)**betaIII : 0.0
+
+# Estimate initial variable
+Tc=440.0
+beta=0.35
+alpha=1
+TcI=445.0
+TcII=460.0
+TcIII=460.0
+betaI=0.32
+betaII=0.32
+betaIII=0.32
+alphaI=0.5
+alphaII=1
+alphaIII=1
+#-------------------------------------------------------------------------------
+
+# set columns to be fitted here T,|m|
+fit [] m(x) "output" u 1:2 via Tc, beta, alpha
+fit [] f(x) "output_I" u 1:2 via TcI, betaI, alphaI
+fit [] n(x) "output_llg" u 1:2 via TcII, betaII, alphaII
+fit [] y(x) "output_mc" u 1:2 via TcIII, betaIII, alphaIII
+
+# Print fitted values to screen
+print "beta =",beta
+print "Tc =  ",Tc
+
+# Set samples for fiitted function for smoother plot
+set samples 1000
+
+# Set eps file name by concatenation (. operator)
+epsfile=ofile.".eps"
+set output epsfile
+
+#--------------------------------------------
+# Plot graph with fit
+p [-20:800][-0.05:1.05] \
+m(x) ls 3 lw 4 notitle,\
+f(x) ls 2 lw 4 notitle,\
+n(x) ls 4 lw 4 notitle,\
+y(x) ls 5 lw 4 notitle,\
+"output_I" u 1:2 ev 1 ls 2 w p title "LSF-I",\
+"output" u 1:2 ev 1 ls 3 w p title "LSF-II",\
+"output_llg" u 1:2 ev 1 ls 4 w p title "LLG",\
+"output_mc" u 1:2 ev 1 ls 5 w p title "Monte Carlo"
+
+# Convert eps to pdf for portability
+cmd = "epstopdf ".epsfile
+sys cmd

@@ -15,6 +15,7 @@
 // Vampire headers
 #include "atoms.hpp" // for exchange list type defs
 #include "exchange.hpp"
+#include "sim.hpp"
 
 // exchange module headers
 #include "internal.hpp"
@@ -42,7 +43,7 @@ namespace exchange{
                std::vector<double>& field_array_z){
 
 
-   	// Calculate standard (bilinear) exchange fields
+      // Calculate standard (bilinear) exchange fields
       exchange::internal::exchange_fields(start_index, end_index,
                                 neighbour_list_start_index, neighbour_list_end_index,
                                 type_array, neighbour_list_array, neighbour_interaction_type_array,
