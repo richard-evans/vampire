@@ -21,15 +21,8 @@
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
 
-// TESTING***
-std::vector <int> mod_S_round;
-int counter;
-int loc_counter;
-double mod_S_pt;
-double mod_S_fe;
-double exchsum;
-double ptdir[3];
-double k_B;
+// RNG seed increments every LSF step
+int seeding = 0;
 
 namespace LSF_arrays{
 
@@ -57,9 +50,6 @@ namespace LSF_arrays{
    // Flag to define state of LSF arrays (initialised/uninitialised)
    bool LSF_set=false;
 
-   // *** TESTING ***
-   std::ofstream MyFile("spinlength");
-   double simtemp=1;
    std::vector <double> mod_S;
 
 }
@@ -93,19 +83,10 @@ int LSFinit(){
 
 	LSF_set=true;
 
-   sim::hamiltonian_simulation_flags[3]=0;
+   mod_S.resize(atoms::num_atoms,1.0);
 
-   mod_S.resize(atoms::num_atoms, 1.0);
-   mod_S_round.resize(401, 0);
-   counter=0;
-   loc_counter=0;
-   mod_S_pt=0;
-   mod_S_fe=0;
-   exchsum = 0.0;
-   k_B=1.38064e-23;
-   for(int i=0; i<3; i++){
-      ptdir[i]=0;
-   }
+   // Disable external thermal field calculations
+   sim::hamiltonian_simulation_flags[3]=0;
 
   	return EXIT_SUCCESS;
 
@@ -158,6 +139,7 @@ void lsf_step(){
    const int num_atoms=atoms::num_atoms;
    double xyz[3]; // Local delta spin components
    double S_new[3]; // New local spin moment
+   const double kB = 1.3806503e-23;
 
    // Calculate fields
    calculate_spin_fields(0, num_atoms);
@@ -171,67 +153,20 @@ void lsf_step(){
 		z_initial_spin_array[atom]=atoms::z_spin_array[atom];
    }
 
-   // *** TESTING ***
-   double spinlength[2];
-   for (int atom = 0; atom < num_atoms; atom++){
-
-      const int imaterial = atoms::type_array[atom];
-
-      const double sx = atoms::x_spin_array[atom];
-      const double sy = atoms::y_spin_array[atom];
-      const double sz = atoms::z_spin_array[atom];
-
-      spinlength[imaterial] = sqrt(sx*sx + sy*sy + sz*sz);
-
-      if(imaterial==1){
-         ptdir[0]+=sx/spinlength[imaterial];
-         ptdir[1]+=sy/spinlength[imaterial];
-         ptdir[2]+=sz/spinlength[imaterial];
-      }
-
-      if(imaterial==0){
-         mod_S_fe += spinlength[imaterial];
-      }
-
-      if(imaterial==1){
-         mod_S_pt += spinlength[imaterial];
-      }
-
-      int spinround = floor((spinlength[imaterial]*100)+0.5);
-      mod_S_round[spinround]+= 1;
-      
-      //double exch = exchange::single_spin_energy(atom, atoms::x_spin_array[atom], atoms::y_spin_array[atom], atoms::z_spin_array[atom]);
-      //exchsum += exch;
-
-   }
-   if(simtemp!=sim::temperature){
-      if(loc_counter==0) loc_counter=1;
-      MyFile << sim::temperature << " " << mod_S_fe/((atoms::num_atoms/mp::num_materials)*loc_counter) << " " << mod_S_pt/((atoms::num_atoms/mp::num_materials)*loc_counter) << std::endl;
-      //MyFile << sim::temperature << " " << exchsum/(loc_counter*atoms::num_atoms) << std::endl;
-      loc_counter=0;
-      exchsum=0;
-      mod_S_pt=0;
-      mod_S_fe=0;
-      simtemp=sim::temperature;
-   }
-   spinlength[0]=0;
-   spinlength[1]=0;
-
    std::vector <double> tx(num_atoms), ty(num_atoms), tz(num_atoms);
 
    //generate (tx.begin(),tx.begin()+num_atoms, mtrandom::gaussian);
    //generate (ty.begin(),ty.begin()+num_atoms, mtrandom::gaussian);
    //generate (tz.begin(),tz.begin()+num_atoms, mtrandom::gaussian);
 
-   double sigma = ( sqrt( ( 2.0 * k_B * sim::temperature * mp::gamma_SI) / ( mp::dt_SI ) ) );
-
-   std::mt19937 temperature(counter);
-
+   // Thermal noise based on Gaussian function
+   double sigma = ( sqrt( ( 2.0 * kB * sim::temperature * mp::gamma_SI) / ( mp::dt_SI ) ) );
+   std::mt19937 temperature(seeding);
    for (int atom = 0; atom < num_atoms; atom++){
 
-      //std::normal_distribution<double> randomTemp(0, (sigma * sqrt(mp::material[atoms::type_array[atom]].alpha / mp::material[atoms::type_array[atom]].mu_s_SI)) );
       std::normal_distribution<double> randomTemp(0, 1.0); 
 
+      // Generate Gaussian
       tx[atom]=randomTemp(temperature);
       ty[atom]=randomTemp(temperature);
       tz[atom]=randomTemp(temperature);
@@ -242,6 +177,8 @@ void lsf_step(){
    for (int atom = 0; atom < num_atoms; atom++){
 
       const int imaterial = atoms::type_array[atom];
+      const double alpha = mp::material[atoms::type_array[atom]].alpha;
+      const double mu = mp::material[atoms::type_array[atom]].mu_s_SI;
 
 		// Store local spin in S and local field in H
 		const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
@@ -251,9 +188,9 @@ void lsf_step(){
 									atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]+LSF_arrays::z_lsf_array[atom]};
 
       // Calculate Delta S
-      xyz[0]=(-mp::gamma_SI*(S[1]*H[2]-S[2]*H[1]))+(mp::gamma_SI*mp::material[imaterial].alpha*H[0])+(tx[atom]*(sigma * sqrt(mp::material[atoms::type_array[atom]].alpha / mp::material[atoms::type_array[atom]].mu_s_SI)));
-      xyz[1]=(-mp::gamma_SI*(S[2]*H[0]-S[0]*H[2]))+(mp::gamma_SI*mp::material[imaterial].alpha*H[1])+(ty[atom]*(sigma * sqrt(mp::material[atoms::type_array[atom]].alpha / mp::material[atoms::type_array[atom]].mu_s_SI)));
-      xyz[2]=(-mp::gamma_SI*(S[0]*H[1]-S[1]*H[0]))+(mp::gamma_SI*mp::material[imaterial].alpha*H[2])+(tz[atom]*(sigma * sqrt(mp::material[atoms::type_array[atom]].alpha / mp::material[atoms::type_array[atom]].mu_s_SI)));
+      xyz[0]=(-mp::gamma_SI*(S[1]*H[2]-S[2]*H[1]))+(mp::gamma_SI*alpha*H[0])+(tx[atom]*(sigma * sqrt(alpha / mu)));
+      xyz[1]=(-mp::gamma_SI*(S[2]*H[0]-S[0]*H[2]))+(mp::gamma_SI*alpha*H[1])+(ty[atom]*(sigma * sqrt(alpha / mu)));
+      xyz[2]=(-mp::gamma_SI*(S[0]*H[1]-S[1]*H[0]))+(mp::gamma_SI*alpha*H[2])+(tz[atom]*(sigma * sqrt(alpha / mu)));
 
       // Store dS in euler array
 		x_euler_array[atom]=xyz[0];
@@ -287,6 +224,8 @@ void lsf_step(){
 	for(int atom=0;atom<num_atoms;atom++){
 
 		const int imaterial=atoms::type_array[atom];
+      const double alpha = mp::material[atoms::type_array[atom]].alpha;
+      const double mu = mp::material[atoms::type_array[atom]].mu_s_SI;
 
 		// Store local spin in S and local field in H
 		const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
@@ -296,9 +235,9 @@ void lsf_step(){
 									atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]+LSF_arrays::z_lsf_array[atom]};
 
       // Calculate Delta S
-      xyz[0]=(-mp::gamma_SI*(S[1]*H[2]-S[2]*H[1]))+(mp::gamma_SI*mp::material[imaterial].alpha*H[0])+(tx[atom]*(sigma * sqrt(mp::material[atoms::type_array[atom]].alpha / mp::material[atoms::type_array[atom]].mu_s_SI)));
-      xyz[1]=(-mp::gamma_SI*(S[2]*H[0]-S[0]*H[2]))+(mp::gamma_SI*mp::material[imaterial].alpha*H[1])+(ty[atom]*(sigma * sqrt(mp::material[atoms::type_array[atom]].alpha / mp::material[atoms::type_array[atom]].mu_s_SI)));
-      xyz[2]=(-mp::gamma_SI*(S[0]*H[1]-S[1]*H[0]))+(mp::gamma_SI*mp::material[imaterial].alpha*H[2])+(tz[atom]*(sigma * sqrt(mp::material[atoms::type_array[atom]].alpha / mp::material[atoms::type_array[atom]].mu_s_SI)));
+      xyz[0]=(-mp::gamma_SI*(S[1]*H[2]-S[2]*H[1]))+(mp::gamma_SI*alpha*H[0])+(tx[atom]*(sigma * sqrt(alpha / mu)));
+      xyz[1]=(-mp::gamma_SI*(S[2]*H[0]-S[0]*H[2]))+(mp::gamma_SI*alpha*H[1])+(ty[atom]*(sigma * sqrt(alpha / mu)));
+      xyz[2]=(-mp::gamma_SI*(S[0]*H[1]-S[1]*H[0]))+(mp::gamma_SI*alpha*H[2])+(tz[atom]*(sigma * sqrt(alpha / mu)));
 
       // Store dS in Heun array
 		x_heun_array[atom]=xyz[0];
@@ -327,18 +266,8 @@ void lsf_step(){
       mod_S[atom] = sqrt(sx*sx + sy*sy + sz*sz);
    }
 
-   counter++;
-   loc_counter++;
-
-   
-   // Write spin length sampling data
-   if(counter==sim::total_time){
-      for (int i=0; i<401; i++){
-         //MyFile << i << " " << mod_S_round[i] << std::endl;  
-      }
-      //std::cout << ptdir[0]/(counter*2662) << " " << ptdir[1]/(counter*2662) << " " << ptdir[2]/(counter*2662) << std::endl;
-   }
-   
+   // Increment seeding
+   seeding++;
 
    return;
 

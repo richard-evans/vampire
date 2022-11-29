@@ -79,11 +79,6 @@ namespace LLG_arrays{
 
 	bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
-	// *** TESTING ***
-   std::ofstream MyFile("spinlength");
-   double simtemp=1;
-   std::vector <double> mod_S;
-
 }
 
 namespace sim{
@@ -181,33 +176,6 @@ int LLG_Heun(){
 		y_initial_spin_array[atom] = atoms::y_spin_array[atom];
 		z_initial_spin_array[atom] = atoms::z_spin_array[atom];
 	}
-
-	// *** TESTING ***
-   double spinlength[2];
-   double exchsum = 0.0;
-   for (int atom = 0; atom < num_atoms; atom++){
-
-      const int imaterial = atoms::type_array[atom];
-
-      const double sx = atoms::x_spin_array[atom];
-      const double sy = atoms::y_spin_array[atom];
-      const double sz = atoms::z_spin_array[atom];
-
-      spinlength[imaterial] += sqrt(sx*sx + sy*sy + sz*sz);
-      
-      if(atoms::type_array[atom]==0){
-         double exch = exchange::single_spin_energy(atom, atoms::x_spin_array[atom], atoms::y_spin_array[atom], atoms::z_spin_array[atom]);
-         exchsum += exch;
-      }
-
-	}
-	if(simtemp!=sim::temperature){
-		//MyFile << sim::temperature << " " << spinlength[0]/2662 << " " << spinlength[1]/2662 << std::endl;
-		MyFile << sim::temperature << " " << exchsum/(atoms::num_atoms/mp::num_materials) << std::endl;
-		simtemp=sim::temperature;
-	}
-	spinlength[0]=0;
-	spinlength[1]=0;
 
 	// Calculate fields
 	calculate_spin_fields(0,num_atoms);

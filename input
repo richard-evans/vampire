@@ -45,14 +45,14 @@ sim:time-steps-increment = 1
 sim:time-step = 1e-15
 #sim:equilibration-time-steps = 2000
 #sim:loop-time-steps = 10000
-sim:total-time-steps = 100000
+sim:total-time-steps = 1000
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
 sim:program = curie-temperature
 #sim:program = time-series
-sim:integrator = lsf
+sim:integrator = lsf-mc
 
 #------------------------------------------
 # Data output

@@ -23,8 +23,6 @@
 // Internal header
 #include "internal.hpp"
 
-double tempcheck=1;
-std::ofstream MyFile("spinlength");
 namespace montecarlo{
 //------------------------------------------------------------------------------
 // Integrates a Monte Carlo step
@@ -57,20 +55,6 @@ void mc_step(std::vector<double> &x_spin_array,
 
       double statistics_moves = 0.0;
       double statistics_reject = 0.0;
-
-      // TESTING***********
-      double exchsum=0.0;
-      for (int atom = 0; atom < num_atoms; atom++){
-         if(atoms::type_array[atom]==0){
-               double exch = exchange::single_spin_energy(atom, atoms::x_spin_array[atom], atoms::y_spin_array[atom], atoms::z_spin_array[atom]);
-               exchsum+=exch;
-         }
-      }
-      if(tempcheck!=sim::temperature){
-         //MyFile << sim::temperature << " " << ((mu_D_avg/(atoms::num_atoms/mp::num_materials)))/mu_i << " " << exchsum/(atoms::num_atoms/mp::num_materials) << std::endl;
-         MyFile << sim::temperature << " " << exchsum/(atoms::num_atoms/mp::num_materials) << std::endl;
-         tempcheck=sim::temperature;
-      }
 
       // loop over natoms to form a single Monte Carlo step
       for(int i=0;i<nmoves; i++){
