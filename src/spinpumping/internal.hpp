@@ -158,19 +158,38 @@ namespace spin_pumping{
       //---------------------------------------------------------------------------
       void calculate_cells_spin_pumping();
 
+      //------------------------------------------------------------------------
+      // Function to write meta data for coordinate and atomic data
+      //------------------------------------------------------------------------
+		void write_atomistic_coordinates_meta();
       //-----------------------------------------------------------------
       // Function to initialise atomic resolution output of coordinates
       //-----------------------------------------------------------------
-      void output_atomistic_coordinates(const int num_atoms,                      // number of atoms (only correct in serial)
-                                        const std::vector<double>& x_coord_array, // atomic coordinates (angstroms)
+      void write_atomistic_coordinates_data(const std::vector<double>& x_coord_array, // atomic coordinates (angstroms)
                                         const std::vector<double>& y_coord_array,
                                         const std::vector<double>& z_coord_array,
                                         const std::vector<double>& moments_array);
+      //------------------------------------------------------------------------
+      // Function to call output of coordinate of atomic data
+      //------------------------------------------------------------------------
+      void output_atomistic_coordinates(const std::vector<double>& x_coord_array, // atomic coordinates (angstroms)
+                                        const std::vector<double>& y_coord_array,
+                                        const std::vector<double>& z_coord_array); 
 
+      //---------------------------------------------------------------------
+      // Function to write meta data for each configuration
+      //---------------------------------------------------------------------
+      void write_atomistic_spin_pumping_meta(const uint64_t config_file_counter);
       //-----------------------------------------------------------------
       // Function to output atomic resolution dipole field
       //-----------------------------------------------------------------
-      void output_atomistic_spin_pumping(const uint64_t config_file_counter);
+      void write_atomistic_spin_pumping_data(const uint64_t config_file_counter,  // counter of output files
+                                             const std::vector<double>& moments_array); // atomistic magnetic moments (bohr magnetons)
+      //------------------------------------------------------------------------
+      // Function to call output of spin pumping of atomic data
+      //------------------------------------------------------------------------
+      void output_atomistic_spin_pumping(const uint64_t config_file_counter,  // counter of output files
+                                       const std::vector<double>& moments_array); // atomistic magnetic moments (bohr magnetons)
 
       //-----------------------------------------------------------------
       // Function to output atomic resolution dipole field

@@ -14,6 +14,7 @@
 #include "vio.hpp"
 
 // Vampire headers
+#include "sim.hpp"
 #include "spinpumping.hpp"
 
 // spintransport module headers
@@ -74,9 +75,9 @@ void update(const unsigned int num_local_atoms,            // number of local at
    // update counter for spin pumping output
    const uint64_t tmp_counter = spin_pumping::internal::config_counter-1;
    // Output atoms only
-   if(spin_pumping::internal::output_atomistic_spin_pumping_flag){ spin_pumping::internal::output_atomistic_spin_pumping(tmp_counter);}
+   if(spin_pumping::internal::output_atomistic_spin_pumping_flag){ spin_pumping::internal::output_atomistic_spin_pumping(tmp_counter,atoms_m_spin_array);}
    // Output cells only
-   if(spin_pumping::internal::output_cells_spin_pumping_flag){ spin_pumping::internal::output_atomistic_spin_pumping(tmp_counter);}
+   if(spin_pumping::internal::output_cells_spin_pumping_flag){ spin_pumping::internal::output_cells_spin_pumping(tmp_counter);}
 
    return;
 
