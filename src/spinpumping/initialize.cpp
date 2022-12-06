@@ -78,7 +78,7 @@ namespace spin_pumping{
       // If enabled, output calculated atomistic coordinates and moments (passing local values)
       if(spin_pumping::internal::output_atomistic_spin_pumping_flag) {
          // zlog << zTs() << "Outputting atomistic coordinates for atomistic calculation of spin pumping" << std::endl;
-         spin_pumping::internal::output_atomistic_coordinates(num_atoms, atoms_x_coord_array, atoms_y_coord_array, atoms_z_coord_array, atoms_m_spin_array);
+         spin_pumping::internal::output_atomistic_coordinates(atoms_x_coord_array, atoms_y_coord_array, atoms_z_coord_array);
       }
       // If enabled, output calculated atomistic coordinates and moments (passing local values)
       if(spin_pumping::internal::output_cells_spin_pumping_flag) {
