@@ -225,7 +225,7 @@ $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $(OPTIONS) $<
 
 serial-llvm-debug: $(LLVMDB_OBJECTS)
-	$(LLVM) $(LLVM_DBLFLAGS) $(LIBS) $(LLVMDB_OBJECTS) -o $(EXECUTABLE)
+	$(LLVM) $(LLVM_DBLFLAGS) $(LIBS) $(LLVMDB_OBJECTS) -o $(EXECUTABLE)-debug
 
 $(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
 	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $(OPTIONS) $<
