@@ -149,7 +149,7 @@ void create::internal::geometry(std::vector<cs::catom_t>& catom_array){
                // make sure atoms are within their material heights, is in the polygon, and has the same unit cell category as the corresponding atom
                if(z >= mat_min[mat] && z <  mat_max[mat] &&
 						vmath::point_in_polygon2(x,y,px,py,geo) &&
-                  catom_array[atom].uc_id == static_cast<uint64_t>(create::internal::mp[mat].unit_cell_category) && // make sure unit cell category is preserved
+                  catom_array[atom].uc_category == static_cast<uint64_t>(create::internal::mp[mat].unit_cell_category) && // make sure unit cell category is preserved
 						create::internal::mp[mat].geometry // define by geometry
 					){
                   catom_array[atom].material=mat;
