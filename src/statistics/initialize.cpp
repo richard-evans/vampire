@@ -219,6 +219,13 @@ namespace stats{
       if(stats::calculate_grain_susceptibility)    stats::grain_susceptibility.initialize(stats::grain_magnetization);
       if(stats::calculate_material_susceptibility) stats::material_susceptibility.initialize(stats::material_magnetization);
 
+      //------------------------------------------------------------------------
+      // system spin length
+      //------------------------------------------------------------------------
+      if(stats::calculate_system_spin_length)      stats::system_spin_length.initialize(stats::system_magnetization);
+      if(stats::calculate_material_spin_length)    stats::material_spin_length.initialize(stats::material_magnetization);
+      if(stats::calculate_height_spin_length)      stats::height_spin_length.initialize(stats::height_magnetization);
+
       return;
 
    }

@@ -58,8 +58,8 @@ sim:integrator = lsf-mc
 # Data output
 #------------------------------------------
 output:temperature
-output:mean-magnetisation-length
-output:material-mean-magnetisation-length
+output:mean-spin-length
+#output:material-mean-magnetisation
 output:output-rate = 1
 
 #------------------------------------------

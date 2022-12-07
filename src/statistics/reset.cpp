@@ -58,6 +58,11 @@ namespace stats{
          if(stats::calculate_grain_susceptibility)    stats::grain_susceptibility.reset_averages();
          if(stats::calculate_material_susceptibility) stats::material_susceptibility.reset_averages();
 
+         // reset spin length statistics
+         if(stats::calculate_system_spin_length)      stats::system_spin_length.reset_averages();
+         if(stats::calculate_material_spin_length)    stats::material_spin_length.reset_averages();
+         if(stats::calculate_height_spin_length)      stats::height_spin_length.reset_averages();
+
       }
 
       return;

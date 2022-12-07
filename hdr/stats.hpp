@@ -81,6 +81,10 @@ namespace stats
 	extern bool calculate_grain_susceptibility;
 	extern bool calculate_material_susceptibility;
 
+   extern bool calculate_system_spin_length;
+   extern bool calculate_material_spin_length;
+   extern bool calculate_height_spin_length;
+
 	// forward declaration of friend classes
 	class susceptibility_statistic_t;
 	class specific_heat_statistic_t;
@@ -156,6 +160,7 @@ namespace stats
 
       friend class susceptibility_statistic_t;
       friend class standard_deviation_statistic_t;
+      friend class spin_length_statistic_t;
       public:
          magnetization_statistic_t (std::string n):initialized(false){
            name = n;
@@ -280,6 +285,31 @@ namespace stats
          std::string name;
 
    };
+
+   //----------------------------------
+   // Spin Length Class definition
+   //----------------------------------
+   class spin_length_statistic_t{
+
+      public:
+         spin_length_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
+         void initialize(magnetization_statistic_t& mag_stat);
+         void calculate(const std::vector<double>& magnetization);
+         void reset_averages();
+         std::string output_mean_spin_length(const double temperature,bool header);
+
+      private:
+         bool initialized;
+         int num_elements;
+         double mean_counter;
+         std::vector<double> mean_spin_length;
+         std::vector<double> mean_spin_length_squared;
+         std::string name;
+
+   };
+
    //----------------------------------
    // Standard Deviation of magnetisation in time Class definition
    //----------------------------------
@@ -334,6 +364,10 @@ namespace stats
    extern susceptibility_statistic_t material_susceptibility;
 
    extern standard_deviation_statistic_t material_standard_deviation;
+
+   extern spin_length_statistic_t system_spin_length;
+   extern spin_length_statistic_t material_spin_length;
+   extern spin_length_statistic_t height_spin_length;
 
 }
 

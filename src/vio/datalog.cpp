@@ -282,7 +282,17 @@ namespace vout{
 				vout::z_track_pos(stream,header);
 				break;
 			case 72:
-			   vout::fractional_electric_field_strength(stream, header);
+			    vout::fractional_electric_field_strength(stream, header);
+			   	break;
+			case 73:
+      			vout::mean_system_spin_length(stream,header);
+      			break;
+      		case 74:
+				vout::mean_material_spin_length(stream,header);
+				break;
+			case 75:
+				vout::mean_height_spin_length(stream,header);
+				break;
 			case 999: //AJN
 				vout::standard_deviation(stream,header);
 				break;
