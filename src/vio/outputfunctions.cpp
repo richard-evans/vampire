@@ -472,17 +472,17 @@ namespace vout{
 
    // Output Function 73 - with Header
    void mean_system_spin_length(std::ostream& stream, bool header){
-      stream << stats::system_spin_length.output_mean_spin_length(sim::temperature,header);
+      stream << stats::system_spin_length.output_mean_spin_length(header);
    }
 
    // Output Function 74 - with Header
    void mean_material_spin_length(std::ostream& stream, bool header){
-      stream << stats::material_spin_length.output_mean_spin_length(sim::temperature,header);
+      stream << stats::material_spin_length.output_mean_spin_length(header);
    }
 
    // Output Function 75 - with Header
    void mean_height_spin_length(std::ostream& stream, bool header){
-      stream << stats::height_spin_length.output_mean_spin_length(sim::temperature,header);
+      stream << stats::height_spin_length.output_mean_spin_length(header);
    }
 
 }

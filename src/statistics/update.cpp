@@ -78,9 +78,9 @@ namespace stats{
             if(stats::calculate_material_susceptibility)      stats::material_susceptibility.calculate(stats::material_magnetization.get_magnetization());
 
             // update spin length statistics
-            if(stats::calculate_system_spin_length)           stats::system_spin_length.calculate(stats::system_magnetization.get_magnetization());
-            if(stats::calculate_material_spin_length)         stats::material_spin_length.calculate(stats::material_magnetization.get_magnetization());
-            if(stats::calculate_height_spin_length)           stats::height_spin_length.calculate(stats::height_magnetization.get_magnetization());
+            if(stats::calculate_system_spin_length)           stats::system_spin_length.calculate_spin_length(sx,sy,sz);
+            if(stats::calculate_material_spin_length)         stats::material_spin_length.calculate_spin_length(sx,sy,sz);
+            if(stats::calculate_height_spin_length)           stats::height_spin_length.calculate_spin_length(sx,sy,sz);
 
          }
 

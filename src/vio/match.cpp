@@ -1438,27 +1438,24 @@ namespace vin{
         //--------------------------------------------------------------------
         test="mean-spin-length";
         if(word==test){
-           // Set flags for calculations of spin length and magnetization
+           // Set flags for calculation of spin length
            stats::calculate_system_spin_length=true;
-           stats::calculate_system_magnetization=true;
            output_list.push_back(73);
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="material-mean-spin-length";
         if(word==test){
-           // Set flags for calculations of spin length and magnetization
+           // Set flags for calculation of spin length
            stats::calculate_material_spin_length=true;
-           stats::calculate_material_magnetization=true;
            output_list.push_back(74);
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="mean-height-spin-length";
         if(word==test){
-           // Set flags for calculations of spin length and magnetization
+           // Set flags for calculation of spin length
            stats::calculate_height_spin_length=true;
-           stats::calculate_height_magnetization=true;
            output_list.push_back(75);
            return EXIT_SUCCESS;
         }

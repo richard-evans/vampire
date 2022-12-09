@@ -295,17 +295,22 @@ namespace stats
          spin_length_statistic_t (std::string n):initialized(false){
            name = n;
          };
-         void initialize(magnetization_statistic_t& mag_stat);
-         void calculate(const std::vector<double>& magnetization);
+         bool is_initialized();
+         void set_mask(const int mask_size, std::vector<int> inmask);
+         void get_mask(std::vector<int>& out_mask);
+         void calculate_spin_length(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz);
          void reset_averages();
-         std::string output_mean_spin_length(const double temperature,bool header);
+         std::string output_mean_spin_length(bool header);
 
       private:
          bool initialized;
-         int num_elements;
+         int num_atoms;
+         int mask_size;
          double mean_counter;
+         std::vector<int> mask;
+         std::vector<double> spin_length;
          std::vector<double> mean_spin_length;
-         std::vector<double> mean_spin_length_squared;
+         std::vector<int> zero_list;
          std::string name;
 
    };
