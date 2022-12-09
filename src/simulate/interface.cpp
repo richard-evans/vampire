@@ -352,6 +352,8 @@ namespace sim{
       test="lsf-second-order-coefficient"; // Landau coefficient A
       if( word==test ){
          double a_l=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(a_l, word, line, prefix, unit, "energy", -1.0e-19, 1.0e-19,"material"," < +/- 1.0e-19");
          sim::internal::mp[super_index].lsf_second_order_coefficient.set(a_l);
          return true;
       }
@@ -359,6 +361,8 @@ namespace sim{
       test="lsf-fourth-order-coefficient"; // Landau coefficient B
       if( word==test ){
          double b_l=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(b_l, word, line, prefix, unit, "energy", -1.0e-19, 1.0e-19,"material"," < +/- 1.0e-19");
          sim::internal::mp[super_index].lsf_fourth_order_coefficient.set(b_l);
          return true;
       }
@@ -366,6 +370,8 @@ namespace sim{
       test="lsf-sixth-order-coefficient"; // Landau coefficient C
       if( word==test ){
          double c_l=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(c_l, word, line, prefix, unit, "energy", -1.0e-19, 1.0e-19,"material"," < +/- 1.0e-19");
          sim::internal::mp[super_index].lsf_sixth_order_coefficient.set(c_l);
          return true;
       }
