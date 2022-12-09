@@ -31,6 +31,40 @@ namespace montecarlo{
         // Initialize spin length to 1.0
         mod_S.resize(atoms::num_atoms,1.0);
 
+        // Function to check if Landau coefficients are reasonably set
+        std::vector<double> spin_length_init_container;
+        std::vector<int> sample_atoms;
+        bool complete_flag = false;
+        int current_material = 0;
+        for(int atom=0; complete_flag==false; atom++){
+            if(atoms::type_array[atom]==current_material){
+               sample_atoms.push_back(atom);
+               current_material++;
+            }
+            if(sample_atoms.size()==internal::num_materials || atom==atoms::num_atoms-1) complete_flag = true;
+        }
+        spin_length_init_container.resize(500,0.0);
+        for(int imaterial=0; imaterial<internal::num_materials; imaterial++){
+            const double A = sim::internal::lsf_second_order_coefficient[imaterial];
+            const double B = sim::internal::lsf_fourth_order_coefficient[imaterial];
+            const double C = sim::internal::lsf_sixth_order_coefficient[imaterial];
+            const double J = exchange::single_spin_energy(sample_atoms[imaterial],0.0,0.0,1.0);
+
+            for(double sl=0.0; sl<500.0; sl++){
+                const double mods = sl/100;
+                const double landau_energy = A*mods*mods + B*mods*mods*mods*mods + C*mods*mods*mods*mods*mods*mods + J*internal::mu_s_SI[imaterial]*mods;
+                spin_length_init_container[sl] = landau_energy;
+            }
+
+            const int index = std::distance(std::begin(spin_length_init_container), std::min_element(std::begin(spin_length_init_container), std::end(spin_length_init_container)));
+            if(index<=70 || index >=130){
+               terminaltextcolor(RED);
+               std::cerr << "Error in LSF-MC integration! - Landau coefficients set for material " << imaterial+1 << " initialise spin length too far from |S|=1!" << std::endl;
+               terminaltextcolor(WHITE);
+               err::vexit();
+            }
+        }
+
         mc_set=true;
 
     }
@@ -51,7 +85,7 @@ namespace montecarlo{
         if(p >= 0.5) factory *= -1;
         p = mtrandom::grnd();
         if(p >= 0.5) factorz *= -1;
-        
+
         new_spin[0] = old_spin[0] + factorx * angle;
         new_spin[1] = old_spin[1] + factory * angle;
         new_spin[2] = old_spin[2] + factorz * angle;
