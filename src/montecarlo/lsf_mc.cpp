@@ -36,7 +36,7 @@ namespace montecarlo{
         std::vector<int> sample_atoms;
         bool complete_flag = false;
         int current_material = 0;
-        for(int atom=0; complete_flag==false; atom++){
+        for(int atom=0; complete_flag==false; atom++){ // Loop over all atoms until a sample atom is found for all materials
             if(atoms::type_array[atom]==current_material){
                sample_atoms.push_back(atom);
                current_material++;
@@ -48,16 +48,18 @@ namespace montecarlo{
             const double A = sim::internal::lsf_second_order_coefficient[imaterial];
             const double B = sim::internal::lsf_fourth_order_coefficient[imaterial];
             const double C = sim::internal::lsf_sixth_order_coefficient[imaterial];
-            const double J = exchange::single_spin_energy(sample_atoms[imaterial],0.0,0.0,1.0);
+            const double J = exchange::single_spin_energy(sample_atoms[imaterial],0.0,0.0,1.0); // Assume S=(0,0,1) when calculating initial exchange energy
 
+            // Iterate spin length values between |S|= 0 - 5
             for(double sl=0.0; sl<500.0; sl++){
                 const double mods = sl/100;
                 const double landau_energy = A*mods*mods + B*mods*mods*mods*mods + C*mods*mods*mods*mods*mods*mods + J*internal::mu_s_SI[imaterial]*mods;
                 spin_length_init_container[sl] = landau_energy;
             }
 
+            // Index of lowest energy value
             const int index = std::distance(std::begin(spin_length_init_container), std::min_element(std::begin(spin_length_init_container), std::end(spin_length_init_container)));
-            if(index<=70 || index >=130){
+            if(index<=70 || index >=130){ // If |S| is between 0.7 - 1.3, accept coefficients. Otherwise, project error message
                terminaltextcolor(RED);
                std::cerr << "Error in LSF-MC integration! - Landau coefficients set for material " << imaterial+1 << " initialise spin length too far from |S|=1!" << std::endl;
                terminaltextcolor(WHITE);

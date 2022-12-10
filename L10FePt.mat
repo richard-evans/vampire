@@ -17,7 +17,7 @@ material[1]:lsf-sixth-order-coefficient=1.14331e-20
 
 #properties for material 2
 material[2]:material-name=Pt
-material[2]:lsf-second-order-coefficient=4.5512e-20
+material[2]:lsf-second-order-coefficient=4.5512e-21
 material[2]:lsf-fourth-order-coefficient=0
 material[2]:lsf-sixth-order-coefficient=0
 material[2]:atomic-spin-moment=0.36 !muB
