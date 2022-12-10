@@ -843,6 +843,21 @@ int integrate_mpi(uint64_t n_steps){
 			}
 			break;
 
+		case 6: // LSF
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+			// Select CUDA version if supported
+				#ifdef CUDA
+					//sim::LSF_cuda();
+				#else
+					sim::LSF_mpi();
+				#endif
+			#endif
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
 		default:{
 			terminaltextcolor(RED);
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;

@@ -52,14 +52,14 @@ sim:total-time-steps = 1000
 #------------------------------------------
 sim:program = curie-temperature
 #sim:program = time-series
-sim:integrator = lsf-mc
+sim:integrator = lsf
 
 #------------------------------------------
 # Data output
 #------------------------------------------
 output:temperature
 output:material-mean-spin-length
-#output:material-mean-magnetisation
+output:material-mean-magnetisation-length
 output:output-rate = 1
 
 #------------------------------------------

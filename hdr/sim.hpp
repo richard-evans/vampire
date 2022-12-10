@@ -194,10 +194,12 @@ namespace sim{
 	extern int LLG_Midpoint();
 	extern int LLG_Midpoint_mpi();
 	extern int LLG_Midpoint_cuda();
-
+	extern int LSF_mpi();
+	extern int LSF_cuda();
 
 	// Integrator initialisers
 	extern int LLGinit();
+	extern int LSFinit();
 
 	// Field and energy functions
 	extern double calculate_spin_energy(const int atom);

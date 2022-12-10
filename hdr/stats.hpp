@@ -311,6 +311,7 @@ namespace stats
          std::vector<double> spin_length;
          std::vector<double> mean_spin_length;
          std::vector<int> zero_list;
+         std::vector<double> normalisation;
          std::string name;
 
    };

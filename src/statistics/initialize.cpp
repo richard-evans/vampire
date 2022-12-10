@@ -254,6 +254,10 @@ namespace stats{
             mask[atom] = height_category_array[atom];
             if(mask[atom]>max_height) max_height=mask[atom];
          }
+         // Reduce maximum height on all CPUS
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &max_height, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+         #endif
 
          // reassign all non-magnetic atoms to last mask
          for(int atom=0; atom < stats::num_atoms; ++atom){

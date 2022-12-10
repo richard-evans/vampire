@@ -31,5 +31,9 @@ namespace LSF_arrays{
 
 	extern std::vector <double> mod_S;
 
+	extern std::vector <double> tx;
+	extern std::vector <double> ty;
+	extern std::vector <double> tz;
+
 }
 #endif /*LSF_H_*/

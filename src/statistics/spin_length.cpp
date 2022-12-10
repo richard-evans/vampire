@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <iomanip>
+
 // Vampire headers
 #include "errors.hpp"
 #include "stats.hpp"
@@ -11,6 +13,8 @@
 #include "vio.hpp"
 #include "constants.hpp"
 #include "atoms.hpp"
+#include "errors.hpp"
+#include "sim.hpp"
 
 namespace stats{
 
@@ -44,6 +48,18 @@ void spin_length_statistic_t::set_mask(const int in_mask_size, std::vector<int> 
    mask=in_mask; // copy contents of vector
    spin_length.resize(in_mask_size, 0.0);
    mean_spin_length.resize(in_mask_size, 0.0);
+   normalisation.resize(in_mask_size, 0.0);
+
+   // calculate number of spins in each mask
+   for(int atom=0; atom<num_atoms; ++atom){
+      const int mask_id = mask[atom]; // get mask id
+      normalisation[mask_id] += 1.0;
+   }
+
+   // Calculate normalisation for all CPUs
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &normalisation[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #endif
 
    // determine mask id's with no atoms
    std::vector<int> num_atoms_in_mask(in_mask_size,0);
@@ -52,6 +68,11 @@ void spin_length_statistic_t::set_mask(const int in_mask_size, std::vector<int> 
       // add atoms to mask
       num_atoms_in_mask[mask_id]++;
    }
+
+   // Reduce on all CPUs
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &num_atoms_in_mask[0], mask_size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   #endif
 
    // Check for no atoms in mask on any CPU
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -92,17 +113,23 @@ void spin_length_statistic_t::calculate_spin_length(const std::vector<double>& s
 
    // calculate contributions of spins to spin length
    for(int atom=0; atom<num_atoms; ++atom){
-
       const int mask_id = mask[atom]; // get mask id
-      spin_length[mask_id] = sqrt(sx[atom]*sx[atom] + sy[atom]*sy[atom] + sz[atom]*sz[atom]);
+      spin_length[mask_id] += sqrt(sx[atom]*sx[atom] + sy[atom]*sy[atom] + sz[atom]*sz[atom]);
    }
 
+   // Reduce on all CPUS
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &spin_length[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #endif
+
    // Zero empty mask id's
-   for(unsigned int id=0; id<zero_list.size(); ++id) mean_spin_length[zero_list[id]]=0.0;
+   for(unsigned int id=0; id<zero_list.size(); ++id) spin_length[zero_list[id]]=0.0;
 
    // Add spin length to mean
    const int slsize = spin_length.size();
-   for(int idx=0; idx<slsize; ++idx) mean_spin_length[idx] += spin_length[idx];
+   for(int idx=0; idx<slsize; ++idx){ 
+      mean_spin_length[idx] += spin_length[idx];
+   }
    mean_counter+=1.0;
 
    return;
@@ -138,17 +165,18 @@ std::string spin_length_statistic_t::output_mean_spin_length(bool header){
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
    vout::fixed_width_output result(res,vout::fw_size);
+
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
    // loop over all spin length value(s)
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-   if(header){
-      result << name + std::to_string(mask_id) + "|S|";
-   }
-   else{
-      result << mean_spin_length[mask_id]*ic;
-   }
+      if(header){
+         result << name + std::to_string(mask_id) + "|S|";
+      }
+      else{
+         result << mean_spin_length[mask_id]*ic/normalisation[mask_id];
+      }
    }
 
    return result.str();

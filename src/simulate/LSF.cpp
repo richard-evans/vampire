@@ -22,9 +22,6 @@
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
 
-// RNG seed increments every LSF step
-int seeding = 0;
-
 namespace LSF_arrays{
 
    // Local arrays for LSF integration
@@ -52,6 +49,10 @@ namespace LSF_arrays{
    bool LSF_set=false;
 
    std::vector <double> mod_S;
+
+   std::vector <double> tx;
+   std::vector <double> ty;
+   std::vector <double> tz;
 
 }
 namespace sim{
@@ -83,6 +84,10 @@ int LSFinit(){
 	z_heun_array.resize(atoms::num_atoms,0.0);
 
    mod_S.resize(atoms::num_atoms,1.0);
+
+   tx.resize(atoms::num_atoms,0.0);
+   ty.resize(atoms::num_atoms,0.0);
+   tz.resize(atoms::num_atoms,0.0);
 
    // Disable external thermal field calculations
    sim::hamiltonian_simulation_flags[3]=0;
@@ -190,14 +195,13 @@ void lsf_step(){
 		z_initial_spin_array[atom]=atoms::z_spin_array[atom];
    }
 
-   std::vector <double> tx(num_atoms), ty(num_atoms), tz(num_atoms);
-
-   //generate (tx.begin(),tx.begin()+num_atoms, mtrandom::gaussian);
-   //generate (ty.begin(),ty.begin()+num_atoms, mtrandom::gaussian);
-   //generate (tz.begin(),tz.begin()+num_atoms, mtrandom::gaussian);
-
    // Thermal noise based on Gaussian function
    double sigma = ( sqrt( ( 2.0 * kB * sim::temperature * mp::gamma_SI) / ( mp::dt_SI ) ) );
+   generate (tx.begin(),tx.begin()+num_atoms, mtrandom::gaussian);
+   generate (ty.begin(),ty.begin()+num_atoms, mtrandom::gaussian);
+   generate (tz.begin(),tz.begin()+num_atoms, mtrandom::gaussian);
+
+   /*
    std::mt19937 temperature(seeding);
    for (int atom = 0; atom < num_atoms; atom++){
 
@@ -209,6 +213,7 @@ void lsf_step(){
       tz[atom]=randomTemp(temperature);
 
    }
+   */
 
    // Calculate first GSE step
    for (int atom = 0; atom < num_atoms; atom++){
@@ -302,9 +307,6 @@ void lsf_step(){
 
       mod_S[atom] = sqrt(sx*sx + sy*sy + sz*sz);
    }
-
-   // Increment seeding
-   seeding++;
 
    return;
 
