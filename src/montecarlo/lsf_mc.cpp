@@ -16,7 +16,6 @@
 #include "sim.hpp"
 #include "vmath.hpp"
 #include "vio.hpp"
-#include "internal.hpp"
 #include "lsf_mc.hpp"
 #include "exchange.hpp"
 #include "../simulate/internal.hpp"

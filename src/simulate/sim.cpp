@@ -857,6 +857,23 @@ int integrate_mpi(uint64_t n_steps){
 				sim::internal::increment_time();
 			}
 			break;
+		
+		case 7: // LSF-Montecarlo
+
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				#ifdef MPICF
+               if(montecarlo::lsf_mc_parallel_initialized == false) {
+                  montecarlo::lsf_mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                                               	   vmpi::min_dimensions, vmpi::max_dimensions);
+               }
+               montecarlo::lsf_mc_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                                            atoms::type_array);
+            #endif
+
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
 
 		default:{
 			terminaltextcolor(RED);

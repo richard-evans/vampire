@@ -9,6 +9,8 @@ namespace montecarlo{
 
     extern bool mc_set;
 
+    extern void mcinit();
+
 }
 #endif /*LSF_MC_H_*/
 
