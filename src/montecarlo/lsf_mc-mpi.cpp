@@ -1,14 +1,3 @@
-//------------------------------------------------------------------------------
-//
-//   This file is part of the VAMPIRE open source package under the
-//   Free BSD licence (see licence file for details).
-//
-//   (c) Richard Evans and Adam Laverack 2017. All rights reserved.
-//
-//   Email: richard.evans@york.ac.uk
-//
-//------------------------------------------------------------------------------
-//
 #ifdef MPICF
 // Standard Libraries
 #include <cmath>
