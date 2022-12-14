@@ -92,6 +92,7 @@ int LSFinit(){
    // Disable external thermal field calculations
    sim::hamiltonian_simulation_flags[3]=0;
 
+   /*
    // Function to check if Landau coefficients are reasonably set
    std::vector<double> spin_length_init_container;
    std::vector<int> sample_atoms;
@@ -127,6 +128,7 @@ int LSFinit(){
          err::vexit();
       }
    }
+   */
 
    LSF_set = true;
 

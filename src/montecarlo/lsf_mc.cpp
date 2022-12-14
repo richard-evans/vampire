@@ -30,6 +30,7 @@ namespace montecarlo{
         // Initialize spin length to 1.0
         mod_S.resize(atoms::num_atoms,1.0);
 
+        /*
         // Function to check if Landau coefficients are reasonably set
         std::vector<double> spin_length_init_container;
         std::vector<int> sample_atoms;
@@ -65,6 +66,7 @@ namespace montecarlo{
                err::vexit();
             }
         }
+        */
 
         mc_set=true;
 

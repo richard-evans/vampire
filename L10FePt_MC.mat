@@ -1,0 +1,26 @@
+#number of materials
+material:num-materials=2
+
+#properties for material 1
+material[1]:material-name=Fe
+material[1]:atomic-spin-moment=3.62 !muB
+material[1]:damping-constant=0.01
+material[1]:uniaxial-anisotropy-constant=-6.8687476e-23
+material[1]:temperature-rescaling-exponent = 1.75
+material[1]:temperature-rescaling-curie-temperature = 700.0
+
+#properties for material 2
+material[2]:material-name=Pt
+material[2]:non-magnetic=remove
+
+material[1]:lsf-second-order-coefficient=-7.91306e-20 
+material[1]:lsf-fourth-order-coefficient=3.03004e-20
+material[1]:lsf-sixth-order-coefficient=1.14331e-20
+
+#material[2]:lsf-second-order-coefficient=4.5512e-21
+#material[2]:lsf-fourth-order-coefficient=0
+#material[2]:lsf-sixth-order-coefficient=0
+
+
+
+
