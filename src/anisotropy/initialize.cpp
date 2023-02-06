@@ -410,11 +410,16 @@ namespace anisotropy{
       //---------------------------------------------------------------------
       if(internal::enable_lattice_anisotropy){
 
+
          // arrays for storing unrolled parameters for lattice anisotropy
+         internal::klattice.resize(num_materials);
          internal::klattice_array.resize(num_materials); // anisoptropy constant
 
          // loop over all materials and set up lattice anisotropy constants
          for(int m = 0; m < num_materials; m++){
+
+            // save anisotropy constant to unrolled array in units of tesla
+            internal::klattice[m] = internal::mp[m].k_lattice * inverse_mu_s[m];
 
             // set up interpolation between temperature points
             internal::mp[m].lattice_anisotropy.set_interpolation_table();

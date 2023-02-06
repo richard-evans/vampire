@@ -116,7 +116,8 @@ namespace anisotropy{
       double neel_exponential_factor         = 5.53; // F value for range dependence of Neel anisotropy (default assumes nnn fraction of 10% of nn value)
 
       // arrays for storing unrolled parameters for lattice anisotropy
-      std::vector<double> klattice_array(0); // anisoptropy constant
+      std::vector<double> klattice(0); // anisotropy constant
+      std::vector<double> klattice_array(0); // array for unrolled anisotropy including temperature dependence
 
    } // end of internal namespace
 
