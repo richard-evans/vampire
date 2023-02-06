@@ -419,6 +419,25 @@ namespace vout{
    void material_mean_total_energy(std::ostream& stream, bool header){
       stream << stats::material_energy.output_mean_energy(stats::total,header);
    }
+   //Output Function 65
+	void system_spin_temperature(std::ostream& stream, bool header) {
+		stream << stats::system_spin_temperature.output_spin_temperature(header);
+		
+	}
+	//Output Function 66
+	void material_spin_temperature(std::ostream& stream, bool header) {
+		stream << stats::material_spin_temperature.output_spin_temperature(header);
+		
+	}
+	//Output Function 67
+	void mean_system_spin_temperature(std::ostream& stream, bool header) {
+		stream << stats::system_spin_temperature.output_mean_spin_temperature(header);
+	}
+
+	//Output Function 68
+	void mean_material_spin_temperature(std::ostream& stream, bool header) {
+		stream << stats::material_spin_temperature.output_mean_spin_temperature(header);
+	}
 
    // Output Function 65
    void resistance(std::ostream& stream, bool header){

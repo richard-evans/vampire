@@ -142,7 +142,10 @@ void mm::calculate_llg_external_fields(const double temperature,
                                        std::vector<double>& z_array,
                                        std::vector<double>& x_total_external_field_array,
                                        std::vector<double>& y_total_external_field_array,
-                                       std::vector<double>& z_total_external_field_array){
+                                       std::vector<double>& z_total_external_field_array,
+                                       std::vector<double>& thermal_x_field,
+                                       std::vector<double>& thermal_y_field,
+                                       std::vector<double>& thermal_z_field){
 
    // temporary constants for brevity
    const double kB = constants::kB;
@@ -156,9 +159,9 @@ void mm::calculate_llg_external_fields(const double temperature,
       // calculate width of thermal field
       const double sigma_perp = sqrt( 2.0 * kB * temperature * mm::alpha_perp[cell] / ( mm::ms[cell] * mp::dt ) );
 
-      x_total_external_field_array[cell] = mm::ext_field[0] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_x[cell];
-      y_total_external_field_array[cell] = mm::ext_field[1] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_y[cell];
-      z_total_external_field_array[cell] = mm::ext_field[2] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_z[cell];
+      thermal_x_field[cell] = mm::ext_field[0] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_x[cell];
+      thermal_y_field[cell] = mm::ext_field[1] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_y[cell];
+      thermal_z_field[cell] = mm::ext_field[2] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_z[cell];
 
    //   std::cout << pinning_field_y[cell] <<std::endl;
      // optionally add dipole field

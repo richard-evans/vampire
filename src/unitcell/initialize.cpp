@@ -51,6 +51,7 @@ namespace unitcell{
       else if(uc::internal::crystal_structure == "mn2au"          ) uc::internal::build_mn2au(                  unit_cell );
       else if(uc::internal::crystal_structure == "NdFeB"          ) uc::internal::build_NdFeB(                  unit_cell );
       else if(uc::internal::crystal_structure == "rocksalt"       ) uc::internal::build_rock_salt(              unit_cell );
+      else if(uc::internal::crystal_structure == "heusler"        ) uc::internal::build_heusler(                unit_cell );
       else if(uc::internal::crystal_structure == "spinel"         ) uc::internal::build_spinel(                 unit_cell );
       else if(uc::internal::crystal_structure == "spinel-layered" ) uc::internal::build_spinel_layered(         unit_cell );
       else if(uc::internal::crystal_structure == "SmFeN"          ) uc::internal::build_SmFeN(                  unit_cell );

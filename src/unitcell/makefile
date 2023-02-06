@@ -29,8 +29,6 @@ kagome.o \
 mn2au.o \
 nd2fe14b.o\
 rocksalt.o \
-rutile.o \
-smfe12n.o\
 spinel.o \
 spinel-layered.o \
 verify.o

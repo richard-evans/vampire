@@ -329,6 +329,42 @@ namespace vcuda{
          std::copy(::atoms::z_total_external_field_array.begin(), ::atoms::z_total_external_field_array.end(), tmp_buffer.begin());
          cudaMemcpy(cu::d_z_external_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice); */
 
+         cudaMemcpy(cu::d_z_external_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+
+
+         cudaMalloc((void**)&cu::d_thermal_x_field, num_bytes);
+         cudaMalloc((void**)&cu::d_thermal_y_field, num_bytes);
+         cudaMalloc((void**)&cu::d_thermal_z_field, num_bytes);
+         
+         std::copy(::atoms::thermal_x_field.begin(), ::atoms::thermal_x_field.end(), temp_buffer.begin());
+         cudaMemcpy(cu::d_thermal_x_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+          std::copy(::atoms::thermal_y_field.begin(), ::atoms::thermal_y_field.end(), temp_buffer.begin());
+         cudaMemcpy(cu::d_thermal_y_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+          std::copy(::atoms::thermal_z_field.begin(), ::atoms::thermal_z_field.end(), temp_buffer.begin());
+         cudaMemcpy(cu::d_thermal_z_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+
+         /*cu::x_total_external_field_array.resize(::atoms::num_atoms);
+         cu::y_total_external_field_array.resize(::atoms::num_atoms);
+         cu::z_total_external_field_array.resize(::atoms::num_atoms);
+
+         thrust::copy(
+               ::atoms::x_total_external_field_array.begin(),
+               ::atoms::x_total_external_field_array.end(),
+               cu::x_total_external_field_array.begin()
+               );
+
+         thrust::copy(
+               ::atoms::y_total_external_field_array.begin(),
+               ::atoms::y_total_external_field_array.end(),
+               cu::y_total_external_field_array.begin()
+               );
+
+         thrust::copy(
+               ::atoms::z_total_external_field_array.begin(),
+               ::atoms::z_total_external_field_array.end(),
+               cu::z_total_external_field_array.begin()
+               );
+         */
          /*
           * Allocate memory and transfer any existing
           * initial data for the dipolar field

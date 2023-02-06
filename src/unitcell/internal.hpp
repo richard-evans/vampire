@@ -73,12 +73,8 @@ namespace unitcell{
       void build_honeycomb_alpha(unitcell::unit_cell_t& unit_cell);
       void build_honeycomb_beta(unitcell::unit_cell_t& unit_cell);
       void build_kagome(unitcell::unit_cell_t& unit_cell);
-      void build_heusler(unitcell::unit_cell_t& unit_cell);
-      void build_mn2au(unitcell::unit_cell_t& unit_cell);
-      void build_NdFeB(unitcell::unit_cell_t& unit_cell);
       void build_rock_salt(unitcell::unit_cell_t& unit_cell);
-      void build_SmFeN(unitcell::unit_cell_t& unit_cell);
-      void build_rutile(unitcell::unit_cell_t& unit_cell);
+      void build_heusler(unitcell::unit_cell_t& unit_cell);
       void build_spinel(unitcell::unit_cell_t& unit_cell);
       void build_spinel_layered(unitcell::unit_cell_t& unit_cell);
 

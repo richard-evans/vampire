@@ -79,13 +79,14 @@ void calculate_spin_fields(const int start_index,const int end_index){
 	///======================================================
 
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "calculate_spin_fields has been called" << std::endl;}
+	if(err::check==true) {std::cout << "calculate_spin_fields has been called" << std::endl;}
 
 	// Initialise Total Spin Fields to zero
 	fill (atoms::x_total_spin_field_array.begin()+start_index,atoms::x_total_spin_field_array.begin()+end_index,0.0);
 	fill (atoms::y_total_spin_field_array.begin()+start_index,atoms::y_total_spin_field_array.begin()+end_index,0.0);
 	fill (atoms::z_total_spin_field_array.begin()+start_index,atoms::z_total_spin_field_array.begin()+end_index,0.0);
 
+	
    //-----------------------------------------
 	// Calculate exchange Fields
    //-----------------------------------------
@@ -161,9 +162,17 @@ void calculate_external_fields(const int start_index,const int end_index){
 	}
    else if(program::program==13){
 
+  //reset thermal field arrays
+	fill (atoms::thermal_x_field.begin()+start_index,atoms::thermal_x_field.begin()+end_index,0.0);
+	fill (atoms::thermal_y_field.begin()+start_index,atoms::thermal_y_field.begin()+end_index,0.0);
+	fill (atoms::thermal_z_field.begin()+start_index,atoms::thermal_z_field.begin()+end_index,0.0);
+
+	if(sim::program==7) calculate_hamr_fields(start_index,end_index);
+   else if(sim::program==13){
+
       // Local thermal Fields
-      ltmp::get_localised_thermal_fields(atoms::x_total_external_field_array,atoms::y_total_external_field_array,
-            atoms::z_total_external_field_array, start_index, end_index);
+      ltmp::get_localised_thermal_fields(atoms::thermal_x_field,atoms::thermal_y_field,
+            atoms::thermal_z_field, start_index, end_index);
 
       // Applied Fields
       if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
@@ -316,18 +325,24 @@ int calculate_thermal_fields(const int start_index,const int end_index){
       sigma_prefactor.push_back(sqrt_T*mp::material[mat].H_th_sigma);
    }
 
-   generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-   generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-   generate (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+  //reset thermal field arrays
+	fill (atoms::thermal_x_field.begin()+start_index,atoms::thermal_x_field.begin()+end_index,0.0);
+	fill (atoms::thermal_y_field.begin()+start_index,atoms::thermal_y_field.begin()+end_index,0.0);
+	fill (atoms::thermal_z_field.begin()+start_index,atoms::thermal_z_field.begin()+end_index,0.0);
 
+	
+	generate (atoms::thermal_x_field.begin()+start_index,atoms::thermal_x_field.begin()+end_index, mtrandom::gaussian);
+  	generate (atoms::thermal_y_field.begin()+start_index,atoms::thermal_y_field.begin()+end_index, mtrandom::gaussian);
+    generate (atoms::thermal_z_field.begin()+start_index,atoms::thermal_z_field.begin()+end_index, mtrandom::gaussian);
+	
    for(int atom=start_index;atom<end_index;atom++){
 
       const int imaterial=atoms::type_array[atom];
       const double H_th_sigma = sigma_prefactor[imaterial];
 
-      atoms::x_total_external_field_array[atom] *= H_th_sigma;
-		atoms::y_total_external_field_array[atom] *= H_th_sigma;
-		atoms::z_total_external_field_array[atom] *= H_th_sigma;
+     	atoms::thermal_x_field[atom] *= H_th_sigma;
+		atoms::thermal_y_field[atom] *= H_th_sigma;
+		atoms::thermal_z_field[atom] *= H_th_sigma;
 	}
 
    return EXIT_SUCCESS;
@@ -358,6 +373,78 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
    }
 
    return 0;
+}
+
+void calculate_hamr_fields(const int start_index,const int end_index){
+
+	if(err::check==true){std::cout << "calculate_hamr_fields has been called" << std::endl;}
+
+	// Declare hamr variables
+	const double fwhm=200.0; // A
+	const double fwhm2=fwhm*fwhm;
+	const double px = sim::head_position[0];
+	const double py = sim::head_position[1];
+	const double DeltaT=sim::Tmax-sim::Tmin;
+
+	// declare head-field variables
+	const double H_bounds_min[2]={-400.0,-250.0}; // A
+	const double H_bounds_max[2]={-100.0,+250.0}; // A
+	const double H_osc_freq=200.0; // A
+	const double Hloc_min_x=sim::head_position[0]+H_bounds_min[0];
+	const double Hloc_min_y=sim::head_position[1]+H_bounds_min[1];
+	const double Hloc_max_x=sim::head_position[0]+H_bounds_max[0];
+	const double Hloc_max_y=sim::head_position[1]+H_bounds_max[1];
+	const double Hloc_parity_field=sim::H_applied*double(2*(int(sim::head_position[0]/H_osc_freq)%2)-1);
+	const double Hvecx=sim::H_vec[0];
+	const double Hvecy=sim::H_vec[1];
+	const double Hvecz=sim::H_vec[2];
+
+	// Add localised thermal field
+	generate (atoms::thermal_x_field.begin()+start_index,atoms::thermal_x_field.begin()+end_index, mtrandom::gaussian);
+  	generate (atoms::thermal_y_field.begin()+start_index,atoms::thermal_y_field.begin()+end_index, mtrandom::gaussian);
+    generate (atoms::thermal_z_field.begin()+start_index,atoms::thermal_z_field.begin()+end_index, mtrandom::gaussian);
+	
+	if(sim::head_laser_on){
+		for(int atom=start_index;atom<end_index;atom++){
+			const int imaterial=atoms::type_array[atom];
+			const double cx = atoms::x_coord_array[atom];
+			const double cy = atoms::y_coord_array[atom];
+			const double r2 = (cx-px)*(cx-px)+(cy-py)*(cy-py);
+			const double sqrt_T = sqrt(sim::Tmin+DeltaT*exp(-r2/fwhm2));
+			const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
+			atoms::thermal_x_field[atom] *= H_th_sigma;
+			atoms::thermal_y_field[atom] *= H_th_sigma;
+			atoms::thermal_z_field[atom] *= H_th_sigma;
+		}
+
+		// Add localised applied field
+		for(int atom=start_index;atom<end_index;atom++){
+			const double cx = atoms::x_coord_array[atom];
+			const double cy = atoms::y_coord_array[atom];
+			double Hx=0.0;
+			double Hy=0.0;
+			double Hz=0.0;
+			if((cx >= Hloc_min_x) && (cx <= Hloc_max_x) && (cy >= Hloc_min_y) && (cy <= Hloc_max_y)){
+				Hx=Hvecx*Hloc_parity_field;
+				Hy=Hvecy*Hloc_parity_field;
+				Hz=Hvecz*Hloc_parity_field;
+			}
+			atoms::x_total_external_field_array[atom] += Hx;
+			atoms::y_total_external_field_array[atom] += Hy;
+			atoms::z_total_external_field_array[atom] += Hz;
+		}
+	}
+	else{
+		// Otherwise just use global temperature
+		double sqrt_T=sqrt(sim::temperature);
+		for(int atom=start_index;atom<end_index;atom++){
+			const int imaterial=atoms::type_array[atom];
+			const double H_th_sigma = sqrt_T*material_parameters::material[imaterial].H_th_sigma;
+			atoms::thermal_x_field[atom] *= H_th_sigma;
+			atoms::thermal_y_field[atom] *= H_th_sigma;
+			atoms::thermal_z_field[atom] *= H_th_sigma;
+	}
+	}
 }
 
 void calculate_fmr_fields(const int start_index,const int end_index){

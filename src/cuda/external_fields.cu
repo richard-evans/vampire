@@ -90,6 +90,13 @@ namespace internal{
          Hx_app, Hy_app, Hz_app,
          cu::atoms::d_materials, cu::mp::d_material_params,
    		num_atoms); 
+         cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
+         cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+         cu::d_thermal_x_field, cu::d_thermal_y_field, cu::d_thermal_z_field,
+         cu::d_rand_state,
+         global_temperature,
+         Hx, Hy, Hz,
+         num_atoms);
 
    	check_cuda_errors (__FILE__, __LINE__);
 
@@ -121,6 +128,110 @@ namespace internal{
          x_ext_field[atom] += x_dip_field[atom];
          y_ext_field[atom] += y_dip_field[atom];
          z_ext_field[atom] += z_dip_field[atom];
+//------------------------------------------------------------------------------
+// Kernel function to calculate external fields
+//------------------------------------------------------------------------------
+__global__ void update_external_fields_kernel (
+      int *  material,
+      vcuda::internal::material_parameters_t * material_params,
+      cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+      cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+      cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
+      curandState * rand_states,
+      cu_real_t global_temperature,
+      cu_real_t Hx_app, cu_real_t Hy_app, cu_real_t Hz_app,
+      int n_atoms
+      )
+{
+
+   // Thread identification
+   int tid = blockIdx.x * blockDim.x + threadIdx.x;
+   for ( size_t atom = tid;
+         atom < n_atoms;
+         atom += blockDim.x * gridDim.x){
+
+      // Get material of atom
+      int mid = material[atom];
+      // Load parameters to local variables from memory
+      cu::material_parameters_t mat = material_params[mid];
+
+      // Load the curand state into local memory
+      curandState local_state = rand_states[tid];
+
+      // initialize registers for total external field
+      cu_real_t field_x = 0.0;
+      cu_real_t field_y = 0.0;
+      cu_real_t field_z = 0.0;
+
+      cu_real_t therm_x = 0.0;
+      cu_real_t therm_y = 0.0;
+      cu_real_t therm_z = 0.0;
+      /*
+      * TODO: HAMR fields
+      */
+
+      // thermal field calculation
+      //cu_real_t temp = mat.temperature;
+      cu_real_t temp = global_temperature;
+      cu_real_t alpha = mat.temperature_rescaling_alpha;
+      cu_real_t sigma = mat.H_th_sigma;
+      cu_real_t tc = mat.temperature_rescaling_Tc;
+
+      #ifdef CUDA_DP
+         double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
+         double rsigma = sigma*sqrt(resc_temp);
+      #else
+         float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
+         float rsigma = sigma*sqrtf(resc_temp);
+      #endif
+
+      #ifdef CUDA_DP
+         therm_x = rsigma * curand_normal_double (&local_state);
+         therm_y = rsigma * curand_normal_double (&local_state);
+         therm_z = rsigma * curand_normal_double (&local_state);
+      #else
+         therm_x = rsigma * curand_normal(&local_state);
+         therm_y = rsigma * curand_normal(&local_state);
+         therm_z = rsigma * curand_normal(&local_state);
+      #endif
+
+      // Local applied field
+      cu_real_t norm_h = mat.applied_field_strength;
+
+      field_x += norm_h * mat.applied_field_unit_x;
+      field_y += norm_h * mat.applied_field_unit_y;
+      field_z += norm_h * mat.applied_field_unit_z;
+
+      // Global applied field
+      field_x += Hx_app;
+      field_y += Hy_app;
+      field_z += Hz_app;
+
+      /*
+      * TODO: FMR fields?
+      */
+
+      /*
+      * Dipolar fields
+      */
+
+      field_x += x_dip_field[atom];
+      field_y += y_dip_field[atom];
+      field_z += z_dip_field[atom];
+      
+//      printf("       %d  %lf  %lf  %lf\n",atom,x_dip_field[atom],y_dip_field[atom],z_dip_field[atom]);
+
+      // Write back to main memory
+      x_ext_field[atom] = field_x;
+      y_ext_field[atom] = field_y;
+      z_ext_field[atom] = field_z;
+
+      x_thermal_field[atom] = therm_x;
+      y_thermal_field[atom] = therm_y;
+      z_thermal_field[atom] = therm_z;
+
+      // Write local curand state back to global memory
+      rand_states[tid] = local_state;
 
       }
    }

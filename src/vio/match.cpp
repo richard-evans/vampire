@@ -1467,6 +1467,36 @@ namespace vin{
             vout::output_rate=r;
             return EXIT_SUCCESS;
         }
+                //--------------------------------------------------------------------
+        
+        test = "spin-temperature";
+        if (word == test) {
+            stats::calculate_system_spin_temperature = true;
+            stats::calculate_system_magnetization = true; //override magnetisation flag
+            output_list.push_back(65);
+            return EXIT_SUCCESS;
+        }
+        test = "material-spin-temperature";
+        if (word == test) {
+            stats::calculate_material_spin_temperature = true;
+            stats::calculate_material_magnetization = true; //override magnetisation flad
+            output_list.push_back(66);
+            return EXIT_SUCCESS;
+        }
+        test = "mean-spin-temperature";
+        if (word == test) {
+            stats::calculate_system_spin_temperature = true;
+            stats::calculate_system_magnetization = true;
+            output_list.push_back(67);
+            return EXIT_SUCCESS;
+        }
+        test = "mean-material-spin-temperature";
+        if (word == test) {
+            stats::calculate_material_spin_temperature = true;
+            stats::calculate_material_magnetization = true;
+            output_list.push_back(68);
+            return EXIT_SUCCESS;
+        }
 
         //--------------------------------------------------------------------
         // keyword not found

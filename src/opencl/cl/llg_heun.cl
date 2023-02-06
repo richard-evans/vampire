@@ -21,6 +21,7 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
                                    __global vec_t *const restrict spin,
                              const __global vec_t *const restrict sp_field,
                              const __global vec_t *const restrict ext_field,
+                             const __global vec_t *const restrict thermal_field,
                                    __global vec_t *const restrict dS)
 {
    const size_t gsz=get_global_size(0);
@@ -31,7 +32,7 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
       const real_t3 S = VEC_LOAD(spin, atom);
 
       // total field
-      const real_t3 H = VEC_LOAD(sp_field, atom) + VEC_LOAD(ext_field, atom);
+      const real_t3 H = VEC_LOAD(sp_field, atom) + VEC_LOAD(ext_field, atom) + VEC_LOAD(thermal_field, atom);
 
       const size_t mid = material_id[atom];
 
@@ -66,6 +67,7 @@ void llg_heun_corrector_step(const __global int *const restrict material_id,
                                    __global vec_t *const restrict spin,
                              const __global vec_t *const restrict sp_field,
                              const __global vec_t *const restrict ext_field,
+                             const __global vec_t *const restrict thermal_field,
                              const __global vec_t *const restrict spin_buffer,
                              const __global vec_t *const restrict dS)
 {
@@ -77,7 +79,7 @@ void llg_heun_corrector_step(const __global int *const restrict material_id,
       real_t3 S = VEC_LOAD(spin, atom);
 
       // revised total field
-      const real_t3 H = VEC_LOAD(sp_field, atom) + VEC_LOAD(ext_field, atom);
+      const real_t3 H = VEC_LOAD(sp_field, atom) + VEC_LOAD(ext_field, atom) + VEC_LOAD(thermal_field, atom);
 
       const size_t mid = material_id[atom];
 

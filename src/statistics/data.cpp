@@ -42,9 +42,6 @@ namespace stats{
    bool calculate_grain_susceptibility          = false;
    bool calculate_material_susceptibility       = false;
 
-   bool calculate_system_binder_cumulant        = false;
-   bool calculate_material_binder_cumulant      = false;
-
    energy_statistic_t system_energy("s");
    energy_statistic_t grain_energy("g");
    energy_statistic_t material_energy("m");
@@ -70,9 +67,6 @@ namespace stats{
    susceptibility_statistic_t system_susceptibility("s");
    susceptibility_statistic_t grain_susceptibility("g");
    susceptibility_statistic_t material_susceptibility("m");
-
-   binder_cumulant_statistic_t system_binder_cumulant("bc");
-   binder_cumulant_statistic_t material_binder_cumulant("mbc");
 
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation
