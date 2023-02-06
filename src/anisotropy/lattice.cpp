@@ -52,7 +52,7 @@ namespace anisotropy{
 
          // Precalculate material lattice anisotropy constants from current temperature
          for(int imat=0; imat<mp::num_materials; imat++){
-            internal::klattice_array[imat] = -2.0 * internal::mp[imat].k_lattice * internal::mp[imat].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
+            internal::klattice_array[imat] = 2.0 * internal::klattice[imat] * internal::mp[imat].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
          }
 
          // Now calculate fields
@@ -102,7 +102,7 @@ namespace anisotropy{
       double lattice_energy(const int atom, const int mat, const double sx, const double sy, const double sz, const double temperature){
 
          // get lattice anisotropy constant at temperature
-         const double klatt = internal::mp[mat].k_lattice * internal::mp[mat].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
+         const double klatt = -1.0 * internal::klattice[mat] * internal::mp[mat].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
 
          // calculate s . e
          const double ex = internal::ku_vector[mat].x;

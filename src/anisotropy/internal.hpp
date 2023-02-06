@@ -100,7 +100,7 @@ namespace anisotropy{
             std::vector<double> ku_vector; // unit vector defining axis for uniaxial anisotropy
 
             std::vector<double> u1_vector; // unit vector defining axis for uniaxial anisotropy
-            std::vector<double> u2_vector; // unit vector defining axis for uniaxial anisotropy                        
+            std::vector<double> u2_vector; // unit vector defining axis for uniaxial anisotropy
 
             std::vector<double> kc_vector1; // first unit vector defining axis for cubic anisotropy
             std::vector<double> kc_vector2; // second unit vector defining axis for cubic anisotropy
@@ -143,11 +143,11 @@ namespace anisotropy{
 
                u1_vector[0] = oneosqrt2*1.0; // set direction along [1,1,0]
                u1_vector[1] = oneosqrt2*1.0;
-               u1_vector[2] = 0.0;      
+               u1_vector[2] = 0.0;
 
                u2_vector[0] = oneosqrt2*1.0; // set direction along [1,-1,0]
                u2_vector[1] = -oneosqrt2*1.0;
-               u2_vector[2] = 0.0;                             
+               u2_vector[2] = 0.0;
 
                // set default uniaxial and cubic directions
                kc_vector1.resize(3); // resize to three elements
@@ -261,7 +261,8 @@ namespace anisotropy{
       extern std::vector < double > ku4_triaxial_basis3z;
 
       // arrays for storing unrolled parameters for lattice anisotropy
-      extern std::vector<double> klattice_array; // anisoptropy constant
+      extern std::vector< double > klattice; // anisotropy constant
+      extern std::vector< double > klattice_array; // array for unrolled anisotropy including temperature dependence
 
       //-------------------------------------------------------------------------
       // internal function declarations
@@ -335,7 +336,7 @@ namespace anisotropy{
                                         std::vector<double>& field_array_y,
                                         std::vector<double>& field_array_z,
                                         const int start_index,
-                                        const int end_index);                                        
+                                        const int end_index);
 
       void uniaxial_sixth_order_fields( std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
@@ -449,7 +450,7 @@ namespace anisotropy{
                                           const int mat,
                                           const double sx,
                                           const double sy,
-                                          const double sz);                                          
+                                          const double sz);
 
       double uniaxial_sixth_order_energy( const int atom,
                                           const int mat,
