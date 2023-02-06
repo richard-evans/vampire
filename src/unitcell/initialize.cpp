@@ -54,6 +54,7 @@ namespace unitcell{
       else if(uc::internal::crystal_structure == "spinel"         ) uc::internal::build_spinel(                 unit_cell );
       else if(uc::internal::crystal_structure == "spinel-layered" ) uc::internal::build_spinel_layered(         unit_cell );
       else if(uc::internal::crystal_structure == "SmFeN"          ) uc::internal::build_SmFeN(                  unit_cell );
+      else if(uc::internal::crystal_structure == "rutile"         ) uc::internal::build_rutile(                  unit_cell );
       // Otherwise print an error to user
       else{
          terminaltextcolor(RED);
