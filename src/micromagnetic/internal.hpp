@@ -1,13 +1,13 @@
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//   (c) Jack B Collings, Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
 //
 //   Email: sj681@york.ac.uk
 //
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //
 
 #ifndef MICROMAGNETIC_INTERNAL_H_
@@ -32,14 +32,15 @@
 #include <fstream>  
 
 
-namespace micromagnetic{
+namespace micromagnetic
+{
 
-   namespace internal{
+   namespace internal
+   {
 
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
-
       extern int my_num_micromagnetic_cells;
       extern int my_start_index; // first cell to intergrate on local (my) cpu
       extern int my_end_index;  // last cell +1 to intergrate on local (my) cpu
@@ -53,10 +54,13 @@ namespace micromagnetic{
       extern bool output_temperature;
       extern bool output_resistance;
       extern std::vector <int> output_list;
+
+      extern bool homogeneous_isotropic_exchange;
+      extern double homogeneous_isotropic_exchange_value;
+
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
-
       extern bool temperature_dependent_parameters; // flag to set temperature dependent micrmagnetic parameters
 
       extern std::vector < double > bias_field_x;
@@ -148,6 +152,10 @@ namespace micromagnetic{
                                       std::vector <double> x_coord_array,
                                       std::vector <double> y_coord_array,
                                       std::vector <double> z_coord_array,
+                                      std::vector <double> pos_array,
+                                      double macro_x,
+                                      double macro_y,
+                                      double macro_z,
                                       double num_atoms_in_unit_cell,
                                       std::vector <int> local_cell_array);
 

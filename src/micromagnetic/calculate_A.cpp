@@ -1,13 +1,13 @@
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //
-//   This file is part of the VAMPIRE open source package under the
-//   Free BSD licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the Free BSD licence (see licence
+//   file for details).
 //
-//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//   (c) Jack B. Collings, Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
 //
 //   Email: sj681@york.ac.uk
 //
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //
 
 // Vampire headers
@@ -17,216 +17,462 @@
 #include "material.hpp"
 #include "create.hpp"
 
-// micromagnetic module headers
-#include <stdlib.h>
-#include <vector>
-#include <iostream>
+// Micromagnetic module headers
 #include "errors.hpp"
 #include "vio.hpp"
 
-namespace micromagnetic{
+// C Libraries
+#include <stdlib.h>
 
-   namespace internal{
+// C++ Libraries
+#include <vector>
+#include <map>
+#include <iostream>
+#include <algorithm>
 
-      //---------------------------------------------------------------------------------------------------
-      // Function to calulate the intercell exchange.
-      // Each cell has an exchange interaction with every other cell in the system.
-      // This is calculated as a sum over all the atoms on the surface of the cells and their interaction
-      // with atoms in the other cell.
+namespace micromagnetic
+{
 
-      //---------------------------------------------------------------------------------------------------
+   namespace internal
+   {
+
+      //-------------------------------------------------------------------------------------------
+      // Function to calulate the exchange stiffness tensor (A_{ij}) for a microcell --------------
+      //-------------------------------------------------------------------------------------------
+      // The isotropic exchange stiffness is
       //
-      //                       A = 1 / 4 * sum((Jij) * (x_i - x_j)^2)
-      // This calculates the interaction between neighbouring cells therefore only interactions
-      // where i and j are in different macrocells are summed.
+      //          A_{ i j } = (1 / 4) * sum_{ i != j } [ J_{ i j } * ( x_j - x_i )^2 ] / V
+      // 
+      // where V is the micromagnetic cell, microcell, volume. Index i denotes summation over all
+      // atoms in the microcell, and j denotes summation over all nearest neighbours to atoms in
+      // the microcell. The value x_i - x_j is the distance between an atom and its neighbour in
+      // the x-direction (for isotropic exchange summing over x distances is equivalent to any
+      // other direction).
       //
-      // We take some components of the exchange field in here and calculate them as part of a ?
-      // therefore we return
+      // We take some components of the exchange field into A, thus A is technically not what is
+      // returned; a field coefficient is retunred instead. The field coefficients, C, are given by
       //
-      //      A = (1/2)*sum((Jij)(x_i - x_j)^2) * (V_cell / V_atomic) * (1 / l_cell) * (1 / Ms)
+      //             C = [ 2 * A / (M * delta^2)] = [ 2 * A * V / ( m * delta^2 ) ]
+      //                      C = [ A * V * 4 / ( 2 * m * delta^2 ) ]
       //
-      //---------------------------------------------------------------------------------------
-      // Nice feature of atomic scale interactions is that all cell-cell interactions are
-      // always included, even in parallel version of the code (no need to reduce across all
-      // processors)
-      //---------------------------------------------------------------------------------------
-      // Note: this solution is 2N^2 in memory usage - not scalable for large numbers of cells
-      // (eg 1M cells = 64*10^12 bytes- 64 TB memory PER PROCESS(!))
-      // solution is partial sum via MPI as only local interactions are needed (but gets messy).
+      // where delta is the inter-microcell distance equal to microcell length in the axial
+      // direction considered. M is the magnetization, which is m / V, where m is the magnetic
+      // moment of the microcell.
+      //
+      //-------------------------------------------------------------------------------------------
 
+      std::vector< double > calculate_a(
+         int num_atoms,                                  // Number of atoms
+         int num_cells,                                  // Number of microcells
+         int num_local_cells,                            // Number of microcells local to processor
+         std::vector < int > cell_array,                 // Microcells atoms are in
+         std::vector < int > neighbour_list_array,       // Nearest neighbours for each atom
+         std::vector < int > neighbour_list_start_index, // Start index for atom's neighbours
+         std::vector < int > neighbour_list_end_index,   // End index for atom's neigbours
+         const std::vector < int > type_array,           // Material for each atom
+         std::vector < mp::materials_t > material,       // Atom material parameters
+         std::vector < double > volume_array,            // Volume of each microcell
+         std::vector < double > x_coord_array,           // x-positions of atoms in the system
+         std::vector < double > y_coord_array,           // y-positions of atoms in the system
+         std::vector < double > z_coord_array,           // z-positions of atoms in the system
+         std::vector < double > pos_array,               // Positions of microcells in the system
+         double macro_x,                                 // x-length of microcells
+         double macro_y,                                 // y-length of microcells
+         double macro_z,                                 // z-length of microcells
+         double num_atoms_in_unit_cell,                  // Number of atoms per unit cell -- remove
+         std::vector < int > local_cell_array            // Cell array local to each processor
+      )
+      {
 
-      std::vector< double > calculate_a(int num_atoms,
-                                        int num_cells,
-                                        int num_local_cells,
-                                        std::vector<int> cell_array,                      // 1D array storing which cell each atom is in
-                                        std::vector<int> neighbour_list_array,            // 1D vector listing the nearest neighbours of each atom
-                                        std::vector<int> neighbour_list_start_index,      // 1D vector storing the start index for each atom in the neighbour_list_array
-                                        std::vector<int> neighbour_list_end_index,        // 1D vector storing the end index for each atom in the neighbour_list_array
-                                        const std::vector<int> type_array,                // 1D array storing which material each cell is
-                                        std::vector <mp::materials_t> material,           // Class of material parameters for the atoms
-                                        std::vector <double> volume_array,                // 1D array storing the volume of each cell
-                                        std::vector <double> x_coord_array,
-                                        std::vector <double> y_coord_array,
-                                        std::vector <double> z_coord_array,
-                                        double num_atoms_in_unit_cell,
-                                        std::vector<int> local_cell_array){               // Cell array local to each processor
+         // Stores the exchange constants in a 2D array (they will be multiplied by microcell
+         // volume and 4 hence the V and 4 in variable name)
+         std::vector< std::vector< double > > a2dV4;
 
+         // A_{ij} initially set to zero, and the array length should be the microcell number
+         a2dV4.resize( num_cells, std::vector< double >( 3, 0.0 ) );
 
+         bool check_microcell_coupling = true;
 
-            int array_index = 0;
-            std::vector< std::vector< double> > a2d; //stores the 2D exchange constants.
-            a2d.resize(num_cells, std::vector<double>(num_cells,0.0));
+         // For MPI version, only add local atoms
+         #ifdef MPICF
+            unsigned int num_local_atoms =  vmpi::num_core_atoms + vmpi::num_bdry_atoms;
+         #else
+            unsigned int num_local_atoms = atoms::num_atoms;
+         #endif
 
-            std::vector< std::vector< double> > num_interactions_cell; //stores the 2D exchange constants.
-            num_interactions_cell.resize(num_cells, std::vector<double>(num_cells,0.0));
+         std::vector<double> a( 0, 0.0 );
 
-            // For MPI version, only add local atoms
-            #ifdef MPICF
-               int num_local_atoms =  vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-            #else
-               int num_local_atoms = atoms::num_atoms;
-            #endif
+         // Determines type of exchange stiffness to be calculated
+         int exchange_type = 0;
 
-            std::vector<double> a;
-            std::vector<double> a_test(num_cells*num_cells,0.0);
-            std::vector<double> N(num_cells*num_cells,0.0);
+         //----------------------------------------------------------------------------------------
+         // Undertakes the calculation of the exchange stiffness based on type selected -----------
+         //----------------------------------------------------------------------------------------
+         switch( exchange_type )
+         {
 
-            // Calculates the atomic volume  = volume of one cell/number of atoms in a unitcell = atomic volume
-            const double atomic_volume = cs::unit_cell.dimensions[0] * cs::unit_cell.dimensions[1] * cs::unit_cell.dimensions[2] / num_atoms_in_unit_cell;
+            // Atomistically generated, diagonal, inhomogeneous exchange stiffness tensor
+            case 0:
+            {
 
-            int exchange_type = 0;
+               //----------------------------------------------------------------------------------
+               // Identify exchange coupled microcells to validate microcell neighbour list -------
+               //----------------------------------------------------------------------------------
 
-            // What is the exchange type?
-            switch(exchange_type){
+               // A map to connect each microcell to a vector of their neighbour microcells
+               std::map < int, std::vector < int > > exchange_coupled_microcell_map;
 
-               case 0: // isotropic
+               // Loop over all atoms in the system
+               for ( unsigned int atom = 0; atom < num_local_atoms; ++atom )
+               {
 
-               //loops over all atoms
-               //std::cout << num_local_atoms << std::endl;
-               for (int atom = 0; atom <num_local_atoms; ++atom){
-                  //saves the cell the atom is in and the material
-                  const int cell  = cell_array[atom];
-                  const int mat   = type_array[atom];
-                  //the nearest neighbours are stored in an array - for each atom the start and end index for the array are found,
-                  const int start = atoms::neighbour_list_start_index[atom];
-                  const int end   = atoms::neighbour_list_end_index[atom] + 1;
-                  //std::cout << "cell:\t" << cell << '\t' <<"mat:\t"  << mat << "\t" << start << '\t' << end << std::endl;
-                  //loops over all nearest neighbours
-                  for(int nn = start; nn < end; ++nn){
-                     //calcualted the atom id and cell id of the nn atom
-                     const int natom = atoms::neighbour_list_array[nn];
-                     const int ncell = cell_array[natom];
+                  // Store cell of atom
+                  const unsigned int acell = cell_array[ atom ];
 
-                     //if interaction is accross a cell boundary
+                  // Get start and end index of atom's neighbours
+                  const unsigned int start   = atoms::neighbour_list_start_index[ atom ];
+                  const unsigned int end     = atoms::neighbour_list_end_index[ atom ];
 
-                     if(ncell != cell){
-                        //calculate the distance between the two atoms
-                        const double dx = x_coord_array[atom] - x_coord_array[natom];
-                        const double dy = y_coord_array[atom] - y_coord_array[natom];
-                        const double dz = z_coord_array[atom] - z_coord_array[natom];
-                        const double d2 = dx * dx + dy * dy + dz * dz;
+                  // Loop through all nearest neighbours
+                  for ( unsigned int natom = start; natom <= end; ++natom )
+                  {
 
-                        //Jij is stored as Jij/mu_s so to get Jij we have to multiply by mu_s
-                        //Jij = sum(Jij*distance^2)
-                        //std::cout << Jij << std::endl;
-                        const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij*mp::material[mat].mu_s_SI;
-                        a2d[cell][ncell] += Jij * d2;
-                        ++num_interactions_cell[cell][ncell];
-                     }
+                     // Get microcell of neighbour atom
+                     const unsigned int ncell   = cell_array[ atoms::neighbour_list_array[ natom ] ];
+
+                     // If neighbour atom is in same microcell, ignore
+                     if ( ncell == acell ) continue;
+
+                     // Reject neighbour atom in microcell already included as a neighbour
+                     else if ( std::find( exchange_coupled_microcell_map[ acell ].begin() , exchange_coupled_microcell_map[ acell ].end(), ncell ) != exchange_coupled_microcell_map[ acell ].end() ) continue;
+                     
+                     // Not a duplicate, so add to the vector of neighbours
+                     else exchange_coupled_microcell_map[ acell ].push_back( ncell );
+
                   }
+
                }
 
-               break;
+               // Print the exchange coupled microcell map to check for errors
+               /*
+               for ( unsigned int cell = 0; cell < num_cells; ++cell )
+               {
 
+                  // Print the microcell
+                  std::cout << "Cell:\t" << cell << "\t Neighbours:\t";
 
-               case 1: // Vector
-               terminaltextcolor(RED);
-               std::cerr << "Error! Vectoral exchange calculation not yet implemented in micromagnetic mode" << std::endl;
-               terminaltextcolor(WHITE);
-               zlog << zTs() << "Error! Vectoral exchange calculation not yet implemented in micromagnetic mode" << std::endl;
-               err::vexit();
-               break;
+                  // Loop through this cell's vector of neighbours
+                  for ( unsigned int ncell = 0; ncell < exchange_coupled_microcell_map[ cell ].size(); ++ncell )
+                  {
 
-               case 2: // Tensor
-               terminaltextcolor(RED);
-               std::cerr << "Error! Tensor exchange calculation not yet implemented in micromagnetic mode" << std::endl;
-               terminaltextcolor(WHITE);
-               zlog << zTs() << "Error! Tensor exchange calculation not yet implemented in micromagnetic mode" << std::endl;
-               err::vexit();
-               break;
-            }
+                     // Print the coupled neighbour cell index
+                     std::cout << exchange_coupled_microcell_map[ cell ][ ncell ] << "\t";
 
-            // Unrolls the 2D array of how many interactions accross each boundary into a 1D array.
-            int count = 0;
-            for (int i = 0; i < num_cells; ++i){
-               for (int j = 0; j < num_cells; ++j){
-                  a_test[count] = a2d[i][j];
-                  N[count] = num_interactions_cell[i][j];
-                  //if (vmpi::my_rank == 0)  std::cerr << i << '\t' << j << '\t' << a2d[i][j] << '\t' << num_interactions_cell[i][j] <<std::endl;
-                  ++count;
+                  }
+
+                  std::cout << std::endl;
+
                }
-            }
+               */
 
-            // Sums the number of interactions on each processor.
-            #ifdef MPICF
-               MPI_Allreduce(MPI_IN_PLACE, &a_test[0],     num_cells*num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               MPI_Allreduce(MPI_IN_PLACE, &N[0],     num_cells*num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-            #endif
+               //----------------------------------------------------------------------------------
+               // The diagonal exchange stiffness tensor is calculated for each cell --------------
+               //----------------------------------------------------------------------------------
+               
+               // Loop over all atoms in the system
+               for ( unsigned int atom = 0; atom < num_local_atoms; ++atom )
+               {
+                  
+                  // Save the material type of the atom
+                  const unsigned int mat  = type_array[ atom ];
 
-            int i = 0;
-            int j = 0;
+                  // Save the cell atom belongs to
+                  const unsigned int cell = cell_array[ atom ];
+                  
+                  // Find the start and end index for the atom's neighbours
+                  const unsigned int start   = atoms::neighbour_list_start_index[ atom ];
+                  const unsigned int end     = atoms::neighbour_list_end_index[ atom ] + 1;
 
-            // Puts the 1D array back into a 2D array
-            for (int count = 0; count < num_cells * num_cells; ++count){
-               a2d[i][j] = a_test[count];
-               num_interactions_cell[i][j] = N[count];
-               ++j;
-               //same!
-               //std::cout << i << '\t' << j << '\t' << a_test[count] << '\t' << num_interactions_cell[i][j] <<std::endl;
-               if (j == num_cells) {
-                  ++i;
-                  j = 0;
+                  // Loop over all nearest neighbours
+                  for( unsigned int nn = start; nn < end; ++nn )
+                  {
+                     
+                     // Calcualte the atom id of the nn atom
+                     const unsigned int natom   = atoms::neighbour_list_array[ nn ];
+
+                     // Calculate component square distances between the two atoms
+                     const double dx   = x_coord_array[ atom ] - x_coord_array[ natom ];
+                     const double dx2  = dx * dx;
+                     const double dy   = y_coord_array[ atom ] - y_coord_array[ natom ];
+                     const double dy2  = dy * dy;
+                     const double dz   = z_coord_array[ atom ] - z_coord_array[ natom ];
+                     const double dz2  = dz * dz;
+
+                     // J_{ i j } is stored as J_{ i j } / mu_s so have to multiply by mu_s
+                     const double Jij  = atoms::i_exchange_list[ atoms::neighbour_interaction_type_array[ nn ] ].Jij * mp::material[ mat ].mu_s_SI;
+                     
+                     // ( Exchange stiffness ) * ( Volume ) * 4 is
+                     // ( distance squared along axis ) * ( J_{ i j } ) summed for all interactions
+                     // in the microcell
+                     a2dV4[ cell ][ 0 ] += Jij * dx2;
+                     a2dV4[ cell ][ 1 ] += Jij * dy2;
+                     a2dV4[ cell ][ 2 ] += Jij * dz2;
+                     
+                  }
+
                }
-            }
 
-
-            // sums over all interactions to check interaction between cell i j = interaction cell j i
-            // non symmetric interactions not realistic
-            for (int celli = 0; celli < num_cells; ++celli){
-               for (int cellj = 0; cellj < num_cells; ++cellj){
-                  if (int(a2d[celli][cellj]) != int(a2d[cellj][celli])) std::cout << "Error! Non symmetric exchange" <<"\t"  <<  celli << '\t' << cellj << "\t"  <<  a2d[celli][cellj]<<"\t"  <<  a2d[cellj][celli] <<std::endl;
+               // Check for homogeneous isotropic override to simulate standard micromagnetics
+               if (homogeneous_isotropic_exchange)
+               {
+                  
+                  // Loop over number of cells to override value of exchange stiffness tensor
+                  for ( unsigned int cell = 0; cell < a2dV4.size(); ++cell )
+                  {
+                     
+                     // Set the values to the override homogneneous exchange values given
+                     a2dV4[ cell ][ 0 ] = homogeneous_isotropic_exchange_value * 4.0 * volume_array[cell];
+                     a2dV4[ cell ][ 1 ] = homogeneous_isotropic_exchange_value * 4.0 * volume_array[cell];
+                     a2dV4[ cell ][ 2 ] = homogeneous_isotropic_exchange_value * 4.0 * volume_array[cell];
+                  
+                  }
+               
                }
-            }
 
-            // loops over all cells to turn the 2D array into a 1D array
-            // multiplies A by cell size/2Ms*V_Atomic to ad din the terms of H_Ex
-            // removes all the zero interactions by using neighbourlists.
-            // The neighbour lists store every interaction as a list. The section of list relevent to each cell is pointed out using the start index and end index.
-            if (num_cells > 1){
-               for (int celli = 0; celli < num_cells; ++celli){
-                  double cell_size = pow(volume_array[celli], 1.0 / 3.0);  //calcualte the size of each cell
-                  macro_neighbour_list_start_index[celli] = array_index;   //saves the start index for each cell to an array for easy access later
-                  double N = volume_array[celli]/atomic_volume;
-                  for (int cellj = 0; cellj < num_cells; ++cellj){
-                     if (a2d[celli][cellj] != 0 && celli != cellj){
-                        macro_neighbour_list_array.push_back(cellj); //if the interaction is non zero add the cell to the neighbourlist
-                        a.push_back(-a2d[celli][cellj] / (4 * atomic_volume));  //*cell_size)/(2.0*ms[celli]*atomic_volume*num_interactions_cell[celli][cellj]));
-                        //calculates the exchange interaction for the cells.  //the end index is updated for each cell so is given the value for the last cell.
+               // Print out exchange stiffness values for each cell to check for errors
+               /*
+               std::cout << "Exchange Stiffness Values Given for Each Cell" << std::endl;
+               for ( unsigned int cell = 0; cell < num_cells; ++cell )
+               {
+                  
+                  const double cell_volume = volume_array[ cell ];
+                  
+                  std::cout << "Cell:\t" << cell << std::endl;
+                  std::cout << "A_xx\t" << a2dV4[ cell ][ 0 ] / ( cell_volume * 4.0 ) << std::endl;
+                  std::cout << "A_yy\t" << a2dV4[ cell ][ 1 ] / ( cell_volume * 4.0 ) << std::endl;
+                  std::cout << "A_zz\t" << a2dV4[ cell ][ 2 ] / ( cell_volume * 4.0 ) << std::endl;
+
+               }
+               std::cout << "----------------------------------------------" << std::endl;
+               */
+
+               //----------------------------------------------------------------------------------
+               // Create microcell neighbour list for second-order approximation to second order mu
+               // derivative with respect to space, and attribute correct exchange stiffness ------
+               // tensor to each microcell --------------------------------------------------------
+               //----------------------------------------------------------------------------------
+               
+               // Index for setting start and end indices of microcell neighbour list
+               unsigned int array_index = 0;
+
+               // Useful constants to determine if neighbour microcell is a nearest neighbour
+               const double err_factor = 0.00001;
+               const double errx_offset = err_factor * macro_x;
+               const double erry_offset = err_factor * macro_y;
+               const double errz_offset = err_factor * macro_z;
+
+               // Useful constants to calculate the field coefficients
+               const double halfomacrox2 = 0.5 / ( macro_x * macro_x );
+               const double halfomacroy2 = 0.5 / ( macro_y * macro_y );
+               const double halfomacroz2 = 0.5 / ( macro_z * macro_z );
+
+               // Loop through all microcells in the system
+               for ( unsigned int cell = 0; cell < num_cells; ++cell )
+               {
+
+                  // Set neighbour list start index for this cell
+                  macro_neighbour_list_start_index[ cell ] = array_index;
+
+                  // Define useful constants for parsing cell position array
+                  const unsigned int cell0 = cell * 3;
+                  const unsigned int cell1 = cell0 + 1;
+                  const unsigned int cell2 = cell0 + 2;
+                  
+                  // Loop through all microcells and test to find the neighbouring microcells
+                  for ( unsigned int neighbour = 0; neighbour < num_cells; ++neighbour )
+                  {
+
+                     // Check microcell and neighbour microcell are not the same
+                     if ( cell != neighbour )
+                     {
+
+                        // If neighbour is not exchange coupled, ignore
+                        if ( std::find( exchange_coupled_microcell_map[ cell ].begin(), exchange_coupled_microcell_map[ cell ].end(), neighbour ) == exchange_coupled_microcell_map[ cell ].end() ) continue;
+
+                        // Define useful constants for parsing pos_array
+                        const unsigned int neighbour0 = neighbour * 3;
+                        const unsigned int neighbour1 = neighbour0 + 1;
+                        const unsigned int neighbour2 = neighbour0 + 2;
+
+                        // Obtain inter-microcell distances
+                        const double abs_deltax = abs( pos_array[ cell0 ] - pos_array[ neighbour0 ] );
+                        const double abs_deltay = abs( pos_array[ cell1 ] - pos_array[ neighbour1 ] );
+                        const double abs_deltaz = abs( pos_array[ cell2 ] - pos_array[ neighbour2 ] );
                         
-                        a[array_index] = a[array_index] * 2 * cell_size / (ms[celli] * N); //*N instead od numinteraction  //a[array_index] = (a[array_index]*2*cell_size)/(ms[celli]*N); //*N instead od numinteraction
-                        //std::cout << celli << '\t' << cellj << '\t' << a[array_index] << '\t' << cell_size << '\t' << ms[celli] << '\t' << N << "\t" << (a[array_index]*2*cell_size)/(ms[celli]*N) << std::endl;
-                        macro_neighbour_list_end_index[celli] = array_index;
-                        //the end index is updated for each cell so is given the value for the last cell.
-                        ++array_index;
+                        // Calculate the field coefficients factor to AV4
+                        const double m_s = ms[ cell ];
+                        const double factorx = halfomacrox2 / m_s;
+                        const double factory = halfomacroy2 / m_s;
+                        const double factorz = halfomacroz2 / m_s;
+
+                        // Only consider neighbour microcells in nearest neighbour range
+                        if ( ( abs_deltax - errx_offset < macro_x ) && ( abs_deltay - erry_offset < macro_y ) && ( abs_deltaz - errz_offset < macro_z ) )
+                        {
+                           
+                           // Find linear x, y neighbours, i.e., must be aligned in z direction
+                           if ( abs_deltaz - errz_offset < 0 )
+                           {
+
+                              // The [ neighbour != cell ] condition used earlier ensures x, y, z
+                              // positions of neighbour microcell and microcell cannot be identical
+                              
+                              // It is an x linear neighbour if aligned in y direction
+                              if ( abs_deltay - erry_offset < 0 )
+                              {
+                                 
+                                 // Add to neighbour list array
+                                 macro_neighbour_list_array.push_back( neighbour );
+                              
+                                 // Push field coefficient into array
+                                 a.push_back( a2dV4[ cell ][ 0 ] * factorx );
+                              
+                                 // Increment array index for next neighbour position
+                                 ++array_index;
+                              
+                                 // Neighbour identified, now move to the next candidate
+                                 continue;
+
+                              }
+
+                              // It is a y linear neighbour if aligned in the x direction
+                              else if ( abs_deltax - errx_offset < 0 )
+                              {
+                                 
+                                 // Add to neighbour list array
+                                 macro_neighbour_list_array.push_back( neighbour );
+
+                                 // Push field coefficient into array
+                                 a.push_back( a2dV4[ cell ][ 1 ] * factory );
+
+                                 // Increment array index for next neighbour position
+                                 ++array_index;
+
+                                 // Neighbour identified, now move on to the next candidate
+                                 continue;
+
+                              }
+                           
+                           }
+
+                           // Only other case of interest is if the neighbour microcell is a
+                           // linear z neighbour
+                           else if ( ( abs_deltax - errx_offset < 0 ) && ( abs_deltay - erry_offset < 0 ) )
+                           {
+                              
+                              // Add to neighbour list array
+                              macro_neighbour_list_array.push_back( neighbour );
+
+                              // Push field coefficient into array
+                              a.push_back( a2dV4[ cell ][ 2 ] * factorz );
+
+                              // Increment array index for next neighbour position
+                              ++array_index;
+
+                              // Neighbour identified, now move on to the next candidate
+                              continue;
+
+                           }
+                           
+                           // Neighbour cannot be a linear neighbour so move on to next
+                           // candidate
+                           else continue;
+
+                        }
+                        
+                        // Ignore neighbour microcells outside nearest neighbour range
+                        else continue;
+
                      }
+
                   }
+
+                  // Update neighbour list end index
+                  macro_neighbour_list_end_index[ cell ] = array_index - 1;
+
                }
+               
+               break;
+
             }
-            //std::cin.get();
 
-            std::cout << "Exchange Stiffness:\t" << a[0] << std::endl;
+            case 1: // Vector
+            {
 
-            return a;        //returns a 1D vector of the cellular exchange interactions,
+               // Set terminal colour to red for the error statement
+               terminaltextcolor(RED);
+               
+               // Print out the error statement
+               std::cerr << "Error! Vectoral exchange calculation not yet implemented in micromagnetic mode" << std::endl;
+               
+               // Set terminal colour back to white
+               terminaltextcolor(WHITE);
+               
+               // Add error statement to the log
+               zlog << zTs() << "Error! Vectoral exchange calculation not yet implemented in micromagnetic mode" << std::endl;
+               
+               // Exit as error
+               err::vexit();
+               
+               break;
+
+            }
+
+            case 2: // Tensor
+            {
+
+               // Set terminal colour to red for the error statement
+               terminaltextcolor(RED);
+
+               // Print out the error statement
+               std::cerr << "Error! Tensor exchange calculation not yet implemented in micromagnetic mode" << std::endl;
+               
+               // Set terminal colour back to white
+               terminaltextcolor(WHITE);
+
+               // Add error statement to the log
+               zlog << zTs() << "Error! Tensor exchange calculation not yet implemented in micromagnetic mode" << std::endl;
+               
+               // Exit as error
+               err::vexit();
+            
+            break;
+            
+            }
+         
          }
+
+         // Print out field coefficients to check for errors
+         // Loop through all cells
+         /*
+         for( int i = 0; i < num_cells; ++i )
+         {
+            
+            for( int j = macro_neighbour_list_start_index[ i ]; j <= macro_neighbour_list_end_index[ i ]; ++j )
+            {
+               
+               std::cout << "Cell:\t" << i << "\tNeighbour cell:\t" <<  macro_neighbour_list_array[ j ] << std::endl;
+               std::cout << "Field coefficient value:\t" << a[ macro_neighbour_list_array[ j ] ] << std::endl;
+            
+            }
+         
+         }
+         */
+
+         // Return the 1D vector of the cellular exchange field coefficients
+         return a;
+
       }
+
    }
+
+}

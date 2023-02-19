@@ -1,13 +1,13 @@
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//   (c) Jack B Collings Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
 //
 //   Email: sj681@york.ac.uk
 //
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 //
 
 // C++ standard library headers
@@ -31,66 +31,75 @@ namespace micromagnetic{
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
 
       // Check for valid key, if no match return false
-      std::string prefix="micromagnetic";
-      if(key!=prefix) return false;
+      std::string prefix = "micromagnetic";
+      if( key != prefix ) return false;
 
       //--------------------------------------------------------------------
-      std::string test="integrator";
-      if(word==test){
-         test="llg";
-         if(value==test){
-            micromagnetic::integrator=0;
+      std::string test = "integrator";
+      if( word == test){
+         test = "llg";
+         if( value == test ){
+            micromagnetic::integrator = 0;
             return true;
          }
-         test="llb";
-         if(value==test){
-            micromagnetic::integrator=1;
+         test = "llb";
+         if( value == test ){
+            micromagnetic::integrator = 1;
             return true;
          }
          else{
-            terminaltextcolor(RED);
+            terminaltextcolor( RED );
             std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
             std::cerr << "\t\"llg\"" << std::endl;
             std::cerr << "\t\"llb\"" << std::endl;
-            terminaltextcolor(WHITE);
+            terminaltextcolor( WHITE );
             err::vexit();
          }
       }
       //--------------------------------------------------------------------
-      test="atomistic-steps-per-micromagnetic-step";
-      if(word==test){
-         double dt=atof(value.c_str());
-         vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1, 100000,"input","1 step - 100000 steps");
-         micromagnetic::num_atomic_steps_mm =dt;
+      test = "homogeneous-isotropic-override";
+      if( word == test ){
+         internal::homogeneous_isotropic_exchange = true;
+         double hio = atof( value.c_str() );
+         vin::check_for_valid_value( hio, word, line, prefix, unit, "energy per unit distance", 1.0 * 10e-25, 1.0 * 10e-15, "input", "1e-25 J / Angstrom to 1e-15 J / Angstrom" );
+         internal::homogeneous_isotropic_exchange_value = hio;
          return true;
       }
       //--------------------------------------------------------------------
-      test="discretisation"; // whether the material is micromagnetic or atomistic
-      if(word==test){
+      test = "atomistic-steps-per-micromagnetic-step";
+      if( word == test ){
+         double dt = atof( value.c_str() );
+         vin::check_for_valid_value( dt, word, line, prefix, unit, "time", 1, 100000, "input", "1 step - 100000 steps" );
+         micromagnetic::num_atomic_steps_mm = dt;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test = "discretisation"; // whether the material is micromagnetic or atomistic
+      if( word == test ){
 
          // check for type of discretisation
-         test="micromagnetic";
-         if(value==test){
+         test = "micromagnetic";
+         if( value == test){
             discretisation_type = 1;
             return true;
          }
-         test="atomistic"; // runs simualtion as normal (atomistics)
-         if(value==test){
+         test = "atomistic"; // runs simualtion as normal (atomistics)
+         if(value == test){
             discretisation_type = 0;
             return true;
          }
-         test="multiscale"; // at the moment just runs a normal atomsitic simulation
-         if(value==test){
+         test = "multiscale"; // at the moment just runs a normal atomsitic simulation
+         if( value == test){
             discretisation_type = 2;
             return true;
          }
          // otherwise throw an error
-         terminaltextcolor(RED);
+         terminaltextcolor( RED );
          std::cerr << "Error - value for" << word << "\' must be one of:" << std::endl;
          std::cerr << "\t\"micromagnetic\"" << std::endl;
          std::cerr << "\t\"atomistic\"" << std::endl;
          std::cerr << "\t\"multiscale\"" << std::endl;
-         terminaltextcolor(WHITE);
+         terminaltextcolor( WHITE );
          zlog << zTs() << "Error - value for" << word << "\' must be one of:" << std::endl;
          zlog << zTs() << "\t\"micromagnetic\"" << std::endl;
          zlog << zTs() <<"\t\"atomistic\"" << std::endl;
@@ -100,79 +109,79 @@ namespace micromagnetic{
          return true;
       }
       //--------------------------------------------------------------------
-      test="pinning-field-correction";
-      if(word==test){
+      test = "pinning-field-correction";
+      if( word == test ){
          micromagnetic::internal::mm_correction = true;
          return true;
       }
       //--------------------------------------------------------------------
-      test="resistance-GMR";
-      if(word==test){
-         double h = atof(value.c_str());
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100000");
+      test = "resistance-GMR";
+      if( word == test ){
+         double h = atof( value.c_str() );
+         vin::check_for_valid_value( h, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100000" );
          micromagnetic::internal::res_GMR = h;
          return true;
       }
       //--------------------------------------------------------------------
-      test="resistance-RA";
-      if(word==test){
-         double h = atof(value.c_str());
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100000");
+      test = "resistance-RA";
+      if( word == test ){
+         double h = atof( value.c_str() );
+         vin::check_for_valid_value( h, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100000" );
          micromagnetic::internal::res_RA = h;
          return true;
       }
       //--------------------------------------------------------------------
-      test="bias-magnets";
-      if(word==test){
+      test = "bias-magnets";
+      if( word == test ){
          micromagnetic::internal::bias_magnets = true;
          return true;
       }
       //--------------------------------------------------------------------
-      test="bias-magnets-max-height";
-      if(word==test){
-         double h = atof(value.c_str());
+      test = "bias-magnets-max-height";
+      if( word == test ){
+         double h = atof( value.c_str() );
          micromagnetic::internal::bias_magnets_max_height = h;
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         vin::check_for_valid_value( h, word, line, prefix, unit, "none", 0, 1, "input","0 - 1" );
          return true;
       }
       //--------------------------------------------------------------------
-      test="bias-magnets-min-height";
-      if(word==test){
-         double h = atof(value.c_str());
+      test = "bias-magnets-min-height";
+      if( word == test ){
+         double h = atof( value.c_str() );
          micromagnetic::internal::bias_magnets_min_height = h;
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         vin::check_for_valid_value( h, word, line, prefix, unit, "none", 0, 1, "input", "0 - 1" );
          return true;
       }
       //--------------------------------------------------------------------
-      test="bias-magnets-max-width";
-      if(word==test){
-         double h = atof(value.c_str());
+      test = "bias-magnets-max-width";
+      if( word == test ){
+         double h = atof( value.c_str() );
          micromagnetic::internal::bias_magnets_max_width = h;
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         vin::check_for_valid_value( h, word, line, prefix, unit, "none", 0, 1, "input", "0 - 1" );
          return true;
       }
       //--------------------------------------------------------------------
-      test="bias-magnets-min-width";
-      if(word==test){
-         double h = atof(value.c_str());
+      test = "bias-magnets-min-width";
+      if( word == test ){
+         double h = atof( value.c_str() );
          micromagnetic::internal::bias_magnets_min_width = h;
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1, "input", "0 - 1");
          return true;
       }
       //--------------------------------------------------------------------
-      test="bias-magnets-gap";
-      if(word==test){
-         double h = atof(value.c_str());
-         vin::check_for_valid_value(h, word, line, prefix, unit, "length", 0, 100000000,"input","1 A - 100000 A");
+      test = "bias-magnets-gap";
+      if( word == test ){
+         double h = atof( value.c_str() );
+         vin::check_for_valid_value( h, word, line, prefix, unit, "length", 0, 100000000, "input", "1 A - 100000 A" );
          micromagnetic::internal::bias_magnets_gap = h;
          return true;
       }
       //--------------------------------------------------------------------
-      test="pinning-field-height";
-      if(word==test){
-         double h=atof(value.c_str());
-         vin::check_for_valid_value(h, word, line, prefix, unit, "length", 1, 100000000,"input","1 A - 100000 A");
-         micromagnetic::internal::pinning_field_height =h;
+      test = "pinning-field-height";
+      if( word == test ){
+         double h = atof( value.c_str() );
+         vin::check_for_valid_value( h, word, line, prefix, unit, "length", 1, 100000000, "input", "1 A - 100000 A" );
+         micromagnetic::internal::pinning_field_height = h;
          return true;
       }
       //--------------------------------------------------------------------
@@ -280,7 +289,7 @@ namespace micromagnetic{
          vin::read_material[super_index].SAF[sub_index] = J;
          vin::read_material[super_index].enable_SAF = true;
          vin::read_material[sub_index].enable_SAF = true;
-         std::cout << super_index << '\t' << sub_index << std::endl;
+         //std::cout << super_index << '\t' << sub_index << std::endl;
          return true;
       }
 

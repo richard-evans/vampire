@@ -38,16 +38,16 @@ void initialize(int num_local_cells,
                 int num_cells,
                 int num_atoms,
                 int num_materials,
-                std::vector<int> cell_array,                     //1D array storing which cell each atom is in
-                std::vector<int> neighbour_list_array,           //1D vector listing the nearest neighbours of each atom
-                std::vector<int> neighbour_list_start_index,     //1D vector storing the start index for each atom in the neighbour_list_array
-                std::vector<int> neighbour_list_end_index,       //1D vector storing the end index for each atom in the neighbour_list_array
-                const std::vector<int> type_array,               //1D array storing which material each cell is
-                std::vector <mp::materials_t> material,          //1D vector of type material_t stiring the material properties
+                std::vector<int> cell_array,                      //1D array storing which cell each atom is in
+                std::vector<int> neighbour_list_array,            //1D vector listing the nearest neighbours of each atom
+                std::vector<int> neighbour_list_start_index,      //1D vector storing the start index for each atom in the neighbour_list_array
+                std::vector<int> neighbour_list_end_index,        //1D vector storing the end index for each atom in the neighbour_list_array
+                const std::vector<int> type_array,                //1D array storing which material each cell is
+                std::vector <mp::materials_t> material,           //1D vector of type material_t stiring the material properties
                 std::vector <double> x_coord_array,
                 std::vector <double> y_coord_array,
                 std::vector <double> z_coord_array,
-                std::vector <double> volume_array,               //1D vector storing the volume of each cell
+                std::vector <double> volume_array,                //1D vector storing the volume of each cell
                 double Temperature,
                 double num_atoms_in_unit_cell,
                 double system_dimensions_x,
@@ -107,7 +107,8 @@ void initialize(int num_local_cells,
    mm::gamma =                mm::calculate_gamma(num_atoms, num_cells, cell_array,type_array,material,num_local_cells,local_cell_array);
    mm::A =                    mm::calculate_a(num_atoms_interactions, num_cells, num_local_cells,cell_array, neighbour_list_array, neighbour_list_start_index,
                                               neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
-                                              y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
+                                              y_coord_array, z_coord_array, cells::pos_array, cells::macro_cell_size_x, cells::macro_cell_size_y, cells::macro_cell_size_z,
+                                              num_atoms_in_unit_cell, local_cell_array);
 
    // calculate spin transfer torque parameters
    mm::calculate_stt(num_atoms, num_cells, cell_array, type_array, material, mm::stt_rj, mm::stt_pj);
@@ -287,6 +288,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
    // Save the cell material type to enable setting material specific properties
    // taking average over constituent atoms
    //-------------------------------------------------------------------------------------------
+
    std::vector< std::vector < int> > counter;
    counter.resize(num_cells);
    for (int i = 0; i < num_cells; ++i)
@@ -349,55 +351,55 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
    //--------------------------------------------------------------------------------------------------
    //Replace atomsitic fields with SAF accross the boundary
    //--------------------------------------------------------------------------------------------------
-   double area = cells::macro_cell_size_x*cells::macro_cell_size_y;
-   for (int cell = 0; cell < num_cells; cell++ ){
+   double area = cells::macro_cell_size_x * cells::macro_cell_size_y;
+   for (int cell = 0; cell < num_cells; ++cell){
 
       //double zi = cells::pos_and_mom_array[4*cell+2];
       const int mat = mm::cell_material_array[cell];
       const int start = mm::macro_neighbour_list_start_index[cell]; // save start index for neighbour list
-      const int end = mm::macro_neighbour_list_end_index[cell] +1;  // save end index for neighbour list
-         // loop over neighbouring cells
-         for(int j = start;j< end;j++){
+      const int end = mm::macro_neighbour_list_end_index[cell] + 1;  // save end index for neighbour list
 
-            const int cellj = mm::macro_neighbour_list_array[j];
-            const int matj = mm::cell_material_array[cellj];
-            // Check if spaced SAF is included
+      // loop over neighbouring cells
+      
+      for(int j = start; j < end; ++j){
 
+         const int cellj = mm::macro_neighbour_list_array[j];
+         const int matj = mm::cell_material_array[cellj];
+         
+         // Check if spaced SAF is included
+         if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj){
+            // check that materials are different
+         //std::cout <<"SAF" << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;
+            //  std::cout << "enter2" << std::endl;
+            double dx = cells::pos_array[cell * 3 + 0] - cells::pos_array[cellj * 3 + 0];
+            double dy = cells::pos_array[cell * 3 + 1] - cells::pos_array[cellj * 3 + 1];
+            //double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
+            //if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
+            if (dx * dx < cs::unit_cell.dimensions[0] * cs::unit_cell.dimensions[0] && dy * dy < cs::unit_cell.dimensions[1] * cs::unit_cell.dimensions[1]){
 
-            if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj){
-               // check that materials are different
-            //std::cout <<"SAF" << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;
-             //  std::cout << "enter2" << std::endl;
-               double dx = cells::pos_array[cell*3 +0] - cells::pos_array[cellj*3 +0];
-               double dy = cells::pos_array[cell*3 +1] - cells::pos_array[cellj*3 +1];
-               //double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
-               //if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
-               if (dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
+               // why mj^1.66?? need to check how this actually works. why / ms[cell]?
+               // Ac = -prefactor[matj]*mp::material[mat].SAF[matj];
+               mm::A[j] = - area * mp::material[mat].SAF[matj] / mm::ms[cell];
+               // if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
 
-                  // why mj^1.66?? need to check how this actually works. why / ms[cell]?
-                  //Ac = -prefactor[matj]*mp::material[mat].SAF[matj];
-                  mm::A[j] = -area*mp::material[mat].SAF[matj]/mm::ms[cell];
-                  //if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
-
-               }
-               else {
-                  mm::A[j] = 0.0;
-               }
             }
-
-
-            // option to override atomistic exchange with a micromagnetic value
-            if (mp::material[mat].override_atomsitic[matj] == true){
-               //double Area = cells::macro_cell_size*cells::macro_cell_size;
-               //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
-               //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
-               mm::A[j] = 2.0*mp::material[mat].EF_MM[matj]/(mm::ms[cell]);
+            else {
+               mm::A[j] = 0.0;
             }
-            // Output SAF coupling for testing
-            //if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj) std::cout << cell << '\t' << cellj << "\t" << mm::A[j]  <<std::endl;
          }
-   }
 
+
+         // option to override atomistic exchange with a micromagnetic value
+         if (mp::material[mat].override_atomsitic[matj] == true){
+            //double Area = cells::macro_cell_size*cells::macro_cell_size;
+            //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
+            //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
+            mm::A[j] = 2.0*mp::material[mat].EF_MM[matj]/(mm::ms[cell]);
+         }
+         // Output SAF coupling for testing
+         //if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj) std::cout << cell << '\t' << cellj << "\t" << mm::A[j]  <<std::endl;
+      }
+   }
    //--------------------------------------------------------------------------------------------------
    // Initialise pinning field calculation
    //--------------------------------------------------------------------------------------------------
@@ -465,7 +467,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
             //         std::cout << mm::resistance_layer_1 << '\t' << mm::resistance_layer_2 <<std::endl;
         //       std::cout << cell << '\t' << cellj << "\t" <<mat << '\t' << matj << std::endl;// x_coord_array[cell] << "\t" <<y_coord_array[cell] << "\t" <<z_coord_array[cell] << "\t" <<  x_coord_array[cellj] << "\t" <<y_coord_array[cellj] << "\t" <<z_coord_array[cellj] << "\t" <<std::endl;
                mm::overlap_area = mm::overlap_area + cells::macro_cell_size_x*cells::macro_cell_size_y;
-               std::cout << cell << '\t' << cellj << "\t" <<mm::overlap_area << std::endl;// x_coord_array[cell] << "\t" <<y_coord_array[cell] << "\t" <<z_coord_array[cell] << "\t" <<  x_coord_array[cellj] << "\t" <<y_coord_array[cellj] << "\t" <<z_coord_array[cellj] << "\t" <<std::endl;
+               //std::cout << cell << '\t' << cellj << "\t" <<mm::overlap_area << std::endl;// x_coord_array[cell] << "\t" <<y_coord_array[cell] << "\t" <<z_coord_array[cell] << "\t" <<  x_coord_array[cellj] << "\t" <<y_coord_array[cellj] << "\t" <<z_coord_array[cellj] << "\t" <<std::endl;
 
             }
          }

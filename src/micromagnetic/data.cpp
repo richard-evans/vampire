@@ -102,6 +102,9 @@ namespace micromagnetic{
 
       bool bias_magnets = false;
 
+      bool homogeneous_isotropic_exchange = false;
+      double homogeneous_isotropic_exchange_value = 0.0;
+
       //stores the micromagnetic properties of the macrocells
       std::vector<double> A;
       std::vector<double> alpha;

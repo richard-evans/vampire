@@ -23,7 +23,7 @@
 
 namespace exchange{
 
-   // internal namespacve for exchange module
+   // internal namespace for exchange module
    namespace internal{
 
       //-----------------------------------------------------------------------------------------------------------------------
@@ -34,12 +34,12 @@ namespace exchange{
          // extract comma separated values from string
          std::vector<double> Jij = vin::doubles_from_string(value);
          if(Jij.size() == 1){
-            vin::check_for_valid_value(Jij[0], word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
+            vin::check_for_valid_value(Jij[0], word, line, prefix, unit, "energy", -1e-16, 1e-16,"material"," < +/- 1.0e18");
             // set exchange constants
             exchange_matrix.set_exchange_values(material_i, material_j, neighbour, Jij);
          }
          else if(Jij.size() == 3){
-            vin::check_for_valid_vector(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
+            vin::check_for_valid_vector(Jij, word, line, prefix, unit, "energy", -1e-16, 1e-16,"material"," < +/- 1.0e18");
             // set exchange constants
             exchange_matrix.set_exchange_values(material_i, material_j, neighbour, Jij);
             internal::minimum_needed_exchange_type = exchange::vectorial;
