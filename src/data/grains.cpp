@@ -218,7 +218,7 @@ int set_properties(){
 	//--------------------------------------------------
 	// output grain coordinates to disk on root process
 	//--------------------------------------------------
-	if( vmpi::my_rank == 0 && grains::num_grains > 0){
+	if( vmpi::my_rank == 0 && grains::num_grains > 1){
 
 		std::ofstream file4;
 		file4.open("grain-coordinates.txt");
