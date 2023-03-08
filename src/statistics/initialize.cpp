@@ -128,7 +128,7 @@ namespace stats{
             else mask[atom] = num_materials * grain + mat;
          }
 
-         stats::material_grain_magnetization.set_mask(num_materials*(num_grains+1)+1,mask,magnetic_moment_array);
+         stats::material_grain_magnetization.set_mask(num_materials*(num_grains)+1,mask,magnetic_moment_array);
 
       }
 
