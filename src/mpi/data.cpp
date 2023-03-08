@@ -30,7 +30,7 @@ namespace vmpi{
 
    bool replicated_data_staged=false;
 
-   char hostname[20];
+   std::string hostname;
 
    // timing variables
    double start_time;
