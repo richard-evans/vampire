@@ -10,8 +10,19 @@
 //------------------------------------------------------------------------------
 //
 
+/**************************************************************************************************
+ * @file initialize.cpp
+ * @brief Contains the function which initialises the micromagnetic module.
+**************************************************************************************************/
+
 // C++ standard library headers
 #include <iostream>
+
+/**************************************************************************************************
+ * @todo Should only be using micromagnetic.hpp, would be good to find a a way to remove all
+ * others.
+ * @todo Remove include of internal header files from other modules.
+**************************************************************************************************/
 
 // Vampire headers
 #include "micromagnetic.hpp"
@@ -19,7 +30,7 @@
 #include "material.hpp"
 #include "cells.hpp"
 #include "sim.hpp"
-#include "../create/internal.hpp" // please fix
+#include "../create/internal.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
 #include "create.hpp"
@@ -73,6 +84,7 @@ void initialize(int num_local_cells,
       num_atoms_interactions = num_atoms;
    #endif
 
+   /** @todo is it possible to move these somewhere else? */
    mm::A.resize(num_cells*num_cells,0.0);
    mm::alpha.resize(num_cells,0.0);
    mm::one_o_chi_perp.resize(num_cells,0.0);
