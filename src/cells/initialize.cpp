@@ -150,7 +150,7 @@ namespace cells{
 
 
       // Assign atoms to cells
-      for(int atom=0;atom<num_local_atoms; atom++){
+      for( int atom = 0 ; atom < num_local_atoms /*+ vmpi::num_halo_atoms*/; ++atom ){ // The commented out code was added in by Sarah Jenkins in an attempt to fix the parallel micromagnetic code
          // temporary for atom coordinates
          double c[3];
          // convert atom coordinates to st reference frame
