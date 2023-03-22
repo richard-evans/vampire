@@ -63,7 +63,7 @@ namespace micromagnetic
 namespace internal
 {
    
-/** @brief The function that calculates the field coefficients.   */
+/** @brief This function calculates the field coefficients.   */
 std::vector < double > calculate_a (
    int num_atoms,                                  /** @param num_atoms total number of atoms.  */
    int num_cells,                                  /** @param num_cells number of microcells.   */
@@ -108,7 +108,7 @@ std::vector < double > calculate_a (
 
    // Determines type of exchange stiffness to be calculated
    int exchange_type = 0;
-   std::cout << "neighbour_list_array_size:\t" << neighbour_list_array.size() << std::endl;
+   //std::cout << "neighbour_list_array_size:\t" << neighbour_list_array.size() << std::endl;
    //----------------------------------------------------------------------------------------
    // Undertakes the calculation of the exchange stiffness based on type selected -----------
    //----------------------------------------------------------------------------------------
@@ -137,15 +137,10 @@ std::vector < double > calculate_a (
             const unsigned int start   = atoms::neighbour_list_start_index[ atom ];
             const unsigned int end     = atoms::neighbour_list_end_index[ atom ];
 
-            std::cout << "neighbour_list_start_index_array_size:\t" << atoms::neighbour_list_start_index.size() << std::endl;
-            std::cout << "neighbour_list_end_index_array_size:\t" << atoms::neighbour_list_end_index.size() << std::endl;
-
-            std::cout << "Start:\t" << start << "\tEnd:\t" << end << std::endl;
             // Loop through all nearest neighbours
-            for ( unsigned int natom = start; natom <= end; ++natom ) /** @todo is this correct? */
+            for ( unsigned int natom = start; natom < end; ++natom )
             {
 
-               std::cout << "natom:\t" << natom << std::endl;
                // Get microcell of neighbour atom
                const unsigned int ncell   = cell_array[ atoms::neighbour_list_array[ natom ] ];
 
@@ -220,7 +215,7 @@ std::vector < double > calculate_a (
 
                // J_{ i j } is stored as J_{ i j } / mu_s so have to multiply by mu_s
                const double Jij  = atoms::i_exchange_list[ atoms::neighbour_interaction_type_array[ nn ] ].Jij * mp::material[ mat ].mu_s_SI;
-               
+
                // ( Exchange stiffness ) * ( Volume ) * 4 is
                // ( distance squared along axis ) * ( J_{ i j } ) summed for all interactions
                // in the microcell
@@ -232,26 +227,42 @@ std::vector < double > calculate_a (
 
          }
 
+         // Print out exchange stiffness values for each cell to check for errors before homogeneous override
+         /*
+         std::cout << "Exchange Stiffness Values Given for Each Cell before override" << std::endl;
+         for ( unsigned int cell = 0; cell < num_cells; ++cell )
+         {
+
+            const double cell_volume = volume_array[ cell ];
+
+            std::cout << "Cell:\t" << cell << std::endl;
+            std::cout << "A_xx\t" << a2dV4[ cell ][ 0 ] / ( cell_volume * 4.0 ) << std::endl;
+            std::cout << "A_yy\t" << a2dV4[ cell ][ 1 ] / ( cell_volume * 4.0 ) << std::endl;
+            std::cout << "A_zz\t" << a2dV4[ cell ][ 2 ] / ( cell_volume * 4.0 ) << std::endl;
+
+         }
+         std::cout << "----------------------------------------------" << std::endl;
+         */
          // Check for homogeneous isotropic override to simulate standard micromagnetics
          if ( homogeneous_isotropic_exchange )
          {
-            
+
             // Loop over number of cells to override value of exchange stiffness tensor
             for ( unsigned int cell = 0; cell < a2dV4.size(); ++cell )
             {
-               
+
                // Set the values to the override homogneneous exchange values given
                a2dV4[ cell ][ 0 ] = homogeneous_isotropic_exchange_value * 4.0 * volume_array[cell];
                a2dV4[ cell ][ 1 ] = homogeneous_isotropic_exchange_value * 4.0 * volume_array[cell];
                a2dV4[ cell ][ 2 ] = homogeneous_isotropic_exchange_value * 4.0 * volume_array[cell];
-            
+
             }
-         
+
          }
 
-         // Print out exchange stiffness values for each cell to check for errors
+         // Print out exchange stiffness values for each cell to check for errors after homogeneous override
          /*
-         std::cout << "Exchange Stiffness Values Given for Each Cell" << std::endl;
+         std::cout << "Exchange Stiffness Values Given for Each Cell after override" << std::endl;
          for ( unsigned int cell = 0; cell < num_cells; ++cell )
          {
             
@@ -348,7 +359,7 @@ std::vector < double > calculate_a (
                         
                            // Increment array index for next neighbour position
                            ++array_index;
-                        
+
                            // Neighbour identified, now move to the next candidate
                            continue;
 
@@ -407,7 +418,7 @@ std::vector < double > calculate_a (
             }
 
             // Update neighbour list end index
-            macro_neighbour_list_end_index[ cell ] = array_index - 1;
+            macro_neighbour_list_end_index[ cell ] = array_index - 1; /** @todo Get rid of this -1 end formalism. */
 
          }
 
@@ -463,17 +474,16 @@ std::vector < double > calculate_a (
 
    // Print out field coefficients to check for errors
    // Loop through all cells
-   std::cout << "a.size():\t" << a.size() << std::endl;
    // std::cout << "a[0]:\t" << a[0] << std::endl;
    /*
-   for( int i = 0; i < num_cells; ++i )
+   for( unsigned int i = 0; i < num_cells; ++i )
    {
       
-      for( int j = macro_neighbour_list_start_index[ i ]; j < macro_neighbour_list_end_index[ i ]; ++j )
+      for( unsigned int j = macro_neighbour_list_start_index[ i ]; j <= macro_neighbour_list_end_index[ i ]; ++j )
       {
          
          std::cout << "Cell:\t" << i << "\tNeighbour cell:\t" <<  macro_neighbour_list_array[ j ] << std::endl;
-         std::cout << "Field coefficient value:\t" << a[ macro_neighbour_list_array[ j ] ] << std::endl;
+         std::cout << "Field coefficient value:\t" << a[ j ] << std::endl;
       
       }
    
