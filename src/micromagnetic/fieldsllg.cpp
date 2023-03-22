@@ -107,9 +107,9 @@ void mm::calculate_llg_spin_fields(const double temperature,
             double Ac = A[j]*std::pow(mj,1.71);
 
             // Add field from cell to total exchange field (at equillibrium this term goes to zero)
-            exchange_field[0] -= Ac*(mx_array[cellj]*m_e[cellj] - mx*me);
-            exchange_field[1] -= Ac*(my_array[cellj]*m_e[cellj] - my*me);
-            exchange_field[2] -= Ac*(mz_array[cellj]*m_e[cellj] - mz*me);
+            exchange_field[0] += Ac*(mx_array[cellj]*m_e[cellj] - mx*me);
+            exchange_field[1] += Ac*(my_array[cellj]*m_e[cellj] - my*me);
+            exchange_field[2] += Ac*(mz_array[cellj]*m_e[cellj] - mz*me);
 
          } // end of loop over cells
 
