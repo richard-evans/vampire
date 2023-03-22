@@ -64,7 +64,7 @@ namespace internal{
 
          // temporary constants for loop start and end indices
 			const int start = neighbour_list_start_index[atom];
-			const int end   = neighbour_list_end_index[atom]+1;
+			const int end   = neighbour_list_end_index[atom];
 
          // load spin Si components into temporary contants
          const double six = spin_array_x[atom];

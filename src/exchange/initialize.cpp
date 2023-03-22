@@ -213,7 +213,7 @@ namespace exchange{
    		}
    		//std::cout << std::endl;
    		// Set end index
-   		atoms::neighbour_list_end_index[atom]=counter-1;
+   		atoms::neighbour_list_end_index[atom]=counter;
    	}
 
       //------------------------------------------------------------------------
@@ -266,7 +266,7 @@ namespace exchange{
       		}
       		//std::cout << std::endl;
       		// Set end index
-      		exchange::internal::biquadratic_neighbour_list_end_index[atom]=counter-1;
+      		exchange::internal::biquadratic_neighbour_list_end_index[atom]=counter;
       	}
       }
 

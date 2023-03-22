@@ -140,7 +140,7 @@ namespace vcuda
 
                 // temporray constants for loop start and end indices
                 const int start = ::atoms::neighbour_list_start_index[atom];
-                const int end   = ::atoms::neighbour_list_end_index[atom]+1;
+                const int end   = ::atoms::neighbour_list_end_index[atom];
 
                 // loop over all neighbours
                 for(int nn = start; nn < end; ++nn){

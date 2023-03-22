@@ -45,7 +45,7 @@ void mm_A_calculation(){
    for(int atom = 0; atom < atoms::num_atoms; atom++){
    const int imaterial = atoms::type_array[atom];
 
-      for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
+      for(int nn = atoms::neighbour_list_start_index[atom];nn < atoms::neighbour_list_end_index[atom]; nn++){
          const int natom = atoms::neighbour_list_array[nn];
          //const int jmaterial = atoms::type_array[natom];
          double dx = (atoms::x_coord_array[atom] - atoms::x_coord_array[natom]);

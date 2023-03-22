@@ -103,7 +103,7 @@ namespace vcuda
                     //std::cout << Ncoloured << "  " << iatom << "  " << atom_colour[iatom] << "  ";
                     // temporay constants for loop start and end indices
                     const int start = ::atoms::neighbour_list_start_index[iatom];
-                    const int end   = ::atoms::neighbour_list_end_index[iatom]+1;
+                    const int end   = ::atoms::neighbour_list_end_index[iatom];
 
 
                     nbr_colours.assign(M, 0);

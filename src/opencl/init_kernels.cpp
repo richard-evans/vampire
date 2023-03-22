@@ -172,7 +172,7 @@ static void init_exchange(void)
    limits_h[0] = 0;
    for (int atom=0; atom<::atoms::num_atoms; ++atom)
    {
-      limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+      limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom];
    }
 
    // Allocate device memory and initialize limits array

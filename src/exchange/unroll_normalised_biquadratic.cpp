@@ -54,7 +54,7 @@ namespace exchange{
    			for(int atom = 0; atom < atoms::num_atoms; atom++){
    				const int imaterial = atoms::type_array[atom];
                const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
-   				for(int nn = exchange::internal::biquadratic_neighbour_list_start_index[atom]; nn <= exchange::internal::biquadratic_neighbour_list_end_index[atom]; nn++){
+   				for(int nn = exchange::internal::biquadratic_neighbour_list_start_index[atom]; nn < exchange::internal::biquadratic_neighbour_list_end_index[atom]; nn++){
    					const int natom = exchange::internal::biquadratic_neighbour_list_array[nn];
    					const int jmaterial = atoms::type_array[natom];
    					exchange::internal::bq_i_exchange_list.push_back(tmp_zval);
@@ -81,7 +81,7 @@ namespace exchange{
       			for(int atom = 0; atom < atoms::num_atoms; atom++){
       				const int imaterial = atoms::type_array[atom];
                   const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
-      				for(int nn = exchange::internal::biquadratic_neighbour_list_start_index[atom];nn <= exchange::internal::biquadratic_neighbour_list_end_index[atom]; nn++){
+      				for(int nn = exchange::internal::biquadratic_neighbour_list_start_index[atom];nn < exchange::internal::biquadratic_neighbour_list_end_index[atom]; nn++){
       					const int natom = exchange::internal::biquadratic_neighbour_list_array[nn];
       					const int jmaterial = atoms::type_array[natom];
       					exchange::internal::bq_v_exchange_list.push_back(tmp_zvec);
@@ -124,7 +124,7 @@ namespace exchange{
             for(int atom = 0; atom < atoms::num_atoms; atom++){
                const int imaterial = atoms::type_array[atom];
                const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
-               for(int nn = exchange::internal::biquadratic_neighbour_list_start_index[atom]; nn <= exchange::internal::biquadratic_neighbour_list_end_index[atom]; nn++){
+               for(int nn = exchange::internal::biquadratic_neighbour_list_start_index[atom]; nn < exchange::internal::biquadratic_neighbour_list_end_index[atom]; nn++){
                   const int natom = exchange::internal::biquadratic_neighbour_list_array[nn]; // atom id of neighbour atom
                   const int jmaterial = atoms::type_array[natom]; // material of neighbour atom
                   exchange::internal::bq_t_exchange_list.push_back(tmp_zten);

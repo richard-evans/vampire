@@ -753,7 +753,7 @@ namespace vcuda{
          // Transfer the row ptrs and col indices to the device
          std::vector<int> limits_h( ::atoms::num_atoms + 1, 0);
          for( int atom = 0; atom < ::atoms::num_atoms; atom++)
-            limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+            limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom];
 
          cudaMalloc((void**)&cu::atoms::d_limits, (::atoms::num_atoms + 1) * sizeof(int));
          cudaMalloc((void**)&cu::atoms::d_neighbours, ::atoms::neighbour_list_array.size() * sizeof(int));

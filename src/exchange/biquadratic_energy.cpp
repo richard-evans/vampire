@@ -33,7 +33,7 @@ namespace exchange{
    	double energy=0.0;
 
    	// Loop over neighbouring spins to calculate exchange
-   	for(int nn = internal::biquadratic_neighbour_list_start_index[atom]; nn <= internal::biquadratic_neighbour_list_end_index[atom]; ++nn){
+   	for(int nn = internal::biquadratic_neighbour_list_start_index[atom]; nn < internal::biquadratic_neighbour_list_end_index[atom]; ++nn){
 
    		const int natom = internal::biquadratic_neighbour_list_array[nn];
 

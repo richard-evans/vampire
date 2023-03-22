@@ -30,7 +30,7 @@ namespace exchange{
    	double energy=0.0;
 
    	// Loop over neighbouring spins to calculate exchange
-   	for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; ++nn){
+   	for(int nn = atoms::neighbour_list_start_index[atom]; nn < atoms::neighbour_list_end_index[atom]; ++nn){
 
    		const int natom = atoms::neighbour_list_array[nn];
    		const double Jij = atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
@@ -54,7 +54,7 @@ namespace exchange{
    	double energy=0.0;
 
       // Loop over neighbouring spins to calculate exchange
-   	for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; ++nn){
+   	for(int nn = atoms::neighbour_list_start_index[atom]; nn < atoms::neighbour_list_end_index[atom]; ++nn){
 
    		const int natom = atoms::neighbour_list_array[nn];
    		const double Jij[3]={atoms::v_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0],
@@ -82,7 +82,7 @@ namespace exchange{
    	double energy=0.0;
 
       // Loop over neighbouring spins to calculate exchange
-   	for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; ++nn){
+   	for(int nn = atoms::neighbour_list_start_index[atom]; nn < atoms::neighbour_list_end_index[atom]; ++nn){
 
    		const int natom = atoms::neighbour_list_array[nn];
    		const double Jij[3][3]={{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],

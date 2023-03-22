@@ -60,7 +60,7 @@ std::vector<double> calculate_tc(int num_local_cells,
          for (int atom = 0; atom < num_atoms; atom++){
             const int cell  = cell_array[atom];
             const int start = atoms::neighbour_list_start_index[atom];
-            const int end   = atoms::neighbour_list_end_index[atom] + 1;
+            const int end   = atoms::neighbour_list_end_index[atom];
             const int mat   = type_array[atom];
             N[cell]++;
             for(int nn=start;nn<end;nn++){

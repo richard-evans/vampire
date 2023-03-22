@@ -59,7 +59,7 @@ namespace internal{
 
                // temporray constants for loop start and end indices
    				const int start = neighbour_list_start_index[atom];
-   				const int end   = neighbour_list_end_index[atom]+1;
+   				const int end   = neighbour_list_end_index[atom];
 
                // loop over all neighbours
    				for(int nn = start; nn < end; ++nn){
@@ -92,7 +92,7 @@ namespace internal{
 
                // temporray constants for loop start and end indices
                const int start = neighbour_list_start_index[atom];
-               const int end   = neighbour_list_end_index[atom]+1;
+               const int end   = neighbour_list_end_index[atom];
 
                // loop over all neighbours
                for(int nn = start; nn < end; ++nn){
@@ -129,7 +129,7 @@ namespace internal{
 
                // temporray constants for loop start and end indices
                const int start = neighbour_list_start_index[atom];
-               const int end   = neighbour_list_end_index[atom]+1;
+               const int end   = neighbour_list_end_index[atom];
 
                // loop over all neighbours
                for(int nn = start; nn < end; ++nn){

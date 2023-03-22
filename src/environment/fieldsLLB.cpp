@@ -74,7 +74,7 @@ namespace environment
               //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
                //loops over cells with an interaction from the neighbour lists
                const int start = neighbour_list_start_index[cell];
-               const int end =   neighbour_list_end_index[cell] +1;
+               const int end =   neighbour_list_end_index[cell];
                for(int j = start;j<end;j++){
 
                   const int cellj = neighbour_list_array[j];
