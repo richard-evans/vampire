@@ -111,9 +111,10 @@ namespace anisotropy{
       // Check for material properties
       //------------------------------------------------------------
       //Minimal orthogonality TBD
-      std::string test  = "second-order-uniaxial-anisotropy-constant"; // new form (preferred)
-      std::string test2 = "uniaxial-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
-      if( (word == test) || (word == test2) ){
+      std::string test  = "2-0-order-anisotropy-constant";
+      std::string test2 = "second-order-uniaxial-anisotropy-constant";
+      std::string test3 = "uniaxial-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
+      if( (word == test) || (word == test2) || (word == test3) ){
          double ku2 = atof(value.c_str());
          vin::check_for_valid_value(ku2, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].ku2 = ku2;
@@ -122,9 +123,10 @@ namespace anisotropy{
       }
 
       // Second order theta second order phi anisotropy constant
-      test = "2-2-order-anisotropy-constant";
+      test  = "2-2-order-anisotropy-constant";
       test2 = "second-order-theta-second-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
+      test3 = "second-order-rotational-anisotropy-constant";
+      if( (word == test) || (word == test2) || (word == test3) ){
          double k2r2 = atof(value.c_str());
          vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2 = k2r2;
@@ -274,8 +276,9 @@ namespace anisotropy{
 
       //------------------------------------------------------------
       //Minimal orthogonality TBD
-      test = "fourth-order-uniaxial-anisotropy-constant";
-      if( word == test ){
+      test  = "4-0-order-anisotropy-constant";
+      test2 = "fourth-order-uniaxial-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
          double ku4 = atof(value.c_str());
          vin::check_for_valid_value(ku4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].ku4 = ku4;
@@ -295,8 +298,8 @@ namespace anisotropy{
       //------------------------------------------------------------
       test = "4-4-order-anisotropy-constant";
       test2 = "fourth-order-theta-fourth-order-phi-anisotropy-constant";
-      std::string test3 = "fourth-order-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
+      test3 = "fourth-order-rotational-anisotropy-constant";
+      if( (word == test) || (word == test2) || (word == test3) ){
          double k4r4 = atof(value.c_str());
          vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4 = k4r4;
@@ -315,8 +318,9 @@ namespace anisotropy{
       }
       //------------------------------------------------------------
       //Minimal orthogonality
-      test = "sixth-order-uniaxial-anisotropy-constant";
-      if( word == test ){
+      test = "6-0-order-anisotropy-constant";
+      test2 = "sixth-order-uniaxial-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
          double ku6 = atof(value.c_str());
          vin::check_for_valid_value(ku6, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].ku6 = ku6;

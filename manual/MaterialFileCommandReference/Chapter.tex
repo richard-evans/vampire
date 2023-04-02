@@ -53,18 +53,67 @@ E^{\mathrm{BQ}} = \sum_{i<j} \Jij^{\mathrm{BQ}} \left( \sms_i \cdot \sms_j \righ
 %--------------------------------
 % Magnetic anisotropy parameters
 %--------------------------------
+\noindent For details on how anisotropy has been implemented into VAMPIRE in the real spherical harmonic (tesseral harmonic) form, consult 10.1103/PhysRevB.107.064413.
+
 {\zicf material:uniaxial-anisotropy-constant = float [default 0.0 J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-constant} Defines the local second order single-ion magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
 
 \begin{equation*}
-E_i = -\kuu (\sms_i \cdot \ei)^2
+E_{2,0} = -k_{2,0} (\sms_i \cdot \hat{\mathbf{c}}_z )^2
 \end{equation*}
 
-\noindent where $\sms_i$ is the local spin direction and \ei is the easy axis unit vector. Positive values of \kuu give a preferred easy axis orientation, and negative values give a preferred easy plane orientation of the spin perpendicular to the easy axis direction.
+\noindent where $\sms_i$ is the local spin direction and $\hat{\mathbf{c}}_z$ is the easy/hard axis unit vector. Positive values of $k_{2,0}$ give a preferred easy axis orientation, and negative values give a preferred easy plane orientation of the spin perpendicular to the easy axis direction.
 
 {\zicf material:second-order-uniaxial-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:second-order-uniaxial-anisotropy-constant} Has the same meaning and is the preferred form for material:uniaxial-anisotropy-constant.
 
-{\zicf material:fourth-order-uniaxial-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-uniaxial-anisotropy-constant} Implements fourth order uniaxial anisotropy as implemented with spherical
-harmonics.
+{\zicf material:2-0-order-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:2-0-anisotropy-constant} Has the same meaning, but in a form understood in relation to the tesseral harmonic formulation of anisotropy; 2 refers to order in $\theta$, and 0 to order in $\phi$.
+
+{\zicf material:second-order-theta-second-order-phi-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:second-order-theta-second-order-phi-anisotropy-constant} Defines the local second order theta second order phi single-ion magnetocrystalline anisotropy constant at each atomic site.
+
+\begin{equation*}
+E_{2,2} = - k_{2,2} ( ( \sms_i \cdot \hat{\mathbf{c}}_x )^2 - ( \sms_i \cdot \hat{\mathbf{c}}_y )^2 )
+\end{equation*}
+
+\noindent where \hat{\mathbf{c}}_x and \hat{\mathbf{c}}_y are the anisotropic $x$ and $y$ axes respectively.
+
+{\zicf material:2-2-order-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:2-2-order-anisotropy-constant} Has the same meaning.
+
+{\zicf material:second-order-rotational-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:second-order-rotational-anisotropy-constant} Has the same meaning.
+
+{\zicf material:fourth-order-uniaxial-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-uniaxial-anisotropy-constant} Implements fourth order uniaxial anisotropy as implemented with spherical harmonics.
+
+\begin{equation*}
+  E_{4,0} = - k_{4,0} [ ( \sms_i \cdot \hat{\mathbf{c}}_z )^4 - \frac{6}{7} ( \sms_i \cdot \hat{\mathbf{c}}_z )^2 ]
+\end{equation*}
+
+{\zicf material:4-0-order-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:4-0-order-anisotropy-constant} Has the same meaning, but in a form understood in relation to the tesseral harmonic formulation of anisotorpy; 4 refers to order in $\theta$, and 0 to order in $\phi$.
+
+{\zicf material:fourth-order-theta-second-order-phi-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-theta-second-order-phi-anisotropy-constant} Sets fourth order $\theta$ second order $\phi$ rotational anisotropy constant.
+
+{\zicf material:4-2-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addconstentsline{toc}{subsection}{material:4-2-order-anisotropy-constant} Has the same meaning.
+
+{\zicf material:fourth-order-theta-fourth-order-phi-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-theta-fourth-order-phi-anisotropy-constant} Sets fourth order $\theta$ fourth order $\phi$ fully rotational anisotropy constant for the tesseral harmonic formalism.
+
+{\zicf material:4-4-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addconstentsline{toc}{subsection}{material:4-4-order-anisotropy-constant} Has the same meaning.
+
+{\zicf material:fourth-order-rotational-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-rotational-anisotropy-constant} Has the same meaning.
+
+{\zicf material:sixth-order-uniaxial-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:sixth-order-uniaxial-anisotropy-constant} Sets the sixth order uniaxial anisotropy constant for materials with single ion anisotropy.
+
+{\zicf material:6-0-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:6-0-order-anisotropy-constant} Has the same meaning.
+
+{\zicf material:sixth-order-theta-second-order-phi-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addconstentsline{toc}{subsection}{material:sixth-order-theta-second-order-phi-anisotropy-constant} Sets the sixth order $\theta$ second order $\phi$ rotational anisotropy constant for single ion anisotropy in the tesseral harmonic formalism.
+
+{\zicf material:6-2-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:6-2-order-anisotropy-constant} Has the same meaning.
+
+{\zicf material:sixth-order-theta-fourth-order-phi-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:sixth-order-theta-fourth-order-phi-anisotropy-constant} Sets the sixth order $\theta$ fourth order $\phi$ rotational anisotorpy constant for single ion anisotropy in the teseral harmonic formalism.
+
+{\zicf material:6-4-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:6-4-order-anisotropy-constant} Has the same meaning.
+
+{\zicf material:sixth-order-theta-sixth-order-phi-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:sixth-order-theta-sixth-order-phi-anisotropy-constant} Sets the sixth order $theta$ sixth order $phi$ fully rotational anisotropy constant for single ion anisotropy in the tesseral harmonic formalism.
+
+{\zicf material:6-6-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:6-6-order-anisotropy-constant} Has the same meaning.
+
+{\zicf material:sixth-order-rotational-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:sixth-order-rotational-anisotropy-constant} Has the same meaning.
 
 {\zicf material:cubic-anisotropy-constant = float [default 0.0 J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:cubic-anisotropy-constant}
 Defines the local cubic magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
