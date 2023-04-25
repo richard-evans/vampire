@@ -25,6 +25,7 @@ namespace vdc{
    bool xyz      = false; // flag to specify crystal.xyz file output
    bool povray   = false; // flag to specify povray file output
    bool povcells = false; // flag to specify povray cells output
+   bool povsticks= false; // flag to specify povray sticks output
    bool cells    = false; // flag to specify cells output
    bool cellsf   = false; // flag to output cell file
    bool vtk      = false; // flag to specify vtk output
@@ -87,6 +88,9 @@ namespace vdc{
    std::vector<double> camera_look_at = {0.0,0.0,0.0};
    double camera_zoom = 1.0;
    std::string background_colour = "Gray30";
+
+   // povray stick settings
+   double sticks_cutoff = 2.6; // cutoff distance for sticks (Angstroms)
 
    // povray shape sizes
    std::vector<double> atom_sizes  = {1.2};
@@ -163,6 +167,8 @@ namespace vdc{
       {"camera-look-at" , set_camera_look_at},
       {"camera-lookat"  , set_camera_look_at},
       {"camera-zoom"    , set_camera_zoom},
+      // povray sticks settings
+      {"sticks-cutoff"   , set_sticks_cutoff},
       // povray background colour
       {"background-colour", set_background_colour},
       {"background-color" , set_background_colour},

@@ -63,8 +63,9 @@ void command( int argc, char* argv[] ){
       //------------------------------------------------------------------------
       // Check for appropriate data outputs
       //------------------------------------------------------------------------
-      if      (sw == "--xyz"   ){ vdc::xyz    = true; } // xyz coordinate file output
+      if (sw == "--xyz"   ){ vdc::xyz    = true; } // xyz coordinate file output
       else if (sw == "--povray"){ vdc::povray = true; } // pov coordinate file output
+      else if (sw == "--povray-sticks"){ vdc::povsticks = true; } // pov sticks file output
       else if (sw == "--vtk"   ){ vdc::vtk    = true; } // vtk coordinate file output
       else if (sw == "--text"  ){ vdc::txt    = true; } // plain text file output
       else if (sw == "--cells" ){ // cell raw data

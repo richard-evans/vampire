@@ -508,6 +508,38 @@ void set_camera_zoom(const input_t &input){
 }
 
 //----------------------------------------------------------------------------------
+// Set povray stick cutoff
+//----------------------------------------------------------------------------------
+void set_sticks_cutoff(const input_t &input){
+
+   // print help message if argument is "-h"
+   if (input.value[0] == "-h"){
+      std::cout << "\"sticks-cutoff\"\tExpects 1 argument: positive real\n\n"
+                << "Povray sticks cutoff. Sticks connect nearby atoms to better\n"
+                << "visualise the atomic structure in povray. The cutoff gives\n"
+                << "the maximum distance in Angstroms between atoms connected\n"
+                << "sticks. Note that this option is very inefficient for large\n"
+                << "system sizes."
+                << "\nExample usage: sticks-cutoff = 3.54\t\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,1,"eq");
+
+   // convert to double and store
+   vdc::sticks_cutoff = std::stod(input.value[0]);
+
+   // check range
+   if (vdc::sticks_cutoff <= 0.0){
+      error_message(input,"sticks-cutoff must be greater than 0.0");
+   }
+
+   return;
+
+}
+
+//----------------------------------------------------------------------------------
 // Set povray background colour
 //----------------------------------------------------------------------------------
 void set_background_colour(const input_t &input){

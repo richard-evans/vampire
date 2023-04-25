@@ -29,6 +29,7 @@ obj/povray.o \
 obj/povray-cells.o \
 obj/read.o \
 obj/spins.o \
+obj/sticks.o \
 obj/ssc.o \
 obj/text.o \
 obj/vtk.o \

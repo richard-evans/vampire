@@ -30,6 +30,7 @@ namespace vdc{
    extern bool xyz;
    extern bool povray;
    extern bool povcells;
+   extern bool povsticks;
    extern bool cells;
    extern bool cellsf;
    extern bool vtk;
@@ -121,6 +122,9 @@ namespace vdc{
    extern double camera_zoom;
    extern std::string background_colour;
 
+   // povray sticks settings
+   extern double sticks_cutoff;
+
    // povray shape sizes
    extern std::vector<double> atom_sizes;
    extern std::vector<double> arrow_sizes;
@@ -187,17 +191,16 @@ namespace vdc{
    void output_povray_file();
    void output_cells_inc_file(unsigned int spin_file_id);
    void output_povray_cells_file();
+   void output_sticks_file();
 
    // Colour
    void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
    void initialise_colourwheel();
 
-
    // SSC
    void initialise_ssc();
    void output_average_ssc_file();
    void output_ssc_file(unsigned int spin_file_id);
-
 
    // CELL
    void initialise_cells();
@@ -221,6 +224,7 @@ namespace vdc{
    void set_camera_position(const input_t &input);
    void set_camera_look_at(const input_t &input);
    void set_camera_zoom(const input_t &input);
+   void set_sticks_cutoff(const input_t &input);
    void set_background_colour(const input_t &input);
    void set_atom_sizes(const input_t &input);
    void set_arrow_sizes(const input_t &input);

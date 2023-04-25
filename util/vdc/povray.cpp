@@ -298,6 +298,52 @@ void output_povray_file(){
       //std::cout << std::find(remove_materials.begin(), remove_materials.end(), ) << std::endl;
    }
 
+   //-----------------------------------------------------
+   // optionally output sticks macro if requested in vdc
+   //-----------------------------------------------------
+   /*if(vdc::povsticks){ // version with truncated cylinders
+      pfile << "\n" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "// Sticks macro" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "#macro stick(sx,sy,sz,ex,ey,ez,r1,r2)" << std::endl;
+      pfile << "   #declare dx = ex-sx;" << std::endl;
+      pfile << "   #declare dy = ey-sy;" << std::endl;
+      pfile << "   #declare dz = ez-sz;" << std::endl;
+      pfile << "   #declare r = sqrt(dx*dx + dy*dy + dz*dz);" << std::endl;
+      pfile << "   #declare xh = 0.5*dx/r;" << std::endl;
+      pfile << "   #declare yh = 0.5*dy/r;" << std::endl;
+      pfile << "   #declare zh = 0.5*dz/r;" << std::endl;
+      pfile << "   difference{" << std::endl;
+      pfile << "      cylinder {" << std::endl;
+      pfile << "         <sx+xh*r1,sy+yh*r1,sz+zh*r1>," << std::endl;
+      pfile << "         <ex-xh*r2,ey-yh*r2,ez-zh*r2>, 0.2" << std::endl;
+      pfile << "      }" << std::endl;
+      pfile << "      sphere{<sx,sy,sz>, r1*0.5}" << std::endl;
+      pfile << "      sphere{<ex,ey,ez>, r2*0.5}" << std::endl;
+      pfile << "      texture { pigment {color rgb < 0.1 0.1 0.1 >} finish {reflection ref diffuse dif ambient amb } }" << std::endl;
+      pfile << "   }" << std::endl;
+      pfile << "#end\n" << std::endl;
+   }*/
+
+   if(vdc::povsticks){
+      pfile << "\n" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "// Sticks macro" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "#macro stick(sx,sy,sz,ex,ey,ez,r1,r2)" << std::endl;
+      pfile << "   difference{" << std::endl;
+      pfile << "      cylinder {" << std::endl;
+      pfile << "         <sx,sy,sz>," << std::endl;
+      pfile << "         <ex,ey,ez>, 0.2" << std::endl;
+      pfile << "      }" << std::endl;
+      pfile << "      sphere{<sx,sy,sz>, r1*0.5}" << std::endl;
+      pfile << "      sphere{<ex,ey,ez>, r2*0.5}" << std::endl;
+      pfile << "      texture { pigment {color rgb < 0.1 0.1 0.1 >} finish {reflection ref diffuse dif ambient amb } }" << std::endl;
+      pfile << "   }" << std::endl;
+      pfile << "#end\n" << std::endl;
+   }
+
    // Output material specific macros
 	for(unsigned int indx=0; indx < vdc::materials.size(); indx++){
 
@@ -366,11 +412,15 @@ void output_povray_file(){
          }
       } // end of check if material is to be removed
 	}
+
    // frame specific povray output
    pfile << "//----------------------------------------------------------------" << std::endl;
-   pfile << "// Include spin data" << std::endl;
+   pfile << "// Include spin and sticks data" << std::endl;
    pfile << "//----------------------------------------------------------------" << std::endl;
    pfile << "#include concat(\"spins-\", str(frame_number, -8, 0) \".inc\")" << std::endl;
+
+   // optionally include sticks
+   if(vdc::povsticks) pfile << "#include \"sticks.inc\"" << std::endl;
 
    // close output file
 	pfile.close();
