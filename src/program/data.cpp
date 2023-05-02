@@ -43,6 +43,12 @@ namespace program{
       int num_electrical_pulses         = 1;
 
       //------------------------------------------------------------------------
+      // Exchange stiffness program
+      //------------------------------------------------------------------------
+      double exchange_stiffness_max_constraint_angle   = 180.01; // degrees
+      double exchange_stiffness_delta_constraint_angle =  5; // 22.5 degrees
+
+      //------------------------------------------------------------------------
       // Material specific program parameters
       //------------------------------------------------------------------------
       std::vector<internal::mp_t> mp; // array of material properties
