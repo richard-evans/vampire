@@ -42,13 +42,13 @@
 //---------------------
 // Determine grading
 //---------------------
-//#declare factor=pow(cos(phi*pi/180),2);
-//#declare factor=pow(cos(phi*pi/180),3);
-#declare factor=cos(phi*pi/180);
+#declare rfactor=pow(cos(phi*pi/180),2);
+#declare rfactor=pow(cos(phi*pi/180),7);
+//#declare rfactor=cos(phi*pi/180);
 
 #switch(phi)
   #range(0,90)
-    #declare factor=cos(phi*pi/180);
+    #declare factor=rfactor;
     #switch(rr)
     #range(0,factor)
       #declare rr=factor;
@@ -66,7 +66,7 @@
   #break
 
   #range(90,180)
-    #declare factor=1.+cos(phi*pi/180);
+    #declare factor=1.+rfactor;
     //#debug concat("Phi: ",str(phi,5,1),"\n")
     //#debug concat("factor: ",str(factor,5,1),"\n")
     #switch(rr)
@@ -116,7 +116,17 @@ pigment {color rgb <rr gg bb>}
 // Macro for povray spins
 //-------------------------------------------
 #macro spinrgb(sx,sy,sz,cr,cg,cb)
-   #declare theta = acos(sx/(sqrt(sx*sx+sy*sy)));
-   #declare phi = acos(sz);
+//#debug concat("sx : ",str(sx,5,2),"\n")
+//#debug concat("sy : ",str(sy,5,2),"\n")
+//#debug concat("sz : ",str(sz,5,2),"\n")
+#declare delta = 0.01;
+#declare sxxx=sx+delta;
+#declare syyy=sy;
+#declare ang = atan2(syyy,sxxx);
+#declare theta=(180.0*(ang+pi)/pi);
+#declare phi=180.0*acos(sz)/pi;
+//#debug concat("phi   : ",str(phi,5,2),"\n")
+//#debug concat("theta : ",str(theta,5,2),"\n")
+
    colour_wheel(theta, phi)
 #end
