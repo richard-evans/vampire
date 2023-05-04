@@ -189,7 +189,73 @@ const std::vector<double>& magnetization_statistic_t::get_magnetization(){
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to get magnetisation data
+// Function to write mean magnetisation data to a checkpoint file
+//------------------------------------------------------------------------------------------------------
+void magnetization_statistic_t::save_checkpoint(std::ofstream& chkfile){
+
+   const uint64_t num_elements = mean_magnetization.size();
+
+   chkfile.write(reinterpret_cast<const char*>(&num_elements),sizeof(uint64_t));
+   chkfile.write(reinterpret_cast<const char*>(&mean_counter),sizeof(double));
+   chkfile.write(reinterpret_cast<const char*>(&mean_magnetization[0]),sizeof(double)*mean_magnetization.size());
+   return;
+
+}
+
+std::string expand_str(std::string str){
+
+   if(str == "s") return "system_magnetization";
+   if(str == "g") return "grain_magnetization";
+   if(str == "m") return "material_magnetization";
+   if(str == "mg") return "material_grain_magnetization";
+   if(str == "h") return "height_magnetization";
+   if(str == "mh") return "material_height_magnetization";
+   if(str == "mgh") return "material_grain_height_magnetization";
+
+   return "";
+
+}
+//------------------------------------------------------------------------------------------------------
+// Function to write mean magnetisation data to a checkpoint file
+//------------------------------------------------------------------------------------------------------
+void magnetization_statistic_t::load_checkpoint(std::ifstream& chkfile, bool chk_continue){
+
+   // load number of elements to see how much data to read
+   uint64_t num_elements = 0;
+   chkfile.read((char*)&num_elements,sizeof(uint64_t));
+
+   // set up data storage for reading
+   double read_mean_counter = 0.0;
+   std::vector<double> read_mean_magnetization(num_elements, 0.0);
+
+   // read data elements
+   chkfile.read((char*)&read_mean_counter,sizeof(double));
+   chkfile.read((char*)&read_mean_magnetization[0],sizeof(double)*num_elements);
+
+   // check that simulation is a continuation (in the case of not continuing do nothing)
+   if(chk_continue){
+
+      // check that the number of elements (materials, heights, etc) is the same
+      if(num_elements == mean_magnetization.size()){
+
+         // load mean counter and magnetization into class variables
+         mean_counter = read_mean_counter;
+         mean_magnetization = read_mean_magnetization;
+
+      }
+      // if not, don't load them (allowing changing of stats after checkpoint)
+      // but print out warning message to user
+      else{
+         zlog << zTs() << "Warning - checkpoint loaded for previously unused statistic " << expand_str(name) << std::endl;
+      }
+   }
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to set magnetisation data
 //------------------------------------------------------------------------------------------------------
 void magnetization_statistic_t::set_magnetization(std::vector<double>& new_magnetization, std::vector<double>& new_mean_magnetization, long counter){
 

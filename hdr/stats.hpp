@@ -32,9 +32,6 @@ namespace stats
    /// Statistics types
    enum stat_t { atotal=0, mean=1};
 
-   /// Statistics output functions
-   //extern void output_energy(std::ostream&, enum energy_t, enum stat_t,bool header);
-
    //-------------------------------------------------
    // New statistics module functions and variables
    //-------------------------------------------------
@@ -174,6 +171,9 @@ namespace stats
          void set_magnetization(std::vector<double>& magnetization, std::vector<double>& mean_magnetization, long counter);
          void reset_magnetization_averages();
          const std::vector<double>& get_magnetization();
+         void save_checkpoint(std::ofstream& chkfile);
+         void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+         const std::vector<double>& get_checkpoint_parameters(double& sum_mx, double& sum_my, double& sum_mz, double& sum_count);
          std::string output_magnetization(bool header);
          std::string output_normalized_magnetization(bool header);
          std::string output_normalized_magnetization_length(bool header);
