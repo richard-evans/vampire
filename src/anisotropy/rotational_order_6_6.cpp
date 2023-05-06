@@ -135,8 +135,8 @@ namespace anisotropy{
          const double gz = internal::kl_vector[mat].z;
 
          // calculate sin^6{theta}cos{6phi}
-         //          = sin^6{theta}(32cos^6{phi} - 48cos^4{phi} + 18cos^2{phi} - 1)
-         //          = 32 * Sx^6 - 48 * (Sx^2 + Sy^2) * Sx^4 + 18 * (Sx^2 + Sy^2)^2 * Sx^2 - (Sx^2 + Sy^2)^3
+         //          = sin^6{theta}( 32 * cos^6{phi} - 48 * cos^4{phi} + 18 * cos^2{phi} - 1 )
+         //          = 32 * Sx^6 - 48 * ( Sx^2 + Sy^2 ) * Sx^4 + 18 * ( Sx^2 + Sy^2 )^2 * Sx^2 - ( Sx^2 + Sy^2 )^3
          //          = Sx^6 - 15 * Sx^4 * Sy^2 + 15 * Sx^2 * Sy^4 - Sy^6
 
          const double Sx = sx * fx + sy * fy + sz * fz;
