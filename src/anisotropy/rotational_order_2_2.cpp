@@ -132,12 +132,11 @@ namespace anisotropy{
          // calculate sin^2{theta}cos{2phi} = sin^2{theta}cos^2{phi} - sin^2{theta}sin^2{phi} = S_x^2 - S_y^2
          const double Sx = sx * fx + sy * fy + sz * fz;
          const double Sy = sx * gx + sy * gy + sz * gz;
-         const double sintheta2cos2phi = Sx * Sx - Sy * Sy;
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
          const double k2r2 = internal::k2r2[mat];
 
-         return - k2r2 * sintheta2cos2phi;
+         return - k2r2 * (Sx * Sx - Sy * Sy);
 
       }
    }
