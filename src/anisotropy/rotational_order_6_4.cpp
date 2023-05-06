@@ -136,10 +136,10 @@ namespace anisotropy{
          const double gy = internal::kl_vector[mat].y;
          const double gz = internal::kl_vector[mat].z;
 
-         // calculate sin^4{theta}(cos^2{theta} - 1/11)cos{4phi}
-         //          = (sin^6{theta} - (10/11)sin^4{theta})(8cos^4{phi} - 8cos^2{phi} + 1)
-         //          = (sin^2{theta} - 10/11)(8Sx^4 - 8(Sx^2 + Sy^2)Sx^2 + (Sx^2 + Sy^2)^2)
-         //          = (Sx^2 + Sy^2 - 10/11)(Sx^4 - 6Sx^2Sy^2 + Sy^4)
+         // calculate - sin^4{theta}(cos^2{theta} - 1/11)cos{4phi}
+         //          = ( sin^6{theta} - ( 10 / 11 ) * sin^4{theta} ) * ( 8 * cos^4{phi} - 8 * cos^2{phi} + 1 )
+         //          = ( sin^2{theta} - 10 / 11 ) * ( 8 * Sx^4 - 8 * (Sx^2 + Sy^2) * Sx^2 + ( Sx^2 + Sy^2 )^2 )
+         //          = ( Sx^2 + Sy^2 - 10 / 11 ) * ( Sx^4 - 6 * Sx^2 * Sy^2 + Sy^4 )
 
          const double Sx = sx * fx + sy * fy + sz * fz;
          const double Sx2 = Sx * Sx;
@@ -152,7 +152,7 @@ namespace anisotropy{
          // get reduced anisotropy constant ku/mu_s (Tesla)
          const double k6r4 = internal::k6r4[mat];
 
-         return - k6r4 * (sintheta2 - tenoeleven) * (Sx2 * Sx2 - six * Sx2 * Sy2 + Sy2 * Sy2);
+         return k6r4 * (sintheta2 - tenoeleven) * (Sx2 * Sx2 - six * Sx2 * Sy2 + Sy2 * Sy2);
 
       }
    }
