@@ -114,7 +114,7 @@ namespace anisotropy{
       // Function to add 6-theta-2-phi anisotropy
       //---------------------------------------------------------------------------------
       // Define useful constants
-      const double eight = 8.0;
+      const double six = 6.0;
 
       double fourth_order_theta_fourth_order_phi_energy(const int atom,
                                           const int mat,
@@ -133,17 +133,16 @@ namespace anisotropy{
          const double gy = internal::kl_vector[mat].y;
          const double gz = internal::kl_vector[mat].z;
 
-         // calculate sin^4{theta}cos{4phi} = sin^4{theta}(8cos^4{phi} - 8cos^2{phi} + 1)
-         //                                 = 8Sx^4 - 8sin^2{theta}Sx^2 + sin^4{theta}
+         // calculate sin^4{theta}cos{4phi} = sin^4{theta} * ( 8 * cos^4{phi} - 8 * cos^2{phi} + 1 )
+         //                                 = 8 * Sx^4 - 8 * sin^2{theta} * Sx^2 + sin^4{theta}
+         //                                 = Sx^4 - 6 Sx^2 * Sy^2 + Sy^4
          const double Sx = sx * fx + sy * fy + sz * fz;
          const double Sx2 = Sx * Sx;
 
          const double Sy = sx * gx + sy * gy + sz * gz;
          const double Sy2 = Sy * Sy;
 
-         const double sintheta2 = Sx2 + Sy2;
-
-         return - k4r4 * (eight * Sx2 * Sx2 - eight * Sx2 * sintheta2 + sintheta2 * sintheta2);
+         return - k4r4 * (Sx2 * Sx2 - six * Sx2 * Sy2 + Sy * Sy );
 
       }
    }
