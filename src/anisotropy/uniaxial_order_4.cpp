@@ -108,8 +108,7 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
 
       // Define useful constants
-      const double fiveothirtyfive  = 5.0  / 35.0;
-      const double thirtyothirtyfive = 30.0 / 35.0;
+      const double six_o_seven = 6.0 / 7.0;
 
       double uniaxial_fourth_order_energy(const int atom,
                                           const int mat,
@@ -128,7 +127,7 @@ namespace anisotropy{
          const double sdote  = (sx * ex + sy * ey + sz * ez);
          const double sdote2 = sdote * sdote;
 
-         return - ku4 * (sdote2 * sdote2 - thirtyothirtyfive * sdote2 - fiveothirtyfive);
+         return - ku4 * ( sdote2 * sdote2 - six_o_seven * sdote2 );
 
       }
 
