@@ -99,8 +99,8 @@ namespace anisotropy{
             const double two_k6r2 = two * internal::k6r2[mat];
 
             // calculate full form to add to field
-            const double fullx = two_k6r2 * (Sx * Sx2pSy2 * (Sx2 - three * Sy2) - Sx * (thirtytwooeleven * Sx2 - sixteenothirtythree));
-            const double fully = two_k6r2 * (Sy * Sx2pSy2 * (three * Sx2 - Sy2) + Sy * (thirtytwooeleven * Sy2 - sixteenothirtythree));
+            const double fullx = two_k6r2 * ( Sx * Sx2pSy2 * ( three * Sx2 - Sy2 ) - Sx * ( thirtytwooeleven * Sx2 - sixteenothirtythree ) );
+            const double fully = two_k6r2 * ( Sy * Sx2pSy2 * ( Sx2 - three * Sy2 ) + Sy * ( thirtytwooeleven * Sy2 - sixteenothirtythree ) );
 
             field_array_x[atom] += fullx * fx + fully * gx;
             field_array_y[atom] += fullx * fy + fully * gy;
