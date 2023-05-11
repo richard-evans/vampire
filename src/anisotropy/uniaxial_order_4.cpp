@@ -54,7 +54,7 @@ namespace anisotropy{
       //--------------------------------------------------------------------------------------------------------------
 
       // Define useful constants
-      const double sixtyothirtyfive = 60.0 / 35.0;
+      const double twelve_o_seven = 12.0 / 7.0;
       const double four = 4.0;
 
       void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
@@ -91,7 +91,7 @@ namespace anisotropy{
             const double sdote3 = sdote * sdote * sdote;
 
             // calculate field (double negative from scale factor and negative derivative)
-            const double k4 = ku4 * (four * sdote3 - sixtyothirtyfive * sdote);
+            const double k4 = ku4 * (four * sdote3 - twelve_o_seven * sdote);
 
             field_array_x[atom] += ex * k4;
             field_array_y[atom] += ey * k4;

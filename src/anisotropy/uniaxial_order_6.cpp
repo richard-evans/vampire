@@ -51,7 +51,7 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
 
       // Define useful constants
-      const double twentytwo = 22.0;
+      const double two_o_eleven = 2.0 / 11.0;
       const double thirtythree = 33.0;
       const double thirty = 30.0;
       const double five = 5.0;
@@ -90,7 +90,7 @@ namespace anisotropy{
             // get reduced anisotropy constant ku/mu_s
             const double ku6 = internal::ku6[mat];
 
-            const double fullz = twentytwo * ku6 * sdote * (thirtythree * sdote4 + thirty * sdote2 + five);
+            const double fullz = two_o_eleven * ku6 * sdote * ( thirtythree * sdote4 - thirty * sdote2 + five );
 
             field_array_x[atom] += ex * fullz;
             field_array_y[atom] += ey * fullz;
