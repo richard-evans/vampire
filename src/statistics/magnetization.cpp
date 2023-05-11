@@ -34,6 +34,21 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+// file scope function to expand statistic type string
+inline std::string expand_str(std::string str){
+
+   if(str == "s") return "system_magnetization";
+   if(str == "g") return "grain_magnetization";
+   if(str == "m") return "material_magnetization";
+   if(str == "mg") return "material_grain_magnetization";
+   if(str == "h") return "height_magnetization";
+   if(str == "mh") return "material_height_magnetization";
+   if(str == "mgh") return "material_grain_height_magnetization";
+
+   return "";
+
+}
+
 namespace stats{
 
 //------------------------------------------------------------------------------------------------------
@@ -202,19 +217,6 @@ void magnetization_statistic_t::save_checkpoint(std::ofstream& chkfile){
 
 }
 
-std::string expand_str(std::string str){
-
-   if(str == "s") return "system_magnetization";
-   if(str == "g") return "grain_magnetization";
-   if(str == "m") return "material_magnetization";
-   if(str == "mg") return "material_grain_magnetization";
-   if(str == "h") return "height_magnetization";
-   if(str == "mh") return "material_height_magnetization";
-   if(str == "mgh") return "material_grain_height_magnetization";
-
-   return "";
-
-}
 //------------------------------------------------------------------------------------------------------
 // Function to write mean magnetisation data to a checkpoint file
 //------------------------------------------------------------------------------------------------------

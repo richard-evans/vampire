@@ -96,6 +96,14 @@ void save_checkpoint(){
    stats::material_height_magnetization.save_checkpoint(chkfile);
    stats::material_grain_height_magnetization.save_checkpoint(chkfile);
 
+   stats::system_specific_heat.save_checkpoint(chkfile);
+   stats::grain_specific_heat.save_checkpoint(chkfile);
+   stats::material_specific_heat.save_checkpoint(chkfile);
+
+   stats::system_susceptibility.save_checkpoint(chkfile);
+   stats::grain_susceptibility.save_checkpoint(chkfile);
+   stats::material_susceptibility.save_checkpoint(chkfile);
+
    // close checkpoint file
    chkfile.close();
 
@@ -213,6 +221,14 @@ void load_checkpoint(){
    stats::height_magnetization.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
    stats::material_height_magnetization.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
    stats::material_grain_height_magnetization.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
+
+   stats::system_specific_heat.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
+   stats::grain_specific_heat.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
+   stats::material_specific_heat.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
+
+   stats::system_susceptibility.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
+   stats::grain_susceptibility.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
+   stats::material_susceptibility.load_checkpoint(chkfile,sim::load_checkpoint_continue_flag);
 
    // close checkpoint file
    chkfile.close();

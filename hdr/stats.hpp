@@ -239,13 +239,15 @@ namespace stats
    class specific_heat_statistic_t{
 
       public:
-         specific_heat_statistic_t (std::string n):initialized(false){
-           name = n;
-         };
-         void initialize(energy_statistic_t& energy_statistic);
-         void calculate(const std::vector<double>& energy);
-         void reset_averages();
-         std::string output_mean_specific_heat(const double temperature,bool header);
+			specific_heat_statistic_t (std::string n):initialized(false){
+				name = n;
+			};
+			void initialize(energy_statistic_t& energy_statistic);
+			void calculate(const std::vector<double>& energy);
+			void save_checkpoint(std::ofstream& chkfile);
+			void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+			void reset_averages();
+			std::string output_mean_specific_heat(const double temperature,bool header);
 
 
       private:
@@ -269,10 +271,12 @@ namespace stats
          susceptibility_statistic_t (std::string n):initialized(false){
            name = n;
          };
-         void initialize(magnetization_statistic_t& mag_stat);
-         void calculate(const std::vector<double>& magnetization);
-         void reset_averages();
-         std::string output_mean_susceptibility(const double temperature,bool header);
+			void initialize(magnetization_statistic_t& mag_stat);
+			void calculate(const std::vector<double>& magnetization);
+			void save_checkpoint(std::ofstream& chkfile);
+			void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+			void reset_averages();
+			std::string output_mean_susceptibility(const double temperature,bool header);
          //std::string output_mean_absolute_susceptibility();
 
       private:

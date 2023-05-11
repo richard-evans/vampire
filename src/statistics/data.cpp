@@ -62,7 +62,7 @@ namespace stats{
    torque_statistic_t material_torque("m");
 
    specific_heat_statistic_t system_specific_heat("s");
-   specific_heat_statistic_t grain_specific_heat("s");
+   specific_heat_statistic_t grain_specific_heat("g");
    specific_heat_statistic_t material_specific_heat("m");
 
    standard_deviation_statistic_t material_standard_deviation("m");

@@ -19,6 +19,17 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+// file scope function to expand statistic type string
+inline std::string expand_str(std::string str){
+
+   if(str == "s") return "system_susceptibility";
+   if(str == "g") return "grain_susceptibility";
+   if(str == "m") return "material_susceptibility";
+
+   return "";
+
+}
+
 namespace stats{
 
 //------------------------------------------------------------------------------------------------------
@@ -107,6 +118,64 @@ void susceptibility_statistic_t::calculate(const std::vector<double>& magnetizat
    }
 
    mean_counter+=1.0;
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to write mean susceptibility data to a checkpoint file
+//------------------------------------------------------------------------------------------------------
+void susceptibility_statistic_t::save_checkpoint(std::ofstream& chkfile){
+
+   const uint64_t num_elements = mean_susceptibility.size();
+
+   chkfile.write(reinterpret_cast<const char*>(&num_elements),sizeof(uint64_t));
+   chkfile.write(reinterpret_cast<const char*>(&mean_counter),sizeof(double));
+   chkfile.write(reinterpret_cast<const char*>(&mean_susceptibility[0]),sizeof(double)*mean_susceptibility.size());
+   chkfile.write(reinterpret_cast<const char*>(&mean_susceptibility_squared[0]),sizeof(double)*mean_susceptibility_squared.size());
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to write mean susceptibility data to a checkpoint file
+//------------------------------------------------------------------------------------------------------
+void susceptibility_statistic_t::load_checkpoint(std::ifstream& chkfile, bool chk_continue){
+
+   // load number of elements to see how much data to read
+   uint64_t num_elements = 0;
+   chkfile.read((char*)&num_elements,sizeof(uint64_t));
+
+   // set up data storage for reading
+   double read_mean_counter = 0.0;
+   std::vector<double> read_mean_susceptibility(num_elements, 0.0);
+   std::vector<double> read_mean_susceptibility_squared(num_elements, 0.0);
+
+   // read data elements
+   chkfile.read((char*)&read_mean_counter,sizeof(double));
+   chkfile.read((char*)&read_mean_susceptibility[0],sizeof(double)*num_elements);
+   chkfile.read((char*)&read_mean_susceptibility_squared[0],sizeof(double)*num_elements);
+
+   // check that simulation is a continuation (in the case of not continuing do nothing)
+   if(chk_continue){
+
+      // check that the number of elements (materials, heights, etc) is the same
+      if(num_elements == mean_susceptibility.size()){
+
+         // load mean counter and data into class variables
+         mean_counter = read_mean_counter;
+         mean_susceptibility = read_mean_susceptibility;
+         mean_susceptibility_squared = read_mean_susceptibility_squared;
+
+      }
+      // if not, don't load them (allowing changing of stats after checkpoint)
+      // but print out warning message to user
+      else{
+         zlog << zTs() << "Warning - checkpoint loaded for previously unused statistic " << expand_str(name) << std::endl;
+      }
+   }
 
    return;
 
