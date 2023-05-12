@@ -19,7 +19,9 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
-// file scope function to expand statistic type string
+// file scope function in annonymous namespace to expand statistic type string
+namespace {
+
 inline std::string expand_str(std::string str){
 
    if(str == "s") return "system_susceptibility";
@@ -27,6 +29,8 @@ inline std::string expand_str(std::string str){
    if(str == "m") return "material_susceptibility";
 
    return "";
+
+}
 
 }
 

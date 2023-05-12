@@ -34,8 +34,10 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
-// file scope function to expand statistic type string
-inline std::string expand_str(std::string str){
+// file scope function in annonymous namespace to expand statistic type string
+namespace {
+
+std::string expand_str(std::string str){
 
    if(str == "s") return "system_magnetization";
    if(str == "g") return "grain_magnetization";
@@ -46,6 +48,8 @@ inline std::string expand_str(std::string str){
    if(str == "mgh") return "material_grain_height_magnetization";
 
    return "";
+
+}
 
 }
 
