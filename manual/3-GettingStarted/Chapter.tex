@@ -17,9 +17,26 @@ Structural parameters define properties such as the system size, shape, particle
 
 \section*{Input and Output Files}
 \phantomsection\addcontentsline{toc}{section}{Input and Output Files}
-\vampire requires at least two files to run a simulation, the \textit{input} file and the \textit{material} file. The \textit{input} file defines all the properties of the simulated system, such as the dimensions or particle shape, as well as the simulation parameters and program output. The \textit{material} file defines the properties of all the materials used in the simulation, and is usually given the \textit{.mat} file extension. A sample material file \textit{Co.mat} is included with the code which defines a minimum set of parameters for Co. 
+\vampire requires at least two files to run a simulation, the \textit{input} file and the \textit{material} file. The \textit{input} file defines all the properties of the simulated system, such as the dimensions or particle shape, as well as the simulation parameters and program output. The \textit{material} file defines the properties of all the materials used in the simulation, and is usually given the \textit{.mat} file extension. A sample material file \textit{Co.mat} is included with the code which defines a minimum set of parameters for Co. The \textit{input} file can be specified with the \verb|--input-file| command line option, and the \textit{material} file is specified in the input file.
 
-The output of the code includes a main \textit{output} file, which records data such as the magnetisation, timesteps, temperature etc. The format of the \textit{output} file is fully customisable, so that the amount of output data is limited to what is useful. In addition to the output file, the other main available outputs are spin configuration files, which with post-processing allow output of snapshots of the magnetic configurations during the simulation.
+
+The output of the code includes a main \textit{output} file, which records data such as the magnetisation, timesteps, temperature etc. The format of the \textit{output} file is fully customisable, so that the amount of output data is limited to what is useful. The \textit{output} file can be specified with the \verb|--output-file| command line option. In addition to the output file, the other main available outputs are spin configuration files, which with post-processing allow output of snapshots of the magnetic configurations during the simulation.
+
+
+To change the name of the \textit{input} and \textit{output} files, a command line parameter can be used. For example, to set the \textit{input} file for a serial simulation, or the \textit{output} file for a parallel simulation:
+
+\noindent
+\begin{minipage}[c]{\textwidth}
+\centering
+	\begin{minipage}[c]{0.8\textwidth}
+        \raggedright
+\verb|vampire-serial --input-file [input_filename]|
+\verb|vampire-parallel --output-file [output_filename]|
+        \end{minipage}
+\end{minipage}
+
+If unspecified, the default \textit{input} file name is "input", and the default \textit{output} filename is "output".
+
 
 \section*{Sample input files}
 \phantomsection\addcontentsline{toc}{section}{Sample input files}
