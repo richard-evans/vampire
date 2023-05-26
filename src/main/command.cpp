@@ -31,10 +31,8 @@ void command_line_args(int argc, char* argv[]){
 
    // Loop over all arguments
    for(int arg = 1; arg < argc; arg++){
-
       // convert text to std::string
       std::string sw = argv[arg];
-
       //-----------------------------
       // version information
       //-----------------------------
@@ -65,6 +63,24 @@ void command_line_args(int argc, char* argv[]){
          else{
             terminaltextcolor(RED);
             std::cerr << "Error - no file specified for \'--input-file\' command line option" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+            return;
+         }
+      }
+
+      //-----------------------------
+      // output file name
+      //-----------------------------
+      else if(sw=="--output-file"){
+         // check number of args not exceeded
+         if(arg+1 < argc){
+            arg++;
+            vout::output_file_name = string(argv[arg]);
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - no file specified for \'--output-file\' command line option" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
             return;
