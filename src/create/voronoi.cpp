@@ -401,6 +401,12 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
    double tmp_grain_pointx_array[max_vertices];
 	double tmp_grain_pointy_array[max_vertices];
 
+	// optionally output grain vertices to file
+	std::ofstream gvfile;
+	if(create::internal::output_gv_file && vmpi::master){
+		gvfile.open("grain_shapes.txt");
+	}
+
 	// loop over all grains with vertices
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
 		// Exclude grains with zero vertices
@@ -410,6 +416,12 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		  zlog << "." << std::flush;
 		}
 		if(grain_vertices_array[grain].size()!=0){
+
+			if(create::internal::output_gv_file){
+				const double dx = grain_coord_array[grain][0];
+				const double dy = grain_coord_array[grain][1];
+				create::internal::write_grain_vertices(grain, dx, dy, gvfile, grain_vertices_array[grain]);
+			}
 
 			// initialise minimum and max supercell coordinates for grain
 			int minx=10000000;

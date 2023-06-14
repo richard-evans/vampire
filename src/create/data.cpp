@@ -54,6 +54,7 @@ namespace create{
 
          bool select_material_by_geometry = false;	// Toggle override of input material type by geometry
          bool select_material_by_z_height = false;	// Toggle overwriting of material id by z-height
+         bool output_gv_file = true; // toggle output of grain positions to file
 
       } // end of internal namespace
 
