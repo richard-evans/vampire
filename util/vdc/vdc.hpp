@@ -22,12 +22,19 @@
 
 namespace vdc{
 
+   // simple struct for xy coordinates
+   struct xy_t{
+      double x;
+      double y;
+   };
+
    // input filename
    extern std::string input_file;
 
    // program option flags
    extern bool verbose;
    extern bool xyz;
+   extern bool grains; // flag to enable grain calculations
    extern bool povray;
    extern bool povcells;
    extern bool povsticks;
@@ -107,6 +114,7 @@ namespace vdc{
 
    extern std::vector<int> category;
    extern std::vector<int> type;
+   extern std::vector<int> grain;
 
    extern std::vector<double> coordinates;
    extern std::vector<double> spins;
@@ -133,6 +141,7 @@ namespace vdc{
    extern uint64_t num_nm_atoms;
    extern std::vector<int> nm_category;
    extern std::vector<int> nm_type;
+   extern std::vector<int> nm_grain;
    extern std::vector<double> nm_coordinates;
 
    // cell data
@@ -146,6 +155,9 @@ namespace vdc{
    extern std::vector<int> num_atoms_in_cell;
    extern std::vector<double> cell_coords;
    extern std::vector< std::vector< std::vector <double> > > cell_magnetization;
+
+   // grain data
+   extern std::vector < std::vector <xy_t> > grain_vertices_array;
 
    // array to store subsidiary data file names
    extern std::vector <std::string> coord_filenames;
@@ -179,6 +191,9 @@ namespace vdc{
    // XYZ
    void output_xyz_file();
 
+   // atoms
+   void output_atoms_txt_file();
+
    // VTK
    void output_vtk_file(unsigned int spin_file_id);
 
@@ -192,6 +207,11 @@ namespace vdc{
    void output_cells_inc_file(unsigned int spin_file_id);
    void output_povray_cells_file();
    void output_sticks_file();
+
+   // grains
+   void load_grain_vertices();
+   void determine_atom_grain_id();
+   //void generate_povray_grains()
 
    // Colour
    void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);

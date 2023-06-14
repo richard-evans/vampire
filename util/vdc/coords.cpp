@@ -60,6 +60,15 @@ void process_coordinates(){
    // Calculate systenm dimensions after slicing
    vdc::calculate_system_extent(vdc::sliced_atoms_list,vdc::sliced_nm_atoms_list);
 
+   // calculate grain properties
+   if(vdc::grains){
+      vdc::load_grain_vertices();
+      vdc::determine_atom_grain_id();
+   }
+
+   // output atoms text file
+   if(vdc::txt) output_atoms_txt_file();
+
    // output xyz file;
    if(vdc::xyz) output_xyz_file();
 

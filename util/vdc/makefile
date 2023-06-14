@@ -16,6 +16,7 @@ GCC_CFLAGS=-O3 -std=c++0x
 
 # Objects
 OBJECTS= \
+obj/atoms.o \
 obj/cells.o \
 obj/colour.o \
 obj/colourmaps.o \
@@ -23,6 +24,7 @@ obj/command.o \
 obj/coords.o \
 obj/data.o \
 obj/functions.o \
+obj/grains.o \
 obj/main.o \
 obj/non_magnetic.o \
 obj/povray.o \
