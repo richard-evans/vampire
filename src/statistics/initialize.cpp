@@ -124,7 +124,7 @@ namespace stats{
             int grain = grain_array[atom];
             int mat = material_type_array[atom];
             // ignore non-magnetic atoms in stats calculation by assigning them to last mask
-            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = (num_grains)*num_materials+mat;
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = (num_grains)*num_materials;
             else mask[atom] = num_materials * grain + mat;
          }
 
