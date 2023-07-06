@@ -7,13 +7,15 @@
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-create:periodic-boundaries-x
-create:periodic-boundaries-y
-create:periodic-boundaries-z
+#create:periodic-boundaries-x
+#create:periodic-boundaries-y
+#create:periodic-boundaries-z
 
 #create:truncated-octahedron
 #create:cube
-#create:crystal-structure=bcc
+create:crystal-structure=bcc
+create:crystal-sublattice-materials
+exchange:interaction-range=1.4
 #create:single-spin
 
 #------------------------------------------
@@ -28,7 +30,7 @@ dimensions:system-size-z = 4 !nm
 # Material Files:
 #------------------------------------------
 material:file = L10FePt.mat
-material:unit-cell-file = L10FePt.ucf
+#material:unit-cell-file = L10FePt.ucf
 
 #------------------------------------------
 # Simulation attributes:
@@ -52,7 +54,7 @@ sim:total-time-steps = 1000000
 #------------------------------------------
 sim:program = curie-temperature
 #sim:program = time-series
-sim:integrator = lsf
+sim:integrator = lsf-mc
 
 #------------------------------------------
 # Data output
