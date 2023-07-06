@@ -30,7 +30,7 @@ namespace unitcell{
       std::istringstream& ucf_ss,
       std::string& filename,
       unsigned int& line_counter,
-      int& interaction_range
+      unsigned int& interaction_range
    ){
 
 		int num_interactions = 0; // assume no interactions
@@ -114,9 +114,9 @@ namespace unitcell{
          interaction[i].dz=dz;
 
          // check for long range interactions
-         if(abs(dx)>interaction_range) interaction_range=abs(dx);
-         if(abs(dy)>interaction_range) interaction_range=abs(dy);
-         if(abs(dz)>interaction_range) interaction_range=abs(dz);
+         if(static_cast<unsigned int>(abs(dx))>interaction_range) interaction_range=abs(dx);
+         if(static_cast<unsigned int>(abs(dy))>interaction_range) interaction_range=abs(dy);
+         if(static_cast<unsigned int>(abs(dz))>interaction_range) interaction_range=abs(dz);
 
          //int iatom_mat = unit_cell.atom[iatom].mat;
          //int jatom_mat = unit_cell.atom[jatom].mat;

@@ -317,7 +317,7 @@ namespace internal{
             // array of MPI requests
             std::vector<MPI_Request> requests(0);
 
-            MPI_Request req; // temporary variable for push_back operations
+            MPI_Request req = MPI_REQUEST_NULL; // temporary variable for push_back operations
             //MPI_Status status; // temporary variable for stati
 
             //std::stringstream textsse;
@@ -642,7 +642,7 @@ namespace internal{
             // array of MPI requests
             std::vector<MPI_Request> requests(0);
 
-            MPI_Request req; // temporary variable for push_back operations
+            MPI_Request req = MPI_REQUEST_NULL; // temporary variable for push_back operations
 
             int recv_message_ID = 0;
             // loop over all processors and dispatch only necessary sends and recieves
@@ -759,7 +759,7 @@ namespace internal{
             // array of MPI requests
             std::vector<MPI_Request> requests(0);
 
-            MPI_Request req; // temporary variable for push_back operations
+            MPI_Request req = MPI_REQUEST_NULL; // temporary variable for push_back operations
 
             // loop over all processors and dispatch only necessary sends and recieves
             for ( int cpu = 0; cpu < vmpi::num_processors; cpu++){

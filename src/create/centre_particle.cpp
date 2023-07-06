@@ -40,7 +40,7 @@ void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<c
    const double prz = particle_origin[2];
 
    // loop over all atoms to find closest atom
-   for(int atom=0;atom<catom_array.size();atom++){
+   for(size_t atom=0;atom<catom_array.size();atom++){
       double dx = catom_array[atom].x - prx;
       double dy = catom_array[atom].y - pry;
       double dz = catom_array[atom].z - prz;

@@ -39,6 +39,20 @@ namespace create{
          double radius;
       };
 
+      // simple struct storing 2d points
+      struct points_t{
+
+         double x;
+         double y;
+
+         // simple constructor fpr struct
+         points_t(double xi = 0.0, double yi = 0.0){
+            x = xi;
+            y = yi;
+         }
+
+      };
+
       // simple class for slave material properties
       class slave_material_t{
 
@@ -75,6 +89,9 @@ namespace create{
          int unit_cell_category; // association of material to unit cell id
          double min; // minimum material height
          double max; // maximum material height
+
+         bool geometry = false; // define geometry for material
+   		std::vector<points_t> geometry_points; // array of geometry coordinates
 
          // constructor
          mp_t ():
@@ -124,13 +141,16 @@ namespace create{
 
       extern bool grain_poission;
 
+      extern bool select_material_by_geometry;	// Toggle override of input material type by geometry
       extern bool select_material_by_z_height;
+      extern bool output_gv_file; // toggle output of grain positions to file
 
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
       void set_atom_vars(std::vector<cs::catom_t> &, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
 
+      bool point_in_polygon2(const create::internal::points_t test, std::vector<create::internal::points_t>& points);
 
       extern void alloy(std::vector<cs::catom_t> & catom_array);
       extern void layers(std::vector<cs::catom_t> & catom_array);
@@ -143,6 +163,7 @@ namespace create{
       extern void ellipse(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain);
       extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void geometry(std::vector<cs::catom_t>& catom_array);
       extern void sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void teardrop(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
@@ -162,6 +183,8 @@ namespace create{
       void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_array,
                                   std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,
                                   bool include_boundary_grains);
+
+      extern void write_grain_vertices(int id, double dx, double dy, std::ofstream& ofile, std::vector< std::vector <double> >& vertices);
 
       extern bool compare_radius(core_radius_t first,core_radius_t second);
       extern void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array);

@@ -35,13 +35,13 @@ namespace anisotropy{
       //---------------------------------------------------------------------
       // get number of materials for simulation
       //---------------------------------------------------------------------
-      unsigned int init_num_materials = internal::mp.size();
+      int init_num_materials = internal::mp.size();
 
       // if no anisotropy constants initialised, then make sure anisotropy array is the correct size
       if(init_num_materials == 0) internal::mp.resize(mu_s_array.size());
 
       // set actual number of materials
-      const unsigned int num_materials = internal::mp.size();
+      const int num_materials = internal::mp.size();
 
       // output informative message
       zlog << zTs() << "Initialising data structures for anisotropy calculation for " << num_materials << " materials" << std::endl;
@@ -76,7 +76,7 @@ namespace anisotropy{
       if(internal::enable_biaxial_fourth_order_simple){
          internal::ku4.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
-      }     
+      }
       // Sixth order uniaxial
       if(internal::enable_uniaxial_sixth_order){
          internal::ku6.resize(num_materials);
@@ -410,11 +410,16 @@ namespace anisotropy{
       //---------------------------------------------------------------------
       if(internal::enable_lattice_anisotropy){
 
+
          // arrays for storing unrolled parameters for lattice anisotropy
+         internal::klattice.resize(num_materials);
          internal::klattice_array.resize(num_materials); // anisoptropy constant
 
          // loop over all materials and set up lattice anisotropy constants
          for(int m = 0; m < num_materials; m++){
+
+            // save anisotropy constant to unrolled array in units of tesla
+            internal::klattice[m] = internal::mp[m].k_lattice * inverse_mu_s[m];
 
             // set up interpolation between temperature points
             internal::mp[m].lattice_anisotropy.set_interpolation_table();

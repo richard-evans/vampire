@@ -32,31 +32,31 @@ namespace micromagnetic{
          std::string str_temp;
          std::string str_H;
          std::string str_R;
-         for (int i = 0; i < mm::output_list.size(); i ++){
+         for (size_t i = 0; i < mm::output_list.size(); i ++){
          //   std::cout << i << '\t' << "\t" << output_list.size() << "\t" << output_list[i] << std::endl;
 
 
       if (internal::output_list[i] == 3){
 
          str_time = std::to_string(sim::time) + "\t";
-            str.append(str_time); 
+            str.append(str_time);
       }
       if (internal::output_list[i] == 2){
 
          str_temp = std::to_string(sim::temperature) + "\t";
-         str.append(str_temp);  
+         str.append(str_temp);
       }
 
       if (internal::output_list[i] == 1){
 
          str_H = std::to_string(sim::H_applied) + "\t";
-         str.append(str_H);  
+         str.append(str_H);
       }
 
       if (internal::output_list[i] == 4){
 
          str_R = std::to_string(internal::calculate_resistance()) + "\t";
-         str.append(str_R);  
+         str.append(str_R);
       }
 
       if (internal::output_list[i] == 0){
@@ -91,7 +91,7 @@ namespace micromagnetic{
    for (int mat = 0; mat < mp::num_materials; mat++){
       str_m = std::to_string((mx[mat]/ml[mat])) + "\t" +  std::to_string(my[mat]/ml[mat]) + "\t" +  std::to_string(mz[mat]/ml[mat]) + "\t" +  std::to_string(sqrt(mx[mat]*mx[mat] + my[mat]*my[mat] +mz[mat]*mz[mat])/ml[mat]) + "\t" ;
 
-   str.append(str_m);  
+   str.append(str_m);
       }
 
 
@@ -99,7 +99,7 @@ namespace micromagnetic{
         }
 
 
-      } 
+      }
 
 
 
@@ -107,4 +107,3 @@ namespace micromagnetic{
 
       }
 }
-   

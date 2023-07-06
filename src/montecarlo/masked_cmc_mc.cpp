@@ -43,7 +43,7 @@ namespace cmc{
 void mask_polar_rot_matrix(std::vector<cmc_material_t>& cmc_mask){
 
 	// loop over all sets of constrained and unconstrained materials
-	for( int mask=0; mask < cmc_mask.size(); mask++ ){
+	for( size_t mask=0; mask < cmc_mask.size(); mask++ ){
 
 		const double phi   = cmc_mask[mask].constraint_phi;
 		const double theta = cmc_mask[mask].constraint_theta;
@@ -151,7 +151,7 @@ void initialise_masked_cmc_mc(const int num_sets,                       // numbe
 	// temporary variable for brevity
 	const double pi180 = M_PI / 180.0;
 
-	for( int mask_id = 0; mask_id < cmc::cmc_mask.size(); mask_id++ ){
+	for( size_t mask_id = 0; mask_id < cmc::cmc_mask.size(); mask_id++ ){
 		cmc::cmc_mask[mask_id].constrained      = constrained[   mask_id     ];
 		cmc::cmc_mask[mask_id].constraint_phi   = constraints[ 2*mask_id + 0 ];
 		cmc::cmc_mask[mask_id].constraint_theta = constraints[ 2*mask_id + 1 ];
@@ -244,7 +244,7 @@ void cmc_mc_step_mask(){
 	//---------------------------------------------------------------------------
 	// save initial magnetisations
 	//---------------------------------------------------------------------------
-	for(int mask_id = 0; mask_id < cmc::cmc_mask.size(); mask_id++){
+	for(size_t mask_id = 0; mask_id < cmc::cmc_mask.size(); mask_id++){
 		cmc::cmc_mask[mask_id].M_other[0] = 0.0;
 		cmc::cmc_mask[mask_id].M_other[1] = 0.0;
 		cmc::cmc_mask[mask_id].M_other[2] = 0.0;

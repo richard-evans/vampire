@@ -22,7 +22,7 @@
 
 // unitcell module headers
 #include "internal.hpp"
- 
+
 namespace unitcell{
 namespace internal{
 
@@ -47,7 +47,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
    std::string exchange_type_string; // string defining exchange type
 
    // defaults for interaction list
-   int interaction_range = 1; // assume +-1 unit cell as default
+   unsigned int interaction_range = 1; // assume +-1 unit cell as default
 
 	// Loop over all lines
 	while (! inputfile.eof() ){

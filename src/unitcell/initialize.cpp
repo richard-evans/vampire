@@ -41,15 +41,18 @@ namespace unitcell{
       else if(uc::internal::crystal_structure == "bcc"            ) uc::internal::build_body_centred_cubic(     unit_cell );
       else if(uc::internal::crystal_structure == "bcc-110"        ) uc::internal::build_body_centred_cubic_110( unit_cell );
       else if(uc::internal::crystal_structure == "fcc"            ) uc::internal::build_face_centred_cubic(     unit_cell );
+      else if(uc::internal::crystal_structure == "fcc-111"        ) uc::internal::build_face_centred_cubic_111( unit_cell );
       else if(uc::internal::crystal_structure == "hcp"            ) uc::internal::build_hexagonal_close_packed( unit_cell );
+      else if(uc::internal::crystal_structure == "heusler"        ) uc::internal::build_heusler(                unit_cell );
       else if(uc::internal::crystal_structure == "honeycomb"      ) uc::internal::build_honeycomb(              unit_cell );
       else if(uc::internal::crystal_structure == "alpha-honeycomb") uc::internal::build_honeycomb_alpha(        unit_cell );
+      else if(uc::internal::crystal_structure == "beta-honeycomb")  uc::internal::build_honeycomb_beta(         unit_cell );
       else if(uc::internal::crystal_structure == "kagome"         ) uc::internal::build_kagome(                 unit_cell );
+      else if(uc::internal::crystal_structure == "mn2au"          ) uc::internal::build_mn2au(                  unit_cell );
+      else if(uc::internal::crystal_structure == "NdFeB"          ) uc::internal::build_NdFeB(                  unit_cell );
       else if(uc::internal::crystal_structure == "rocksalt"       ) uc::internal::build_rock_salt(              unit_cell );
-      else if(uc::internal::crystal_structure == "heusler"        ) uc::internal::build_heusler(                unit_cell );
       else if(uc::internal::crystal_structure == "spinel"         ) uc::internal::build_spinel(                 unit_cell );
       else if(uc::internal::crystal_structure == "spinel-layered" ) uc::internal::build_spinel_layered(         unit_cell );
-      else if(uc::internal::crystal_structure == "NdFeB"          ) uc::internal::build_NdFeB(                  unit_cell );
       else if(uc::internal::crystal_structure == "SmFeN"          ) uc::internal::build_SmFeN(                  unit_cell );
       // Otherwise print an error to user
       else{
@@ -59,6 +62,9 @@ namespace unitcell{
          zlog << zTs() << "Error: Unknown crystal_type "<< uc::internal::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl;
          err::vexit();
       }
+
+      // optionally write generated unit cell file to disk
+      //internal::write_unit_cell_file(unit_cell);
 
       return;
 

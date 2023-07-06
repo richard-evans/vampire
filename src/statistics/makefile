@@ -13,6 +13,7 @@ specific_heat.o \
 standard_deviation.o\
 reset.o \
 susceptibility.o \
+binder_cumulant.o\
 torque.o \
 update.o \
 spin_length.o

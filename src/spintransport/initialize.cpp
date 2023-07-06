@@ -82,7 +82,7 @@ namespace spin_transport{
       zlog << zTs() << "Initializing spin transport module" << std::endl;
 
       // If st material parameters uninitialised then initialise with default parameters
-      if(spin_transport::internal::mp.size() != num_materials){
+      if(spin_transport::internal::mp.size() != static_cast<size_t>(num_materials)){
          spin_transport::internal::mp.resize(num_materials);
       }
 
@@ -218,7 +218,7 @@ namespace spin_transport{
       st::internal::stack_current.resize(st::internal::num_stacks, 0.0);    // total current in each stack
 
       // determine initial start and end cell of each stack
-      for(int s = 0; s < st::internal::num_stacks; s++){
+      for(uint64_t s = 0; s < st::internal::num_stacks; s++){
          st::internal::stack_start_index[s] = s*num_cells_in_stack;
          st::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack; // loop to less than this number
       }
@@ -534,7 +534,7 @@ namespace spin_transport{
 
       if( vmpi::my_rank == 0 ){
          std::ofstream ofile("data.txt");
-         for(int i =0; i< st::internal::total_num_cells; i++){
+         for(uint64_t i =0; i< st::internal::total_num_cells; i++){
             ofile << st::internal::cell_position[3*i+0] << "\t" <<
                      st::internal::cell_position[3*i+1] << "\t" <<
                      st::internal::cell_position[3*i+2] << "\t" <<

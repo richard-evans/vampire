@@ -212,7 +212,7 @@ namespace vmpi{
       }
 
       // set the remaining elements of the array as 1 if there are no other factors
-      for (int i=counter_factor+1;i<factor_array.size();i++){
+      for (size_t i=counter_factor+1;i<factor_array.size();i++){
          factor_array[i]=1;
       }
 

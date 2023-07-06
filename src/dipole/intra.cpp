@@ -54,7 +54,7 @@ namespace dipole{
 
          // search for cells i and j in local atom-cells list
          int cell_with_atoms_index_i = -1;
-         for(int idx = 0; idx < atoms_in_cells_array.size(); idx++){
+         for(size_t idx = 0; idx < atoms_in_cells_array.size(); idx++){
             const int cell = list_of_cells_with_atoms[idx];
             if( cell == celli ) cell_with_atoms_index_i = idx;
          }

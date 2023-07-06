@@ -112,11 +112,21 @@ namespace vout{
          return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
-      /*test="material-magnetisation";
+      test="material-magnetisation";
       if(word==test){
+         // enable statistics collection for grains
+         stats::calculate_material_grain_magnetization  = true;
          grain::output_list.push_back(grain::material_magnetisation);
          return EXIT_SUCCESS;
-      }*/
+      }
+      //--------------------------------------------------------------------
+      test="material-height-magnetisation";
+      if(word==test){
+         // enable statistics collection for grains
+         stats::calculate_material_grain_height_magnetization  = true;
+         grain::output_list.push_back(grain::material_height_magnetisation);
+         return EXIT_SUCCESS;
+      }
       //-------------------------------------------------------------------
       test="output-rate";
       if(word==test){

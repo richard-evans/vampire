@@ -26,17 +26,6 @@
 // vio module headers
 #include "internal.hpp"
 
-namespace vout{
-	std::string zLogProgramName; /// Program Name
-	std::string zLogHostName; /// Host Name
-	bool        zLogInitialised=false; /// Initialised flag
-	#ifdef WIN_COMPILE
-		int      zLogPid; /// Process ID
-	#else
-		pid_t    zLogPid; /// Process ID
-	#endif
-}
-
 ///-------------------------------------------------------
 /// Function to write header information about simulation
 ///-------------------------------------------------------
@@ -282,8 +271,8 @@ namespace vout{
 				vout::z_track_pos(stream,header);
 				break;
 			case 72:
-			    vout::fractional_electric_field_strength(stream, header);
-			   	break;
+			   vout::fractional_electric_field_strength(stream, header);
+				break;
 			case 73:
       			vout::mean_system_spin_length(stream,header);
       			break;
@@ -293,6 +282,12 @@ namespace vout{
 			case 75:
 				vout::mean_height_spin_length(stream,header);
 				break;
+         	case 997: //MP
+				vout::material_binder_cumulant(stream,header);
+				break;
+   			case 998:
+      			vout::system_binder_cumulant(stream,header);
+      			break;
 			case 999: //AJN
 				vout::standard_deviation(stream,header);
 				break;
@@ -324,87 +319,6 @@ namespace vout{
       } // end of code for rank 0 only
       header = false;
    }
-
-	void zLogTsInit(std::string tmp){
-
-		// Get program name and process ID
-		std::string tmprev;
-		int linelength = tmp.length();
-
-		// set character triggers
-		const char* key="/";	/// Word identifier
-
-		// copy characters after last /
-		for(int i=linelength-1;i>=0;i--){
-
-			char c=tmp.at(i);
-
-			if(c != *key){
-				tmprev.push_back(c);
-			}
-			else break;
-		}
-
-		//reverse read into program name
-		linelength = tmprev.size();
-		for(int i = linelength-1; i>=0; i--){
-			char c = tmprev.at(i);
-			zLogProgramName.push_back(c);
-		}
-
-		// Get hostname
-		char loghostname [80];
-		#ifdef WIN_COMPILE
-			DWORD sizelhn = sizeof ( loghostname );
-			int GHS=!GetComputerName(loghostname, &sizelhn); //GetComputerName returns true when retrieves hostname
-		#else
-			int GHS=gethostname(loghostname, 80);
-		#endif
-	  terminaltextcolor(YELLOW);
-		if(GHS!=0) std::cerr << "Warning: Unable to retrieve hostname for zlog file." << std::endl;
-	  terminaltextcolor(WHITE);
-		zLogHostName = loghostname;
-
-		// Now get process ID
-		#ifdef WIN_COMPILE
-			zLogPid = _getpid();
-		#else
-			zLogPid = getpid();
-		#endif
-
-		// Open log filename
-		if(vmpi::my_rank==0) zlog.open("log");
-
-		// Mark as initialised;
-		zLogInitialised=true;
-
-		zlog << zTs() << "Logfile opened" << std::endl;
-
-      //------------------------------------
-   	// Determine current directory
-   	//------------------------------------
-   	char directory [256];
-
-   	#ifdef WIN_COMPILE
-   		if(_getcwd(directory, sizeof(directory)) == NULL){
-            std::cerr << "Fatal getcwd error in datalog." << std::endl;
-        }
-   	#else
-   		if(getcwd(directory, sizeof(directory)) == NULL){
-            std::cerr << "Fatal getcwd error in datalog." << std::endl;
-        }
-   	#endif
-
-      // write system and version information
-      zlog << zTs() << "Executable : " << vout::zLogProgramName << std::endl;
-      zlog << zTs() << "Host name  : " << vout::zLogHostName << ":" << std::endl;
-      zlog << zTs() << "Directory  : " << directory << std::endl;
-      zlog << zTs() << "Process ID : " << vout::zLogPid << std::endl;
-      zlog << zTs() << "Version    : " << vinfo::version() << std::endl;
-      zlog << zTs() << "Githash    : " << vinfo::githash() << std::endl;
-
-		return;
-	}
 
    //-------------------------------------------
 	// Data output wrapper function
@@ -444,10 +358,10 @@ namespace vout{
       if(vmpi::my_rank == 0){
          if(!zmag.is_open()){
             // check for checkpoint continue and append data
-            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
+            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open(vout::output_file_name,std::ofstream::app);
             // otherwise overwrite file
             else{
-               zmag.open("output",std::ofstream::trunc);
+               zmag.open(vout::output_file_name,std::ofstream::trunc);
                // write file header information
                write_output_file_header(zmag, file_output_list);
             }
@@ -479,62 +393,3 @@ namespace vout{
    } // end of data()
 
 } // end of namespace vout
-
-/// @brief Function to output timestamp to stream
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2012. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.0
-/// @date    19/04/2012
-///
-/// @return TS
-///
-/// @internal
-///	Created:		19/04/2012
-///	Revision:	  ---
-///=====================================================================================
-///
-std::string zTs(){
-
-  std::string NullString;
-  NullString="";
-
-	if(vout::zLogInitialised==true){
-		std::ostringstream Ts;
-
-		// varibale for time
-		time_t seconds;
-
-		// get current time
-		seconds = time (NULL);
-		struct tm * timeinfo;
-		char logtime [80];
-
-		timeinfo = localtime ( &seconds );
-		// Format time string
-		//strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
-      strftime (logtime,80,"%d-%m-%Y [%X] ",timeinfo);
-
-		Ts << logtime;
-      // << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
-
-		return Ts.str();
-
-	}
-	else{
-		terminaltextcolor(RED);
-		std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
-		// This can be recursive - vexit calls zTs()
-		//err::vexit();
-		// Exit manually
-		std::cerr << "Fatal error: Aborting program. See log file for details." << std::endl;
-	  terminaltextcolor(WHITE);
-		exit(EXIT_FAILURE);
-	}
-
-	return NullString;
-}

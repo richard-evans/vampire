@@ -23,8 +23,10 @@ namespace vdc{
    // program option flags
    bool verbose  = false; // flag to specify verbosity of output to user
    bool xyz      = false; // flag to specify crystal.xyz file output
+   bool grains   = false; // flag to enable grain calculations
    bool povray   = false; // flag to specify povray file output
    bool povcells = false; // flag to specify povray cells output
+   bool povsticks= false; // flag to specify povray sticks output
    bool cells    = false; // flag to specify cells output
    bool cellsf   = false; // flag to output cell file
    bool vtk      = false; // flag to specify vtk output
@@ -61,6 +63,7 @@ namespace vdc{
 
    std::vector<int> category(0);
    std::vector<int> type(0);
+   std::vector<int> grain(0);
 
    std::vector<double> coordinates(0);
    std::vector<double> spins(0);
@@ -88,6 +91,9 @@ namespace vdc{
    double camera_zoom = 1.0;
    std::string background_colour = "Gray30";
 
+   // povray stick settings
+   double sticks_cutoff = 2.6; // cutoff distance for sticks (Angstroms)
+
    // povray shape sizes
    std::vector<double> atom_sizes  = {1.2};
    std::vector<double> arrow_sizes = {2.0};
@@ -96,6 +102,7 @@ namespace vdc{
    uint64_t num_nm_atoms = 0;
    std::vector<int> nm_category(0);
    std::vector<int> nm_type(0);
+   std::vector<int> nm_grain(0);
    std::vector<double> nm_coordinates(0);
 
    // cell data
@@ -109,6 +116,9 @@ namespace vdc{
    std::vector<int> num_atoms_in_cell;
    std::vector<double> cell_coords;
    std::vector<std::vector<std::vector <double>>> cell_magnetization;
+
+   // grain data
+   std::vector < std::vector <xy_t> > grain_vertices_array;
 
    // array to store subsidiary data file names
    std::vector<std::string> coord_filenames(0);
@@ -163,6 +173,8 @@ namespace vdc{
       {"camera-look-at" , set_camera_look_at},
       {"camera-lookat"  , set_camera_look_at},
       {"camera-zoom"    , set_camera_zoom},
+      // povray sticks settings
+      {"sticks-cutoff"   , set_sticks_cutoff},
       // povray background colour
       {"background-colour", set_background_colour},
       {"background-color" , set_background_colour},

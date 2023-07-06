@@ -974,6 +974,7 @@ namespace vin{
             double H=atof(value.c_str());
             check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
             sim::fmr_field_strength=H;
+            sim::hamiltonian_simulation_flags[5]=1; // enable fmr fields
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -982,6 +983,7 @@ namespace vin{
             double w = atof(value.c_str());
             check_for_valid_value(w, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"input","0 - 10,000 GHz");
             sim::fmr_field_frequency = w;
+            sim::hamiltonian_simulation_flags[5]=1; // enable fmr fields
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -1194,6 +1196,24 @@ namespace vin{
             stats::calculate_material_susceptibility=true;
             stats::calculate_material_magnetization=true;
             output_list.push_back(50);
+            return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
+        test="binder-cumulant";
+        if(word==test){
+            // Set flags for calculations of binder cumulant and magnetization
+            stats::calculate_system_binder_cumulant=true;
+            stats::calculate_system_magnetization=true;
+            output_list.push_back(998);
+            return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
+        test="material-binder-cumulant";
+        if(word==test){
+            // Set flags for calculations of binder cumulant and magnetization
+            stats::calculate_material_binder_cumulant=true;
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(997);
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
@@ -1812,52 +1832,6 @@ namespace vin{
                 }
             }
             //--------------------------------------------------------------------
-            else
-            test="geometry-file";
-            if(word==test){
-
-               // Open geometry file
-               std::stringstream gfile;
-          		gfile.str( vin::get_string(value.c_str(), "material", line) );
-
-                gfile >> read_material[super_index].geometry;
-                if((read_material[super_index].geometry<3) || (read_material[super_index].geometry>100)){
-                    terminaltextcolor(RED);
-                std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
-                    terminaltextcolor(WHITE);
-                return EXIT_FAILURE;
-                }
-                //std::cout << "ngp " << read_material[super_index].geometry << std::endl;
-                for(int c=0;c<read_material[super_index].geometry;c++){
-                    for(int xy=0;xy<2;xy++){
-                        double var;
-                        gfile >> var;
-                        if(gfile.eof()){
-                    terminaltextcolor(RED);
-                            std::cerr << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates" << std::endl;
-                            terminaltextcolor(WHITE);
-                    return EXIT_FAILURE;
-                        }
-                        if((var<0.0) || (var > 1.0)){
-                    terminaltextcolor(RED);
-                            std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
-                            terminaltextcolor(WHITE);
-                    return EXIT_FAILURE;
-                        }
-                        else read_material[super_index].geometry_coords[c][xy]=var;
-                    }
-                    //std::cout << read_material[super_index].geometry_coords[c][0] << "\t" << read_material[super_index].geometry_coords[c][1] << std::endl;
-                }
-                //double min=atof(value.c_str());
-                //if((min<-0.11) || (min > 1.11)){
-                //	std::cerr << "Error in input file - material[" << super_index << "]:min is outside of valid range (0.0-1.0)" << std::endl;
-                //	return EXIT_FAILURE;}
-                //else{
-                //	read_material[super_index].min=min;
-                    return EXIT_SUCCESS;
-                //}
-            }
-            //--------------------------------------------------------------------
             test="core-shell-size";
             if(word==test){
                 double css=atof(value.c_str());
@@ -2143,7 +2117,7 @@ namespace vin{
                 string str="field";
                 if(unit_type==str){
                     // Test for valid range
-                    if((H>=0.0) && (H<1.0E5)){
+                    if((H>=-1.0E5) && (H<1.0E5)){
                         read_material[super_index].applied_field_strength=H;
                         // set local applied field flag
                         sim::local_applied_field=true;
@@ -2151,14 +2125,14 @@ namespace vin{
                     }
                     else{
                         terminaltextcolor(RED);
-                        std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+                        std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range -1.0e5 - +1.0e5" << std::endl;
                         terminaltextcolor(WHITE);
                         err::vexit();
                     }
                 }
                 else{
                     terminaltextcolor(RED);
-                    std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+                    std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << std::endl;
                     terminaltextcolor(WHITE);
                     err::vexit();
                 }

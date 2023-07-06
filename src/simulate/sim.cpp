@@ -214,12 +214,6 @@ int run(){
    // now seed generator
 	mtrandom::grnd.seed(vmpi::parallel_rng_seed(mtrandom::integration_seed));
 
-   // Check for load spin configurations from checkpoint
-   if(sim::load_checkpoint_flag) load_checkpoint();
-
-	// For continuous checkpoints inform user about I/O
-	if(sim::save_checkpoint_continuous_flag) zlog << zTs() << "Continuously writing checkpoints to disk throughout simulation." << std::endl;
-
    {
       // Set up statistical data sets
       #ifdef MPICF
@@ -235,9 +229,16 @@ int run(){
       stats::initialize(num_atoms_for_statistics, mp::num_materials, grains::num_grains, atoms::m_spin_array, atoms::type_array, atoms::grain_array, atoms::category_array, non_magnetic_materials_array);
    }
 
-   // Precalculate initial statistics and then reset averages
+	// Check for load spin configurations from checkpoint
+   if(sim::load_checkpoint_flag) load_checkpoint();
+
+   // Precalculate initial statistics and then reset averages if not continuing a previous simulation
+   // RE technically this double counts the last data point in the statistics, need to implement a reset_counter to fix.
    stats::update();
-	stats::reset();
+   if(!load_checkpoint_continue_flag) stats::reset();
+
+   // For continuous checkpoints inform user about I/O
+   if(sim::save_checkpoint_continuous_flag) zlog << zTs() << "Continuously writing checkpoints to disk throughout simulation." << std::endl;
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
@@ -290,9 +291,6 @@ int run(){
                      atoms::magnetic,
                      atoms::num_atoms
    );
-
-
-
 
 	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
 

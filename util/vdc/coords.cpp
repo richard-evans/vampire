@@ -60,8 +60,20 @@ void process_coordinates(){
    // Calculate systenm dimensions after slicing
    vdc::calculate_system_extent(vdc::sliced_atoms_list,vdc::sliced_nm_atoms_list);
 
+   // calculate grain properties
+   if(vdc::grains){
+      vdc::load_grain_vertices();
+      vdc::determine_atom_grain_id();
+   }
+
+   // output atoms text file
+   if(vdc::txt) output_atoms_txt_file();
+
    // output xyz file;
    if(vdc::xyz) output_xyz_file();
+
+   // output sticks povray file
+   if(vdc::povsticks) output_sticks_file();
 
    return;
 
@@ -359,7 +371,7 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
 // Find list of atoms in user defined slice
 //---------------------------------------------------------------
 void slice_system(){
-   
+
    // work out borders for slice param
    for (slice_t &slice : vdc::slices){
 
@@ -379,7 +391,7 @@ void slice_system(){
          slice.bound[3] = (slice.param[3]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1];
          slice.bound[5] = (slice.param[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
          break;
-      
+
       case vdc::sphere :
          slice.bound.resize(3); // a,b,c
 
@@ -388,7 +400,7 @@ void slice_system(){
          slice.bound[1] = vdc::system_size[1]*slice.param[1]/2.0;
          slice.bound[2] = vdc::system_size[2]*slice.param[2]/2.0;
          break;
-      
+
       case vdc::cylinder :
          slice.bound.resize(4); // a,b,zmin,zmax
 
@@ -429,11 +441,11 @@ void slice_system(){
             case vdc::box :
                in_bounds = box_slice(x,y,z,slice.bound);
                break;
-            
+
             case vdc::box_void :
                in_bounds = !box_slice(x,y,z,slice.bound);
                break;
-            
+
             case vdc::sphere :
                in_bounds = sphere_slice(x,y,z,slice.bound);
                break;
@@ -448,7 +460,7 @@ void slice_system(){
             }
 
             // if the atom is in any slice, add to final list and stop checking others
-            if (in_bounds){ 
+            if (in_bounds){
                vdc::sliced_atoms_list.push_back(atom);
                break;
             }
@@ -485,11 +497,11 @@ void slice_system(){
             case vdc::box :
                in_bounds = box_slice(x,y,z,slice.bound);
                break;
-            
+
             case vdc::box_void :
                in_bounds = !box_slice(x,y,z,slice.bound);
                break;
-            
+
             case vdc::sphere :
                in_bounds = sphere_slice(x,y,z,slice.bound);
                break;
@@ -504,13 +516,13 @@ void slice_system(){
             }
 
             // if the atom is in any slice, add to final list and stop checking others
-            if (in_bounds){ 
+            if (in_bounds){
                vdc::sliced_nm_atoms_list.push_back(atom);
                break;
             }
          }
       }
-   } 
+   }
 
    // output informative message to user
    if(vdc::verbose) std::cout << "done!" << std::endl;
@@ -519,8 +531,7 @@ void slice_system(){
 }
 
 bool box_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){
-
-   return (x >= bound[0] && x <= bound[1]) && (y >= bound[2] && y <= bound[3]) && (z >= bound[4] && z <= bound[5]);   
+   return (x >= bound[0] && x <= bound[1]) && (y >= bound[2] && y <= bound[3]) && (z >= bound[4] && z <= bound[5]);
 }
 
 bool sphere_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){

@@ -45,8 +45,8 @@ double exchange(double range, double cutoff, int mat_i, int mat_j){
 
       case exponential:{
          // Set exchange parameters ready for general normalisation function.
-         for (int i = 0; i < uc::internal::material_exchange_parameters.size(); ++i){
-            for (int j = 0; j < uc::internal::material_exchange_parameters.size(); ++j){
+         for (size_t i = 0; i < uc::internal::material_exchange_parameters.size(); ++i){
+            for (size_t j = 0; j < uc::internal::material_exchange_parameters.size(); ++j){
                if (j >= i){
                   uc::internal::material_exchange_parameters[i][j].decay_multiplier = uc::internal::exchange_multiplier;
                   uc::internal::material_exchange_parameters[i][j].decay_length = uc::internal::exchange_decay;

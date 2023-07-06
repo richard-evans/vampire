@@ -221,6 +221,13 @@ void read_nm_data(){
    // output informative message to user
    if(vdc::verbose) std::cout << "done!" << std::endl;
 
+   // check that number of materials is sufficient
+   int num_materials = 0;
+   for(int mat : vdc::nm_type){
+      if(mat > num_materials-1) num_materials = mat+1;
+   }
+   if(static_cast<unsigned int>(num_materials) > materials.size()) materials.resize(num_materials);
+
    return;
 
 }

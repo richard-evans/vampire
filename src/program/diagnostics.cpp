@@ -73,7 +73,7 @@ namespace program{
          for(int value=1;value<10;value++){
             mp::dt_SI=double(value)*pow(10.0,-1.0*powerv);
 
-            int timesteps = 5.0e-12/mp::dt_SI;
+            uint64_t timesteps = 5.0e-12/mp::dt_SI;
 
             std::cout << timesteps << std::endl;
 
@@ -98,9 +98,9 @@ namespace program{
 
             sim::integrate(timesteps);
             stats::reset();
-            int start_time=sim::time;
+            uint64_t start_time = sim::time;
             // Simulate system
-            while(sim::time<timesteps+start_time){
+            while( sim::time < timesteps+start_time ){
                sim::integrate(1);
 
                // Calculate mag_m, mag after sim::partial_time steps

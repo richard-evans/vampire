@@ -15,9 +15,13 @@ GCC_CFLAGS=-O3 -std=c++17
 
 # Objects
 OBJECTS= \
-obj/test_suite.o
+obj/main.o \
+obj/exchange.o \
+obj/integrator.o \
+obj/structure.o \
+obj/utilities.o
 
-EXECUTABLE=tests
+EXECUTABLE=integration_tests
 
 all: $(OBJECTS) gcc
 
@@ -25,7 +29,7 @@ all: $(OBJECTS) gcc
 gcc: $(OBJECTS)
 	$(GCC) $(OBJECTS) $(GCC_CFLAGS) $(LIBS) -o $(EXECUTABLE)
 
-$(OBJECTS): obj/%.o: ./%.cpp
+$(OBJECTS): obj/%.o: ./src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
 clean:

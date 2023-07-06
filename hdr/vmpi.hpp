@@ -64,7 +64,7 @@ namespace vmpi{
 
 	extern bool replicated_data_staged; ///< Flag for staged system generation
 
-	extern char hostname[20];			///< Hostname of local CPU
+	extern std::string hostname;			///< Hostname of local CPU
 	extern double min_dimensions[3]; 	///< Minimum coordinates of system on local cpu
 	extern double max_dimensions[3]; 	///< Maximum coordinates of system on local cpu
 

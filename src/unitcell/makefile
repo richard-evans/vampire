@@ -18,16 +18,20 @@ sc.o \
 bcc.o \
 bcc110.o \
 fcc.o \
+fcc111.o \
+file.o \
 hcp.o \
 heusler.o \
 honeycomb.o \
 honeycomb-a.o \
+honeycomb-b.o \
 kagome.o \
+mn2au.o \
+nd2fe14b.o\
 rocksalt.o \
+smfe12n.o\
 spinel.o \
 spinel-layered.o \
-NdFeB.o\
-SmFeN.o\
 verify.o
 
 # Append module objects to global tree

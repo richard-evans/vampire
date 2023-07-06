@@ -52,7 +52,7 @@ namespace dipole{
       if(!dipole::activated) return;
 
 		// prevent double calculation for split integration (MPI)
-		if(dipole::internal::update_time != sim_time){
+		if(dipole::internal::update_time != static_cast<int>(sim_time)){
 
 			// Check if update required
 		   if(sim_time%dipole::update_rate == 0){

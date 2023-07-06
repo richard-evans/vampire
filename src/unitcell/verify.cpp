@@ -40,13 +40,13 @@ void unitcell::exchange_template_t::verify(std::string filename){
    std::vector<int> asym_interaction_list(0);
 
    // Parallelise in case of large interaction sizes
-   int my_num_interactions = interaction.size()/vmpi::num_processors;
-   int first = vmpi::my_rank * my_num_interactions;
-   int last = first + my_num_interactions;
+   size_t my_num_interactions = interaction.size()/vmpi::num_processors;
+   size_t first = vmpi::my_rank * my_num_interactions;
+   size_t last = first + my_num_interactions;
    if(vmpi::my_rank == vmpi::num_processors-1) last = interaction.size(); // add last points to last processor
 
    // loop over all interactions to find matching reciprocal interaction
-   for(unsigned int i = first; i < last; ++i){
+   for(size_t i = first; i < last; ++i){
 
       // Output progress indicator to screen for large interaction counts
       if( (i % (my_num_interactions/10 + 1)) == 0 && interaction.size() > 10000) std::cout << "." << std::flush;
@@ -62,7 +62,7 @@ void unitcell::exchange_template_t::verify(std::string filename){
       bool match=false;
 
       // loop over all interactions for reciprocal interactions i -> j -> i
-      for(unsigned int j=0; j<interaction.size(); ++j){
+      for(size_t j=0; j<interaction.size(); ++j){
          if(interaction[j].i==ia && interaction[j].j==ja && interaction[j].dx==dx && interaction[j].dy==dy && interaction[j].dz==dz){
             match=true;
             break;

@@ -32,9 +32,6 @@ namespace stats
    /// Statistics types
    enum stat_t { atotal=0, mean=1};
 
-   /// Statistics output functions
-   //extern void output_energy(std::ostream&, enum energy_t, enum stat_t,bool header);
-
    //-------------------------------------------------
    // New statistics module functions and variables
    //-------------------------------------------------
@@ -64,8 +61,10 @@ namespace stats
 	extern bool calculate_system_magnetization;
 	extern bool calculate_grain_magnetization;
 	extern bool calculate_material_magnetization;
+	extern bool calculate_material_grain_magnetization;
 	extern bool calculate_height_magnetization;
 	extern bool calculate_material_height_magnetization;
+	extern bool calculate_material_grain_height_magnetization;
 
 	extern bool calculate_system_torque;
 	extern bool calculate_grain_torque;
@@ -81,6 +80,9 @@ namespace stats
 	extern bool calculate_grain_susceptibility;
 	extern bool calculate_material_susceptibility;
 
+	extern bool calculate_system_binder_cumulant;
+	extern bool calculate_material_binder_cumulant;
+
    extern bool calculate_system_spin_length;
    extern bool calculate_material_spin_length;
    extern bool calculate_height_spin_length;
@@ -88,6 +90,7 @@ namespace stats
 	// forward declaration of friend classes
 	class susceptibility_statistic_t;
 	class specific_heat_statistic_t;
+        class binder_cumulant_statistic_t;
 
 	class standard_deviation_statistic_t;
    //----------------------------------
@@ -161,6 +164,7 @@ namespace stats
       friend class susceptibility_statistic_t;
       friend class standard_deviation_statistic_t;
       friend class spin_length_statistic_t;
+      friend class binder_cumulant_statistic_t;
       public:
          magnetization_statistic_t (std::string n):initialized(false){
            name = n;
@@ -172,6 +176,9 @@ namespace stats
          void set_magnetization(std::vector<double>& magnetization, std::vector<double>& mean_magnetization, long counter);
          void reset_magnetization_averages();
          const std::vector<double>& get_magnetization();
+         void save_checkpoint(std::ofstream& chkfile);
+         void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+         const std::vector<double>& get_checkpoint_parameters(double& sum_mx, double& sum_my, double& sum_mz, double& sum_count);
          std::string output_magnetization(bool header);
          std::string output_normalized_magnetization(bool header);
          std::string output_normalized_magnetization_length(bool header);
@@ -237,13 +244,15 @@ namespace stats
    class specific_heat_statistic_t{
 
       public:
-         specific_heat_statistic_t (std::string n):initialized(false){
-           name = n;
-         };
-         void initialize(energy_statistic_t& energy_statistic);
-         void calculate(const std::vector<double>& energy);
-         void reset_averages();
-         std::string output_mean_specific_heat(const double temperature,bool header);
+			specific_heat_statistic_t (std::string n):initialized(false){
+				name = n;
+			};
+			void initialize(energy_statistic_t& energy_statistic);
+			void calculate(const std::vector<double>& energy);
+			void save_checkpoint(std::ofstream& chkfile);
+			void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+			void reset_averages();
+			std::string output_mean_specific_heat(const double temperature,bool header);
 
 
       private:
@@ -267,10 +276,12 @@ namespace stats
          susceptibility_statistic_t (std::string n):initialized(false){
            name = n;
          };
-         void initialize(magnetization_statistic_t& mag_stat);
-         void calculate(const std::vector<double>& magnetization);
-         void reset_averages();
-         std::string output_mean_susceptibility(const double temperature,bool header);
+			void initialize(magnetization_statistic_t& mag_stat);
+			void calculate(const std::vector<double>& magnetization);
+			void save_checkpoint(std::ofstream& chkfile);
+			void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+			void reset_averages();
+			std::string output_mean_susceptibility(const double temperature,bool header);
          //std::string output_mean_absolute_susceptibility();
 
       private:
@@ -342,7 +353,29 @@ namespace stats
          std::string name;
 
    };
+   //----------------------------------
+   // Binder cumulant Class definition
+   //----------------------------------
+   class binder_cumulant_statistic_t{
 
+      public:
+         binder_cumulant_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
+         void initialize(magnetization_statistic_t& mag_stat);
+         void calculate(const std::vector<double>& magnetization);
+         void reset_averages();
+         std::string output_binder_cumulant(bool header);
+
+      private:
+         bool initialized;
+         int num_elements;
+         double mean_counter;
+         std::vector<double> binder_cumulant_squared;
+         std::vector<double> binder_cumulant_fourth_power;
+         std::string name;
+
+   };
 
    //----------------------------------
 	// Statistics class instantiations
@@ -354,8 +387,10 @@ namespace stats
    extern magnetization_statistic_t system_magnetization;
 	extern magnetization_statistic_t grain_magnetization;
 	extern magnetization_statistic_t material_magnetization;
+	extern magnetization_statistic_t material_grain_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
+   extern magnetization_statistic_t material_grain_height_magnetization;
 
 	extern torque_statistic_t system_torque;
 	extern torque_statistic_t grain_torque;
@@ -374,6 +409,9 @@ namespace stats
    extern spin_length_statistic_t system_spin_length;
    extern spin_length_statistic_t material_spin_length;
    extern spin_length_statistic_t height_spin_length;
+
+   extern binder_cumulant_statistic_t system_binder_cumulant;
+   extern binder_cumulant_statistic_t material_binder_cumulant;
 
 }
 

@@ -120,7 +120,7 @@ namespace unitcell{
          std::istringstream& ucf_ss,
          std::string& filename,
          unsigned int& line_counter,
-         int& interaction_range);
+         unsigned int& interaction_range);
 
       // function to set exchange type
       unsigned int set_exchange_type(std::string exchange_type_string);

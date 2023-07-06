@@ -18,9 +18,9 @@ export OMPI_CXX=g++ -std=c++11
 #export FFTLIBS= -lfftw3_omp -lfftw3
 
 # Compilers
-ICC=icc -std=c++0x -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
+ICC=icc -std=c++11 -DCOMP='"Intel C++ Compiler"'
+GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
+LLVM=g++ -std=c++11 -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
@@ -43,16 +43,16 @@ CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi
-GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi
+GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi -Wsign-compare
+GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi -Wsign-compare
 
 PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
 PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
-LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi
-LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi -Wsign-compare
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi -Wsign-compare
 
 # Performance Flags
 ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
@@ -63,8 +63,8 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
 LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
 LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++0x
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++11 -Wsign-compare
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -Wsign-compare
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
@@ -328,6 +328,10 @@ tidy:
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
+
+tests:
+	$(MAKE) -C test/integration/
+	$(MAKE) -C test/unit/
 
 vdc:
 	$(MAKE) -C util/vdc/

@@ -66,7 +66,7 @@ namespace hamr{
 		std::cout << " Setting initial field magnitude to: " << sim::H_applied << " T" << std::endl;
 
 		std::cout << " Bit sequence to be written: ";
-		for(int i=0; i<hamr::internal::bit_sequence.size(); i++){ std::cout << hamr::internal::bit_sequence[i] << " ";}
+		for(size_t i=0; i<hamr::internal::bit_sequence.size(); i++){ std::cout << hamr::internal::bit_sequence[i] << " ";}
 		std::cout << std::endl;
 		std::cout << " Bits to be written: " << n_bits_per_track*n_tracks << ", in x,y: " << n_bits_per_track << ", " << n_tracks << std::endl;
 		zlog << zTs() << "Bits to be written: " << n_bits_per_track*n_tracks << ", in x,y: " << n_bits_per_track << ", " << n_tracks << std::endl;

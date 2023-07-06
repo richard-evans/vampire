@@ -42,13 +42,12 @@ namespace vmain{
       std::string input_file_name = "input"; // default input file name
    }
 }
-
 int simulate_system();
 
 /// Main function for vampire
 /// Prints out program header and calls main program routines
 int main(int argc, char* argv[]){
-
+  vout::output_file_name="output"; // default output file name
    // For parallel execution intialise MPI
    vmpi::initialise(argc, argv);
 

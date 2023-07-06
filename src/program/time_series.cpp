@@ -42,6 +42,9 @@ void time_series(){
 	   sim::temperature=sim::Teq;
    }
 
+	// Output data
+	vout::data();
+
 	// Equilibrate system
 	while(sim::time<sim::equilibration_time){
 

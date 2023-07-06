@@ -55,6 +55,9 @@ void output_txt_file(unsigned int spin_file_id){
    std::ofstream txtfile;
    txtfile.open(txt_file.c_str());
 
+   // output number of atoms
+   txtfile << vdc::sliced_atoms_list.size() + vdc::sliced_nm_atoms_list.size() << "\n";
+
    //---------------------------------------------------------------------------
    // parallelise stream formatting for better performance
    // step 1: parallel formatted output to stringstream in memory
@@ -67,7 +70,10 @@ void output_txt_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          // format text for plain text file
          otext << coordinates[3*atom+0]-vdc::system_centre[0] << "\t" << coordinates[3*atom+1]-vdc::system_centre[1] << "\t" << coordinates[3*atom+2]-vdc::system_centre[2] << "\t" <<
@@ -93,7 +99,10 @@ void output_txt_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+      for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
          // format text for text file
          otext << nm_coordinates[3*atom+0]-vdc::system_centre[0] << "\t" << nm_coordinates[3*atom+1]-vdc::system_centre[1] << "\t" << nm_coordinates[3*atom+2]-vdc::system_centre[2] << "\t" <<

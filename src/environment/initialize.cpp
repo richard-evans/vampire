@@ -174,7 +174,7 @@ namespace environment{
           //       std::cout << "created initial cells " <<std::endl;
         //  std::cin.get();
 
-          for (int cell = 0; cell < tmp_x.size(); cell ++ ){
+          for (size_t cell = 0; cell < tmp_x.size(); cell ++ ){
 
         //    std::cout << shield << '\t' << cell << "\txyzdx\t" << tmp_x[cell] << '\t' << tmp_y[cell] << '\t' << tmp_z[cell]  << '\t' << size_x[cell] << "\t" <<  std::endl;
           //  std::cout << "create corners" << std::endl;

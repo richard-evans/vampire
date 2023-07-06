@@ -189,6 +189,11 @@ namespace vout{
       stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature,header);
    }
 
+    // Output Function 998 - with Header
+   void system_binder_cumulant(std::ostream& stream, bool header){
+      stream << stats::system_binder_cumulant.output_binder_cumulant(header);
+   }
+
    // Output Function 999 - with Header
    void standard_deviation(std::ostream& stream, bool header){
       stream << stats::material_standard_deviation.output_standard_deviation(header);
@@ -202,7 +207,7 @@ namespace vout{
    void material_temperature(std::ostream& stream, bool header){
       std::ostringstream res;
       vout::fixed_width_output result(res,vout::fw_size);
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(size_t mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_Temp";
          }
@@ -217,7 +222,7 @@ namespace vout{
    void material_applied_field_strength(std::ostream& stream, bool header){
       std::ostringstream res;
       vout::fixed_width_output result(res,vout::fw_size);
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(size_t mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_H";
          }
@@ -235,7 +240,7 @@ namespace vout{
 
       const double real_time=sim::time*mp::dt_SI;
 
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(size_t mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_fmr_H";
          }
@@ -373,6 +378,11 @@ namespace vout{
    void mean_material_susceptibility(std::ostream& stream, bool header){
 		stream << stats::material_susceptibility.output_mean_susceptibility(sim::temperature,header);
 	}
+
+   // Output Function 997 - with Header
+   void material_binder_cumulant(std::ostream& stream, bool header){
+		stream << stats::material_binder_cumulant.output_binder_cumulant(header);
+   }
 
 	// Output Function 51 - with Header
    void mean_height_magnetisation_length(std::ostream& stream, bool header){

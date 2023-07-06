@@ -58,7 +58,7 @@ namespace hamr{
 			zlog << zTs() << "Checking length of bit sequence ..." << std::endl;
 
       	// Check that "number-of-bits" and size of bit sequence provided are consistent
-      	if(hamr::internal::num_bits > hamr::internal::bit_sequence.size()){
+      	if(static_cast<size_t>(hamr::internal::num_bits) > hamr::internal::bit_sequence.size()){
             std::cout << "Warning: Requested number of bits "  << hamr::internal::num_bits
                      << " larger than size of the provided bit sequence=" << hamr::internal::bit_sequence.size()
                      << ". Adjusting to " << hamr::internal::bit_sequence.size() << std::endl;
@@ -67,7 +67,7 @@ namespace hamr{
                         << ". Adjusting to " << hamr::internal::bit_sequence.size() << std::endl;
             hamr::internal::num_bits = hamr::internal::bit_sequence.size();
       	}
-      	else if(hamr::internal::num_bits < hamr::internal::bit_sequence.size()){
+      	else if(static_cast<size_t>(hamr::internal::num_bits) < hamr::internal::bit_sequence.size()){
 				std::cout << "Warning: requested number of bits "  << hamr::internal::num_bits
 				         << " smaller than size of provided bit sequence=" << hamr::internal::bit_sequence.size()
 				         << ". Trimming bit sequence." << std::endl;

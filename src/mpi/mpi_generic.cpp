@@ -59,7 +59,7 @@ void initialise(int argc, char *argv[]){
 
 #ifdef MPICF
 	int resultlen;
-
+	char name[512];
 	// Initialise MPI
 	MPI_Init(&argc, &argv);
 
@@ -70,11 +70,11 @@ void initialise(int argc, char *argv[]){
    // set master flag on master (root) process
    if(vmpi::my_rank == 0) vmpi::master = true;
 
-	MPI_Get_processor_name(vmpi::hostname, &resultlen);
+	MPI_Get_processor_name(name, &resultlen);
 	//IOCommunicator(num_io_processors);
 	// Start MPI Timer
 	vmpi::start_time = MPI_Wtime();
-
+	hostname = name;
 #else
 
    // set master flag on master (root) process (serial)

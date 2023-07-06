@@ -74,7 +74,7 @@ void unitcell::exchange_template_t::normalise_functional_exchange(std::vector < 
    // Calculate sum of interaction energies for different material category pairs. Stored by [lowest mat cat][highest mat cat]
    std::vector <std::vector <double> > material_sum(num_materials, std::vector<double>(num_materials, 0.0));
 
-   for (int i = 0; i < interaction.size(); ++i){
+   for (size_t i = 0; i < interaction.size(); ++i){
       int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
       int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
       if(interaction[i].rij < nn_cutoff_range[min_mat][max_mat]){
@@ -85,21 +85,21 @@ void unitcell::exchange_template_t::normalise_functional_exchange(std::vector < 
 
    // Obtain inverse normalisation factors for different material category pairs. Stored by [lowest mat cat][highest mat cat]
    std::vector <std::vector <double> > mat_inv_norm_factor(num_materials, std::vector<double>(num_materials, 0.0));
-   
-   for(int i = 0; i < mat_inv_norm_factor.size(); ++i){
-      for (int j = 0; j < mat_inv_norm_factor.size(); ++j){
+
+   for(size_t i = 0; i < mat_inv_norm_factor.size(); ++i){
+      for (size_t j = 0; j < mat_inv_norm_factor.size(); ++j){
          if(j >= i){ // Only need to do this set of possibities due to symmetry of the problem
             if(fabs(material_sum[i][j]) < 0.000000001) {
                mat_inv_norm_factor[i][j] = 0; // Prevents division by zero when exchange function is set to zero
                zlog << zTs() << "unit-cell-category[" << i << "][" << j << "] interaction strength set to zero" << std::endl;
-            } 
+            }
             else mat_inv_norm_factor[i][j] = material_expected_sum[i][j]/material_sum[i][j]; // Calculates the standard inv_norm_factor
          }
       }
    }
-   
+
    // Calculate normalised exchange energies
-   for(int i=0; i<interaction.size(); ++i){
+   for(size_t i=0; i<interaction.size(); ++i){
       int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
       int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
       interaction[i].Jij[0][0] *= mat_inv_norm_factor[min_mat][max_mat];

@@ -56,8 +56,10 @@ namespace stats{
             if(stats::calculate_system_magnetization)          stats::system_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_grain_magnetization)           stats::grain_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_material_magnetization)        stats::material_magnetization.calculate_magnetization(sx,sy,sz,mm);
+            if(stats::calculate_material_grain_magnetization)  stats::material_grain_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_height_magnetization)          stats::height_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_material_height_magnetization) stats::material_height_magnetization.calculate_magnetization(sx,sy,sz,mm);
+            if(stats::calculate_material_grain_height_magnetization) stats::material_grain_height_magnetization.calculate_magnetization(sx,sy,sz,mm);
 
             // update torque statistics
             if(stats::calculate_system_torque)          stats::system_torque.calculate_torque(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
@@ -76,6 +78,10 @@ namespace stats{
             if(stats::calculate_system_susceptibility)        stats::system_susceptibility.calculate(stats::system_magnetization.get_magnetization());
             if(stats::calculate_grain_susceptibility)         stats::grain_susceptibility.calculate(stats::grain_magnetization.get_magnetization());
             if(stats::calculate_material_susceptibility)      stats::material_susceptibility.calculate(stats::material_magnetization.get_magnetization());
+
+            // update binder cumulant statistics
+            if(stats::calculate_system_binder_cumulant)         stats::system_binder_cumulant.calculate(stats::system_magnetization.get_magnetization());
+            if(stats::calculate_material_binder_cumulant)       stats::material_binder_cumulant.calculate(stats::material_magnetization.get_magnetization());
 
             // update spin length statistics
             if(stats::calculate_system_spin_length)           stats::system_spin_length.calculate_spin_length(sx,sy,sz);

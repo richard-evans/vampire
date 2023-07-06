@@ -184,8 +184,10 @@ namespace dipole{
       // Output Demag tensor only if first step of simulation since depending only on shape
       std::vector<double> N_tensor_array(6*dipole::internal::cells_num_cells,0.0);
 
+      if (dipole::internal::solver == dipole::internal::macrocell){
 
-      if (dipole::internal::solver == dipole::internal::hierarchical){
+
+      //if (dipole::internal::solver == dipole::internal::hierarchical){
 
                //Every cpus print to check dipolar matrix inter term
                // RFLE - currently commented out as caused a sagfault and not that important
@@ -231,9 +233,8 @@ namespace dipole{
                     // std::cout << std::endl;
          }*/
 
-      }
+      //}
 
-      else if (dipole::internal::solver != dipole::internal::fft){
 
          // Every cpus print to check dipolar matrix inter term
          for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
@@ -271,7 +272,7 @@ namespace dipole{
             // std::cout << "*----------------------------------*" << std::endl;
             // std::cout << std::endl;
          }
-      }
+
 
       // if vampire is running in parallel, all cpus send demag field to root proc
       #ifdef MPICF
@@ -373,6 +374,8 @@ namespace dipole{
       // End of output dipolar tensor
 	   //--------------------------------------------------/
 
+      }
+
     	return;
-    }
+   }
 } // end of dipole namespace

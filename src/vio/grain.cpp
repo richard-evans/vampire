@@ -97,14 +97,15 @@ void write_grain_file(){
                   zgrain << stats::grain_magnetization.output_normalized_mean_magnetization_length(header);
                   break;
                //------------------------------------------
-               /*case grain::material_magnetisation:
-                  vout::grain_mat_mvec(zgrain,header);
-                  // Output Function 13
-                  void grain_mat_mvec(std::ostream& stream, bool header){
-                     grains::output_mat_mag(stream);
-
-                  }
-                  break;*/
+               case grain::material_magnetisation:
+                  // inline function to output grain data
+                  zgrain << stats::material_grain_magnetization.output_normalized_magnetization(header);
+                  break;
+               //------------------------------------------
+               case grain::material_height_magnetisation:
+                  // inline function to output grain data
+                  zgrain << stats::material_grain_height_magnetization.output_normalized_magnetization(header);
+                  break;
                //------------------------------------------
                case grain::mean_torque:
                   // inline function to output grain data

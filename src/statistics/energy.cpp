@@ -310,8 +310,8 @@ void energy_statistic_t::set_total_energy(std::vector<double>& new_energy, std::
    // copy energy vector
    total_energy = new_energy;
 
-   const unsigned int array_size = mean_total_energy.size();
-   for( int i=0; i < array_size; ++i ){
+   const size_t array_size = mean_total_energy.size();
+   for( size_t i=0; i < array_size; ++i ){
       mean_total_energy[i] += new_mean_energy[i];
    }
 
@@ -325,8 +325,8 @@ void energy_statistic_t::set_exchange_energy(std::vector<double>& new_energy, st
    // copy energy vector
    exchange_energy = new_energy;
 
-   const unsigned int array_size = mean_exchange_energy.size();
-   for( int i=0; i < array_size; ++i ){
+   const size_t array_size = mean_exchange_energy.size();
+   for( size_t i=0; i < array_size; ++i ){
       mean_exchange_energy[i] += new_mean_energy[i];
    }
 
@@ -340,8 +340,8 @@ void energy_statistic_t::set_anisotropy_energy(std::vector<double>& new_energy, 
    // copy energy vector
    anisotropy_energy = new_energy;
 
-   const unsigned int array_size = mean_anisotropy_energy.size();
-   for( int i=0; i < array_size; ++i ){
+   const size_t array_size = mean_anisotropy_energy.size();
+   for( size_t i=0; i < array_size; ++i ){
       mean_anisotropy_energy[i] += new_mean_energy[i];
    }
 
@@ -355,8 +355,8 @@ void energy_statistic_t::set_applied_field_energy(std::vector<double>& new_energ
    // copy energy vector
    applied_field_energy = new_energy;
 
-   const unsigned int array_size = mean_applied_field_energy.size();
-   for( int i=0; i < array_size; ++i ){
+   const size_t array_size = mean_applied_field_energy.size();
+   for( size_t i=0; i < array_size; ++i ){
       mean_applied_field_energy[i] += new_mean_energy[i];
    }
 
@@ -370,8 +370,8 @@ void energy_statistic_t::set_magnetostatic_energy(std::vector<double>& new_energ
    // copy energy vector
    magnetostatic_energy = new_energy;
 
-   const unsigned int array_size = mean_magnetostatic_energy.size();
-   for( int i=0; i < array_size; ++i ){
+   const size_t array_size = mean_magnetostatic_energy.size();
+   for( size_t i=0; i < array_size; ++i ){
       mean_magnetostatic_energy[i] += new_mean_energy[i];
    }
 
@@ -415,7 +415,7 @@ std::string energy_statistic_t::output_energy(enum energy_t energy_type,bool hea
 
    // result string stream
    std::ostringstream res;
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // set custom precision if enabled
    if(vout::custom_precision){
       res.precision(vout::precision);
@@ -469,7 +469,7 @@ std::string energy_statistic_t::output_mean_energy(enum energy_t energy_type,boo
 
    // result string stream
    std::ostringstream res;
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    // set custom precision if enabled
    if(vout::custom_precision){
       res.precision(vout::precision);

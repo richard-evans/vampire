@@ -63,7 +63,7 @@ namespace dipole{
          if(vmpi::master) data_from_all_atoms.resize(4*total_num_atoms);
 
          // copy local position data to local array
-         for(int atom = 0; atom < local_num_atoms; atom++){
+         for(uint64_t atom = 0; atom < local_num_atoms; atom++){
             data_from_local_atoms[ 4 * atom + 0 ] = x_coord_array[atom];
             data_from_local_atoms[ 4 * atom + 1 ] = y_coord_array[atom];
             data_from_local_atoms[ 4 * atom + 2 ] = z_coord_array[atom];
@@ -80,7 +80,7 @@ namespace dipole{
          double mean_x = 0.0;
          double mean_y = 0.0;
          double mean_z = 0.0;
-         for(int atom = 0; atom < total_num_atoms; atom++){
+         for(uint64_t atom = 0; atom < total_num_atoms; atom++){
             mean_x += data_from_all_atoms[ 4 * atom + 0 ];
             mean_y += data_from_all_atoms[ 4 * atom + 1 ];
             mean_z += data_from_all_atoms[ 4 * atom + 2 ];
@@ -93,7 +93,7 @@ namespace dipole{
          if(vmpi::master){
             std::ofstream ofile;
             ofile.open("atomistic_dipole_positions.txt");
-            for(int atom = 0; atom < total_num_atoms; atom++){
+            for(uint64_t atom = 0; atom < total_num_atoms; atom++){
                ofile << data_from_all_atoms[ 4 * atom + 0 ] - mean_x << "\t" <<
                         data_from_all_atoms[ 4 * atom + 1 ] - mean_y << "\t" <<
                         data_from_all_atoms[ 4 * atom + 2 ] - mean_z << "\t" <<
@@ -133,7 +133,7 @@ namespace dipole{
          const uint64_t local_num_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
 
          // copy local field data to local array
-         for(int atom = 0; atom < local_num_atoms; atom++){
+         for(uint64_t atom = 0; atom < local_num_atoms; atom++){
             data_from_local_atoms[ 3 * atom + 0 ] = dipole::atom_dipolar_field_array_x[atom];
             data_from_local_atoms[ 3 * atom + 1 ] = dipole::atom_dipolar_field_array_y[atom];
             data_from_local_atoms[ 3 * atom + 2 ] = dipole::atom_dipolar_field_array_z[atom];

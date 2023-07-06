@@ -28,6 +28,18 @@ std::ofstream dp_fields;
 
 namespace vout{
 
+   std::string output_file_name;
+
+
+   std::string zLogProgramName; /// Program Name
+   std::string zLogHostName; /// Host Name
+   bool        zLogInitialised=false; /// Initialised flag
+   #ifdef WIN_COMPILE
+   	int      zLogPid; /// Process ID
+   #else
+   	pid_t    zLogPid; /// Process ID
+   #endif
+
    bool custom_precision = false; // enable user selectable precision for data output
    unsigned int precision = 6; // variable to control output precision (digits)
    int fw_size = 11;

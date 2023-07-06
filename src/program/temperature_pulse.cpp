@@ -279,13 +279,13 @@ void temperature_pulse(){
 	for(int r=0; r<sim::runs;r++){
 
 	// record starting time after equiibration/last pulse
-	int start_time=sim::time;
+	uint64_t start_time = sim::time;
 
 	// Simulate temperature pulse
 	while(sim::time<sim::total_time+start_time){
 
 		// loop over partial_time to update temperature every time
-		for(int tt=0; tt < sim::partial_time; tt++){
+		for(uint64_t tt=0; tt < sim::partial_time; tt++){
 
 			// Calculate time from pulse
 			double time_from_start=mp::dt_SI*double(sim::time-start_time);

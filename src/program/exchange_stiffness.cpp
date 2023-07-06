@@ -24,14 +24,14 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 
+// program module headers
+#include "internal.hpp"
 
 namespace program{
 
 //--------------------------------------------------------------------------------
 // constants but can be moved to input parameters if need be
 //--------------------------------------------------------------------------------
-const double exchange_stiffness_max_constraint_angle   = 180.01; // degrees
-const double exchange_stiffness_delta_constraint_angle =  5; // 22.5 degrees
 const double pi180 = M_PI/180.0;
 
 //--------------------------------------------------------------------------------
@@ -166,8 +166,8 @@ void exchange_stiffness(){
 	//---------------------------------------------------------------------------
 	// Main exchange calculation program
 	//---------------------------------------------------------------------------
-	const double mt = exchange_stiffness_max_constraint_angle;
-	const double dt = exchange_stiffness_delta_constraint_angle;
+	const double mt = program::internal::exchange_stiffness_max_constraint_angle;
+	const double dt = program::internal::exchange_stiffness_delta_constraint_angle;
 
 	// set constraint phi component
 	const double constraint_phi = 90.0;
@@ -183,24 +183,68 @@ void exchange_stiffness(){
 		m2_data.push_back( std::vector<double>() );
 		torque_data.push_back( std::vector<double>() );
 
+		const double theta = double(constraint_theta); // angle from z per fractional coordinate
+		const double tr = theta*pi180;
+
+		// rotation matrix for angle rotation
+		/*double rot[3][3];
+		rot[0][0] = 1.0;
+		rot[0][1] = 0.0;
+		rot[0][2] = 0.0;
+		rot[1][0] = 0.0;
+		rot[1][1] = cos(tr);
+		rot[1][2] = sin(tr);
+		rot[2][0] = 0.0;
+		rot[2][1] = -sin(tr);
+		rot[2][2] = cos(tr);
+
+		double xx = cosphi*sin(tr);
+		double yy = sinphi*sin(tr);
+		double zz = cos(tr);
+
+		//std::cout << "-----------------------------------------------------" << std::endl;
+		//std::cout << xx << "\t" << yy << "\t" << zz << std::endl;
+
+		double S[3] = {0,0,1};
+		double Sp[3];
+
+		Sp[0] = rot[0][0]*S[0] + rot[0][1]*S[1] + rot[0][2]*S[2];
+		Sp[1] = rot[1][0]*S[0] + rot[1][1]*S[1] + rot[1][2]*S[2];
+		Sp[2] = rot[2][0]*S[0] + rot[2][1]*S[1] + rot[2][2]*S[2];
+
+		//std::cout << S[0] << " , " << S[1] << " , " << S[2] << " -> " << Sp[0] << " , " << Sp[1] << " , " << Sp[2] << std::endl;
+
+		S[0] = 0.0;
+		S[1] = 0.0;
+		S[2] = -1.0;
+
+		Sp[0] = rot[0][0]*S[0] + rot[0][1]*S[1] + rot[0][2]*S[2];
+		Sp[1] = rot[1][0]*S[0] + rot[1][1]*S[1] + rot[1][2]*S[2];
+		Sp[2] = rot[2][0]*S[0] + rot[2][1]*S[1] + rot[2][2]*S[2];
+
+		//std::cout << S[0] << " , " << S[1] << " , " << S[2] << " -> " << Sp[0] << " , " << Sp[1] << " , " << Sp[2] << std::endl;*/
+
 		// initialise new spin positions (half rotation from 1st plane to mid plane, then second half rotation to max plane)
 		for( int atom = 0 ; atom < atoms::num_atoms; atom++ ){
 
 			// get material ID
 			const int mat = atoms::type_array[atom];
+			const double sintr = sin(tr*fractional_coordinates[atom]);
+			const double costr = cos(tr*fractional_coordinates[atom]);
 
 			// if constrained material initialise normal profile (constant angle)
 			if( mat == constrained_material_id){
-				const double theta = double(constraint_theta); // angle from z per fractional coordinate
-				atoms::x_spin_array[atom] = cosphi*sin( theta * pi180 * fractional_coordinates[atom] );
-				atoms::y_spin_array[atom] = sinphi*sin( theta * pi180 * fractional_coordinates[atom] );
-				atoms::z_spin_array[atom] = cos( theta * pi180 * fractional_coordinates[atom] );
+				const double S[3] = {0,0,1};
+				atoms::x_spin_array[atom] = S[0];
+				atoms::y_spin_array[atom] = costr*S[1] + sintr*S[2];
+				atoms::z_spin_array[atom] = -sintr*S[1] + costr*S[2];
 			}
-			// otherwise assume initial spin direction for sublattice (should work OK for most ferro, ferri and antiferromagnets)
+			// otherwise assume initial spin direction for sublattice before rotation (should work OK for most ferro, ferri and antiferromagnets)
 			else{
-				atoms::x_spin_array[atom] = mp::material[mat].initial_spin[0];
-				atoms::y_spin_array[atom] = mp::material[mat].initial_spin[1];
-				atoms::z_spin_array[atom] = mp::material[mat].initial_spin[2];
+				const double S[3] = {mp::material[mat].initial_spin[0],mp::material[mat].initial_spin[1],mp::material[mat].initial_spin[2]};
+				atoms::x_spin_array[atom] = S[0];
+				atoms::y_spin_array[atom] = costr*S[1] + sintr*S[2];
+				atoms::z_spin_array[atom] = -sintr*S[1] + costr*S[2];
 			}
 
 		}
@@ -215,6 +259,10 @@ void exchange_stiffness(){
 		constrained[0] = true; // constrain first plane
 		constrained[1] = true; // constrain middle plane
 		montecarlo::initialise_masked_cmc_mc(constraint_mask.size(), constraint_mask, constrained, phi_theta_constraints);
+
+		// set global constrained angle variables for data output (not used)
+		sim::constraint_phi = phi_theta_constraints[2];
+		sim::constraint_theta = phi_theta_constraints[3];
 
 		// initialise temperature
 		sim::temperature=sim::Tmin;
@@ -266,7 +314,7 @@ void exchange_stiffness(){
 			// store computed net torque in data array
 			temperatures.push_back(sim::temperature);
 			const int end = torque_data.size()-1;
-			const double net_torque = torques[3]*inv_n_atm_p2/counter - torques[0]*inv_n_atm_p1/counter;
+			const double net_torque = (torques[3]*inv_n_atm_p2/counter - torques[0]*inv_n_atm_p1/counter)*0.5;
 			m1_data[end].push_back(magnetizations[0]/counter);
 			m2_data[end].push_back(magnetizations[1]/counter);
 			torque_data[end].push_back(net_torque);
@@ -301,11 +349,15 @@ void exchange_stiffness(){
 	std::cout << " Final exchange fitting" << std::endl;
 	std::cout << "---------------------------------------------------------------" << std::endl;
 
+	ofile.open("exchange-stiffness.txt");
+
 	// loop over all temperatures
-	for(int j = 0; j < temperatures.size(); j++){
+	for(size_t j = 0; j < temperatures.size(); j++){
 
 		// populate 1D data for fitting
-		for(int i = 0; i < torque_data.size(); i++) torque1D[i] = torque_data[i][j];
+		for(size_t i = 0; i < torque_data.size(); i++){
+			torque1D[i] = torque_data[i][j];
+		}
 
 		double m = 0.0;
 		double c = 0.0;
@@ -314,11 +366,31 @@ void exchange_stiffness(){
 		vmath::regression(angles, torque1D, m, c);
 
 		// output resulting gradient to screen
-		std::cout << temperatures[j] << "\t" << m << "\t" << c << std::endl;
+		std::cout << temperatures[j] << "\t" << m << "\t" << c << "\t" << m1_data[0][j] << "\t" << m2_data[0][j] << std::endl;
+		ofile     << temperatures[j] << "\t" << m << "\t" << c << "\t" << m1_data[0][j] << "\t" << m2_data[0][j] << std::endl;
 
 	}
 
+	//---------------------------------------------------------------------------
+	// Output final torques in plotable format
+	//---------------------------------------------------------------------------
+	std::ofstream ofile2("exchange-stiffness-final-torques.txt");
 
+	ofile2 << "#angle\t";
+	for(size_t j = 0; j < temperatures.size(); j++) ofile2 << temperatures[j] << "\t";
+	ofile2 << std::endl;
+
+	// loop over all angles
+	for(size_t i = 0; i < torque_data.size(); i++){
+
+		ofile2 << angles[i] << "\t";
+		// loop over all temperatures
+		for(size_t j = 0; j < temperatures.size(); j++){
+			ofile2 << torque_data[i][j] << "\t";
+		}
+		ofile2 << std::endl;
+	}
+	ofile2.close();
 
 	return;
 
@@ -354,8 +426,8 @@ void set_constraint_mask(const std::vector<double>& coordinates, // atomic coord
 		}
 	}
 
-	// determine coordinate of constrained atoms nearest middle
-	double middle = min_coord + (max_coord - min_coord) * 0.5;
+	// determine coordinate of constrained atoms nearest middle (shift about 1 atom to be slightly more than half)
+	double middle = min_coord + (max_coord - min_coord) * 0.5 + 3.0;
 	double mid_coord = max_coord;
 	double difference = 1.0e10;
 	for( int atom = 0 ; atom < num_atoms; atom++){
@@ -450,7 +522,7 @@ void calculate_torque(const std::vector<int>& mask,
 	double tt[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 	double counter[2] = { 0.0, 0.0 };
 
-	for(int atom = 0; atom < mask.size(); atom++){
+	for(size_t atom = 0; atom < mask.size(); atom++){
 
 		const int mask_id = mask[atom];
 

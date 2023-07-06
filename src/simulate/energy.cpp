@@ -97,9 +97,20 @@ namespace sim{
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-double spin_applied_field_energy(const double Sx, const double Sy, const double Sz){;
+double spin_applied_field_energy(const double Sx, const double Sy, const double Sz){
 
 	return -sim::H_applied*(sim::H_vec[0]*Sx + sim::H_vec[1]*Sy + sim::H_vec[2]*Sz);
+
+}
+
+double spin_local_applied_field_energy(const int mat, const double sx, const double sy, const double sz){
+
+	const double B = mp::material[mat].applied_field_strength;
+	const double hx = B * mp::material[mat].applied_field_unit_vector[0];
+	const double hy = B * mp::material[mat].applied_field_unit_vector[1];
+	const double hz = B * mp::material[mat].applied_field_unit_vector[2];
+
+	return -(hx*sx + hy*sy + hz*sz);
 
 }
 
@@ -201,6 +212,9 @@ double calculate_spin_energy(const int atom){
 
 	energy+=spin_applied_field_energy(Sx, Sy, Sz);
 	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);
+
+	// local applied fields
+	if(sim::local_applied_field) energy += spin_local_applied_field_energy(imaterial, Sx, Sy, Sz);
 
 	// vcma energy
 	const double vcma = program::fractional_electric_field_strength * spin_transport::get_voltage() * sim::internal::vcmak[imaterial];

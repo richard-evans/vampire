@@ -83,7 +83,7 @@ namespace st{
             st::internal::default_properties.beta_diff *= /*st::internal::mp[0].beta_diff**/0.5*(plus_cos+0.5*minus_cos)*exp_t;
 
             // Calculate spin torque parameters
-            for(int cell=0; cell<st::internal::beta_cond.size(); ++cell){
+            for(size_t cell=0; cell<st::internal::beta_cond.size(); ++cell){
 
                // check for zero atoms in cell
                if(st::internal::cell_natom[cell] <= 0.0001){

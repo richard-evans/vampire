@@ -221,6 +221,22 @@ namespace program{
          return true;
       }
       //--------------------------------------------------------------------
+      test="exchange-stiffness-maximum-angle";
+      if(word==test){
+         double ma = atof(value.c_str()); // convert string to uint64_t
+         vin::check_for_valid_value(ma, word, line, prefix, unit, "", 0.0, 180.1,"input","0 - 180 degrees");
+         program::internal::exchange_stiffness_max_constraint_angle = ma;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="exchange-stiffness-angle-increment";
+      if(word==test){
+         double ai = atof(value.c_str()); // convert string to uint64_t
+         vin::check_for_valid_value(ai, word, line, prefix, unit, "", 1.0, 90.0,"input","1 - 90 degrees");
+         program::internal::exchange_stiffness_delta_constraint_angle = ai;
+         return true;
+      }
+      //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
       return false;

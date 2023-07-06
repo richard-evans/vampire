@@ -99,7 +99,7 @@ void output_inc_file(unsigned int spin_file_id){
          vdc::rgb(sx, sy, sz, red, green, blue);
 
          // format text for povray file
-         otext << "spinm"<< type[atom] << "(" <<
+         otext << "spinm"<< type[atom]+1 << "(" <<
                   coordinates[3*atom+0]-vdc::system_centre[0] << "," << coordinates[3*atom+1]-vdc::system_centre[1] << "," << coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
                   spins[3*atom+0] << "," << spins[3*atom+1] << "," << spins[3*atom+2] << "," <<
                   red << "," << green << "," << blue << ")\n";
@@ -130,7 +130,7 @@ void output_inc_file(unsigned int spin_file_id){
          unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
          // format text for povray file
-         otext << "spinm"<< nm_type[atom] << "(" <<
+         otext << "spinm"<< nm_type[atom]+1 << "(" <<
                   nm_coordinates[3*atom+0]-vdc::system_centre[0] << "," <<
                   nm_coordinates[3*atom+1]-vdc::system_centre[1] << "," <<
                   nm_coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
@@ -184,6 +184,10 @@ void output_povray_file(){
    vec[1]/=mag_vec;
    vec[2]/=mag_vec;
 
+   const double camr = size*6.0*vdc::camera_zoom;
+   const double camp = 180.0*acos(vec[1]/sqrt(vec[0]*vec[0]+vec[1]*vec[1]))/M_PI;
+   const double camt = 180.0*acos(vec[2]/sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]))/M_PI;
+
    pfile << "//-------------------------------------------------------------------------" << std::endl;
    pfile << "// Povray file generated using vampire" << std::endl;
    pfile << "//-------------------------------------------------------------------------" << std::endl;
@@ -198,10 +202,17 @@ void output_povray_file(){
 	pfile << "#declare LX = " << vdc::camera_look_at[0]*dim[0]/2.0 << "; // camera looking position" << std::endl;
 	pfile << "#declare LY = " << vdc::camera_look_at[1]*dim[1]/2.0 << ";" << std::endl;
 	pfile << "#declare LZ = " << vdc::camera_look_at[2]*dim[2]/2.0 << ";" << std::endl;
+   pfile << "// camera location" << std::endl;
+   pfile << "#declare cam_theta  = " << camt << "; // angle from z in degrees" << std::endl;
+   pfile << "#declare cam_phi    = " << camp << "; // angle from x in degrees" << std::endl;
+   pfile << "#declare cam_radius = " << camr << "; // distance from origin" << std::endl;
+   pfile << "#declare CX = cam_radius * cos(cam_phi*pi/180.0) * sin(cam_theta*pi/180.0);" << std::endl;
+   pfile << "#declare CY = cam_radius * sin(cam_phi*pi/180.0) * sin(cam_theta*pi/180.0);" << std::endl;
+   pfile << "#declare CZ = cam_radius * cos(cam_theta*pi/180.0);" << std::endl;
    // camera position
-	pfile << "#declare CX = " << size*vec[0]*6.0*vdc::camera_zoom << "; // camera location" << std::endl;
-	pfile << "#declare CY = " << size*vec[1]*6.0*vdc::camera_zoom << ";" << std::endl;
-	pfile << "#declare CZ = " << size*vec[2]*6.0*vdc::camera_zoom << ";" << std::endl;
+	//pfile << "#declare CX = " << size*vec[0]*6.0*vdc::camera_zoom << "; // camera location" << std::endl;
+	//pfile << "#declare CY = " << size*vec[1]*6.0*vdc::camera_zoom << ";" << std::endl;
+	//pfile << "#declare CZ = " << size*vec[2]*6.0*vdc::camera_zoom << ";" << std::endl;
    pfile << "Set_Camera(<CX,CY,CZ>, <LX,LY,LZ>, 15)" << std::endl;
 	pfile << "Set_Camera_Aspect(4,3)"  << std::endl;
 	pfile << "Set_Camera_Sky(<0,0,1>)" << std::endl;
@@ -215,10 +226,53 @@ void output_povray_file(){
 
 
 	pfile << "light_source { <2*CX, 2*CY, 2*CZ> color White} // lights" << std::endl;
+   pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
+   pfile << "#declare Final_Frame = "   << vdc::final_file_id << ";\n" << std::endl;
+
+   pfile << "//------------------------------------------" << std::endl;
+   pfile << "// Global settings for appearance" << std::endl;
+   pfile << "//------------------------------------------\n" << std::endl;
 
    pfile << "#declare ref = 0.05; // reflection level of objects" << std::endl;
-   pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
-   pfile << "#declare Final_Frame = "   << vdc::final_file_id << ";\n\n" << std::endl;
+   pfile << "#declare dif = 1.0; // diffuse level of objects" << std::endl;
+   pfile << "#declare amb = 0.1; // ambient level of objects\n" << std::endl;
+
+   pfile << "// spin scale (default 2.0)" << std::endl;
+   pfile << "#declare global_spin_scale = true;" << std::endl;
+   pfile << "#declare sscale = 2.0;\n" << std::endl;
+
+   pfile << "// radius scale (default 1.2)" << std::endl;
+   pfile << "#declare global_radius_scale = true;" << std::endl;
+   pfile << "#declare rscale = 1.2;\n" << std::endl;
+
+   pfile << "// cube scale (default 1.2)" << std::endl;
+   pfile << "#declare global_cube_scale = true;" << std::endl;
+   pfile << "#declare cscale = 3.54;\n" << std::endl;
+
+   pfile << "// global objects" << std::endl;
+   pfile << "#declare global_cones   = false;" << std::endl;
+   pfile << "#declare global_arrows  = true;" << std::endl;
+   pfile << "#declare global_spheres = true;" << std::endl;
+   pfile << "#declare global_cubes   = false;\n" << std::endl;
+
+   pfile << "// non-magnetic element colours" << std::endl;
+   pfile << "#declare global_non_magnet_colour = true;" << std::endl;
+   pfile << "#declare nmcolour = pigment {color rgb < 0.2 0.2 0.2 >};\n" << std::endl;
+
+   pfile << "//-----------------------------------------------------------------------------------" << std::endl;
+   pfile << "// Colour macro" << std::endl;
+   pfile << "// The default is vdc generated and takes rgb values, but can be overridden to" << std::endl;
+   pfile << "// apply non-linear colour scales, colour maps etc." << std::endl;
+   pfile << "//-----------------------------------------------------------------------------------" << std::endl;
+   pfile << "#macro spinrgb(sx, sy, sz, cr, cg, cb)" << std::endl;
+   pfile << "   pigment {color rgb <cr cg cb>}" << std::endl;
+   pfile << "#end\n" << std::endl;
+
+   pfile << "// alternative colour schemes" << std::endl;
+   pfile << "//#include \"util/povray_colours/jet.inc\"" << std::endl;
+   pfile << "//#include \"util/povray_colours/purple_white.inc\"" << std::endl;
+   pfile << "//#include \"util/povray_colours/blue_gold.inc\"" << std::endl;
+   pfile << "//#include \"util/povray_colours/color_wheel.inc\"\n" << std::endl;
 
    //---------------------------------------------------------------------------
    // Determine non-magnetic materials looping over all non-magnetic atoms
@@ -238,25 +292,87 @@ void output_povray_file(){
    while (vdc::atom_sizes.size()  < vdc::materials.size()){ vdc::atom_sizes.push_back(1.2);  }
    while (vdc::arrow_sizes.size() < vdc::materials.size()){ vdc::arrow_sizes.push_back(2.0); }
 
+   //for( auto i : remove_materials){
+   for(int i=0; i< remove_materials.size(); i++){
+      std::cout << i << "\t" << remove_materials[i] << std::endl;
+      //std::cout << std::find(remove_materials.begin(), remove_materials.end(), ) << std::endl;
+   }
+
+   //-----------------------------------------------------
+   // optionally output sticks macro if requested in vdc
+   //-----------------------------------------------------
+   /*if(vdc::povsticks){ // version with truncated cylinders
+      pfile << "\n" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "// Sticks macro" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "#macro stick(sx,sy,sz,ex,ey,ez,r1,r2)" << std::endl;
+      pfile << "   #declare dx = ex-sx;" << std::endl;
+      pfile << "   #declare dy = ey-sy;" << std::endl;
+      pfile << "   #declare dz = ez-sz;" << std::endl;
+      pfile << "   #declare r = sqrt(dx*dx + dy*dy + dz*dz);" << std::endl;
+      pfile << "   #declare xh = 0.5*dx/r;" << std::endl;
+      pfile << "   #declare yh = 0.5*dy/r;" << std::endl;
+      pfile << "   #declare zh = 0.5*dz/r;" << std::endl;
+      pfile << "   difference{" << std::endl;
+      pfile << "      cylinder {" << std::endl;
+      pfile << "         <sx+xh*r1,sy+yh*r1,sz+zh*r1>," << std::endl;
+      pfile << "         <ex-xh*r2,ey-yh*r2,ez-zh*r2>, 0.2" << std::endl;
+      pfile << "      }" << std::endl;
+      pfile << "      sphere{<sx,sy,sz>, r1*0.5}" << std::endl;
+      pfile << "      sphere{<ex,ey,ez>, r2*0.5}" << std::endl;
+      pfile << "      texture { pigment {color rgb < 0.1 0.1 0.1 >} finish {reflection ref diffuse dif ambient amb } }" << std::endl;
+      pfile << "   }" << std::endl;
+      pfile << "#end\n" << std::endl;
+   }*/
+
+   if(vdc::povsticks){
+      pfile << "\n" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "// Sticks macro" << std::endl;
+      pfile << "//----------------------------------------------------------------" << std::endl;
+      pfile << "#macro stick(sx,sy,sz,ex,ey,ez,r1,r2)" << std::endl;
+      pfile << "   difference{" << std::endl;
+      pfile << "      cylinder {" << std::endl;
+      pfile << "         <sx,sy,sz>," << std::endl;
+      pfile << "         <ex,ey,ez>, 0.2" << std::endl;
+      pfile << "      }" << std::endl;
+      pfile << "      sphere{<sx,sy,sz>, r1*0.5}" << std::endl;
+      pfile << "      sphere{<ex,ey,ez>, r2*0.5}" << std::endl;
+      pfile << "      texture { pigment {color rgb < 0.1 0.1 0.1 >} finish {reflection ref diffuse dif ambient amb } }" << std::endl;
+      pfile << "   }" << std::endl;
+      pfile << "#end\n" << std::endl;
+   }
+
    // Output material specific macros
-	for(unsigned int imat=0; imat < vdc::materials.size(); imat++){
-      if (std::find(remove_materials.begin(), remove_materials.end(), imat+1) == remove_materials.end() ){
+	for(unsigned int indx=0; indx < vdc::materials.size(); indx++){
+
+      const int imat = indx+1; // correct for standard material numbering as in vampire material file
+
+      // check for removed material
+      if (std::find(remove_materials.begin(), remove_materials.end(), imat) == remove_materials.end() ){
+
          pfile << "//-----------------------------------------------------------------------------------" << std::endl;
-         pfile << "// Material " << imat << std::endl;
+         pfile << "// Material " << vdc::materials[indx].id+1 << "\tName: " << vdc::materials[indx].name << "\tElement: " << vdc::materials[indx].element << std::endl;
          pfile << "//-----------------------------------------------------------------------------------" << std::endl;
-         if(is_nm_mat[imat] == false){
-            // sscale affects the spin arrow
-      		pfile << "#declare sscale" << imat << "=" << vdc::arrow_sizes[imat] << ";" << std::endl;
-            // rscale affects sphere(atom) size
-      		pfile << "#declare rscale" << imat << "=" << vdc::atom_sizes[imat]  << ";" << std::endl;
-            // cscale affects cube size
-            pfile << "#declare cscale" << imat << " = 3.54;" << std::endl;
-            pfile << "#declare cones"  << imat << " = false;" << std::endl;
-            pfile << "#declare arrows" << imat << " = true;" << std::endl;
-            pfile << "#declare spheres"<< imat << " = true;" << std::endl;
-            pfile << "#declare cubes"  << imat << " = false;" << std::endl;
-            pfile << "#declare spincolors"<< imat << " = true; // enable colours defined in vdc" << std::endl;
-            pfile << "#declare spincolor" << imat << " = pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+
+         // if material is magnetic
+         if(is_nm_mat[indx] == false){
+
+
+            pfile << "#if(global_spin_scale) #declare sscale"  << imat << " = sscale;" << std::endl;
+            pfile << "#else #declare sscale" << imat << " = " << vdc::arrow_sizes[indx] << "; #end" << std::endl;
+            pfile << "#if(global_radius_scale) #declare rscale"  << imat << " = rscale;" << std::endl;
+            pfile << "#else #declare rscale" << imat << " = " << vdc::atom_sizes[indx]  << "; #end" << std::endl;
+            pfile << "#if(global_cube_scale) #declare cscale"  << imat << " = cscale;" << std::endl;
+            pfile << "#else #declare cscale" << imat << " = 3.54; #end" << std::endl;
+
+            pfile << "#if(global_cones)   #declare cones"   << imat << " = global_cones;   #else #declare cones"   << imat << " = false; #end" << std::endl;
+            pfile << "#if(global_cubes)   #declare arrows"  << imat << " = global_arrows;  #else #declare arrows"  << imat << " = true;  #end" << std::endl;
+            pfile << "#if(global_spheres) #declare spheres" << imat << " = global_spheres; #else #declare spheres" << imat << " = true;  #end" << std::endl;
+            pfile << "#if(global_cubes)   #declare cubes"   << imat << " = global_cubes;   #else #declare cubes"   << imat << " = false; #end" << std::endl;
+            pfile << "#declare spincolors" << imat << " = true; // enable colours defined in vdc" << std::endl;
+            pfile << "#declare spincolor" << imat << "  = pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
             pfile << "//-------------------------------------" << std::endl;
             pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz, cr,cg,cb)" << std::endl;
             pfile << "union{"      << std::endl;
@@ -269,35 +385,42 @@ void output_povray_file(){
             pfile << "      cone     {<cx+sx*0.5*1.6*sscale"<< imat <<",cy+sy*0.5*1.6*sscale"<< imat <<",cz+sz*0.5*1.6*sscale"<< imat <<">,sscale"<< imat <<"*0.0" << std::endl;
             pfile << "                <cx+sx*0.5*sscale"<< imat <<",    cy+sy*0.5*sscale"<< imat <<",    cz+sz*0.5*sscale"<< imat <<"    >,sscale"<< imat <<"*0.2}" << std::endl;
             pfile << "   #end" << std::endl;
-            pfile << "   #if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
-            pfile << "   #else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
+            pfile << "   #if(spincolors"<< imat << ") texture { spinrgb(sx,sy,sz,cr,cg,cb) finish {reflection ref diffuse dif ambient amb } }" << std::endl;
+            pfile << "   #else texture { spincolor"<< imat << " finish {reflection ref diffuse dif ambient amb }} #end" << std::endl;
             pfile << "}"    << std::endl;
             pfile << "#end\n" << std::endl;
          }
          else{
-            pfile << "#declare rscale" << imat << " = " << vdc::atom_sizes[imat]  << ";" << std::endl;
-            pfile << "#declare cscale" << imat << " =  0.1;" << std::endl;
-            pfile << "#declare spheres"<< imat << " = true;"   << std::endl;
-            pfile << "#declare cubes"  << imat << " = false;"   << std::endl;
+            pfile << "#if(global_spheres) #declare spheres" << imat << " = global_spheres; #else #declare spheres" << imat << " = true;  #end" << std::endl;
+            pfile << "#if(global_cubes)   #declare cubes"   << imat << " = global_cubes;   #else #declare cubes"   << imat << " = false; #end" << std::endl;
+            pfile << "#if(global_radius_scale) #declare rscale"  << imat << " = rscale;" << std::endl;
+            pfile << "#else #declare rscale" << imat << " = " << vdc::atom_sizes[indx]  << "; #end" << std::endl;
+            pfile << "#if(global_cube_scale) #declare cscale"  << imat << " = cscale;" << std::endl;
+            pfile << "#else #declare cscale" << imat << " = 3.54; #end" << std::endl;
             pfile << "#declare spincolors"<< imat << " = false;" << std::endl;
-            pfile << "#declare spincolor" << imat << " = pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+            pfile << "#declare spincolor" << imat << " = pigment {color rgb < 0.2 0.2 0.2 >};" << std::endl;
             pfile << "//-------------------------------------" << std::endl;
             pfile << "#macro spinm"  << imat << "(cx,cy,cz,sx,sy,sz,cr,cg,cb)" << std::endl;
-            pfile << "union{"        << std::endl;
+            pfile << "union{" << std::endl;
             pfile << "   #if(spheres"   << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
-            pfile << "   #if(cubes"     << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
+            pfile << "   #if(cubes"     << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>," << std::endl;
+            pfile << "                        <cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
             pfile << "   #if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
             pfile << "   #else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
             pfile << "}"    << std::endl;
             pfile << "#end" << std::endl;
          }
-      }
+      } // end of check if material is to be removed
 	}
+
    // frame specific povray output
    pfile << "//----------------------------------------------------------------" << std::endl;
-   pfile << "// Include spin data" << std::endl;
+   pfile << "// Include spin and sticks data" << std::endl;
    pfile << "//----------------------------------------------------------------" << std::endl;
    pfile << "#include concat(\"spins-\", str(frame_number, -8, 0) \".inc\")" << std::endl;
+
+   // optionally include sticks
+   if(vdc::povsticks) pfile << "#include \"sticks.inc\"" << std::endl;
 
    // close output file
 	pfile.close();

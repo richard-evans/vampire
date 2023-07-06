@@ -45,7 +45,7 @@ void calculate_magnetoresistance(){
    //---------------------------------------------------------------------------------------------------------
    // loop over all stacks to calculate stack resistance (can OpenMP this loop)
    //---------------------------------------------------------------------------------------------------------
-   for(int stack = st::internal::first_stack; stack < st::internal::last_stack; stack++){
+   for(uint64_t stack = st::internal::first_stack; stack < st::internal::last_stack; stack++){
 
       const unsigned int start = stack_start_index[stack];
       const unsigned int end   = stack_final_index[stack];

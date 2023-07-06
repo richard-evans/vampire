@@ -44,7 +44,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
                                           std::vector < bool >& magnetic){ // is magnetic
 
    // initialise all cells to zero on all processors
-   for(int cell_index = 0; cell_index < ha::mag_array_x.size() ; ++cell_index ) {
+   for(size_t cell_index = 0; cell_index < ha::mag_array_x.size() ; ++cell_index ) {
 
       ha::mag_array_x[cell_index] = 0.0;
       ha::mag_array_y[cell_index] = 0.0;

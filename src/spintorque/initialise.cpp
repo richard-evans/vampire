@@ -247,8 +247,8 @@ namespace internal{
       st::internal::default_properties.lambda_sdl = 100.0e-9; // m
       st::internal::default_properties.diffusion = 0.0001; //Angstroms^2/s
       st::internal::default_properties.sd_exchange = 1.6e-21; //Joule
-   
-      
+
+
       // Temporary array to hold number of atoms in each cell for averaging
       std::vector<double> count(st::internal::beta_cond.size(),0.0);
 
@@ -291,7 +291,7 @@ namespace internal{
       #endif
 
       // Calculate average (mean) spin torque parameters
-      for(int cell=0; cell<beta_cond.size(); ++cell){
+      for(size_t cell=0; cell<beta_cond.size(); ++cell){
          const double nat = count.at(cell);
 
           st::internal::cell_natom[cell] = nat;
@@ -307,7 +307,7 @@ namespace internal{
             st::internal::diffusion.at(cell)   /= nat;
             st::internal::sd_exchange.at(cell) /= nat;
          }
-         
+
          else{
             st::internal::beta_cond.at(cell)   = st::internal::default_properties.beta_cond;
             st::internal::beta_diff.at(cell)   = st::internal::default_properties.beta_diff;
@@ -318,11 +318,11 @@ namespace internal{
          }
       }
 
-      
-      
+
+
       // Determine a and b parameters
       const double hbar = 1.05457162e-34;
-      for(int cell=0; cell<beta_cond.size(); ++cell){
+      for(size_t cell=0; cell<beta_cond.size(); ++cell){
 
          const double B  = st::internal::beta_cond[cell];
          const double Bp = st::internal::beta_diff[cell];

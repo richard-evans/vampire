@@ -33,6 +33,11 @@ namespace exchange{
 
          // extract comma separated values from string
          std::vector<double> Jij = vin::doubles_from_string(value);
+
+         // optional factor 2 correction for ab-initio
+         const double ef = internal::exchange_factor;
+         for(auto& J : Jij) J *= ef;
+
          if(Jij.size() == 1){
             vin::check_for_valid_value(Jij[0], word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
             // set exchange constants
@@ -84,6 +89,13 @@ namespace exchange{
           vin::check_for_valid_value(cr, word, line, prefix, unit, "length", 0.0, 1e3,"input","0.0 - 1e3");
           internal::kitaev_cutoff_range = cr;
           return true;
+      }
+      //--------------------------------------------------------------------
+      if( word == "ab-initio" ){
+         bool set_exchange = vin::check_for_valid_bool(value, word, line, prefix,"input");
+         if(set_exchange) internal::exchange_factor = 2.0;
+         else internal::exchange_factor = 1.0;
+         return true;
       }
       //--------------------------------------------------------------------
       // Keyword not found

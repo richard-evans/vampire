@@ -733,7 +733,7 @@ namespace dipole{
          // arrays of MPI requests
          std::vector<MPI_Request> requests(0);
 
-         MPI_Request req; // temporary variable for push_back operations
+         MPI_Request req = MPI_REQUEST_NULL; // temporary variable for push_back operations
          MPI_Status status; // temporary variable for stati
 
          //------------------------------------------------------------
@@ -856,7 +856,7 @@ namespace dipole{
       // array of MPI requests
       std::vector<MPI_Request> requests(0);
 
-      MPI_Request req; // temporary variable for push_back operations
+      MPI_Request req = MPI_REQUEST_NULL; // temporary variable for push_back operations
       MPI_Status status; // temporary variable for stati
 
       // send cells id, B-field, Hd-field

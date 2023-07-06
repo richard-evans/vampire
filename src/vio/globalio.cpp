@@ -12,8 +12,8 @@
 
 // C++ standard library headers
 #include <sstream>
+
 // Vampire headers
-// Headers
 #include "vio.hpp"
 
 // vio module headers
