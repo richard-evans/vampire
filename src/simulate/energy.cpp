@@ -64,6 +64,7 @@
 #include "spintransport.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "constants.hpp"
 
 // sim module header
 #include "internal.hpp"
@@ -194,5 +195,7 @@ double calculate_spin_energy(const int atom){
 
 	return energy; // Tesla
 }
+
+
 
 } // end of namespace sim

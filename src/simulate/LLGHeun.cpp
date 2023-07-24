@@ -180,6 +180,7 @@ int LLG_Heun(){
 	// Calculate fields
 	calculate_spin_fields(0,num_atoms);
 	calculate_external_fields(0,num_atoms);
+	
 
 	// Calculate Euler Step
 	for(int atom=0;atom<num_atoms;atom++){
@@ -273,7 +274,10 @@ int LLG_Heun(){
 		atoms::x_spin_array[atom]=S_new[0];
 		atoms::y_spin_array[atom]=S_new[1];
 		atoms::z_spin_array[atom]=S_new[2];
+
 	}
+	
+	
 
 	return EXIT_SUCCESS;
 }

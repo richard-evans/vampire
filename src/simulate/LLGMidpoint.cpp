@@ -108,6 +108,7 @@ int LLG_Midpoint(){
 	calculate_spin_fields(0,num_atoms);
 	calculate_external_fields(0,num_atoms);
 
+
 	// Calculate Predictor Step
 	for(int atom=0;atom<num_atoms;atom++){
 
