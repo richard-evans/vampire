@@ -13,6 +13,9 @@
 #ifndef CREATE_ATOMS_CLASS_H_
 #define CREATE_ATOMS_CLASS_H_
 
+#include <cstdint>
+
+
 //namespace create{
 namespace cs{
 
