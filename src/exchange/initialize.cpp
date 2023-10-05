@@ -270,11 +270,17 @@ namespace exchange{
       	}
       }
 
+      std::cout << "A" << "\t" << exchange::four_spin <<  std::endl;
       // Unroll exchange interactions
       exchange::internal::unroll_exchange_interactions(bilinear);
 
       // initialise biquadratic_exchange
       exchange::internal::initialize_biquadratic_exchange();
+
+
+      // initialise four spin
+      exchange::internal::initialize_four_spin_exchange(bilinear);
+
 
       // Calculate Dzyaloshinskii-Moriya interactions (must be done after exchange unrolling)
       exchange::internal::calculate_dmi(bilinear);
