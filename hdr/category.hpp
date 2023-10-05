@@ -43,6 +43,9 @@ namespace cat{
 		double torque;
 		double mean_torque;
 		double energy;
+		
+		double spin_temp;
+        double mean_spin_temp;
 
 		// constraint variables
 		double theta;

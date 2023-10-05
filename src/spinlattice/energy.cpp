@@ -36,13 +36,12 @@ namespace sld{
 
    double compute_potential_energy(const int start_index, // first atom for exchange interactions to be calculated
                const int end_index,
-               const std::vector<int>& type_array, // type for atom
-               std::vector<double>& potential_eng){
+               const std::vector<int>& type_array){
 
 //
                 double pot=0.0;
                 for (int at=start_index;at<end_index;at++){
-                    pot += potential_eng[at];
+                    pot += sld::internal::potential_eng[at];
                 }
 
                 pot /= (end_index-start_index);
@@ -61,13 +60,14 @@ double compute_kinetic_energy(const int start_index, // first atom for exchange 
 //
             double kinetic=0;
              for (int at=start_index;at<end_index;at++){
-                 double vx = velo_array_x[at];
-                 double vy = velo_array_y[at];
-                 double vz = velo_array_z[at];
+                 double vx = atoms::x_velo_array[at];
+                 double vy = atoms::y_velo_array[at];
+                 double vz = atoms::z_velo_array[at];
                  kinetic+=vx*vx+vy*vy+vz*vz;
              }
 
             kinetic*=sld::internal::mp[0].mass.get()*0.5/(end_index-start_index);
+           // std::cout<<"kinetic en "<<kinetic<<std::endl;
 
    return kinetic;
 
@@ -130,5 +130,6 @@ double compute_exchange_energy(const int start_index, // first atom for exchange
    return sumJ;
 
 }//end of potential energy
+
 
    } // end of sld namespace

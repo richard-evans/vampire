@@ -25,6 +25,7 @@
 // Add internal module header file
 #include "internal.hpp"
 
+
 namespace create{
 namespace internal{
 
@@ -56,7 +57,9 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 	atoms::x_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::y_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
-   atoms::m_spin_array.resize(atoms::num_atoms,0.0);
+    atoms::m_spin_array.resize(atoms::num_atoms,0.0);
+    atoms::mass_spin_array.resize(atoms::num_atoms,0.0);
+
 
    atoms::type_array.resize(     atoms::num_atoms,0);
    atoms::category_array.resize( atoms::num_atoms,0);
@@ -68,6 +71,15 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_spin_field_array.resize(atoms::num_atoms,0.0);
+	
+	atoms::x_total_spin_forces_array.resize(atoms::num_atoms,0.0);
+    atoms::y_total_spin_forces_array.resize(atoms::num_atoms,0.0);
+    atoms::z_total_spin_forces_array.resize(atoms::num_atoms,0.0);
+    
+    atoms::x_velo_array.resize(atoms::num_atoms,0.0);
+    atoms::y_velo_array.resize(atoms::num_atoms,0.0);
+    atoms::z_velo_array.resize(atoms::num_atoms,0.0);
+	
 	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);
@@ -117,7 +129,9 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 		atoms::x_spin_array[atom]=sx*modS;
 		atoms::y_spin_array[atom]=sy*modS;
 		atoms::z_spin_array[atom]=sz*modS;
-      atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
+        atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
+        
+     
 
       // generate list of magnetic atoms
       if( mp::material[mat].non_magnetic == 0 ) atoms::magnetic[atom] = true;

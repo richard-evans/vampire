@@ -76,6 +76,8 @@ double compute_lattice_temperature(const int start_index, // first atom for exch
                  double vy = velo_array_y[at];
                  double vz = velo_array_z[at];
                  kinetic+=vx*vx+vy*vy+vz*vz;
+                 
+                 //if (at==2) std::cout<<"SLD at 2 "<<kinetic*sld::internal::mp[0].mass.get()*0.5*( 2.0 /(3.0*constants::kB_eV))<<std::endl;
              }
 
             kinetic*=sld::internal::mp[0].mass.get()*0.5/(end_index-start_index);

@@ -57,10 +57,21 @@ namespace atoms{
 	std::vector <double> y_spin_array(0);
 	std::vector <double> z_spin_array(0);
     std::vector <double> m_spin_array(0);
+    std::vector <double> mass_spin_array(0);
+
 
 	std::vector <double> x_total_spin_field_array(0);		/// Total spin dependent fields
 	std::vector <double> y_total_spin_field_array(0);		/// Total spin dependent fields
 	std::vector <double> z_total_spin_field_array(0);		/// Total spin dependent fields
+	
+	std::vector <double> x_total_spin_forces_array(0);		/// Total spin dependent forces
+    std::vector <double> y_total_spin_forces_array(0);		/// Total spin dependent forces
+    std::vector <double> z_total_spin_forces_array(0);		/// Total spin dependent forces
+    
+    std::vector <double> x_velo_array(0);		///  velocities
+    std::vector <double> y_velo_array(0);		/// 
+    std::vector <double> z_velo_array(0);		/// 
+	
 	std::vector <double> x_total_external_field_array(0);	/// Total external fields
 	std::vector <double> y_total_external_field_array(0);	/// Total external fields
 	std::vector <double> z_total_external_field_array(0);	/// Total external fields

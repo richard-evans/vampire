@@ -91,6 +91,7 @@ namespace mp
 
 		double alpha;
 		double mu_s_SI;
+	    double mass;
 		double magnetisation;
 
 		double gamma_rel;

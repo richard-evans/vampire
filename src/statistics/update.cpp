@@ -65,6 +65,17 @@ namespace stats{
             if(stats::calculate_grain_torque)           stats::grain_torque.calculate_torque(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
             if(stats::calculate_material_torque)        stats::material_torque.calculate_torque(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
 
+            // update spin temp
+            if(stats::calculate_system_spin_temp)          stats::system_spin_temp.calculate_spin_temp(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
+            if(stats::calculate_grain_spin_temp)           stats::grain_spin_temp.calculate_spin_temp(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
+            if(stats::calculate_material_spin_temp)        stats::material_spin_temp.calculate_spin_temp(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
+
+            // update lattice temp
+            if(stats::calculate_system_lattice_temp)          stats::system_lattice_temp.calculate_lattice_temp(sx,sy,sz);
+            if(stats::calculate_grain_lattice_temp)           stats::grain_lattice_temp.calculate_lattice_temp(sx,sy,sz);
+            if(stats::calculate_material_lattice_temp)        stats::material_lattice_temp.calculate_lattice_temp(sx,sy,sz);
+
+
             // update specific heat statistics
             if(stats::calculate_system_specific_heat)         stats::system_specific_heat.calculate(stats::system_energy.get_total_energy());
             if(stats::calculate_grain_specific_heat)          stats::grain_specific_heat.calculate(stats::grain_energy.get_total_energy());

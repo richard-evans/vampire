@@ -26,25 +26,26 @@ material:file = fe.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature = 10
+sim:temperature = 300
+sim:equilibration-temperature=300
 sim:time-steps-increment = 1
-sim:total-time-steps = 20000
+sim:total-time-steps = 10000
 sim:time-step = 0.5 !fs
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program = benchmark
+sim:program = time-series
 sim:integrator = spin-lattice
-sim:applied-field-strength=0 !T
-sim:applied-field-unit-vector=0,0,1
 
 spin-lattice:potential-cutoff-range=7.8 !A
 spin-lattice:fields-cutoff-range=3.75 !A
 spin-lattice:coupling=pseudodipolar
 spin-lattice:potential=harmonic
+#spin-lattice:initial-random-displacement=0.1
+#spin-lattice:initial-thermal-velocity=600
 
-###exchange int range is in units of nearest neigh distances
+
 exchange:interaction-range = 3
 
 config:atoms
@@ -55,18 +56,25 @@ output:real-time
 output:magnetisation
 output:spin-temperature
 output:lattice-temperature
+output:sld-lattice-temperature
+
+
+
+
 output:kinetic-energy
 output:potential-energy
 output:sld-exchange-energy
 output:sld-coupling-energy
-output:output-rate=10
-
+output:output-rate=1
+output:precision=16
 
 screen:real-time
 screen:magnetisation
 screen:spin-temperature
 screen:lattice-temperature
+screen:output-rate=1
+screen:sld-lattice-temperature
 screen:kinetic-energy
 screen:potential-energy
-screen:sld-exchange-energy
-screen:sld-coupling-energy
+
+

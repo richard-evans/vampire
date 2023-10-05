@@ -32,6 +32,8 @@ namespace sld{
    double kinetic_energy;
    double sld_exchange_energy;
    double sld_coupling_energy;
+   double sld_total_energy;
+   double sld_total_spin_energy;
    double J_eff;
    double C_eff;
 
@@ -47,6 +49,9 @@ namespace sld{
 
       double r_cut_pot; // mechanical potential cutoff
       double r_cut_fields;
+      
+      double dr_init; // initial conditions
+      double th_velo;
 
       bool harmonic; //flag for harmonic potential
       bool pseudodipolar;

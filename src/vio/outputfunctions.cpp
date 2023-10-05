@@ -480,9 +480,8 @@ namespace vout{
 
    // Output Function 74
    void lattice_temperature(std::ostream& stream, bool header){
-      stream << generic_output_double("lattice-temperature", sld::lattice_temperature, header);
+      stream << generic_output_double("sld-lattice-temperature", sld::lattice_temperature, header);
    }
-//
 
    // Output Function 75
    void potential_energy(std::ostream& stream, bool header){
@@ -502,6 +501,57 @@ namespace vout{
    void sld_coupling_energy(std::ostream& stream, bool header){
       stream << generic_output_double("sld-coupling-energy", sld::sld_coupling_energy, header);
    }
+  
+   // Output Function 80
+   void sld_total_energy(std::ostream& stream, bool header){
+      stream << generic_output_double("sld-total-energy",  sld::sld_total_energy, header);
+   }
+
+   // Output Function 81
+   void sld_total_spin_energy(std::ostream& stream, bool header){
+      stream << generic_output_double("sld-total-spin-energy", sld::sld_total_spin_energy, header);
+   }
+ 
+  // Output Function 82 - with Header
+     void sysspintemp(std::ostream& stream, bool header){
+        stream << stats::system_spin_temp.output_spin_temp(header);
+     }
+
+  // Output Function 83 - with Header
+     void mean_sysspintemp(std::ostream& stream, bool header){
+        stream << stats::system_spin_temp.output_mean_spin_temp(header);
+     }
+     
+  // Output Function 84
+     void material_mean_sysspintemp(std::ostream& stream, bool header){
+   stream << stats::material_spin_temp.output_mean_spin_temp(header);
+   }
+
+  // Output Function 85
+    void material_spin_temp(std::ostream& stream, bool header){
+   stream << stats::material_spin_temp.output_spin_temp(header);
+   }
+ 
+  // Output Function 86 - with Header
+     void syslatticetemp(std::ostream& stream, bool header){
+        stream << stats::system_lattice_temp.output_lattice_temp(header);
+     }
+
+  // Output Function 87 - with Header
+     void mean_syslatticetemp(std::ostream& stream, bool header){
+        stream << stats::system_lattice_temp.output_mean_lattice_temp(header);
+     }
+     
+  // Output Function 88
+     void material_mean_syslatticetemp(std::ostream& stream, bool header){
+   stream << stats::material_lattice_temp.output_mean_lattice_temp(header);
+   }
+
+  // Output Function 89
+    void material_lattice_temp(std::ostream& stream, bool header){
+   stream << stats::material_lattice_temp.output_lattice_temp(header);
+   }
+ 
 
 
 }

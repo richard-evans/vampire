@@ -25,6 +25,7 @@
 
 // vio module headers
 #include "internal.hpp"
+#include "sld.hpp"
 
 ///-------------------------------------------------------
 /// Function to write header information about simulation
@@ -272,12 +273,9 @@ namespace vout{
 				break;
 			case 72:
 			   vout::fractional_electric_field_strength(stream, header);
-			case 73:
-				vout::spin_temperature(stream, header);
-				break;
 			case 74:
-				vout::lattice_temperature(stream, header);
-				break;
+   			   vout::lattice_temperature(stream, header);
+   			   break;
 			case 75:
 				vout::potential_energy(stream, header);
 				break;
@@ -291,6 +289,36 @@ namespace vout{
 			case 78:
 				vout::sld_coupling_energy(stream, header);
 				break;
+			case 80:
+    			vout::sld_total_energy(stream, header);
+    			break;
+    		case 81:
+    			vout::sld_total_spin_energy(stream, header);
+    			break;
+    		case 82:
+         	    vout::sysspintemp(stream, header);
+         	    break;
+         	case 83:
+         	    vout::mean_sysspintemp(stream, header);
+         	    break;
+         	case 84:
+                vout::material_mean_sysspintemp(stream, header);
+                break;
+            case 85:
+                vout::material_spin_temp(stream, header);
+                break;
+            case 86:
+         	    vout::syslatticetemp(stream, header);
+         	    break;
+         	case 87:
+         	    vout::mean_syslatticetemp(stream, header);
+         	    break;
+         	case 88:
+                vout::material_mean_syslatticetemp(stream, header);
+                break;
+            case 89:
+                vout::material_lattice_temp(stream, header);
+                break;
 			case 999: //AJN
 				vout::standard_deviation(stream,header);
 				break;
@@ -381,6 +409,12 @@ namespace vout{
          write_out(std::cout,screen_output_list);
       } // End of if statement to output data to screen
 
+
+//calculate statistics SLD
+/*
+      if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
+         sld::stats_sld();
+      }*/ // End of if statement to output data to screen
 		vout::write_grain_file();
 
 		// Output configuration files to disk

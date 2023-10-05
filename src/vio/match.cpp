@@ -1438,15 +1438,8 @@ namespace vin{
            output_list.push_back(72);
            return EXIT_SUCCESS;
         }
-//
          //--------------------------------------------------------------------
-         test="spin-temperature";
-         if(word==test){
-           output_list.push_back(73);
-           return EXIT_SUCCESS;
-         }
-         //--------------------------------------------------------------------
-         test="lattice-temperature";
+         test="sld-lattice-temperature";
          if(word==test){
            output_list.push_back(74);
            return EXIT_SUCCESS;
@@ -1476,7 +1469,83 @@ namespace vin{
        output_list.push_back(78);
        return EXIT_SUCCESS;
       }
-   //--------------------------------------------------------------------
+      //--------------------------------------------------------------------
+      test="sld-total-energy";
+      if(word==test){
+       output_list.push_back(80);
+       return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
+      test="sld-total-spin-energy";
+      if(word==test){
+       output_list.push_back(81);
+       return EXIT_SUCCESS;
+      }
+      //Spin temperature statistics
+      //--------------------------------------------------------------------
+      test="spin-temperature";
+      if(word==test){
+          stats::calculate_system_spin_temp = true;
+          output_list.push_back(82);
+          return EXIT_SUCCESS;
+      }
+      else
+      //--------------------------------------------------------------------
+      test="mean-spin-temperature";
+      if(word==test){
+          stats::calculate_system_spin_temp = true;
+          output_list.push_back(83);
+          return EXIT_SUCCESS;
+      }
+      
+       //--------------------------------------------------------------------
+       test="material-spin-temperature";
+       if(word==test){
+           stats::calculate_material_spin_temp = true;
+           output_list.push_back(84);
+           return EXIT_SUCCESS;
+       }
+       
+      //--------------------------------------------------------------------
+       test="material-mean-spin-temperature";
+       if(word==test){
+             stats::calculate_material_spin_temp = true;
+             output_list.push_back(85);
+             return EXIT_SUCCESS;
+           }
+        //lattice temperature statistics
+        //--------------------------------------------------------------------
+        test="lattice-temperature";
+        if(word==test){
+            stats::calculate_system_lattice_temp = true;
+            output_list.push_back(86);
+            return EXIT_SUCCESS;
+        }
+        else
+        //--------------------------------------------------------------------
+        test="mean-lattice-temperature";
+        if(word==test){
+            stats::calculate_system_lattice_temp = true;
+            output_list.push_back(87);
+            return EXIT_SUCCESS;
+        }
+        
+         //--------------------------------------------------------------------
+         test="material-lattice-temperature";
+         if(word==test){
+             stats::calculate_material_lattice_temp = true;
+             output_list.push_back(88);
+             return EXIT_SUCCESS;
+         }
+         
+        //--------------------------------------------------------------------
+         test="material-mean-lattice-temperature";
+         if(word==test){
+               stats::calculate_material_lattice_temp = true;
+               output_list.push_back(89);
+               return EXIT_SUCCESS;
+             }
+      //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;

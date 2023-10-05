@@ -98,6 +98,8 @@ namespace sld{
 
    extern int suzuki_trotter();
 
+   extern void stats_sld();
+
    extern std::vector<double> forces_array_x;
    extern double var_test;
    double PBC_wrap ( double dx, double L, bool bounds);
@@ -123,8 +125,7 @@ namespace sld{
 //
    double compute_potential_energy(const int start_index, // first atom for exchange interactions to be calculated
                const int end_index,
-               const std::vector<int>& type_array, // type for atom
-               std::vector<double>& potential_eng);
+               const std::vector<int>& type_array);
 
    double compute_kinetic_energy(const int start_index, // first atom for exchange interactions to be calculated
                const int end_index,
@@ -157,6 +158,8 @@ namespace sld{
    extern double kinetic_energy;
    extern double sld_exchange_energy;
    extern double sld_coupling_energy;
+   extern double sld_total_energy;
+   extern double sld_total_spin_energy;
    extern double J_eff;
    extern double C_eff;
 

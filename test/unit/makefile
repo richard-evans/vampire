@@ -11,7 +11,7 @@ GCC=g++
 LIBS=-lstdc++
 
 # Flags
-GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/
+GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/ -I../../src/
 
 # Objects
 TEST_OBJECTS= \
@@ -31,7 +31,9 @@ VAMPIRE_OBJECTS= \
 ../../obj/vio/globalio.o \
 ../../obj/vio/timestamp.o\
 ../../obj/constants/constants.o\
-../../obj/spinlattice/temperatures.o
+../../obj/spinlattice/temperatures.o\
+../../obj/spinlattice/data.o
+
 
 EXECUTABLE=unit_tests
 

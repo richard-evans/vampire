@@ -77,6 +77,21 @@ namespace sld{
           sld::internal::r_cut_fields= r_cf;
           return true;
       }
+     test = "initial-random-displacement";
+     if( word == test ){
+         double dr_in = vin::str_to_double(value);
+         vin::check_for_valid_value(dr_in, word, line, prefix, unit, "length", 0.001, 1.0,"input","0.001 - 1A");
+         sld::internal::dr_init= dr_in;
+         return true;
+     }
+
+     test = "initial-thermal-velocity";
+     if( word == test ){
+         double temp = vin::str_to_double(value);
+         vin::check_for_valid_value(temp, word, line, prefix, unit, "none", 0, 2000,"input","0 - 2000");
+         sld::internal::th_velo= temp;
+         return true;
+     }
 
       //--------------------------------------------------------------------
       // Keyword not found
@@ -106,7 +121,7 @@ namespace sld{
       test = "damping-constant-lattice";
       if( word == test ){
          double damp= vin::str_to_double(value);
-         vin::check_for_valid_value(damp, word, line, prefix, unit, "mass", 1.0e-20, 1.0e20,"input","1E-20 - 1E20");
+         vin::check_for_valid_value(damp, word, line, prefix, unit, "none", 0, 1.0,"input","0- 1");
          sld::internal::mp[super_index].damp_lat.set(damp);
          return true;
       }
@@ -134,11 +149,7 @@ namespace sld{
          sld::internal::mp[super_index].C0.set(c0);
          return true;
       }
-   //   material[1]:initial-position-dr=0.01
-   //   material[1]:initial-thermal-velocities=10
-
-
-
+     
 
       //--------------------------------------------------------------------
       // Keyword not found

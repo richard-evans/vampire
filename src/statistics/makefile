@@ -14,7 +14,9 @@ standard_deviation.o\
 reset.o \
 susceptibility.o \
 torque.o \
-update.o
+update.o\
+spin_temperature.o\
+lattice_temperature.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/statistics/,$(statistics_objects))

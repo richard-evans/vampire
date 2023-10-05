@@ -49,11 +49,14 @@ namespace sld{
                  sld::internal::z0_coord_array,
                  atoms::x_coord_array, // coord vectors for atoms
                  atoms::y_coord_array,
-                 atoms::z_coord_array);
+                 atoms::z_coord_array,
+                 sld::internal::dr_init);
 
 
     //initialise exchange, coupling parameters
      sld::internal::initialise_sld_parameters();
+     
+     sld::internal::thermal_velocity(atoms::x_velo_array, atoms::y_velo_array,atoms::z_velo_array);
     // sld::tests();
 
       return;
@@ -69,7 +72,8 @@ namespace sld{
                std::vector<double>& z0_coord_array,
                std::vector<double>& x_coord_array, // coord vectors for atoms
                std::vector<double>& y_coord_array,
-               std::vector<double>& z_coord_array){
+               std::vector<double>& z_coord_array,
+               const double dr){
 
 
    x0_coord_array.resize(atoms::num_atoms,0);
@@ -83,9 +87,67 @@ namespace sld{
       z0_coord_array[i]=z_coord_array[i];
 
    }
+   //std::cout<<"random positions  "<<dr<<std::endl;
+   
+    for( int i = 0; i < atoms::num_atoms; i++)
+    {
 
+             x_coord_array[i] += dr* (2.0*rand()/double(RAND_MAX) -1.0);
+             y_coord_array[i] += dr* (2.0*rand()/double(RAND_MAX) -1.0);
+             z_coord_array[i] += dr* (2.0*rand()/double(RAND_MAX) -1.0); 
+
+        
+    }
    return;
    }//end of initialise initialise_positions
+   
+   
+   void thermal_velocity(std::vector<double>& x_velo_array, // velocities vectors
+                         std::vector<double>& y_velo_array,
+                         std::vector<double>& z_velo_array)
+   {
+       const double v_therm = sqrt( 3.0 * constants::kB * sld::internal::th_velo / sld::internal::mp[0].mass.get());
+       int N=atoms::num_atoms;
+       double rx,ry,s;
+       double net_v[] = {0.0, 0.0, 0.0};
+       std::cout<<"vvv 0  "<<x_velo_array[0]<<std::endl;
+       for( int i = 0; i < N; i++)
+       {
+           s = 2.0;
+           while( s >= 1.0)
+           {
+               rx = 2.0* (rand()/double(RAND_MAX)) - 1.0;
+               ry = 2.0* (rand()/double(RAND_MAX)) - 1.0;
+
+               s = rx*rx + ry*ry;
+           }
+
+           x_velo_array[i] = v_therm * 2.0 * rx * sqrt( 1.0 - s);
+           y_velo_array[i] = v_therm * 2.0 * ry * sqrt( 1.0 - s);
+           z_velo_array[i] = v_therm * ( 1.0 - 2.0 * s);
+
+           net_v[0] += x_velo_array[i];
+           net_v[1] += y_velo_array[i];
+           net_v[2] += z_velo_array[i];
+       }
+
+       net_v[0] /= double(N);
+       net_v[1] /= double(N);
+       net_v[2] /= double(N);
+
+       for( int i = 0; i < N; i++)
+       {
+           x_velo_array[i] -= net_v[0];
+           y_velo_array[i] -= net_v[1];
+           z_velo_array[i] -= net_v[2];
+       }
+                  std::cout<<"vvv init  "<<x_velo_array[0]<<std::endl;
+
+   }
+   
+   
+
+
 
    void initialise_sld_parameters(){
 
@@ -123,8 +185,21 @@ namespace sld{
 
          //now change to ev the following
          sld::internal::mp[0].V0.set(sld::internal::mp[0].V0.get()*6.242e18);
+         
+         //initialise mass for the rest of the simulations
+         mp::material[mat].mass=sld::internal::mp[0].mass.get();
        }
 
+
+       //initialise mass array
+       
+       
+       for(int atom=0;atom<atoms::num_atoms;atom++){
+
+   		int mat=atoms::type_array[atom];
+        atoms::mass_spin_array[atom]=mp::material[mat].mass;
+        }
+   	
        //test cayley_update
       /* sld::internal::cayley_update(0,
                    0,

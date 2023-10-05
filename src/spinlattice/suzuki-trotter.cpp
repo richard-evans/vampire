@@ -47,6 +47,67 @@ namespace sld{
 
          return;
                }
+               
+     void stats_sld(){
+      const int num_atoms=atoms::num_atoms;
+
+      std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+      std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
+      std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
+
+      sld::compute_fields(0, // first atom for exchange interactions to be calculated
+                        num_atoms, // last +1 atom to be calculated
+                        atoms::neighbour_list_start_index,
+                        atoms::neighbour_list_end_index,
+                        atoms::type_array, // type for atom
+                        atoms::neighbour_list_array, // list of interactions between atoms
+                        atoms::x_coord_array,
+                        atoms::y_coord_array,
+                        atoms::z_coord_array,
+                        atoms::x_spin_array,
+                        atoms::y_spin_array,
+                        atoms::z_spin_array,
+                        sld::internal::forces_array_x,
+                        sld::internal::forces_array_y,
+                        sld::internal::forces_array_z,
+                        sld::internal::fields_array_x,
+                        sld::internal::fields_array_y,
+                        sld::internal::fields_array_z);
+
+
+      sld::lattice_temperature= sld::compute_lattice_temperature(0,atoms::num_atoms,
+                  atoms::type_array,
+                  atoms::x_velo_array,
+                  atoms::y_velo_array,
+                  atoms::z_velo_array);
+
+//compute kinetic and potential energies
+
+      sld::potential_energy= sld::compute_potential_energy(0,atoms::num_atoms,
+                  atoms::type_array);
+      //std::cout<<"stats sld "<<sld::lattice_temperature<<std::endl;
+      //
+      sld::kinetic_energy= sld::compute_kinetic_energy(0,atoms::num_atoms,
+                  atoms::type_array,
+                  atoms::x_velo_array,
+                  atoms::y_velo_array,
+                  atoms::z_velo_array);
+
+//compute effective exchange and effective coupling
+      sld::J_eff= sld::compute_effective_J(0,atoms::num_atoms,
+                  sld::internal::sumJ);
+//
+      sld::C_eff= sld::compute_effective_C(0,atoms::num_atoms,
+                  sld::internal::sumC);
+//
+      sld::sld_exchange_energy= sld::compute_exchange_energy(0,atoms::num_atoms,sld::internal::exch_eng);
+
+      sld::sld_coupling_energy= sld::compute_coupling_energy(0,atoms::num_atoms,sld::internal::coupl_eng);
+
+   
+   
+   }
+              
 
 
    int suzuki_trotter(){
@@ -61,8 +122,8 @@ namespace sld{
 
       //vectors for thermal noise spin plus lattice
       std::vector <double> Hx_th(atoms::x_spin_array.size());
-   	std::vector <double> Hy_th(atoms::x_spin_array.size());
-   	std::vector <double> Hz_th(atoms::x_spin_array.size());
+   	  std::vector <double> Hy_th(atoms::x_spin_array.size());
+   	  std::vector <double> Hz_th(atoms::x_spin_array.size());
 
       generate (Hx_th.begin(),Hx_th.end(), mtrandom::gaussian);
       generate (Hy_th.begin(),Hy_th.end(), mtrandom::gaussian);
@@ -273,18 +334,18 @@ namespace sld{
 //update position, Velocity
       for(int atom=0;atom<num_atoms;atom++){
 
-             sld::internal::velo_array_x[atom] =  f_eta*sld::internal::velo_array_x[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
-             sld::internal::velo_array_y[atom] =  f_eta*sld::internal::velo_array_y[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
-             sld::internal::velo_array_z[atom] =  f_eta*sld::internal::velo_array_z[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
+             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
+             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
+             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
 
 
-             atoms::x_coord_array[atom] +=  mp::dt_SI*1e12 * sld::internal::velo_array_x[atom];
-             atoms::y_coord_array[atom] +=  mp::dt_SI*1e12 * sld::internal::velo_array_y[atom];
-             atoms::z_coord_array[atom] +=  mp::dt_SI*1e12 * sld::internal::velo_array_z[atom];
+             atoms::x_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::x_velo_array[atom];
+             atoms::y_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::y_velo_array[atom];
+             atoms::z_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::z_velo_array[atom];
 
-             //std::cout<<"forces x "<<atom<<"\t"<<sld::internal::forces_array_x[atom]<<"\t"<<sld::internal::velo_array_x[atom]<<std::endl;
-             //std::cout<<"forces y "<<atom<<"\t"<<sld::internal::forces_array_y[atom]<<"\t"<<sld::internal::velo_array_y[atom]<<std::endl;
-             //std::cout<<"forces z "<<atom<<"\t"<<sld::internal::forces_array_z[atom]<<"\t"<<sld::internal::velo_array_z[atom]<<std::endl;
+             //std::cout<<"forces x "<<atom<<"\t"<<sld::internal::forces_array_x[atom]<<"\t"<<atoms::x_velo_array[atom]<<std::endl;
+             //std::cout<<"forces y "<<atom<<"\t"<<sld::internal::forces_array_y[atom]<<"\t"<<atoms::y_velo_array[atom]<<std::endl;
+             //std::cout<<"forces z "<<atom<<"\t"<<sld::internal::forces_array_z[atom]<<"\t"<<atoms::z_velo_array[atom]<<std::endl;
 
             // std::cout<<"thermal "<< Fx_th[atom]<<"\t"<<Fy_th[atom]<<"\t"<<Fz_th[atom]<<std::endl;
 
@@ -335,9 +396,9 @@ namespace sld{
    //
 
       for(int atom=0;atom<num_atoms;atom++){
-         sld::internal::velo_array_x[atom] =  f_eta*sld::internal::velo_array_x[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
-         sld::internal::velo_array_y[atom] =  f_eta*sld::internal::velo_array_y[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
-         sld::internal::velo_array_z[atom] =  f_eta*sld::internal::velo_array_z[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
+         atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
+         atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
+         atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
       }
 
 
@@ -487,6 +548,8 @@ namespace sld{
 
    }
 
+
+      
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
       std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
@@ -522,21 +585,20 @@ namespace sld{
       //
       sld::lattice_temperature= sld::compute_lattice_temperature(0,atoms::num_atoms,
                   atoms::type_array,
-                  sld::internal::velo_array_x,
-                  sld::internal::velo_array_y,
-                  sld::internal::velo_array_z);
+                  atoms::x_velo_array,
+                  atoms::y_velo_array,
+                  atoms::z_velo_array);
 
 //compute kinetic and potential energies
 
       sld::potential_energy= sld::compute_potential_energy(0,atoms::num_atoms,
-                  atoms::type_array, // type for atom
-                  sld::internal::potential_eng);
+                      atoms::type_array);
       //
       sld::kinetic_energy= sld::compute_kinetic_energy(0,atoms::num_atoms,
                   atoms::type_array,
-                  sld::internal::velo_array_x,
-                  sld::internal::velo_array_y,
-                  sld::internal::velo_array_z);
+                  atoms::x_velo_array,
+                  atoms::y_velo_array,
+                  atoms::z_velo_array);
 
 //compute effective exchange and effective coupling
       sld::J_eff= sld::compute_effective_J(0,atoms::num_atoms,
@@ -548,7 +610,10 @@ namespace sld{
       sld::sld_exchange_energy= sld::compute_exchange_energy(0,atoms::num_atoms,sld::internal::exch_eng);
 
       sld::sld_coupling_energy= sld::compute_coupling_energy(0,atoms::num_atoms,sld::internal::coupl_eng);
+      
+      sld::sld_total_spin_energy=sld::sld_coupling_energy+sld::sld_exchange_energy;
 
+      sld::sld_total_energy=sld::sld_coupling_energy+sld::sld_exchange_energy+sld::potential_energy+sld::kinetic_energy;
 
       return EXIT_SUCCESS;
   }

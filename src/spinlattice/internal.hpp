@@ -114,6 +114,9 @@ namespace sld{
 
       extern double r_cut_pot; // mechanical potential cutoff
       extern double r_cut_fields; // exchange/coupling cutoff
+      
+      extern double dr_init; 
+      extern double th_velo; // exchange/coupling cutoff
 
       extern bool harmonic; // bool to enable module
       extern bool pseudodipolar;
@@ -149,7 +152,13 @@ namespace sld{
                   std::vector<double>& z0_coord_array,
                   std::vector<double>& x_coord_array, // coord vectors for atoms
                   std::vector<double>& y_coord_array,
-                  std::vector<double>& z_coord_array);
+                  std::vector<double>& z_coord_array, 
+                  const double dr);
+    
+     void thermal_velocity(std::vector<double>& x_velo_array, // coord vectors for atoms
+                 std::vector<double>& y_velo_array,
+                 std::vector<double>& z_velo_array);
+                 
 //function to resize vectors and initialise rest of parameters
       void initialise_sld_parameters();
 

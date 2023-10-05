@@ -166,7 +166,6 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
       magnetization[4*mask_id + 2] = magnetization[4*mask_id + 2]/magm;                // z
       magnetization[4*mask_id + 3] = magm/msat; // m/m_s                               // m
    }
-
    // Zero empty mask id's
    for(unsigned int id=0; id<zero_list.size(); ++id) magnetization[zero_list[id]]=0.0;
 

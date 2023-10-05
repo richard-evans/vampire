@@ -3,7 +3,7 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) M Strungaru 2022. All rights reserved.
+// (c) Mara Strungaru 2022. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 
@@ -21,13 +21,12 @@
 #include "stats.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
+#include "sld.hpp"
+#include "atoms.hpp"
+
 
 namespace stats{
 
-//------------------------------------------------------------------------------------------------------
-// Constructor to initialize data structures
-//------------------------------------------------------------------------------------------------------
-//spin_temp_statistic_t::spin_temp_statistic_t (std::string n): initialized(false){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to determine if class is properly initialized
@@ -54,11 +53,11 @@ void spin_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in
 
    // save mask to internal storage
    num_atoms = in_mask.size();
-   mask_size = in_mask_size - 1; // last element contains spin_temps for non-magnetic atoms
+   mask_size = in_mask_size - 1; 
    mean_counter = 0.0;
    mask=in_mask; // copy contents of vector
-   spin_temp.resize(3 * in_mask_size, 0.0);
-   mean_spin_temp.resize(3 * in_mask_size, 0.0);
+   spin_temp.resize(in_mask_size, 0.0);
+   mean_spin_temp.resize(in_mask_size, 0.0);
 
    // determine mask id's with no atoms
    num_atoms_in_mask.resize(in_mask_size,0);
@@ -77,9 +76,7 @@ void spin_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       // if no atoms exist then add to zero list
       if(num_atoms_in_mask[mask_id]==0){
-         zero_list.push_back(3*mask_id+0);
-         zero_list.push_back(3*mask_id+1);
-         zero_list.push_back(3*mask_id+2);
+         zero_list.push_back(mask_id);
       }
    }
 
@@ -103,7 +100,6 @@ void spin_temp_statistic_t::get_mask(std::vector<int>& out_mask){
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to calculate spin_temps on spins given a mask and place result in a spin_temp array
 //------------------------------------------------------------------------------------------------------
 void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, // spin unit vector
                                           const std::vector<double>& sy,
@@ -116,23 +112,39 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                                           const std::vector<double>& bze,
                                           const std::vector<double>& mm){
 
-   // initialise spin_temps to zero [.end() seems to be optimised away by the compiler...]
    std::fill(spin_temp.begin(),spin_temp.end(),0.0);
-   std::fill(crossprod.begin(),crossprod.end(),0.0);
-   std::fill(dotprod.begin(),dotprod.end(),0.0);
-
-
 
    // check for Monte Carlo solvers and recalculate fields
-   if(sim::integrator == sim::monte_carlo || sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc){
+  // if(sim::integrator == sim::monte_carlo || sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc || sim::integrator ==sim::llg_heun){
       const int64_t num_atoms = sx.size();
-      sim::calculate_spin_fields(0, num_atoms);
-      sim::calculate_external_fields(0, num_atoms);
-   }
 
-   //variables used for spin temperatures
-   double SxH2;
-   double SH;
+     // sim::calculate_spin_fields(0, num_atoms);
+    //  sim::calculate_external_fields(0, num_atoms);
+   //}
+   std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
+   std::fill(atoms::y_total_spin_field_array.begin(), atoms::y_total_spin_field_array.end(), 0.0);
+   std::fill(atoms::z_total_spin_field_array.begin(), atoms::z_total_spin_field_array.end(), 0.0);
+   sld::compute_fields(0, // first atom for exchange interactions to be calculated
+                     num_atoms, // last +1 atom to be calculated
+                     atoms::neighbour_list_start_index,
+                     atoms::neighbour_list_end_index,
+                     atoms::type_array, // type for atom
+                     atoms::neighbour_list_array, // list of interactions between atoms
+                     atoms::x_coord_array,
+                     atoms::y_coord_array,
+                     atoms::z_coord_array,
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     atoms::x_total_spin_forces_array,
+                     atoms::y_total_spin_forces_array,
+                     atoms::z_total_spin_forces_array,
+                     atoms::x_total_spin_field_array,
+                     atoms::y_total_spin_field_array,
+                     atoms::z_total_spin_field_array);
+
+   double SxH2=0.0;
+   double SH=0.0;
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
 
@@ -142,44 +154,31 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 		const double mu = mm[atom];
 
 		// Store local spin in Sand local field in H
-		const double S[3] = {sx[atom]*mu,         sy[atom]*mu,         sz[atom]*mu        };
-		const double B[3] = {bxs[atom]+bxe[atom], bys[atom]+bye[atom], bzs[atom]+bze[atom]};
+		const double S[3] = {sx[atom],         sy[atom],         sz[atom]        };
+		const double B[3] = {bxs[atom], bys[atom], bzs[atom]};
 
-
-      double SxHx = S[1]*B[2]-S[2]*B[1];
-      double SxHy = S[2]*B[0]-S[0]*B[2];
-      double SxHz = S[0]*B[1]-S[1]*B[0];
-     SxH2  += SxHx*SxHx + SxHy*SxHy + SxHz*SxHz;
-     SH  +=  S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
-     atomprops.T_spin=0.5* spin_pr.mu_s * consts::inv_kM * SxH2 / SH;
-
-		spin_temp[3*mask_id + 0]  = S[1]*B[2]-S[2]*B[1];
-		spin_temp[3*mask_id + 1] += S[2]*B[0]-S[0]*B[2];
-		spin_temp[3*mask_id + 2] += S[0]*B[1]-S[1]*B[0];
+		 double SxHx = S[1]*B[2]-S[2]*B[1];
+		 double SxHy = S[2]*B[0]-S[0]*B[2];
+		 double SxHz = S[0]*B[1]-S[1]*B[0];
+		 SxH2  = SxH2+ SxHx*SxHx + SxHy*SxHy + SxHz*SxHz;
+         SH  = SH + S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
+         //std::cout<<"s"<<S[0]<<"\t"<<S[1]<<"\t"<<S[2]<<"b"<<B[0]<<"\t"<< B[1]<<"\t"<<B[2]<<"mask id:"<<mask_id<<"\t"<<SxH2<<"\t"<<SH<<std::endl;
+         spin_temp[mask_id]=0.5* mu /constants::kB * SxH2 / SH;
+         
 
 	}
 
+
+
    // Reduce on all CPUS
    #ifdef MPICF
-      MPI_Allreduce(MPI_IN_PLACE, &spin_temp[0], 3*mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &spin_temp[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
-   // Calculate magnetisation length and normalize
-   /*for(int mask_id=0; mask_id < mask_size; ++mask_id){
-
-      // determine inverse number of atoms in mask
-      double inv_atoms_in_mask = 1.0 / double(num_atoms_in_mask[mask_id]);
-
-      spin_temp[3*mask_id + 0] *= inv_atoms_in_mask;
-      spin_temp[3*mask_id + 1] *= inv_atoms_in_mask;
-      spin_temp[3*mask_id + 2] *= inv_atoms_in_mask;
-
-   }*/
 
    // Zero empty mask id's
    for(unsigned int id=0; id<zero_list.size(); ++id) spin_temp[zero_list[id]]=0.0;
 
-   // Add spin_temp to mean
    const int tsize = spin_temp.size();
    for(int idx = 0; idx < tsize; ++idx) mean_spin_temp[idx] += spin_temp[idx];
    mean_counter+=1.0;
@@ -189,7 +188,6 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to get spin_temp data
 //------------------------------------------------------------------------------------------------------
 const std::vector<double>& spin_temp_statistic_t::get_spin_temp(){
 
@@ -198,15 +196,13 @@ const std::vector<double>& spin_temp_statistic_t::get_spin_temp(){
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to set spin_temp data (for checkpoints)
 //------------------------------------------------------------------------------------------------------
 void spin_temp_statistic_t::set_spin_temp(std::vector<double>& new_spin_temp, std::vector<double>& new_mean_spin_temp, long counter){
 
-   // copy spin_temp vector
    spin_temp = new_spin_temp;
 
-   const unsigned int array_size = mean_spin_temp.size();
-   for(int i=0; i< array_size; ++i){
+   const size_t array_size = mean_spin_temp.size();
+   for(size_t i=0; i< array_size; ++i){
       mean_spin_temp[i] += new_mean_spin_temp[i];
    }
 
@@ -216,11 +212,9 @@ void spin_temp_statistic_t::set_spin_temp(std::vector<double>& new_spin_temp, st
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to reset spin_temp averages
 //------------------------------------------------------------------------------------------------------
 void spin_temp_statistic_t::reset_spin_temp_averages(){
 
-   // reinitialise mean spin_temp to zero
    std::fill(mean_spin_temp.begin(),mean_spin_temp.end(),0.0);
 
    // reset data counter
@@ -231,7 +225,6 @@ void spin_temp_statistic_t::reset_spin_temp_averages(){
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to output actual spin_temp values as string (in Joules)
 //------------------------------------------------------------------------------------------------------
 std::string spin_temp_statistic_t::output_spin_temp(bool header){
 
@@ -245,17 +238,12 @@ std::string spin_temp_statistic_t::output_spin_temp(bool header){
    }
    vout::fixed_width_output result(res,vout::fw_size);
 
-   // loop over all spin_temp values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
-         result << name + std::to_string(mask_id) + "_tx"
-                << name + std::to_string(mask_id) + "_ty"
-                << name + std::to_string(mask_id) + "_tz";
+         result << name + std::to_string(mask_id) + "_Ts";
       }
       else{
-         result << constants::muB * spin_temp[3*mask_id + 0]
-                << constants::muB * spin_temp[3*mask_id + 1]
-                << constants::muB * spin_temp[3*mask_id + 2];
+         result << constants::muB * spin_temp[mask_id ];
       }
    }
 
@@ -264,7 +252,6 @@ std::string spin_temp_statistic_t::output_spin_temp(bool header){
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to output mean spin_temp values as string (in Joules)
 //------------------------------------------------------------------------------------------------------
 std::string spin_temp_statistic_t::output_mean_spin_temp(bool header){
 
@@ -281,17 +268,12 @@ std::string spin_temp_statistic_t::output_mean_spin_temp(bool header){
    // inverse number of data samples * muB
    const double ic = constants::muB / mean_counter;
 
-   // loop over all spin_temp values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
-         result << name + std::to_string(mask_id) + "_mean_tx"
-                << name + std::to_string(mask_id) + "_mean_ty"
-                << name + std::to_string(mask_id) + "_mean_tz";
+         result << name + std::to_string(mask_id) + "_mean_Ts";
       }
       else{
-         result << mean_spin_temp[3*mask_id + 0]*ic
-                << mean_spin_temp[3*mask_id + 1]*ic
-                << mean_spin_temp[3*mask_id + 2]*ic;
+         result << mean_spin_temp[mask_id ]*ic;
       }
    }
 

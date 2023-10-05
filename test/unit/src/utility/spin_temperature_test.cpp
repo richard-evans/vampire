@@ -17,19 +17,19 @@
 
 // include header for test functions
 #include "sld.hpp"
+#include "spinlattice/internal.hpp"
 
 #include "constants.hpp"
 #include "material.hpp"
 
-
 namespace vmpi{
-   int my_rank = 0;
+   extern int my_rank;
 }
 
 namespace ut{
 
-int floaterror(const double value, const double expected_value, const double precision, const std::string function){
-   double error = 0.0;
+int floaterror(const double value, const double expected_value, const double precision, const std::string function);
+/*   double error = 0.0;
 
    // check for division by zero
    if(fabs(expected_value) > 0.0) error = value / expected_value;
@@ -42,7 +42,7 @@ int floaterror(const double value, const double expected_value, const double pre
       std::cout << "FAIL: Floating point error in test of function " << function << ": value " << value << " should be the same as " << expected_value << " to precision " << precision << std::endl;
       return 1;
    }
-}
+}*/
 
 
 
