@@ -47,7 +47,7 @@ namespace sld{
 
          return;
                }
-               
+              
      void stats_sld(){
       const int num_atoms=atoms::num_atoms;
 
@@ -75,34 +75,12 @@ namespace sld{
                         sld::internal::fields_array_z);
 
 
-      sld::lattice_temperature= sld::compute_lattice_temperature(0,atoms::num_atoms,
-                  atoms::type_array,
-                  atoms::x_velo_array,
-                  atoms::y_velo_array,
-                  atoms::z_velo_array);
 
-//compute kinetic and potential energies
-
-      sld::potential_energy= sld::compute_potential_energy(0,atoms::num_atoms,
-                  atoms::type_array);
-      //std::cout<<"stats sld "<<sld::lattice_temperature<<std::endl;
-      //
-      sld::kinetic_energy= sld::compute_kinetic_energy(0,atoms::num_atoms,
-                  atoms::type_array,
-                  atoms::x_velo_array,
-                  atoms::y_velo_array,
-                  atoms::z_velo_array);
-
-//compute effective exchange and effective coupling
       sld::J_eff= sld::compute_effective_J(0,atoms::num_atoms,
                   sld::internal::sumJ);
 //
       sld::C_eff= sld::compute_effective_C(0,atoms::num_atoms,
                   sld::internal::sumC);
-//
-      sld::sld_exchange_energy= sld::compute_exchange_energy(0,atoms::num_atoms,sld::internal::exch_eng);
-
-      sld::sld_coupling_energy= sld::compute_coupling_energy(0,atoms::num_atoms,sld::internal::coupl_eng);
 
    
    
@@ -588,32 +566,6 @@ namespace sld{
                   atoms::x_velo_array,
                   atoms::y_velo_array,
                   atoms::z_velo_array);
-
-//compute kinetic and potential energies
-
-      sld::potential_energy= sld::compute_potential_energy(0,atoms::num_atoms,
-                      atoms::type_array);
-      //
-      sld::kinetic_energy= sld::compute_kinetic_energy(0,atoms::num_atoms,
-                  atoms::type_array,
-                  atoms::x_velo_array,
-                  atoms::y_velo_array,
-                  atoms::z_velo_array);
-
-//compute effective exchange and effective coupling
-      sld::J_eff= sld::compute_effective_J(0,atoms::num_atoms,
-                  sld::internal::sumJ);
-//
-      sld::C_eff= sld::compute_effective_C(0,atoms::num_atoms,
-                  sld::internal::sumC);
-//
-      sld::sld_exchange_energy= sld::compute_exchange_energy(0,atoms::num_atoms,sld::internal::exch_eng);
-
-      sld::sld_coupling_energy= sld::compute_coupling_energy(0,atoms::num_atoms,sld::internal::coupl_eng);
-      
-      sld::sld_total_spin_energy=sld::sld_coupling_energy+sld::sld_exchange_energy;
-
-      sld::sld_total_energy=sld::sld_coupling_energy+sld::sld_exchange_energy+sld::potential_energy+sld::kinetic_energy;
 
       return EXIT_SUCCESS;
   }

@@ -128,16 +128,23 @@ void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>&
 
 	}
 	//std::cout<<"lattice temp from SLD"<<sld::compute_lattice_temperature(0,atoms::num_atoms,atoms::type_array, atoms::x_velo_array,atoms::y_velo_array,atoms::z_velo_array)<<std::endl;
-   int  total_atoms=atoms::num_atoms;
-   std::cout<<"tot_at "<<total_atoms<<std::endl;
+ 
 
 
    // Reduce on all CPUS
    #ifdef MPICF
       MPI_Allreduce(MPI_IN_PLACE, &lattice_temp[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-     MPI_Allreduce(MPI_IN_PLACE, &total_atoms,  1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
    #endif
+
+   // Calculate magnetisation length and normalize
+   for(int mask_id=0; mask_id < mask_size; ++mask_id){
+
+      // determine inverse number of atoms in mask
+      double inv_atoms_in_mask = 1.0 / double(num_atoms_in_mask[mask_id]);
+
+      lattice_temp[mask_id] *= inv_atoms_in_mask;
+
+   }
 
 
    // Zero empty mask id's

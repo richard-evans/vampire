@@ -28,12 +28,6 @@ namespace sld{
    double var_test=0;
    double spin_temperature;
    double lattice_temperature;
-   double potential_energy;
-   double kinetic_energy;
-   double sld_exchange_energy;
-   double sld_coupling_energy;
-   double sld_total_energy;
-   double sld_total_spin_energy;
    double J_eff;
    double C_eff;
 

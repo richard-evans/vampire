@@ -191,12 +191,19 @@ namespace vout{
    void MRresistance(std::ostream& stream, bool header);
    void spin_temperature(std::ostream& stream, bool header);
    void lattice_temperature(std::ostream& stream, bool header);
+   
+   
    void potential_energy(std::ostream& stream, bool header);
    void kinetic_energy(std::ostream& stream, bool header);
    void sld_exchange_energy(std::ostream& stream, bool header);
    void sld_coupling_energy(std::ostream& stream, bool header);
    void sld_total_energy(std::ostream& stream, bool header);
-   void sld_total_spin_energy(std::ostream& stream, bool header);
+   
+   void mean_potential_energy(std::ostream& stream, bool header);
+   void mean_kinetic_energy(std::ostream& stream, bool header);
+   void mean_sld_exchange_energy(std::ostream& stream, bool header);
+   void mean_sld_coupling_energy(std::ostream& stream, bool header);
+   void mean_sld_total_energy(std::ostream& stream, bool header);
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp
    //-------------------------------------------------------------------------

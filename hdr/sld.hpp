@@ -144,22 +144,24 @@ namespace sld{
             std::vector<double>& sum_C);
 //
    double compute_exchange_energy(const int start_index, // first atom for exchange interactions to be calculated
-               const int end_index,
-               std::vector<double>& exch_eng);
+               const int end_index);
 //
    double compute_coupling_energy(const int start_index, // first atom for exchange interactions to be calculated
-               const int end_index,
-               std::vector<double>& coupl_eng);
+               const int end_index);
 
 //
-   extern double spin_temperature;
    extern double lattice_temperature;
+   extern double spin_temperature;
+
+/*
    extern double potential_energy;
    extern double kinetic_energy;
    extern double sld_exchange_energy;
    extern double sld_coupling_energy;
    extern double sld_total_energy;
-   extern double sld_total_spin_energy;
+   extern double sld_total_spin_energy;*/  
+   
+   
    extern double J_eff;
    extern double C_eff;
 

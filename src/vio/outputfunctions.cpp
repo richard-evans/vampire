@@ -472,45 +472,32 @@ namespace vout{
    }
 //
 
-   // Output Function 73
-   void spin_temperature(std::ostream& stream, bool header){
-      stream << generic_output_double("spin-temperature",  sld::spin_temperature, header);
-      //stream << generic_output_double("spin-temperature", spin_transport::total_resistance, header);
-   }
-
-   // Output Function 74
-   void lattice_temperature(std::ostream& stream, bool header){
-      stream << generic_output_double("sld-lattice-temperature", sld::lattice_temperature, header);
-   }
+   
 
    // Output Function 75
    void potential_energy(std::ostream& stream, bool header){
-      stream << generic_output_double("potential-energy",  sld::potential_energy, header);
-      //stream << generic_output_double("spin-temperature", spin_transport::total_resistance, header);
+     // stream << generic_output_double("potential-energy",  sld::potential_energy, header);
+      stream << stats::system_sld_energy.output_sld_energy(stats::potential, header);
    }
 
    // Output Function 76
    void kinetic_energy(std::ostream& stream, bool header){
-      stream << generic_output_double("kinetic-energy", sld::kinetic_energy, header);
+      stream << stats::system_sld_energy.output_sld_energy(stats::kinetic, header);
    }
    // Output Function 77
    void sld_exchange_energy(std::ostream& stream, bool header){
-      stream << generic_output_double("sld-exchange-energy", sld::sld_exchange_energy, header);
+      stream << stats::system_sld_energy.output_sld_energy(stats::sld_exchange, header);
    }
    // Output Function 78
    void sld_coupling_energy(std::ostream& stream, bool header){
-      stream << generic_output_double("sld-coupling-energy", sld::sld_coupling_energy, header);
+      stream << stats::system_sld_energy.output_sld_energy(stats::sld_coupling, header);
    }
   
    // Output Function 80
    void sld_total_energy(std::ostream& stream, bool header){
-      stream << generic_output_double("sld-total-energy",  sld::sld_total_energy, header);
+      stream << stats::system_sld_energy.output_sld_energy(stats::sld_total, header);
    }
 
-   // Output Function 81
-   void sld_total_spin_energy(std::ostream& stream, bool header){
-      stream << generic_output_double("sld-total-spin-energy", sld::sld_total_spin_energy, header);
-   }
  
   // Output Function 82 - with Header
      void sysspintemp(std::ostream& stream, bool header){

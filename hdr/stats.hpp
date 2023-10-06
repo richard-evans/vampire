@@ -28,6 +28,9 @@ namespace stats
 
    /// Statistics energy types
    enum energy_t { total = 0, exchange = 1, anisotropy = 2, applied_field = 3, magnetostatic = 4};
+   
+   /// SLD Statistics energy types
+   enum sld_energy_t { sld_total = 0, sld_exchange = 1, sld_coupling = 2, potential = 3, kinetic = 4};
 
    /// Statistics types
    enum stat_t { atotal=0, mean=1};
@@ -60,6 +63,10 @@ namespace stats
 	extern bool calculate_system_energy;
 	extern bool calculate_grain_energy;
 	extern bool calculate_material_energy;
+	
+	extern bool calculate_system_sld_energy;
+	extern bool calculate_grain_sld_energy;
+	extern bool calculate_material_sld_energy;
 
 	extern bool calculate_system_magnetization;
 	extern bool calculate_grain_magnetization;
@@ -150,6 +157,70 @@ namespace stats
       std::vector<double> mean_anisotropy_energy;
       std::vector<double> mean_applied_field_energy;
       std::vector<double> mean_magnetostatic_energy;
+
+      std::vector<int> zero_list;
+      std::vector<double> normalisation;
+
+      std::string name;
+
+   };
+   
+   
+   //----------------------------------
+   // Energy class definition for SLD statistics
+   //----------------------------------
+   class sld_energy_statistic_t{
+
+   public:
+      sld_energy_statistic_t (std::string n):initialized(false){
+        name = n;
+      };
+      bool is_initialized();
+      void set_mask(const int in_mask_size, const std::vector<int> in_mask);
+      void get_mask(std::vector<int>& out_mask, std::vector<double>& out_normalisation);
+      void calculate(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
+                     const std::vector<double>& mm, const std::vector<int>& mat, const double temperature);
+
+      void reset_averages();
+
+      void set_sld_total_energy(         std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_sld_exchange_energy(      std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_sld_coupling_energy(    std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_potential_energy( std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_kinetic_energy( std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+
+      const std::vector<double>& get_sld_total_energy();
+      const std::vector<double>& get_sld_exchange_energy();
+      const std::vector<double>& get_sld_coupling_energy();
+      const std::vector<double>& get_potential_energy();
+      const std::vector<double>& get_kinetic_energy();
+
+      void update_mean_counter(long counter);
+
+      std::string output_sld_energy(enum sld_energy_t sld_energy_type, bool header);
+      std::string output_mean_sld_energy(enum sld_energy_t sld_energy_type, bool header);
+
+   private:
+      bool initialized;
+      int num_atoms;
+      int mask_size;
+      double mean_counter;
+
+      std::vector<int> mask;
+      std::vector<int> num_atoms_in_mask;	
+
+
+      std::vector<double> sld_total_energy;
+      std::vector<double> sld_exchange_energy;
+      std::vector<double> sld_coupling_energy;
+      std::vector<double> potential_energy;
+      std::vector<double> kinetic_energy;
+
+      std::vector<double> mean_sld_total_energy;
+      std::vector<double> mean_sld_exchange_energy;
+      std::vector<double> mean_sld_coupling_energy;
+      std::vector<double> mean_potential_energy;
+      std::vector<double> mean_kinetic_energy;
 
       std::vector<int> zero_list;
       std::vector<double> normalisation;
@@ -422,6 +493,10 @@ namespace stats
     extern susceptibility_statistic_t material_susceptibility;
 
     extern standard_deviation_statistic_t material_standard_deviation;
+    
+    extern sld_energy_statistic_t system_sld_energy;
+    extern sld_energy_statistic_t grain_sld_energy;
+    extern sld_energy_statistic_t material_sld_energy;
 
 }
 

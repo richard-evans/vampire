@@ -19,6 +19,10 @@ namespace stats{
    bool calculate_system_energy                 = false;
    bool calculate_grain_energy                  = false;
    bool calculate_material_energy               = false;
+   
+   bool calculate_system_sld_energy                 = false;
+   bool calculate_grain_sld_energy                  = false;
+   bool calculate_material_sld_energy               = false;
 
    bool calculate_system_magnetization          = true;
    bool calculate_grain_magnetization           = false;
@@ -52,6 +56,10 @@ namespace stats{
    energy_statistic_t system_energy("s");
    energy_statistic_t grain_energy("g");
    energy_statistic_t material_energy("m");
+   
+   sld_energy_statistic_t system_sld_energy("s");
+   sld_energy_statistic_t grain_sld_energy("g");
+   sld_energy_statistic_t material_sld_energy("m");
 
    magnetization_statistic_t system_magnetization("s");
    magnetization_statistic_t grain_magnetization("g");

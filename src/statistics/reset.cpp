@@ -33,6 +33,12 @@ namespace stats{
          if(stats::calculate_grain_energy)                  stats::grain_energy.reset_averages();
          if(stats::calculate_material_energy)               stats::material_energy.reset_averages();
 
+         // reset sld energy statistics
+         if(stats::calculate_system_sld_energy)                 stats::system_sld_energy.reset_averages();
+         if(stats::calculate_grain_sld_energy)                  stats::grain_sld_energy.reset_averages();
+         if(stats::calculate_material_sld_energy)               stats::material_sld_energy.reset_averages();
+
+
          // reset magnetization statistics
          if(stats::calculate_system_magnetization)          stats::system_magnetization.reset_magnetization_averages();
          if(stats::calculate_grain_magnetization)           stats::grain_magnetization.reset_magnetization_averages();

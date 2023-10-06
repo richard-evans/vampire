@@ -273,8 +273,6 @@ namespace vout{
 				break;
 			case 72:
 			   vout::fractional_electric_field_strength(stream, header);
-			case 74:
-   			   vout::lattice_temperature(stream, header);
    			   break;
 			case 75:
 				vout::potential_energy(stream, header);
@@ -291,9 +289,6 @@ namespace vout{
 				break;
 			case 80:
     			vout::sld_total_energy(stream, header);
-    			break;
-    		case 81:
-    			vout::sld_total_spin_energy(stream, header);
     			break;
     		case 82:
          	    vout::sysspintemp(stream, header);

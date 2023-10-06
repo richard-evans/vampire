@@ -15,6 +15,7 @@ reset.o \
 susceptibility.o \
 torque.o \
 update.o\
+energy_sld.o\
 spin_temperature.o\
 lattice_temperature.o
 

@@ -100,12 +100,12 @@ double compute_effective_C(const int start_index, // first atom for exchange int
 }//end of compute eff coupling
 
 double compute_coupling_energy(const int start_index, // first atom for exchange interactions to be calculated
-            const int end_index,
-            std::vector<double>& coupl_eng){
+            const int end_index){
+
 
              double sumC=0.0;
              for (int at=start_index;at<end_index;at++){
-                 sumC += coupl_eng[at];
+                 sumC += sld::internal::coupl_eng[at];
              }
 
              sumC /= (end_index-start_index);
@@ -116,13 +116,12 @@ double compute_coupling_energy(const int start_index, // first atom for exchange
 }//end of potential energy
 
 double compute_exchange_energy(const int start_index, // first atom for exchange interactions to be calculated
-            const int end_index,
-            std::vector<double>& exch_eng){
+            const int end_index){
 
 //
              double sumJ=0.0;
              for (int at=start_index;at<end_index;at++){
-                 sumJ += exch_eng[at];
+                 sumJ += sld::internal::exch_eng[at];
              }
 
              sumJ /= (end_index-start_index);

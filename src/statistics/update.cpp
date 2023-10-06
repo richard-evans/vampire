@@ -51,6 +51,11 @@ namespace stats{
             if(stats::calculate_system_energy)                 stats::system_energy.calculate(sx, sy, sz, mm, mat, temperature);
             if(stats::calculate_grain_energy)                  stats::grain_energy.calculate(sx, sy, sz, mm, mat, temperature);
             if(stats::calculate_material_energy)               stats::material_energy.calculate(sx, sy, sz, mm, mat, temperature);
+            
+            // update sld energy statistics
+            if(stats::calculate_system_sld_energy)                 stats::system_sld_energy.calculate(sx, sy, sz, mm, mat, temperature);
+            if(stats::calculate_grain_sld_energy)                  stats::grain_sld_energy.calculate(sx, sy, sz, mm, mat, temperature);
+            if(stats::calculate_material_sld_energy)               stats::material_sld_energy.calculate(sx, sy, sz, mm, mat, temperature);
 
             // update magnetization statistics
             if(stats::calculate_system_magnetization)          stats::system_magnetization.calculate_magnetization(sx,sy,sz,mm);

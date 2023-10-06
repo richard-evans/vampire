@@ -24,6 +24,7 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 #include "sld.hpp"
+#include "atoms.hpp"
 
 namespace stats{
 
@@ -153,9 +154,7 @@ void energy_statistic_t::calculate(const std::vector<double>& sx,  // spin unit 
    std::fill( applied_field_energy.begin(), applied_field_energy.end(), 0.0 );
    std::fill( magnetostatic_energy.begin(), magnetostatic_energy.end(), 0.0 );
    
-   //test
-   //std::cout<<sld::internal::potential_eng[0]<<std::endl;
-
+  
    //---------------------------------------------------------------------------
    // Calculate exchange energy (in Tesla)
    //---------------------------------------------------------------------------

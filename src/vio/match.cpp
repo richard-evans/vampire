@@ -1438,21 +1438,17 @@ namespace vin{
            output_list.push_back(72);
            return EXIT_SUCCESS;
         }
-         //--------------------------------------------------------------------
-         test="sld-lattice-temperature";
-         if(word==test){
-           output_list.push_back(74);
-           return EXIT_SUCCESS;
-         }
         //--------------------------------------------------------------------
         test="potential-energy";
         if(word==test){
+          stats::calculate_system_sld_energy = true;
           output_list.push_back(75);
           return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="kinetic-energy";
         if(word==test){
+          stats::calculate_system_sld_energy = true;
           output_list.push_back(76);
           return EXIT_SUCCESS;
         }
@@ -1460,24 +1456,28 @@ namespace vin{
       //--------------------------------------------------------------------
       test="sld-exchange-energy";
       if(word==test){
+       stats::calculate_system_sld_energy = true;
        output_list.push_back(77);
        return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
       test="sld-coupling-energy";
       if(word==test){
+       stats::calculate_system_sld_energy = true;
        output_list.push_back(78);
        return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
       test="sld-total-energy";
       if(word==test){
+       stats::calculate_system_sld_energy = true;
        output_list.push_back(80);
        return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
       test="sld-total-spin-energy";
       if(word==test){
+       stats::calculate_system_sld_energy = true;
        output_list.push_back(81);
        return EXIT_SUCCESS;
       }
