@@ -39,6 +39,7 @@ bool lattice_temp_statistic_t::is_initialized(){
 // Function to initialize mask
 //------------------------------------------------------------------------------------------------------
 void lattice_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in_mask, const std::vector<double>& mm){
+ std::cout<<"lat0"<<std::endl;
 
    // Check that mask values never exceed mask_size
    for(unsigned int atom=0; atom<in_mask.size(); ++atom){
@@ -53,11 +54,28 @@ void lattice_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int>
 
    // save mask to internal storage
    num_atoms = in_mask.size();
-   mask_size = in_mask_size - 1; 
+   mask_size = in_mask_size - 1; // last element contains energy for non-magnetic atoms
    mean_counter = 0.0;
    mask=in_mask; // copy contents of vector
    lattice_temp.resize(in_mask_size, 0.0);
    mean_lattice_temp.resize(in_mask_size, 0.0);
+   normalisation.resize(in_mask_size, 0.0);
+
+
+
+
+   // calculate number of spins in each mask
+   for(int atom=0; atom<num_atoms; ++atom){
+      const int mask_id = mask[atom]; // get mask id
+      normalisation[mask_id] += 1.0;
+   }
+
+   // Calculate normalisation for all CPUs
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &normalisation[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #endif
+
+
 
    // determine mask id's with no atoms
    num_atoms_in_mask.resize(in_mask_size,0);
@@ -81,7 +99,7 @@ void lattice_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int>
    }
 
    // Set flag indicating correct initialization
-   initialized=true;
+   initialized = true;
 
    return;
 
@@ -90,10 +108,12 @@ void lattice_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int>
 //------------------------------------------------------------------------------------------------------
 // Function to get mask needed for gpu acceleration of statistics calculation
 //------------------------------------------------------------------------------------------------------
-void lattice_temp_statistic_t::get_mask(std::vector<int>& out_mask){
+void lattice_temp_statistic_t::get_mask(std::vector<int>& out_mask,  std::vector<double>& out_normalisation){
 
    // copy data to objects
    out_mask = mask;
+   out_normalisation = normalisation;
+
 
    return;
 
@@ -103,7 +123,7 @@ void lattice_temp_statistic_t::get_mask(std::vector<int>& out_mask){
 void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>& velo_array_x, // coord vectors for atoms
             const std::vector<double>& velo_array_y,
             const std::vector<double>& velo_array_z){
-
+ //std::cout<<"lat1"<<std::endl;
              
            
 
@@ -112,15 +132,16 @@ void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>&
 
     double kinetic=0.0;
    // calculate contributions of spins to each magetization category
-    for(int atom=0; atom < num_atoms; ++atom){
+   for(int atom=0; atom < num_atoms; ++atom){
 
-       const int mask_id = mask[atom]; // get mask id
+      const int mask_id = mask[atom]; // get mask id
 
       // get atomic moment
 
 		double vx = atoms::x_velo_array[atom];
         double vy = atoms::y_velo_array[atom];
         double vz = atoms::z_velo_array[atom];
+  //      std::cout<<"viteze "<<vx<<"\t"<<vy<<"\t"<<vz<<std::endl;
         kinetic=kinetic+vx*vx+vy*vy+vz*vz;
          //std::cout<<"s"<<S[0]<<"\t"<<S[1]<<"\t"<<S[2]<<"b"<<B[0]<<"\t"<< B[1]<<"\t"<<B[2]<<"mask id:"<<mask_id<<"\t"<<SxH2<<"\t"<<SH<<std::endl;
         lattice_temp[mask_id]=kinetic*atoms::mass_spin_array[atom];
@@ -153,6 +174,8 @@ void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>&
    const int tsize = lattice_temp.size();
    for(int idx = 0; idx < tsize; ++idx) mean_lattice_temp[idx] += lattice_temp[idx];
    mean_counter+=1.0;
+   // std::cout<<"lat2"<<std::endl;
+
 
    return;
 

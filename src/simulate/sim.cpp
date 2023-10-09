@@ -834,7 +834,23 @@ int integrate_mpi(uint64_t n_steps){
 				sim::internal::increment_time();
 			}
 			break;
+    
+     	case 6: // Suzuki Trotter decomposition
 
+ 			for(uint64_t ti=0;ti<n_steps;ti++){
+ 				#ifdef MPICF
+                if(sld::suzuki_trotter_parallel_initialized == false) {
+                   sld::suzuki_trotter_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                                                vmpi::min_dimensions, vmpi::max_dimensions);
+                }
+                sld::suzuki_trotter_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                                             atoms::type_array);
+             #endif
+
+ 				// increment time
+ 				sim::internal::increment_time();
+ 			}
+ 			break;
 		default:{
 			terminaltextcolor(RED);
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;

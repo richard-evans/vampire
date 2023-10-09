@@ -27,6 +27,7 @@
 
 namespace sld{
 
+
    //----------------------------------------------------------------------------
    // Function to initialize sld module
    //----------------------------------------------------------------------------
@@ -57,7 +58,18 @@ namespace sld{
      sld::internal::initialise_sld_parameters();
      
      sld::internal::thermal_velocity(atoms::x_velo_array, atoms::y_velo_array,atoms::z_velo_array);
+     
+     
+     //initialise for Parallel simulations
+     //Initialize parallel mc variables
+     suzuki_trotter_parallel_initialized = false;
+     internal::c_octants.resize(8);
+     internal::b_octants.resize(8);
+     
+     
     // sld::tests();
+    
+    
 
       return;
 
@@ -110,7 +122,6 @@ namespace sld{
        int N=atoms::num_atoms;
        double rx,ry,s;
        double net_v[] = {0.0, 0.0, 0.0};
-       std::cout<<"vvv 0  "<<x_velo_array[0]<<std::endl;
        for( int i = 0; i < N; i++)
        {
            s = 2.0;
@@ -141,7 +152,6 @@ namespace sld{
            y_velo_array[i] -= net_v[1];
            z_velo_array[i] -= net_v[2];
        }
-                  std::cout<<"vvv init  "<<x_velo_array[0]<<std::endl;
 
    }
    

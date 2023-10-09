@@ -11,27 +11,26 @@
 //------------------------------------------------------------------------------
 //
 
-// C++ standard library headers
+#ifdef MPICF
 // Standard Libraries
 #include <cmath>
 #include <iostream>
 #include <vector>
 
-// Vampire headers
+// Vampire Header files
+#include "errors.hpp"
+#include "random.hpp"
+#include "sim.hpp"
+#include "vmpi.hpp"
 #include "sld.hpp"
 #include "atoms.hpp"
 #include "create.hpp"
 #include "material.hpp"
-#include "sim.hpp"
-#include "random.hpp"
-#include "errors.hpp"
-#include "vmpi.hpp"
 
-#ifdef MPICF
-
-
-// sld module headers
+// Internal header
 #include "internal.hpp"
+
+
 
 
 namespace sld{
@@ -44,9 +43,20 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
                       double min_dim[3], // minimum dimensions on local processor
                       double max_dim[3]){ // maximum dimensions on local processor
 
+
+      if (vmpi::my_rank ==0)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
+      if (vmpi::my_rank ==1)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
+      if (vmpi::my_rank ==2)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
+      if (vmpi::my_rank ==3)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
+
+
+
    // Convenient shorthands
    int catoms = vmpi::num_core_atoms;
    int batoms = vmpi::num_bdry_atoms;
+   
+      if (vmpi::my_rank ==0)std::cout<< "inside  2 Suzuki Trotter Parallel init "<<catoms<<"\t"<<batoms<<std::endl;
+
 
    double widthx = max_dim[0] - min_dim[0];
    double widthy = max_dim[1] - min_dim[1];
@@ -73,6 +83,7 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
          }
       }
    }
+   if (vmpi::my_rank ==0) std::cout<< "Suzuki Trotter Parallel initialised core at "<<internal::c_octants[0].size()<<"\t"<< catoms<<std::endl;
 
    octant_num = 0;
    //Sort boundary atoms into appropriate octant arrays.
@@ -101,19 +112,21 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
    int num_atoms_in_octants = 0;
    for(int i=0; i< 8; i++) num_atoms_in_octants += internal::c_octants[i].size();
    if(num_atoms_in_octants != catoms){
-      std::cerr << "Programmer error: missing atoms in core octants in parallel monte carlo initialisation" << std::endl;
+      std::cerr << "Programmer error: missing atoms in core octants in suzuki-trotter initialisation" << std::endl;
       err::vexit();
    }
    // boundary atoms
    num_atoms_in_octants = 0;
    for(int i=0; i< 8; i++) num_atoms_in_octants += internal::b_octants[i].size();
    if(num_atoms_in_octants != batoms){
-      std::cerr << "Programmer error: missing atoms in boundary octants in parallel monte carlo initialisation" << std::endl;
-      err::vexit();
+      //std::cerr << "Programmer error: missing atoms in boundary octants in suzuki-trotter initialisation" << std::endl;
+     // err::vexit();
    }
 
    // set flag to indicate that parallel MC has been initialised
    suzuki_trotter_parallel_initialized = true;
+   
+   std::cout<< "Suzuki Trotter Parallel initialised "<<std::endl;
 
 }
 
@@ -154,6 +167,7 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          generate (Fy_th.begin(),Fy_th.end(), mtrandom::gaussian);
          generate (Fz_th.begin(),Fz_th.end(), mtrandom::gaussian);
 
+
    
 	// loop over all octants
    for(int octant = 0; octant < 8; octant++) {
@@ -161,8 +175,8 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
       int nspins = internal::c_octants[octant].size();
       //Initialise non-blocking send
       vmpi::mpi_init_halo_swap();
-
-      
+      //std::cout<<"octant "<<octant<<std::endl;
+      /*
 
 
          std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
@@ -315,7 +329,7 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
 
    		}
    	}
-
+*/
       // Swap timers compute -> wait
       vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
 

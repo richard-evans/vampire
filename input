@@ -36,44 +36,45 @@ sim:time-step = 0.5 !fs
 # Program and integrator details
 #------------------------------------------
 sim:program = time-series
-sim:integrator = spin-lattice
+sim:integrator = monte-carlo
 
-spin-lattice:potential-cutoff-range=7.8 !A
-spin-lattice:fields-cutoff-range=3.75 !A
-spin-lattice:coupling=pseudodipolar
-spin-lattice:potential=harmonic
-spin-lattice:initial-random-displacement=0.1
-spin-lattice:initial-thermal-velocity=600
+#spin-lattice:potential-cutoff-range=7.8 !A
+#spin-lattice:fields-cutoff-range=3.75 !A
+#spin-lattice:coupling=pseudodipolar
+#spin-lattice:potential=harmonic
+#spin-lattice:initial-random-displacement=0.1
+#spin-lattice:initial-thermal-velocity=600
 
 
-exchange:interaction-range = 3
+#exchange:interaction-range = 3
 
 config:atoms
 config:atoms-output-rate=10000
 config:sld
-
+#
 output:real-time
 output:magnetisation
-output:spin-temperature
-output:lattice-temperature
+#output:spin-temperature
+#output:lattice-temperature
 
 
 
 
 output:kinetic-energy
-output:potential-energy
-output:sld-exchange-energy
-output:sld-coupling-energy
-output:sld-total-energy
+#output:potential-energy
+#output:sld-exchange-energy
+#output:sld-coupling-energy
+#output:sld-total-energy
 
-output:output-rate=10
-output:precision=16
+#output:output-rate=10
+##output:precision=16
 
 screen:real-time
 screen:magnetisation
-screen:spin-temperature
-screen:output-rate=10
+#screen:spin-temperature
+##screen:output-rate=10
 screen:kinetic-energy
 screen:potential-energy
 screen:sld-total-energy
 screen:lattice-temperature
+#screen:total-torque

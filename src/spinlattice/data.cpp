@@ -30,6 +30,7 @@ namespace sld{
    double lattice_temperature;
    double J_eff;
    double C_eff;
+   bool suzuki_trotter_parallel_initialized = false;
 
    namespace internal{
 
@@ -76,6 +77,10 @@ namespace sld{
       std::vector<double> sumC;
       std::vector<double> exch_eng;
       std::vector<double> coupl_eng;
+      
+      //MPI variables
+      std::vector<std::vector<int> > c_octants; //Core atoms of each octant
+      std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
 
 
 

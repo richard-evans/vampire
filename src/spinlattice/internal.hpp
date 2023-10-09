@@ -246,7 +246,9 @@ namespace sld{
                   std::vector<double>& Hy_th,
                   std::vector<double>& Hz_th);
 
-
+    //MPI variables
+    extern std::vector<std::vector<int> > c_octants; //Core atoms of each octant
+    extern std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
 
 
       //-------------------------------------------------------------------------

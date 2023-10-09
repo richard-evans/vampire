@@ -12,6 +12,7 @@ fields.o\
 suzuki-trotter.o\
 temperatures.o\
 energy.o\
+suzuki-trotter-mpi.o\
 tests.o
 
 # Append module objects to global tree
