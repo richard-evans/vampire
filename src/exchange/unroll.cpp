@@ -32,7 +32,7 @@ namespace exchange{
    void unroll_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear){
 
       // if dmi is enabled then set exchange type to force normalised tensor form of exchange
-      if(internal::enable_dmi || internal::enable_kitaev){
+      if(internal::enable_dmi || internal::enable_kitaev ){
          internal::exchange_type = exchange::tensorial;
          internal::use_material_exchange_constants = true;
       }

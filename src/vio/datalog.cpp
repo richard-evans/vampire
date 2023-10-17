@@ -272,7 +272,20 @@ namespace vout{
 				break;
 			case 72:
 			   vout::fractional_electric_field_strength(stream, header);
-				break;
+				break;			
+            case 74:
+         	    vout::sysspintemp(stream, header);
+         	    break;
+         	case 75:
+         	    vout::mean_sysspintemp(stream, header);
+         	    break;
+         	case 76:
+                vout::material_mean_sysspintemp(stream, header);
+                break;
+            case 77:
+                vout::material_spin_temp(stream, header);
+                break;
+                				
          case 997: //MP
 				vout::material_binder_cumulant(stream,header);
 				break;

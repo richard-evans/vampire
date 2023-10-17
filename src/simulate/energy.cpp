@@ -64,6 +64,7 @@
 #include "spintransport.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "constants.hpp"
 
 // sim module header
 #include "internal.hpp"
@@ -178,7 +179,8 @@ double calculate_spin_energy(const int atom){
 	// Calculate total spin energy
    energy += exchange::single_spin_energy(atom, Sx, Sy, Sz);
    energy += exchange::single_spin_biquadratic_energy(atom, Sx, Sy, Sz);
-
+   energy += exchange::single_spin_four_spin_energy(atom, Sx, Sy, Sz);
+   //std::cout << "total" << '\t' << energy << std::endl;
    // calculate anisotropy energy for atom
    energy += anisotropy::single_spin_energy(atom, imaterial, Sx, Sy, Sz, sim::temperature);
 
@@ -194,5 +196,7 @@ double calculate_spin_energy(const int atom){
 
 	return energy; // Tesla
 }
+
+
 
 } // end of namespace sim

@@ -73,7 +73,9 @@ namespace cat{
 		mean_torque(0.0),
 		energy(0.0),
 		theta(0.0),
-		phi(0.0)
+		phi(0.0), 
+		spin_temp(0.0),
+		mean_spin_temp(0.0)
 	{
 		category_atoms.resize(0,0);
 		
