@@ -31,6 +31,11 @@ namespace sld{
    double J_eff;
    double C_eff;
    bool suzuki_trotter_parallel_initialized = false;
+   
+    
+        std::vector<double> x_seq_coord_array;
+        std::vector<double> y_seq_coord_array;
+        std::vector<double> z_seq_coord_array;
 
    namespace internal{
 
@@ -59,6 +64,7 @@ namespace sld{
       std::vector<double> x0_coord_array;
       std::vector<double> y0_coord_array;
       std::vector<double> z0_coord_array;
+     
 
       std::vector<double> forces_array_x;
       std::vector<double> forces_array_y;
@@ -78,10 +84,15 @@ namespace sld{
       std::vector<double> exch_eng;
       std::vector<double> coupl_eng;
       
+      std::vector<int> test_atom_list; //Core atoms of each octant
+
+      
       //MPI variables
       std::vector<std::vector<int> > c_octants; //Core atoms of each octant
       std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
-
+      std::vector <int> all_atoms_octant_start_index; 
+      std::vector <int> all_atoms_octant_end_index;
+      std::vector <int> all_atoms_octant;
 
 
    } // end of internal namespace

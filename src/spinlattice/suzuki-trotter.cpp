@@ -526,7 +526,7 @@ namespace sld{
 
    }
 
-
+    /*
       
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
@@ -565,7 +565,7 @@ namespace sld{
                   atoms::type_array,
                   atoms::x_velo_array,
                   atoms::y_velo_array,
-                  atoms::z_velo_array);
+                  atoms::z_velo_array);*/
 
       return EXIT_SUCCESS;
   }

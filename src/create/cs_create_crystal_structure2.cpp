@@ -24,6 +24,8 @@
 //
 // Vampire Header files
 #include "create.hpp"
+#include "sld.hpp"
+
 #include "errors.hpp"
 #include "material.hpp"
 #include "vio.hpp"
@@ -87,6 +89,10 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 
 	// set catom_array size
 	catom_array.reserve(num_atoms);
+	
+	sld::x_seq_coord_array.reserve(num_atoms);
+    sld::y_seq_coord_array.reserve(num_atoms);
+    sld::z_seq_coord_array.reserve(num_atoms);
 
 	// Initialise atoms number
 	int atom=0;
@@ -127,6 +133,11 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].scx=x;
 							catom_array[atom].scy=y;
 							catom_array[atom].scz=z;
+							
+		
+		
+
+
 							atom++;
 							}
 						#ifdef MPICF
@@ -145,6 +156,10 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].scx=x;
 							catom_array[atom].scy=y;
 							catom_array[atom].scz=z;
+							
+							
+                    		
+                    		
 							catom_array[atom].include=false; // assume no atoms until classification complete
 							atom++;
 							}
@@ -182,6 +197,23 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
 		catom_array[atom].include=false;
 	}
+
+
+
+   //save the unsorted distances //modified by M Strungaru
+
+    for (int i=0; i<num_atoms;i++){
+    
+			sld::x_seq_coord_array[i]=catom_array[i].x;
+            sld::y_seq_coord_array[i]=catom_array[i].y;
+            sld::z_seq_coord_array[i]=catom_array[i].z;
+            //std::cout<<" COORDS "<<i<<"\t"<<sld::x_seq_coord_array[i]<<"\t"<<sld::y_seq_coord_array[i]<<"\t"<<sld::z_seq_coord_array[i]<<std::endl;
+							
+    }
+
+
+
+
 
 	return EXIT_SUCCESS;
 }

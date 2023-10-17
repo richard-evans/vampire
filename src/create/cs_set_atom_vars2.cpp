@@ -21,6 +21,7 @@
 #include "random.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "sld.hpp"
 
 // Add internal module header file
 #include "internal.hpp"
@@ -53,7 +54,10 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
    atoms::x_coord_array.resize(atoms::num_atoms,0.0);
    atoms::y_coord_array.resize(atoms::num_atoms,0.0);
    atoms::z_coord_array.resize(atoms::num_atoms,0.0);
-
+   
+   
+   
+    
 	atoms::x_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::y_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
@@ -104,6 +108,7 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 		atoms::x_coord_array[atom] = catom_array[atom].x;
 		atoms::y_coord_array[atom] = catom_array[atom].y;
 		atoms::z_coord_array[atom] = catom_array[atom].z;
+		
 
 		atoms::type_array[atom] = catom_array[atom].material;
 		atoms::category_array[atom] = catom_array[atom].lh_category;

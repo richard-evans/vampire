@@ -307,7 +307,9 @@ namespace stats{
        // system lattice temperature
        //------------------------------------------------------------------------
        if(stats::calculate_system_lattice_temp){
+       std::cout<<"stats num atoms "<<stats::num_atoms<<std::endl;
           for(int atom=0; atom < stats::num_atoms; ++atom){
+            
              // ignore non-magnetic atoms in stats calculation by assigning them to last mask
              if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
              // all other atoms are included

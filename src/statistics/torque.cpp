@@ -124,7 +124,10 @@ void torque_statistic_t::calculate_torque(const std::vector<double>& sx, // spin
       const int64_t num_atoms = sx.size();
       sim::calculate_spin_fields(0, num_atoms);
       sim::calculate_external_fields(0, num_atoms);
+     //std::cerr<<"in IF"<<sx.size()<<"\t"<<num_atoms<<"\t"<<mask.size()<<"\t"<<mask.size()<<std::endl;
    }
+
+   // std::cerr<<"here tor"<<sx.size()<<"\t"<<num_atoms<<"\t"<<mask.size()<<"\t"<<mask.size()<<std::endl;
 
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
@@ -141,6 +144,8 @@ void torque_statistic_t::calculate_torque(const std::vector<double>& sx, // spin
 		torque[3*mask_id + 0] += S[1]*B[2]-S[2]*B[1];
 		torque[3*mask_id + 1] += S[2]*B[0]-S[0]*B[2];
 		torque[3*mask_id + 2] += S[0]*B[1]-S[1]*B[0];
+		
+		//std::cout<<"atom "<<bxs[atom]<<"\t"<<bys[atom]<<"\t"<<bzs[atom]<<std::endl;
 
 	}
 
@@ -150,7 +155,7 @@ void torque_statistic_t::calculate_torque(const std::vector<double>& sx, // spin
    #endif
 
    // Calculate magnetisation length and normalize
-   /*for(int mask_id=0; mask_id < mask_size; ++mask_id){
+   for(int mask_id=0; mask_id < mask_size; ++mask_id){
 
       // determine inverse number of atoms in mask
       double inv_atoms_in_mask = 1.0 / double(num_atoms_in_mask[mask_id]);
@@ -159,7 +164,7 @@ void torque_statistic_t::calculate_torque(const std::vector<double>& sx, // spin
       torque[3*mask_id + 1] *= inv_atoms_in_mask;
       torque[3*mask_id + 2] *= inv_atoms_in_mask;
 
-   }*/
+   }
 
    // Zero empty mask id's
    for(unsigned int id=0; id<zero_list.size(); ++id) torque[zero_list[id]]=0.0;

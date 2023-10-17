@@ -71,7 +71,7 @@ namespace atoms{
     std::vector <double> x_velo_array(0);		///  velocities
     std::vector <double> y_velo_array(0);		/// 
     std::vector <double> z_velo_array(0);		/// 
-	
+    
 	std::vector <double> x_total_external_field_array(0);	/// Total external fields
 	std::vector <double> y_total_external_field_array(0);	/// Total external fields
 	std::vector <double> z_total_external_field_array(0);	/// Total external fields
@@ -82,6 +82,7 @@ namespace atoms{
 
    std::vector <bool> surface_array(0); // flag to identify atom as surface
    std::vector <bool> magnetic(0); // flag to identify atom as being magnetic
+
 
    std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 

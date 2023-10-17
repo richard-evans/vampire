@@ -128,6 +128,8 @@ namespace sld{
       extern std::vector<double> x0_coord_array;
       extern std::vector<double> y0_coord_array;
       extern std::vector<double> z0_coord_array;
+      
+          
 
       extern std::vector<double> forces_array_x;
       extern std::vector<double> forces_array_y;
@@ -145,6 +147,9 @@ namespace sld{
       extern std::vector<double> coupl_eng;
       extern std::vector<double> sumJ;
       extern std::vector<double> sumC;
+      
+      extern std::vector<int> test_atom_list; //Core atoms of each octant
+
 
 
       void initialise_positions(std::vector<double>& x0_coord_array, // coord vectors for atoms
@@ -249,6 +254,10 @@ namespace sld{
     //MPI variables
     extern std::vector<std::vector<int> > c_octants; //Core atoms of each octant
     extern std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
+    
+    extern std::vector <int> all_atoms_octant_start_index; 
+    extern std::vector <int> all_atoms_octant_end_index;
+    extern std::vector <int> all_atoms_octant;
 
 
       //-------------------------------------------------------------------------

@@ -157,17 +157,6 @@ void sld_energy_statistic_t::calculate(const std::vector<double>& sx,  // spin u
    std::fill( kinetic_energy.begin(), kinetic_energy.end(), 0.0 );
    std::fill( potential_energy.begin(), potential_energy.end(), 0.0 );
    
-   //test
-   double pot_eng=sld::compute_potential_energy(0,atoms::num_atoms, atoms::type_array);
-   double kin_eng=sld::compute_kinetic_energy(0,atoms::num_atoms,atoms::type_array,atoms::x_velo_array,atoms::y_velo_array, atoms::z_velo_array);
-   double sld_exch_eng=sld::compute_exchange_energy(0,atoms::num_atoms);
-   double sld_coupl_eng=sld::compute_coupling_energy(0,atoms::num_atoms);
-    /*           
-   std::cout<<"kin eng "<<kin_eng<<std::endl;
-   std::cout<<"pot eng "<<pot_eng<<std::endl;
-   std::cout<<"exch eng "<<sld_exch_eng<<std::endl;
-   std::cout<<"coupl eng "<<sld_coupl_eng<<std::endl;
-*/
    //---------------------------------------------------------------------------
    // Calculate exchange energy (in Tesla)
    //---------------------------------------------------------------------------

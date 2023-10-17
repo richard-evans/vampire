@@ -39,7 +39,6 @@ bool lattice_temp_statistic_t::is_initialized(){
 // Function to initialize mask
 //------------------------------------------------------------------------------------------------------
 void lattice_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in_mask, const std::vector<double>& mm){
- std::cout<<"lat0"<<std::endl;
 
    // Check that mask values never exceed mask_size
    for(unsigned int atom=0; atom<in_mask.size(); ++atom){
@@ -123,18 +122,18 @@ void lattice_temp_statistic_t::get_mask(std::vector<int>& out_mask,  std::vector
 void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>& velo_array_x, // coord vectors for atoms
             const std::vector<double>& velo_array_y,
             const std::vector<double>& velo_array_z){
- //std::cout<<"lat1"<<std::endl;
              
            
 
            std::fill(lattice_temp.begin(),lattice_temp.end(),0.0);
-           const int64_t num_atoms = velo_array_x.size();
-
     double kinetic=0.0;
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
 
       const int mask_id = mask[atom]; // get mask id
+
+
+       if(mask_id>=lattice_temp.size()) std::cerr<<"ERROR"<<std::endl;
 
       // get atomic moment
 
@@ -146,16 +145,18 @@ void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>&
          //std::cout<<"s"<<S[0]<<"\t"<<S[1]<<"\t"<<S[2]<<"b"<<B[0]<<"\t"<< B[1]<<"\t"<<B[2]<<"mask id:"<<mask_id<<"\t"<<SxH2<<"\t"<<SH<<std::endl;
         lattice_temp[mask_id]=kinetic*atoms::mass_spin_array[atom];
 	    //if(atom==2) std::cout<<"STATS at 2  "<<( 2.0 /(3.0*constants::kB_eV))*kinetic*atoms::mass_spin_array[atom]*0.5<<std::endl;
-
+       //std::cout<<"mask id "<<mask_id<<"\t"<<lattice_temp.size()<<std::endl;
 	}
-	//std::cout<<"lattice temp from SLD"<<sld::compute_lattice_temperature(0,atoms::num_atoms,atoms::type_array, atoms::x_velo_array,atoms::y_velo_array,atoms::z_velo_array)<<std::endl;
- 
+	//std::cout<<"lattice temp from SLD"<<sld::compute_laittice_temperature(0,atoms::num_atoms,atoms::type_array, atoms::x_velo_array,atoms::y_velo_array,atoms::z_velo_array)<<std::endl;
+    vmpi::barrier();
 
 
    // Reduce on all CPUS
    #ifdef MPICF
       MPI_Allreduce(MPI_IN_PLACE, &lattice_temp[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
+
+
 
    // Calculate magnetisation length and normalize
    for(int mask_id=0; mask_id < mask_size; ++mask_id){

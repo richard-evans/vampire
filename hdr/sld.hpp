@@ -165,6 +165,10 @@ namespace sld{
    extern double J_eff;
    extern double C_eff;
    
+    extern std::vector<double> x_seq_coord_array;
+    extern std::vector<double> y_seq_coord_array;
+    extern std::vector<double> z_seq_coord_array;
+   
    void suzuki_trotter_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
                          double min_dim[3], double max_dim[3]);
    extern bool suzuki_trotter_parallel_initialized;

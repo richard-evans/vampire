@@ -120,7 +120,7 @@ namespace atoms
 	extern std::vector <double> x_velo_array;		/// Total spin dependent fields
 	extern std::vector <double> y_velo_array;		/// Total spin dependent fields
 	extern std::vector <double> z_velo_array;		/// Total spin dependent fields
-
+	
 }
 
 

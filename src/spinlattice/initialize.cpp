@@ -66,6 +66,13 @@ namespace sld{
      internal::c_octants.resize(8);
      internal::b_octants.resize(8);
      
+     internal::all_atoms_octant_start_index.reserve(8); 
+     internal::all_atoms_octant_end_index.reserve(8); 
+     internal::all_atoms_octant.reserve(atoms::num_atoms);
+     
+   /*  sld::x_seq_coord_array.reserve(atoms::num_atoms);
+     sld::y_seq_coord_array.reserve(atoms::num_atoms);
+     sld::z_seq_coord_array.reserve(atoms::num_atoms);*/
      
     // sld::tests();
     
@@ -91,6 +98,8 @@ namespace sld{
    x0_coord_array.resize(atoms::num_atoms,0);
    y0_coord_array.resize(atoms::num_atoms,0);
    z0_coord_array.resize(atoms::num_atoms,0);
+   
+ 
 
    for( int i = 0; i < atoms::num_atoms; i++){
 

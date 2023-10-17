@@ -114,18 +114,15 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 
    std::fill(spin_temp.begin(),spin_temp.end(),0.0);
 
-   // check for Monte Carlo solvers and recalculate fields
-  // if(sim::integrator == sim::monte_carlo || sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc || sim::integrator ==sim::llg_heun){
-      const int64_t num_atoms = sx.size();
-
-     // sim::calculate_spin_fields(0, num_atoms);
-    //  sim::calculate_external_fields(0, num_atoms);
-   //}
+   
+   const int64_t num_tot_atoms = atoms::x_total_spin_field_array.size();
+   
+   
    std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
    std::fill(atoms::y_total_spin_field_array.begin(), atoms::y_total_spin_field_array.end(), 0.0);
    std::fill(atoms::z_total_spin_field_array.begin(), atoms::z_total_spin_field_array.end(), 0.0);
    sld::compute_fields(0, // first atom for exchange interactions to be calculated
-                     num_atoms, // last +1 atom to be calculated
+                     num_tot_atoms, // last +1 atom to be calculated
                      atoms::neighbour_list_start_index,
                      atoms::neighbour_list_end_index,
                      atoms::type_array, // type for atom

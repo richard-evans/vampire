@@ -33,6 +33,9 @@
 
 
 
+
+
+
 namespace sld{
 
 
@@ -44,23 +47,31 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
                       double max_dim[3]){ // maximum dimensions on local processor
 
 
-      if (vmpi::my_rank ==0)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
-      if (vmpi::my_rank ==1)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
-      if (vmpi::my_rank ==2)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
-      if (vmpi::my_rank ==3)std::cout<< "inside Suzuki Trotter Parallel init "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
-
+     // if (vmpi::my_rank ==0)std::cout<< "inside Suzuki Trotter Parallel init rank0 "<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
+     // if (vmpi::my_rank ==1)std::cout<< "inside Suzuki Trotter Parallel init rank1"<<max_dim[0]<<"\t"<<max_dim[1]<<"\t"<<max_dim[2]<<std::endl;
+     
 
 
    // Convenient shorthands
    int catoms = vmpi::num_core_atoms;
    int batoms = vmpi::num_bdry_atoms;
    
-      if (vmpi::my_rank ==0)std::cout<< "inside  2 Suzuki Trotter Parallel init "<<catoms<<"\t"<<batoms<<std::endl;
+   if (vmpi::my_rank ==0) {
+   std::cout<< "rank 0 inside  2 Suzuki Trotter Parallel init "<<vmpi::my_rank<<"\t"<<catoms<<"\t"<<batoms<<std::endl;
+   }
+ 
+   if (vmpi::my_rank ==1) std::cout<< "rank 1 inside  2 Suzuki Trotter Parallel init "<<vmpi::my_rank<<"\t"<<catoms<<"\t"<<batoms<<std::endl;
 
 
    double widthx = max_dim[0] - min_dim[0];
    double widthy = max_dim[1] - min_dim[1];
    double widthz = max_dim[2] - min_dim[2];
+
+   if (widthx<=sld::internal::r_cut_fields ||widthy<=sld::internal::r_cut_fields || widthy<=sld::internal::r_cut_fields ){
+     std::cerr << "Error: System size needs to be increased so octants won't interact" << std::endl;
+     std::cerr<<"Width of octants is "<<widthx<<"\t"<<widthy<<"\t"<<widthz<< " While interaction cutoff is "<<sld::internal::r_cut_fields<<std::endl;
+     err::vexit();
+     }
 
    int octant_num = 0; //Count which octant loop is in
 
@@ -77,13 +88,14 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
                    && z[i] >= min_dim[2] + widthz*zoct*0.5 && z[i] < min_dim[2] + widthz*0.5 + widthz*zoct*0.5)
                {
                   internal::c_octants[octant_num].push_back(i);
+                 // std::cout<<"octant core "<<octant_num<<"\t"<<i<<"\t"<<x[i]<<"\t"<<y[i]<<"\t"<<z[i]<<std::endl;
                }
             }
             octant_num++;
          }
       }
    }
-   if (vmpi::my_rank ==0) std::cout<< "Suzuki Trotter Parallel initialised core at "<<internal::c_octants[0].size()<<"\t"<< catoms<<std::endl;
+   
 
    octant_num = 0;
    //Sort boundary atoms into appropriate octant arrays.
@@ -98,6 +110,8 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
                    && z[i] >= min_dim[2] + widthz*zoct*0.5 && z[i] < min_dim[2] + widthz*0.5 + widthz*zoct*0.5)
                {
                   internal::b_octants[octant_num].push_back(i);
+                 // std::cout<<"octant bound "<<octant_num<<" \t"<<i<<"\t"<<x[i]<<"\t"<<y[i]<<"\t"<<z[i]<<std::endl;
+
                }
             }
             octant_num++;
@@ -110,23 +124,63 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
    //--------------------------------------------------------------------
    // core atoms
    int num_atoms_in_octants = 0;
-   for(int i=0; i< 8; i++) num_atoms_in_octants += internal::c_octants[i].size();
+   for(int i=0; i< 8; i++) {num_atoms_in_octants += internal::c_octants[i].size();
+      std::cout<<i<<" num_atoms_in_octants c "<<num_atoms_in_octants<<"\t"<<catoms<<"\t"<<atoms::num_atoms<<std::endl;}
+
    if(num_atoms_in_octants != catoms){
       std::cerr << "Programmer error: missing atoms in core octants in suzuki-trotter initialisation" << std::endl;
       err::vexit();
    }
    // boundary atoms
    num_atoms_in_octants = 0;
-   for(int i=0; i< 8; i++) num_atoms_in_octants += internal::b_octants[i].size();
+   for(int i=0; i< 8; i++) {
+   num_atoms_in_octants += internal::b_octants[i].size();
+  // std::cout<<"i="<<i<<"\t"<<internal::b_octants[i].size()<<std::endl;}
+      std::cout<<i <<" num_atoms_in_octants b "<<num_atoms_in_octants<<"\t"<<batoms<<"\t"<<atoms::num_atoms<<std::endl;}
+
    if(num_atoms_in_octants != batoms){
-      //std::cerr << "Programmer error: missing atoms in boundary octants in suzuki-trotter initialisation" << std::endl;
-     // err::vexit();
+      std::cerr << "Programmer error: missing atoms in boundary octants in suzuki-trotter initialisation" << std::endl;
+      err::vexit();
    }
 
-   // set flag to indicate that parallel MC has been initialised
-   suzuki_trotter_parallel_initialized = true;
+
+
+   //create array for suzuki trotter integration index
+   //initialise variables
+   internal::all_atoms_octant_start_index.push_back(0);
    
-   std::cout<< "Suzuki Trotter Parallel initialised "<<std::endl;
+   for (int j=0;j<2000;j++){
+      
+    for(int octant=0; octant< 8; octant++){
+    
+    int core_at=internal::c_octants[octant].size();
+    int bdry_at=internal::b_octants[octant].size();
+    
+    for (int i=0; i<core_at;i++){
+          	int atom = internal::c_octants[octant][i];
+          	//std::cout<< " core oct and atom " <<octant<<"\t"<<atom<<"\t"<<x[atom]<<"\t"<<y[atom]<<"\t"<<z[atom]<<std::endl;
+            if(x[atom]==sld::x_seq_coord_array[j] && y[atom]==sld::y_seq_coord_array[j]&&z[atom]==sld::z_seq_coord_array[j] ) {
+            //std::cout<<"core at "<<i<<"\t"<<j<<std::endl;
+            internal::all_atoms_octant.push_back(i);}
+    }
+    
+     for (int i=0; i<bdry_at;i++){
+           	int atom = internal::b_octants[octant][i];
+           	if(x[atom]==sld::x_seq_coord_array[j] && y[atom]==sld::y_seq_coord_array[j]&&z[atom]==sld::z_seq_coord_array[j] ) {
+           	//std::cout<<"bdry at "<<i<<"\t"<<j<<std::endl;
+           	internal::all_atoms_octant.push_back(i);}
+
+           	//std::cout<< " bdry oct and atom " <<octant<<"\t"<<atom<<"\t"<<x[atom]<<"\t"<<y[atom]<<"\t"<<z[atom]<<std::endl;
+
+     }
+    
+    }
+    }
+                vmpi::barrier();
+
+    
+   suzuki_trotter_parallel_initialized = true;
+
 
 }
 
@@ -140,6 +194,8 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
                       
                       
                       
+
+                    
        double cay_dt=-mp::dt/4.0;//-dt4*consts::gyro - mp::dt contains gamma;
        double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[0].mass.get();
        double dt2=0.5*mp::dt_SI*1e12;
@@ -167,23 +223,33 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          generate (Fy_th.begin(),Fy_th.end(), mtrandom::gaussian);
          generate (Fz_th.begin(),Fz_th.end(), mtrandom::gaussian);
 
-
-   
-	// loop over all octants
+   int indx_start, indx_end;
+   int number_at=0;
+   int atom=0;
+	// start first octant loop onwards both core and boundary atoms
    for(int octant = 0; octant < 8; octant++) {
-
-      int nspins = internal::c_octants[octant].size();
-      //Initialise non-blocking send
       vmpi::mpi_init_halo_swap();
-      //std::cout<<"octant "<<octant<<std::endl;
-      /*
 
+      //std::cout<<"octant  onwards"<<octant<<"\t"<<nspins<<std::endl;
 
-         std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
-         std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
-         std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
-
-         for(int atom=0;atom<nspins;atom++){
+         
+         /*indx_start=internal::all_atoms_octant_start_index[octant];
+         indx_end=internal::all_atoms_octant_end_index[octant];
+         for(int i=indx_start;i<indx_end;i++){
+         
+         atom=internal::all_atoms_octant[i];
+         
+         number_at++;*/
+         
+         int core_at=internal::c_octants[octant].size();
+         int bdry_at=internal::b_octants[octant].size();
+         
+         for (int i=0; i<core_at;i++){
+         atom = internal::c_octants[octant][i];
+         sld::internal::fields_array_x[atom]=0.0;
+         sld::internal::fields_array_y[atom]=0.0;
+         sld::internal::fields_array_z[atom]=0.0;
+         
          sld::compute_fields(atom, // first atom for exchange interactions to be calculated
                            atom+1, // last +1 atom to be calculated
                            atoms::neighbour_list_start_index,
@@ -216,6 +282,7 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
                      Hx_th, //  vectors for fields
                      Hy_th,
                      Hz_th);
+       // std::cout<<"fields therm "<< atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<std::endl;
 
 
          sld::internal::cayley_update(atom,
@@ -227,25 +294,102 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
                      sld::internal::fields_array_x,
                      sld::internal::fields_array_y,
                      sld::internal::fields_array_z);
+                     
+                     
+       // std::cout<<"fields final suzuki trotter "<< i<<"\t"<<atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<"\t"<< atoms::x_coord_array[atom]<<"\t"<< atoms::y_coord_array[atom]<<"\t"<< atoms::z_coord_array[atom]<<"\t"<< atoms::x_spin_array[atom]<<"\t"<< atoms::y_spin_array[atom]<<"\t"<< atoms::z_spin_array[atom]<<std::endl;
 
-         }
+         } //end spin for loop
+         
+                     vmpi::mpi_complete_halo_swap();
+
+         
+         for (int i=0; i<bdry_at;i++){
+         atom = internal::b_octants[octant][i];
+         sld::internal::fields_array_x[atom]=0.0;
+         sld::internal::fields_array_y[atom]=0.0;
+         sld::internal::fields_array_z[atom]=0.0;
+         
+         sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                           atom+1, // last +1 atom to be calculated
+                           atoms::neighbour_list_start_index,
+                           atoms::neighbour_list_end_index,
+                           atoms::type_array, // type for atom
+                           atoms::neighbour_list_array, // list of interactions between atoms
+                           atoms::x_coord_array,
+                           atoms::y_coord_array,
+                           atoms::z_coord_array,
+                           atoms::x_spin_array,
+                           atoms::y_spin_array,
+                           atoms::z_spin_array,
+                           sld::internal::forces_array_x,
+                           sld::internal::forces_array_y,
+                           sld::internal::forces_array_z,
+                           sld::internal::fields_array_x,
+                           sld::internal::fields_array_y,
+                           sld::internal::fields_array_z);
+
+         sld::internal::add_spin_noise(atom,
+                     atom+1,
+                     mp::dt_SI*1e12,
+                     atoms::type_array, // type for atom
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     sld::internal::fields_array_x,
+                     sld::internal::fields_array_y,
+                     sld::internal::fields_array_z,
+                     Hx_th, //  vectors for fields
+                     Hy_th,
+                     Hz_th);
+       // std::cout<<"fields therm "<< atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<std::endl;
+
+
+         sld::internal::cayley_update(atom,
+                     atom+1,
+                     cay_dt,
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     sld::internal::fields_array_x,
+                     sld::internal::fields_array_y,
+                     sld::internal::fields_array_z);
+                     
+                     
+       // std::cout<<"fields final suzuki trotter "<< i<<"\t"<<atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<"\t"<< atoms::x_coord_array[atom]<<"\t"<< atoms::y_coord_array[atom]<<"\t"<< atoms::z_coord_array[atom]<<"\t"<< atoms::x_spin_array[atom]<<"\t"<< atoms::y_spin_array[atom]<<"\t"<< atoms::z_spin_array[atom]<<std::endl;
+
+         } //end spin for loop
+         
+           //    err::vexit();
 
 
 
-      }
+      vmpi::barrier();
+
+
+      }	// end first octant loop onwards
       
       
-      
-      //update
-      
-      for(int octant = 8; octant < 0; octant--) {
+      //first octant loop return    
+      for(int octant = 7; octant >= 0; octant--) {
+            vmpi::mpi_init_halo_swap();
 
+          
 
-            std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
-            std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
-            std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
-
-            for(int atom=nspins;atom<0;atom--){
+            /*indx_start=internal::all_atoms_octant_start_index[octant];
+            indx_end=internal::all_atoms_octant_end_index[octant];
+            for(int i=indx_end-1;i<=indx_start;i--){
+            
+            atom=internal::all_atoms_octant[i];*/
+            int core_at=internal::c_octants[octant].size();
+            int bdry_at=internal::b_octants[octant].size();
+            
+            for (int i=core_at-1;i>=0;i--){
+            atom = internal::c_octants[octant][i];
+            
+            sld::internal::fields_array_x[atom]=0.0;
+            sld::internal::fields_array_y[atom]=0.0;
+            sld::internal::fields_array_z[atom]=0.0;
+            
             sld::compute_fields(atom, // first atom for exchange interactions to be calculated
                               atom+1, // last +1 atom to be calculated
                               atoms::neighbour_list_start_index,
@@ -290,61 +434,356 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
                         sld::internal::fields_array_y,
                         sld::internal::fields_array_z);
 
-            }
+            }//end spin loop
+            
+            vmpi::mpi_complete_halo_swap();
+
+            
+            for (int i=bdry_at-1;i>=0;i--){
+            atom = internal::b_octants[octant][i];
+            
+            sld::internal::fields_array_x[atom]=0.0;
+            sld::internal::fields_array_y[atom]=0.0;
+            sld::internal::fields_array_z[atom]=0.0;
+            
+            sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                              atom+1, // last +1 atom to be calculated
+                              atoms::neighbour_list_start_index,
+                              atoms::neighbour_list_end_index,
+                              atoms::type_array, // type for atom
+                              atoms::neighbour_list_array, // list of interactions between atoms
+                              atoms::x_coord_array,
+                              atoms::y_coord_array,
+                              atoms::z_coord_array,
+                              atoms::x_spin_array,
+                              atoms::y_spin_array,
+                              atoms::z_spin_array,
+                              sld::internal::forces_array_x,
+                              sld::internal::forces_array_y,
+                              sld::internal::forces_array_z,
+                              sld::internal::fields_array_x,
+                              sld::internal::fields_array_y,
+                              sld::internal::fields_array_z);
+
+            sld::internal::add_spin_noise(atom,
+                        atom+1,
+                        mp::dt_SI*1e12,
+                        atoms::type_array, // type for atom
+                        atoms::x_spin_array,
+                        atoms::y_spin_array,
+                        atoms::z_spin_array,
+                        sld::internal::fields_array_x,
+                        sld::internal::fields_array_y,
+                        sld::internal::fields_array_z,
+                        Hx_th, //  vectors for fields
+                        Hy_th,
+                        Hz_th);
+
+
+            sld::internal::cayley_update(atom,
+                        atom+1,
+                        cay_dt,
+                        atoms::x_spin_array,
+                        atoms::y_spin_array,
+                        atoms::z_spin_array,
+                        sld::internal::fields_array_x,
+                        sld::internal::fields_array_y,
+                        sld::internal::fields_array_z);
+
+            }//end spin loop
+             vmpi::barrier();
+
+
+         }    // end first octant loop return
 
 
 
-         }
+
+       
+       for(int octant = 0; octant < 8; octant++) {
+
+          //std::cout<<"octant  onwards"<<octant<<"\t"<<nspins<<std::endl;
+
+             vmpi::mpi_init_halo_swap();
+             int core_at=internal::c_octants[octant].size();
+             int bdry_at=internal::b_octants[octant].size();
 
 
-      // Finish non-blocking data send/receive
-      vmpi::mpi_complete_halo_swap();
+            /*
+             indx_start=internal::all_atoms_octant_start_index[octant];
+             indx_end=internal::all_atoms_octant_end_index[octant];
+             for(int i=indx_start;i<indx_end;i++){
+             
+             atom=internal::all_atoms_octant[i];*/
+             
+             for (int i=0; i<core_at;i++){
+             atom = internal::c_octants[octant][i];
+             
+             sld::internal::fields_array_x[atom]=0.0;
+             sld::internal::fields_array_y[atom]=0.0;
+             sld::internal::fields_array_z[atom]=0.0;
+             
+             sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                               atom+1, // last +1 atom to be calculated
+                               atoms::neighbour_list_start_index,
+                               atoms::neighbour_list_end_index,
+                               atoms::type_array, // type for atom
+                               atoms::neighbour_list_array, // list of interactions between atoms
+                               atoms::x_coord_array,
+                               atoms::y_coord_array,
+                               atoms::z_coord_array,
+                               atoms::x_spin_array,
+                               atoms::y_spin_array,
+                               atoms::z_spin_array,
+                               sld::internal::forces_array_x,
+                               sld::internal::forces_array_y,
+                               sld::internal::forces_array_z,
+                               sld::internal::fields_array_x,
+                               sld::internal::fields_array_y,
+                               sld::internal::fields_array_z);
 
-      //
-      //Begin integrating boundary region
-      //
-      nmoves = internal::b_octants[octant].size();
-      for(int i=0; i<nmoves; i++){
+             sld::internal::add_spin_noise(atom,
+                         atom+1,
+                         mp::dt_SI*1e12,
+                         atoms::type_array, // type for atom
+                         atoms::x_spin_array,
+                         atoms::y_spin_array,
+                         atoms::z_spin_array,
+                         sld::internal::fields_array_x,
+                         sld::internal::fields_array_y,
+                         sld::internal::fields_array_z,
+                         Hx_th, //  vectors for fields
+                         Hy_th,
+                         Hz_th);
+           // std::cout<<"fields therm "<< atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<std::endl;
 
-         // add one to number of moves counter
-         statistics_moves+=1.0;
 
-   		// pick atom
-   		atom = internal::b_octants[octant][int(nmoves*mtrandom::grnd())];
+             sld::internal::cayley_update(atom,
+                         atom+1,
+                         cay_dt,
+                         atoms::x_spin_array,
+                         atoms::y_spin_array,
+                         atoms::z_spin_array,
+                         sld::internal::fields_array_x,
+                         sld::internal::fields_array_y,
+                         sld::internal::fields_array_z);
+                         
+                         
+           // std::cout<<"fields final suzuki trotter "<< atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<"\t"<< atoms::x_coord_array[atom]<<"\t"<< atoms::y_coord_array[atom]<<"\t"<< atoms::z_coord_array[atom]<<std::endl;
 
-   		// get material id
-   		const int imaterial=type_array[atom];
+             } //end spin for loop
+        
+        vmpi::mpi_complete_halo_swap();
 
-         // Calculate range for move
-         internal::delta_angle=sigma_array[imaterial];
+             
+        for (int i=0; i<bdry_at;i++){
+        atom = internal::b_octants[octant][i];
+        
+        sld::internal::fields_array_x[atom]=0.0;
+        sld::internal::fields_array_y[atom]=0.0;
+        sld::internal::fields_array_z[atom]=0.0;
+        
+        sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                          atom+1, // last +1 atom to be calculated
+                          atoms::neighbour_list_start_index,
+                          atoms::neighbour_list_end_index,
+                          atoms::type_array, // type for atom
+                          atoms::neighbour_list_array, // list of interactions between atoms
+                          atoms::x_coord_array,
+                          atoms::y_coord_array,
+                          atoms::z_coord_array,
+                          atoms::x_spin_array,
+                          atoms::y_spin_array,
+                          atoms::z_spin_array,
+                          sld::internal::forces_array_x,
+                          sld::internal::forces_array_y,
+                          sld::internal::forces_array_z,
+                          sld::internal::fields_array_x,
+                          sld::internal::fields_array_y,
+                          sld::internal::fields_array_z);
 
-   		// Save old spin position
-   		internal::Sold[0] = x_spin_array[atom];
-   		internal::Sold[1] = y_spin_array[atom];
-   		internal::Sold[2] = z_spin_array[atom];
-   		// Copy new spin position
-   		x_spin_array[atom] = internal::Snew[0];
-   		y_spin_array[atom] = internal::Snew[1];
-   		z_spin_array[atom] = internal::Snew[2];
+        sld::internal::add_spin_noise(atom,
+                    atom+1,
+                    mp::dt_SI*1e12,
+                    atoms::type_array, // type for atom
+                    atoms::x_spin_array,
+                    atoms::y_spin_array,
+                    atoms::z_spin_array,
+                    sld::internal::fields_array_x,
+                    sld::internal::fields_array_y,
+                    sld::internal::fields_array_z,
+                    Hx_th, //  vectors for fields
+                    Hy_th,
+                    Hz_th);
+      // std::cout<<"fields therm "<< atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<std::endl;
 
-   		}
-   	}
-*/
-      // Swap timers compute -> wait
-      vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
 
-      // Wait for other processors
-      vmpi::barrier();
+        sld::internal::cayley_update(atom,
+                    atom+1,
+                    cay_dt,
+                    atoms::x_spin_array,
+                    atoms::y_spin_array,
+                    atoms::z_spin_array,
+                    sld::internal::fields_array_x,
+                    sld::internal::fields_array_y,
+                    sld::internal::fields_array_z);
+                    
+                    
+      // std::cout<<"fields final suzuki trotter "<< atom<<"\t"<< sld::internal::fields_array_x[atom]<<"\t"<< sld::internal::fields_array_y[atom]<<"\t"<< sld::internal::fields_array_z[atom]<<"\t"<< atoms::x_coord_array[atom]<<"\t"<< atoms::y_coord_array[atom]<<"\t"<< atoms::z_coord_array[atom]<<std::endl;
 
-      // Swap timers wait -> compute
-      vmpi::TotalWaitTime += vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
+        } //end spin for loop
 
-   } // end of octant loop
+    vmpi::barrier();
 
+
+          }	// end second octant loop onwards
+
+          
+          
+          //first octant loop return    
+          for(int octant = 7; octant >= 0; octant--) {
+          
+                 vmpi::mpi_init_halo_swap();
+                 int core_at=internal::c_octants[octant].size();
+                 int bdry_at=internal::b_octants[octant].size();
+
+              
+                /*
+                indx_start=internal::all_atoms_octant_start_index[octant];
+                indx_end=internal::all_atoms_octant_end_index[octant];
+                for(int i=indx_end-1;i<=indx_start;i--){
+                
+                atom=internal::all_atoms_octant[i];*/
+                
+                for (int i=core_at-1;i>=0;i--){
+                atom = internal::c_octants[octant][i];
+                
+                
+                sld::internal::fields_array_x[atom]=0.0;
+                sld::internal::fields_array_y[atom]=0.0;
+                sld::internal::fields_array_z[atom]=0.0;
+                sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                                  atom+1, // last +1 atom to be calculated
+                                  atoms::neighbour_list_start_index,
+                                  atoms::neighbour_list_end_index,
+                                  atoms::type_array, // type for atom
+                                  atoms::neighbour_list_array, // list of interactions between atoms
+                                  atoms::x_coord_array,
+                                  atoms::y_coord_array,
+                                  atoms::z_coord_array,
+                                  atoms::x_spin_array,
+                                  atoms::y_spin_array,
+                                  atoms::z_spin_array,
+                                  sld::internal::forces_array_x,
+                                  sld::internal::forces_array_y,
+                                  sld::internal::forces_array_z,
+                                  sld::internal::fields_array_x,
+                                  sld::internal::fields_array_y,
+                                  sld::internal::fields_array_z);
+
+                sld::internal::add_spin_noise(atom,
+                            atom+1,
+                            mp::dt_SI*1e12,
+                            atoms::type_array, // type for atom
+                            atoms::x_spin_array,
+                            atoms::y_spin_array,
+                            atoms::z_spin_array,
+                            sld::internal::fields_array_x,
+                            sld::internal::fields_array_y,
+                            sld::internal::fields_array_z,
+                            Hx_th, //  vectors for fields
+                            Hy_th,
+                            Hz_th);
+
+
+                sld::internal::cayley_update(atom,
+                            atom+1,
+                            cay_dt,
+                            atoms::x_spin_array,
+                            atoms::y_spin_array,
+                            atoms::z_spin_array,
+                            sld::internal::fields_array_x,
+                            sld::internal::fields_array_y,
+                            sld::internal::fields_array_z);
+
+                }//end spin loop
+                
+                vmpi::mpi_complete_halo_swap();
+
+                for (int i=bdry_at-1;i>=0;i--){
+                atom = internal::b_octants[octant][i];
+                
+                
+                sld::internal::fields_array_x[atom]=0.0;
+                sld::internal::fields_array_y[atom]=0.0;
+                sld::internal::fields_array_z[atom]=0.0;
+                sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                                  atom+1, // last +1 atom to be calculated
+                                  atoms::neighbour_list_start_index,
+                                  atoms::neighbour_list_end_index,
+                                  atoms::type_array, // type for atom
+                                  atoms::neighbour_list_array, // list of interactions between atoms
+                                  atoms::x_coord_array,
+                                  atoms::y_coord_array,
+                                  atoms::z_coord_array,
+                                  atoms::x_spin_array,
+                                  atoms::y_spin_array,
+                                  atoms::z_spin_array,
+                                  sld::internal::forces_array_x,
+                                  sld::internal::forces_array_y,
+                                  sld::internal::forces_array_z,
+                                  sld::internal::fields_array_x,
+                                  sld::internal::fields_array_y,
+                                  sld::internal::fields_array_z);
+
+                sld::internal::add_spin_noise(atom,
+                            atom+1,
+                            mp::dt_SI*1e12,
+                            atoms::type_array, // type for atom
+                            atoms::x_spin_array,
+                            atoms::y_spin_array,
+                            atoms::z_spin_array,
+                            sld::internal::fields_array_x,
+                            sld::internal::fields_array_y,
+                            sld::internal::fields_array_z,
+                            Hx_th, //  vectors for fields
+                            Hy_th,
+                            Hz_th);
+
+
+                sld::internal::cayley_update(atom,
+                            atom+1,
+                            cay_dt,
+                            atoms::x_spin_array,
+                            atoms::y_spin_array,
+                            atoms::z_spin_array,
+                            sld::internal::fields_array_x,
+                            sld::internal::fields_array_y,
+                            sld::internal::fields_array_z);
+
+                }//end spin loop
+
+             vmpi::barrier();
+
+             }      //end second octant loop return 
+             
+             
+
+    vmpi::barrier();
+           
+ // Swap timers compute -> wait
+ vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
+
+ // Wait for other processors
+ vmpi::barrier();
+
+ // Swap timers wait -> compute
+ vmpi::TotalWaitTime += vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
+    
    
    return;
 
 }
 
-} // End of namespace montecarlo
+} // End of namespace sld
 #endif
