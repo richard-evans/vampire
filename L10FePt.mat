@@ -1,0 +1,56 @@
+#number of materials
+material:num-materials=2
+
+#properties for material 1
+material[1]:material-name=Fe
+material[1]:material-element=Fe
+material[1]:atomic-spin-moment=2.86 !muB
+material[1]:damping-constant=0.1
+material[1]:uniaxial-anisotropy-constant=-1.552e-23    
+material[1]:unit-cell-category=1
+material[1]:lsf-second-order-coefficient=-7.91306e-20 
+material[1]:lsf-fourth-order-coefficient=3.03004e-20
+material[1]:lsf-sixth-order-coefficient=1.14331e-20
+material[1]:exchange-matrix[1]=5.8e-21,5.8e-21,5.8e-21
+material[1]:exchange-matrix[2]=1e-21,1e-21,1e-21
+#material[1]:exchange-matrix[1]=3e-21
+#material[1]:uniaxial-anisotropy-constant=0
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
+
+
+#properties for material 2
+material[2]:material-name=Pt
+material[2]:material-element=Pt
+material[2]:lsf-second-order-coefficient=4.5512e-21
+material[2]:lsf-fourth-order-coefficient=0
+material[2]:lsf-sixth-order-coefficient=0
+material[2]:atomic-spin-moment=0.36 !muB
+material[2]:damping-constant=0.1
+material[2]:uniaxial-anisotropy-constant=2.2832e-22
+material[2]:unit-cell-category=2
+material[2]:exchange-matrix[1]=1e-21,1e-21,1e-21
+material[2]:exchange-matrix[2]=8.64576e-23,8.64576e-23,8.64576e-23
+#material[2]:non-magnetic=remove
+material[2]:minimum-height=0.0
+material[2]:maximum-height=1.0
+
+
+#original lsf coeffs
+#material[1]:lsf-second-order-coefficient=-7.05579e-20
+#material[1]:lsf-fourth-order-coefficient=2.40874e-20
+#material[1]:lsf-sixth-order-coefficient=8.1087e-21
+
+#material[2]:lsf-second-order-coefficient=4.60446e-21
+#material[2]:lsf-fourth-order-coefficient=0
+#material[2]:lsf-sixth-order-coefficient=0
+
+
+#adjusted lsf coeffs
+#material[1]:lsf-second-order-coefficient=-7.91306e-20 
+#material[1]:lsf-fourth-order-coefficient=3.03004e-20
+#material[1]:lsf-sixth-order-coefficient=1.14331e-20
+
+#material[2]:lsf-second-order-coefficient=4.5512e-21
+#material[2]:lsf-fourth-order-coefficient=0
+#material[2]:lsf-sixth-order-coefficient=0

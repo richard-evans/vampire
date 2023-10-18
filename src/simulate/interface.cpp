@@ -145,6 +145,18 @@ namespace sim{
             return true;
          }
          //--------------------------------------------------------------------
+         test="lsf";
+         if( value == test ){
+            sim::integrator = sim::lsf;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="lsf-mc";
+         if( value == test ){
+            sim::integrator = sim::lsf_mc;
+            return true;
+         }
+         //--------------------------------------------------------------------
          else{
             terminaltextcolor(RED);
                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -153,6 +165,8 @@ namespace sim{
                std::cerr << "\t\"llg-quantum\"" << std::endl;
                std::cerr << "\t\"monte-carlo\"" << std::endl;
                std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
+               std::cerr << "\t\"lsf\"" << std::endl;
+               std::cerr << "\t\"lsf-mc\"" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
           }
@@ -332,6 +346,33 @@ namespace sim{
          vin::check_for_valid_value(vcmak, word, line, prefix, unit, "", -1.0e-15, 1.0e-15,"input","0 - 1e-21");
          sim::internal::mp[super_index].vcmak.set(vcmak);
          sim::internal::enable_vcma_fields = true; // enable vcma fields
+         return true;
+      }
+      //------------------------------------------------------------
+      test="lsf-second-order-coefficient"; // Landau coefficient A
+      if( word==test ){
+         double a_l=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(a_l, word, line, prefix, unit, "energy", -1.0e-19, 1.0e-19,"material","-1.0e-19 - 1.0e-19");
+         sim::internal::mp[super_index].lsf_second_order_coefficient.set(a_l);
+         return true;
+      }
+      //------------------------------------------------------------
+      test="lsf-fourth-order-coefficient"; // Landau coefficient B
+      if( word==test ){
+         double b_l=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(b_l, word, line, prefix, unit, "energy", -1.0e-19, 1.0e-19,"material","-1.0e-19 - 1.0e-19");
+         sim::internal::mp[super_index].lsf_fourth_order_coefficient.set(b_l);
+         return true;
+      }
+      //------------------------------------------------------------
+      test="lsf-sixth-order-coefficient"; // Landau coefficient C
+      if( word==test ){
+         double c_l=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(c_l, word, line, prefix, unit, "energy", -1.0e-19, 1.0e-19,"material","-1.0e-19 - 1.0e-19");
+         sim::internal::mp[super_index].lsf_sixth_order_coefficient.set(c_l);
          return true;
       }
       //--------------------------------------------------------------------

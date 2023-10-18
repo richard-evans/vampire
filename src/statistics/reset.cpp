@@ -64,6 +64,11 @@ namespace stats{
          if(stats::calculate_system_binder_cumulant)   stats::system_binder_cumulant.reset_averages();
          if(stats::calculate_material_binder_cumulant) stats::material_binder_cumulant.reset_averages();
 
+         // reset spin length statistics
+         if(stats::calculate_system_spin_length)      stats::system_spin_length.reset_averages();
+         if(stats::calculate_material_spin_length)    stats::material_spin_length.reset_averages();
+         if(stats::calculate_height_spin_length)      stats::height_spin_length.reset_averages();
+
       }
 
       return;

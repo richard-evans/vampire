@@ -15,6 +15,9 @@
 // Vampire headers
 #include "atoms.hpp" // for exchange list type defs
 #include "exchange.hpp"
+#include "lsf_mc.hpp"
+#include "sim.hpp"
+#include "atoms.hpp"
 
 // exchange module headers
 #include "internal.hpp"
@@ -39,6 +42,32 @@ namespace exchange{
          //       - must be normalised in statistics to account for double sum
    		energy -= Jij * (atoms::x_spin_array[natom] * sx + atoms::y_spin_array[natom] * sy + atoms::z_spin_array[natom] * sz);
 
+   	}
+
+   	return energy;
+
+   }
+
+   //---------------------------------------------------------------------------
+   // Calculate isotropic lsf exchange energy for a single spin
+   //---------------------------------------------------------------------------
+   double lsf_spin_exchange_energy_isotropic(const int atom, const double sx, const double sy, const double sz){
+
+   	// energy
+   	double energy=0.0;
+
+   	// Loop over neighbouring spins to calculate exchange
+   	for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; ++nn){
+
+   		const int natom = atoms::neighbour_list_array[nn];
+   		const double Jij = atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
+
+         // note: sum over j only (not sum over i for j) leads to a silent factor 1/2 in exchange energy value
+         //       - must be normalised in statistics to account for double sum
+         //energy -= Jij * ((atoms::x_spin_array[natom]/montecarlo::mod_S[natom]) * (sx/montecarlo::mod_S[atom]) + (atoms::y_spin_array[natom]/montecarlo::mod_S[natom]) * (sy/montecarlo::mod_S[atom]) + (atoms::z_spin_array[natom]/montecarlo::mod_S[natom]) * (sz/montecarlo::mod_S[atom]));
+         //energy -= Jij * ((atoms::x_spin_array[natom]/montecarlo::mod_S[natom]) * sx + (atoms::y_spin_array[natom]/montecarlo::mod_S[natom]) * sy + (atoms::z_spin_array[natom]/montecarlo::mod_S[natom]) * sz);  
+         energy -= Jij * (atoms::x_spin_array[natom] * sx + atoms::y_spin_array[natom] * sy + atoms::z_spin_array[natom] * sz);
+         
    	}
 
    	return energy;
@@ -119,8 +148,12 @@ namespace exchange{
       // select calculation based on exchange type
       switch(internal::exchange_type){
 
-   		case exchange::isotropic:
-            return spin_exchange_energy_isotropic(atom, sx, sy, sz);
+         case exchange::isotropic:
+            if(sim::integrator==sim::lsf_mc){
+               return lsf_spin_exchange_energy_isotropic(atom, sx, sy, sz);
+            } else{
+               return spin_exchange_energy_isotropic(atom, sx, sy, sz);
+            }
             break;
 
 
@@ -133,7 +166,7 @@ namespace exchange{
             return spin_exchange_energy_tensorial(atom, sx, sy, sz);
             break;
 
-   	}
+         }
 
       return 0.0;
 

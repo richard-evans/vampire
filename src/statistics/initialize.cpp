@@ -285,6 +285,54 @@ namespace stats{
       if(stats::calculate_system_binder_cumulant) stats::system_binder_cumulant.initialize(stats::system_magnetization);
       if(stats::calculate_material_binder_cumulant) stats::material_binder_cumulant.initialize(stats::material_magnetization);
 
+      //------------------------------------------------------------------------
+      // system spin length
+      //------------------------------------------------------------------------
+      if(stats::calculate_system_spin_length){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+            // all other atoms are included
+            else mask[atom] = 0;
+         }
+         stats::system_spin_length.set_mask(1+1,mask);
+      }
+
+      //------------------------------------------------------------------------
+      // material spin length
+      //------------------------------------------------------------------------
+      if(stats::calculate_material_spin_length){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] =  num_materials;
+            // other atoms assigned to material level masks
+            else mask[atom] = material_type_array[atom];
+         }
+         stats::material_spin_length.set_mask(num_materials+1,mask);
+      }
+
+      //------------------------------------------------------------------------
+      // height spin length
+      //------------------------------------------------------------------------
+      if(stats::calculate_height_spin_length){
+         int max_height=0;
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            mask[atom] = height_category_array[atom];
+            if(mask[atom]>max_height) max_height=mask[atom];
+         }
+         // Reduce maximum height on all CPUS
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &max_height, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+         #endif
+
+         // reassign all non-magnetic atoms to last mask
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] =  max_height+1;
+         }
+
+         stats::height_spin_length.set_mask(max_height+2,mask);
+      }
+
       return;
 
    }

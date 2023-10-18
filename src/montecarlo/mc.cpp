@@ -17,12 +17,13 @@
 // Vampire Header files
 #include "random.hpp"
 #include "sim.hpp"
+#include "atoms.hpp"
+#include "material.hpp"
 
 // Internal header
 #include "internal.hpp"
 
 namespace montecarlo{
-
 //------------------------------------------------------------------------------
 // Integrates a Monte Carlo step
 //------------------------------------------------------------------------------
@@ -61,7 +62,7 @@ void mc_step(std::vector<double> &x_spin_array,
          // add one to number of moves counter
          statistics_moves+=1.0;
 
-         // pick atom
+         // pick random atom
          atom = int(nmoves*mtrandom::grnd());
 
          // get material id

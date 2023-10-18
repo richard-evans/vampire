@@ -45,6 +45,10 @@ namespace stats{
    bool calculate_system_binder_cumulant        = false;
    bool calculate_material_binder_cumulant      = false;
 
+   bool calculate_system_spin_length            = false;
+   bool calculate_material_spin_length          = false;
+   bool calculate_height_spin_length            = false;
+
    energy_statistic_t system_energy("s");
    energy_statistic_t grain_energy("g");
    energy_statistic_t material_energy("m");
@@ -70,10 +74,13 @@ namespace stats{
    susceptibility_statistic_t system_susceptibility("s");
    susceptibility_statistic_t grain_susceptibility("g");
    susceptibility_statistic_t material_susceptibility("m");
-
    binder_cumulant_statistic_t system_binder_cumulant("bc");
    binder_cumulant_statistic_t material_binder_cumulant("mbc");
 
+   spin_length_statistic_t system_spin_length("s");
+   spin_length_statistic_t material_spin_length("m");
+   spin_length_statistic_t height_spin_length("h");
+   
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation
    //-----------------------------------------------------------------------------

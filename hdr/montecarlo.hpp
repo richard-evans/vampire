@@ -41,15 +41,17 @@ namespace montecarlo{
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
    //---------------------------------------------------------------------------
-   // Function to perform one monte carlo, constrained monte carlo, or hybrid
-   // cmc-mc step, respectively
+   // Function to perform one monte carlo, constrained monte carlo, hybrid
+   // cmc-mc or lsf-mc step respectively
    //---------------------------------------------------------------------------
    void mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, int num_atoms, std::vector<int> &type_array);
    int cmc_step();
    int cmc_mc_step();
    void cmc_mc_step_mask();
    void mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, std::vector<int> &type_array);
-
+   int lsf_mc_step();
+   void lsf_mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, std::vector<int> &type_array);
+   
    //---------------------------------------------------------------------------
    // Provide access to CMCinit and CMCMCinit for cmc_anisotropy and
    // hybrid_cmc programs respectively
@@ -58,6 +60,8 @@ namespace montecarlo{
    void CMCMCinit();
    void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
                          double min_dim[3], double max_dim[3]);
+   void lsf_mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
+                             double min_dim[3], double max_dim[3]);
 
    void initialise_masked_cmc_mc(const int num_sets,                       // number of sets of constrained and unconstrained atoms
 										   const std::vector<int>& mask,             // unique ID for N sets of atoms with different constraints
@@ -65,6 +69,7 @@ namespace montecarlo{
 										   const std::vector<double>& constraints);  // list of 2N vectors listing constraint angles theta and phi
 
    extern bool mc_parallel_initialized;
+   extern bool lsf_mc_parallel_initialized;
 
    //---------------------------------------------------------------------------
    // Function to perform monte carlo preconditioning
@@ -149,6 +154,8 @@ namespace montecarlo{
    	extern double energy_reject;
 
    } //end of cmc namespace
+
+   extern bool mc_set;
 
 } // end of montecarlo namespace
 

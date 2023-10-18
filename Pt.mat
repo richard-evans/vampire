@@ -1,0 +1,28 @@
+#number of materials
+material:num-materials=1
+
+#properties for material 1
+#material[1]:material-name=Fe
+#material[1]:atomic-spin-moment=2.86 !muB
+#material[1]:damping-constant=0.1
+#material[1]:uniaxial-anisotropy-constant=-1.552e-23
+#material[1]:lsf-second-order-coefficient=-7.78421e-20 
+#material[1]:lsf-fourth-order-coefficient=3.04207e-20
+#material[1]:lsf-sixth-order-coefficient=9.64078e-21    
+#material[1]:unit-cell-category=1
+#material[1]:exchange-matrix[1]=3.583616e-20
+#material[1]:exchange-matrix[1]=3e-21
+#material[1]:uniaxial-anisotropy-constant=0
+
+#properties for material 2
+material[1]:material-name=Pt
+material[1]:lsf-second-order-coefficient=4.5512e-21
+material[1]:lsf-fourth-order-coefficient=0
+material[1]:lsf-sixth-order-coefficient=0
+material[1]:atomic-spin-moment=0.36 !muB
+material[1]:damping-constant=0.1
+#material[1]:uniaxial-anisotropy-constant=2.2832e-22
+#material[2]:unit-cell-category=2
+#material[1]:exchange-matrix[1]=2.832e-23
+#material[1]:exchange-matrix[1]=3e-21
+#material[2]:non-magnetic=remove

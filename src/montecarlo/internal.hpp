@@ -54,6 +54,8 @@ namespace montecarlo{
       //MC Variables
       extern double delta_angle;    // Tuned angle for Monte Carlo trial move
       extern double adaptive_sigma; // sigma trial width for adaptive move
+      //extern double adaptive_sigma_l;
+      extern std::vector<double> adaptive_sigma_l;
 
       extern std::vector<double> Sold;
       extern std::vector<double> Snew;

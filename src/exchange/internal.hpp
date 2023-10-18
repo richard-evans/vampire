@@ -262,7 +262,7 @@ namespace exchange{
                            std::vector<double>& field_array_x, // field vectors for atoms
                            std::vector<double>& field_array_y,
                            std::vector<double>& field_array_z);
-
+                           
       void biquadratic_exchange_fields(const int start_index, // first atom for exchange interactions to be calculated
                                        const int end_index, // last +1 atom to be calculated
                                        const std::vector<int>& neighbour_list_start_index,

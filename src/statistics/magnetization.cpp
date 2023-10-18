@@ -33,6 +33,7 @@
 #include "stats.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
+#include "lsf_mc.hpp"
 
 // file scope function in annonymous namespace to expand statistic type string
 namespace {
@@ -160,6 +161,7 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
 
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom<num_atoms; ++atom){
+
       const int mask_id = mask[atom]; // get mask id
       magnetization[4*mask_id + 0] += sx[atom]*mm[atom];
       magnetization[4*mask_id + 1] += sy[atom]*mm[atom];

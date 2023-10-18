@@ -26,6 +26,7 @@ namespace montecarlo{
    //------------------------------------------------------------------------------
 
    bool mc_parallel_initialized = false;
+   bool lsf_mc_parallel_initialized = false;
 
    namespace cmc{
       bool masked_cmc = false;       // determine if generic masked constraint is required
@@ -49,6 +50,7 @@ namespace montecarlo{
       // MC Variables
       double delta_angle = 0.1;     // Tuned angle for Monte Carlo trial move
       double adaptive_sigma = 60.0; // sigma trial width for adaptive move
+      //std::vector<double> adaptive_sigma_l = {0.1, 0.1};
       std::vector<double> Sold(3);
       std::vector<double> Snew(3);
 

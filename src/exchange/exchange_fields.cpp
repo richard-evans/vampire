@@ -61,21 +61,27 @@ namespace internal{
    				const int start = neighbour_list_start_index[atom];
    				const int end   = neighbour_list_end_index[atom]+1;
 
+               //double m = sqrt(spin_array_x[atom]*spin_array_x[atom] + spin_array_y[atom]*spin_array_y[atom] + spin_array_z[atom]*spin_array_z[atom]);
+               double m=1.0;
+
                // loop over all neighbours
    				for(int nn = start; nn < end; ++nn){
 
    					const int natom = neighbour_list_array[nn]; // get neighbouring atom number
    					const double Jij = i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij; // get exchange constant between atoms
 
-   					hx += Jij * spin_array_x[natom]; // add exchange fields
-   					hy += Jij * spin_array_y[natom];
-   					hz += Jij * spin_array_z[natom];
+                  //double mn = sqrt(spin_array_x[natom]*spin_array_x[natom] + spin_array_y[natom]*spin_array_y[natom] + spin_array_z[natom]*spin_array_z[natom]);
+                  double mn =1.0;
+
+   					hx += mn * Jij * spin_array_x[natom]; // add exchange fields
+   					hy += mn * Jij * spin_array_y[natom];
+   					hz += mn * Jij * spin_array_z[natom];
 
    				}
 
-   				field_array_x[atom] += hx; // save total field to field array
-   				field_array_y[atom] += hy;
-   				field_array_z[atom] += hz;
+   				field_array_x[atom] += hx/m; // save total field to field array
+   				field_array_y[atom] += hy/m;
+   				field_array_z[atom] += hz/m;
 
    			}
    			break;

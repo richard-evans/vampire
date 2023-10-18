@@ -83,6 +83,10 @@ namespace stats
 	extern bool calculate_system_binder_cumulant;
 	extern bool calculate_material_binder_cumulant;
 
+   extern bool calculate_system_spin_length;
+   extern bool calculate_material_spin_length;
+   extern bool calculate_height_spin_length;
+
 	// forward declaration of friend classes
 	class susceptibility_statistic_t;
 	class specific_heat_statistic_t;
@@ -159,6 +163,7 @@ namespace stats
 
       friend class susceptibility_statistic_t;
       friend class standard_deviation_statistic_t;
+      friend class spin_length_statistic_t;
       friend class binder_cumulant_statistic_t;
       public:
          magnetization_statistic_t (std::string n):initialized(false){
@@ -291,6 +296,37 @@ namespace stats
          std::string name;
 
    };
+
+   //----------------------------------
+   // Spin Length Class definition
+   //----------------------------------
+   class spin_length_statistic_t{
+
+      public:
+         spin_length_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
+         bool is_initialized();
+         void set_mask(const int mask_size, std::vector<int> inmask);
+         void get_mask(std::vector<int>& out_mask);
+         void calculate_spin_length(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz);
+         void reset_averages();
+         std::string output_mean_spin_length(bool header);
+
+      private:
+         bool initialized;
+         int num_atoms;
+         int mask_size;
+         double mean_counter;
+         std::vector<int> mask;
+         std::vector<double> spin_length;
+         std::vector<double> mean_spin_length;
+         std::vector<int> zero_list;
+         std::vector<double> normalisation;
+         std::string name;
+
+   };
+
    //----------------------------------
    // Standard Deviation of magnetisation in time Class definition
    //----------------------------------
@@ -369,6 +405,10 @@ namespace stats
    extern susceptibility_statistic_t material_susceptibility;
 
    extern standard_deviation_statistic_t material_standard_deviation;
+
+   extern spin_length_statistic_t system_spin_length;
+   extern spin_length_statistic_t material_spin_length;
+   extern spin_length_statistic_t height_spin_length;
 
    extern binder_cumulant_statistic_t system_binder_cumulant;
    extern binder_cumulant_statistic_t material_binder_cumulant;
