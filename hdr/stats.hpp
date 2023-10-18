@@ -70,6 +70,10 @@ namespace stats
 	extern bool calculate_grain_torque;
 	extern bool calculate_material_torque;
 
+	extern bool calculate_system_spin_temp;
+	extern bool calculate_grain_spin_temp;
+	extern bool calculate_material_spin_temp;
+
 	extern bool calculate_system_specific_heat;
 	extern bool calculate_grain_specific_heat;
 	extern bool calculate_material_specific_heat;
@@ -234,6 +238,43 @@ namespace stats
    };
 
 	//----------------------------------
+	// Spin temperature class definition
+	//----------------------------------
+	class spin_temp_statistic_t{
+
+		public:
+			spin_temp_statistic_t (std::string n):initialized(false){
+				name = n;
+			};
+			bool is_initialized();
+      	void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
+			void get_mask(std::vector<int>& out_mask);
+			void calculate_spin_temp(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
+									 		 const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
+									 	    const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
+									 	 	 const std::vector<double>& mm);
+
+			void set_spin_temp(std::vector<double>& spin_temp, std::vector<double>& mean_spin_temp, long counter);
+         void reset_spin_temp_averages();
+         const std::vector<double>& get_spin_temp();
+         std::string output_spin_temp(bool header);
+			std::string output_mean_spin_temp(bool header);
+
+		private:
+			bool initialized;
+			int num_atoms;
+			int mask_size;
+			double mean_counter;
+			std::vector<int> mask;
+			std::vector<int> num_atoms_in_mask;
+			std::vector<double> spin_temp;
+			std::vector<double> mean_spin_temp;
+			std::vector<int> zero_list;
+			std::string name;
+
+  	};
+
+	//----------------------------------
    // Specific Heat Class definition
    //----------------------------------
    class specific_heat_statistic_t{
@@ -360,13 +401,17 @@ namespace stats
 	extern torque_statistic_t grain_torque;
 	extern torque_statistic_t material_torque;
 
-   extern specific_heat_statistic_t system_specific_heat;
-	extern specific_heat_statistic_t grain_specific_heat;
-   extern specific_heat_statistic_t material_specific_heat;
+	extern spin_temp_statistic_t system_spin_temp;
+	extern spin_temp_statistic_t grain_spin_temp;
+	extern spin_temp_statistic_t material_spin_temp;
 
-   extern susceptibility_statistic_t system_susceptibility;
+	extern specific_heat_statistic_t system_specific_heat;
+	extern specific_heat_statistic_t grain_specific_heat;
+	extern specific_heat_statistic_t material_specific_heat;
+
+	extern susceptibility_statistic_t system_susceptibility;
 	extern susceptibility_statistic_t grain_susceptibility;
-   extern susceptibility_statistic_t material_susceptibility;
+	extern susceptibility_statistic_t material_susceptibility;
 
    extern standard_deviation_statistic_t material_standard_deviation;
 

@@ -72,6 +72,7 @@ class zten_t{
 namespace exchange{
 
    extern bool biquadratic; // flag to enable biquadratic exchange calculation
+   extern bool four_spin; // flag to enable four spin exchange calculation
 
    //-----------------------------------------------------------------------------
    // Function to initialise exchange module
@@ -95,6 +96,7 @@ namespace exchange{
    //---------------------------------------------------------------------------
    double single_spin_energy(const int atom, const double sx, const double sy, const double sz);
    double single_spin_biquadratic_energy(const int atom, const double sx, const double sy, const double sz);
+   double single_spin_four_spin_energy(const int atom, const double sx, const double sy, const double sz);
 
    //-----------------------------------------------------------------------------
    // Function to calculate exchange fields for spins between start and end index

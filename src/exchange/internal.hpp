@@ -148,6 +148,7 @@ namespace exchange{
             // variables
             std::vector<double> dmi; // Dzyaloshinskii-Moriya interaction constant
             std::vector<double> kitaev; // Dzyaloshinskii-Moriya interaction constant
+            std::vector<double> fs; //Four-spin interaction constant
 
             // constructor
             mp_t (const unsigned int max_materials = 100)
@@ -155,6 +156,8 @@ namespace exchange{
                // resize arrays to correct size
                dmi.resize(max_materials, 0.0); // initialise pair anisotropy constants to zero
                kitaev.resize(max_materials, 0.0); // initialise pair anisotropy constants to zero
+               fs.resize(max_materials, 0.0); // initialise four-spin constants to zero
+
 
             }; // end of constructor
 
@@ -170,10 +173,15 @@ namespace exchange{
 
       extern bool enable_dmi; // flag to enable dmi calculation
       extern bool enable_kitaev; // flag to enable kitaev calculation
+      extern bool enable_fourspin;
 
       extern double dmi_cutoff_range;    // cutoff range for DMI calculation (Ångstroms)
       extern double kitaev_cutoff_range; // cutoff range for Kitaev calculation (Ångstroms)
       extern double exchange_factor;     // scaling factor for exchange constants (usually to correct for ab-initio)
+
+      extern double fs; //fourspin interaction
+      extern double fs_cutoff_1; //First four-spin interaction range
+      extern double fs_cutoff_2;
 
       extern exchange_t exchange_type; // exchange type to use in simulation
       extern exchange_t biquadratic_exchange_type; // biquadratic exchange type to use in simulation
@@ -234,6 +242,14 @@ namespace exchange{
       extern std::vector <int> biquadratic_neighbour_list_start_index; // list of first biquadratic neighbour for atom i
       extern std::vector <int> biquadratic_neighbour_list_end_index;   // list of last biquadratic neighbour for atom i
 
+      extern std::vector <int> four_spin_neighbour_list_array_j; // 1D list of j neighbours
+      extern std::vector <int> four_spin_neighbour_list_array_k; // 1D list of k neighnours
+      extern std::vector <int> four_spin_neighbour_list_array_l; // 1D list of l neighbours
+      extern std::vector <int> four_spin_neighbour_list_array_i; // 1D list of l neighbours
+      extern std::vector <int> four_spin_neighbour_list_start_index; // list of first four spin neighbour for atom i
+      extern std::vector <int> four_spin_neighbour_list_end_index;   // list of last four spin neighbours for atom i
+      extern std::vector <double> four_spin_exchange_list;   // value of fourspin
+
       extern std::vector <exchange::internal::value_t > bq_i_exchange_list; // list of isotropic biquadratic exchange constants
       extern std::vector <exchange::internal::vector_t> bq_v_exchange_list; // list of vectorial biquadratic exchange constants
       extern std::vector <exchange::internal::tensor_t> bq_t_exchange_list; // list of tensorial biquadratic exchange constants
@@ -280,7 +296,14 @@ namespace exchange{
                                        std::vector<double>& field_array_y,
                                        std::vector<double>& field_array_z);
 
+      void four_spin_exchange_fields(const int start_index, // first atom for exchange interactions to be calculated
+                                     const int end_index, // last +1 atom to be calculated
+                                     std::vector<double>& field_array_x, // field vectors for atoms
+                                     std::vector<double>& field_array_y,
+                                     std::vector<double>& field_array_z);
+
       void initialize_biquadratic_exchange();
+      void initialize_four_spin_exchange(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
 
    } // end of internal namespace
 

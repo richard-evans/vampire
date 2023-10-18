@@ -82,7 +82,8 @@ namespace vout{
          mean_magnetisation_length,
          mean_specific_heat,
          mean_susceptibility,
-         mean_torque
+         mean_torque,
+         mean_spin_temp
       };
 
       // internal variables
@@ -123,6 +124,12 @@ namespace vout{
    void mdoth(std::ostream& stream,bool header);
    void systorque(std::ostream& stream,bool header);
    void mean_systorque(std::ostream& stream,bool header);
+
+   void sysspintemp(std::ostream& stream,bool header);
+   void mean_sysspintemp(std::ostream& stream,bool header);
+   void material_mean_sysspintemp(std::ostream& stream,bool header);
+   void material_spin_temp(std::ostream& stream, bool header);
+
    void constraint_phi(std::ostream& stream,bool header);
    void constraint_theta(std::ostream& stream,bool header);
    void material_constraint_phi(std::ostream& stream,bool header);

@@ -32,6 +32,10 @@ namespace stats{
    bool calculate_grain_torque                  = false;
    bool calculate_material_torque               = false;
 
+   bool calculate_system_spin_temp              = false;
+   bool calculate_grain_spin_temp               = false;
+   bool calculate_material_spin_temp            = false;
+
    bool calculate_system_specific_heat          = false;
    bool calculate_grain_specific_heat           = false;
    bool calculate_material_specific_heat        = false;
@@ -60,6 +64,10 @@ namespace stats{
    torque_statistic_t system_torque("s");
    torque_statistic_t grain_torque("g");
    torque_statistic_t material_torque("m");
+
+   spin_temp_statistic_t system_spin_temp("s");
+   spin_temp_statistic_t grain_spin_temp("g");
+   spin_temp_statistic_t material_spin_temp("m");
 
    specific_heat_statistic_t system_specific_heat("s");
    specific_heat_statistic_t grain_specific_heat("g");

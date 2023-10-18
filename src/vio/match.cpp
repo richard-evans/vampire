@@ -1456,6 +1456,35 @@ namespace vin{
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
+        test="spin-temperature";
+        if(word==test){
+            stats::calculate_system_spin_temp = true;
+            output_list.push_back(74);
+            return EXIT_SUCCESS;
+        }
+        else
+        //--------------------------------------------------------------------
+        test="mean-spin-temperature";
+        if(word==test){
+            stats::calculate_system_spin_temp = true;
+            output_list.push_back(75);
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-spin-temperature";
+        if(word==test){
+           stats::calculate_material_spin_temp = true;
+           output_list.push_back(76);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-spin-temperature";
+        if(word==test){
+           stats::calculate_material_spin_temp = true;
+           output_list.push_back(77);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;

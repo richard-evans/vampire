@@ -389,6 +389,11 @@ namespace st{
             } // end of cell loop
          } // end of stack loop
 
+         // Reduce all microcell spin torques on all nodes
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &st::internal::spin_torque[0],st::internal::spin_torque.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &st::internal::total_ST[0],st::internal::total_ST.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif
          st::internal::output_microcell_data();
 
          return;
