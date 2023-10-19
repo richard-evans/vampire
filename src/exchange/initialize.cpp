@@ -276,6 +276,9 @@ namespace exchange{
       // initialise biquadratic_exchange
       exchange::internal::initialize_biquadratic_exchange();
 
+      // initialise four spin
+      exchange::internal::initialize_four_spin_exchange(bilinear);
+
       // Calculate Dzyaloshinskii-Moriya interactions (must be done after exchange unrolling)
       exchange::internal::calculate_dmi(bilinear);
 

@@ -15,6 +15,7 @@ reset.o \
 susceptibility.o \
 binder_cumulant.o\
 torque.o \
+spin_temperature.o \
 update.o
 
 # Append module objects to global tree
