@@ -81,8 +81,6 @@ namespace internal
 
    // Data buffers for parallel i/o
    extern std::vector<double> local_buffer;
-   //for Spin-lattice simulations - Modified by Mara Strungaru 2022
-   extern std::vector<double> local_buffer_sld;
 
    extern std::vector<double> collated_buffer;
 
@@ -131,17 +129,7 @@ namespace internal
                             const std::vector<double> &z,
                             const std::vector<uint64_t> &mask,
                             std::vector<double> &buffer);
-   /*
-   //for Spin-lattice simulations - Modified by Mara Strungaru 2022
-   void copy_data_to_buffer_sld(const std::vector<double> &x, // vector data
-                            const std::vector<double> &y,
-                            const std::vector<double> &z,
-                            const std::vector<double> &vx, // vector data
-                            const std::vector<double> &vy,
-                            const std::vector<double> &vz,
-                            const std::vector<uint64_t> &mask,
-                            std::vector<double> &buffer);
-  */
+   
    void write_coordinate_meta();
    void write_non_magnetic_meta(const uint64_t num_data);
    void write_meta(const double simulation_time, // time (seconds)

@@ -50,13 +50,6 @@ namespace sld{
                std::vector<double>& fields_array_y,
                std::vector<double>& fields_array_z){
 
-             //fields is set to 0
-            /* std::fill(fields_array_x.begin()+start_index, fields_array_x.begin()+end_index, 0.0);
-             std::fill(fields_array_y.begin()+start_index, fields_array_y.begin()+end_index, 0.0);
-             std::fill(fields_array_z.begin()+start_index, fields_array_z.begin()+end_index, 0.0);
-            */
-//std::cout<<"atom 0 start "<< 0<<"\t"<< atoms::x_coord_array[0]<<"\t"<< atoms::y_coord_array[0]<<"\t"<<atoms::z_coord_array[0]<<"\t"<<atoms::x_spin_array[0]<<"\t"<<atoms::y_spin_array[0]<<"\t"<<atoms::z_spin_array[0]<<std::endl;
-
 
              internal::compute_exchange(start_index, end_index,
                                                         neighbour_list_start_index, neighbour_list_end_index,
@@ -65,8 +58,6 @@ namespace sld{
                                                         x_spin_array, y_spin_array, z_spin_array,
                                                         forces_array_x, forces_array_y, forces_array_z,
                                                         fields_array_x, fields_array_y, fields_array_z);
-///std::cout<<"atom 0 after exch "<< 0<<"\t"<< atoms::x_coord_array[0]<<"\t"<< atoms::y_coord_array[0]<<"\t"<<atoms::z_coord_array[0]<<"\t"<<atoms::x_spin_array[0]<<"\t"<<atoms::y_spin_array[0]<<"\t"<<atoms::z_spin_array[0]<<std::endl;
-//std::cout<<"fields exch "<< 0<<"\t"<< sld::internal::fields_array_x[0]<<"\t"<< sld::internal::fields_array_y[0]<<"\t"<< sld::internal::fields_array_z[0]<<std::endl;
 
 
              internal::compute_sld_coupling(start_index, end_index,
@@ -77,13 +68,13 @@ namespace sld{
                                                          forces_array_x, forces_array_y, forces_array_z,
                                                          fields_array_x, fields_array_y, fields_array_z);
 
-//std::cout<<"atom 0 after coup "<< 0<<"\t"<< atoms::x_coord_array[0]<<"\t"<< atoms::y_coord_array[0]<<"\t"<<atoms::z_coord_array[0]<<"\t"<<atoms::x_spin_array[0]<<"\t"<<atoms::y_spin_array[0]<<"\t"<<atoms::z_spin_array[0]<<std::endl;
-//std::cout<<"fields coupl "<< 0<<"\t"<< sld::internal::fields_array_x[0]<<"\t"<< sld::internal::fields_array_y[0]<<"\t"<< sld::internal::fields_array_z[0]<<std::endl;
 
             
             // now add external fields //to be modified for other fields
             //these are taken from previous functions in VAMPIRE
 
+
+             /*
              sim::calculate_external_fields(start_index,end_index);
 
              //add all the external fields to the fields array in sld_neighbour_list_array
@@ -97,7 +88,7 @@ namespace sld{
                fields_array_z[i]+=atoms::z_total_external_field_array[i];
                //std::cout<<"fields external "<< i<<"\t"<< atoms::z_total_external_field_array[i]<<"\t"<<sld::internal::fields_array_z[i]<<std::endl;
 
-            }
+            }*/
 
       return;
 

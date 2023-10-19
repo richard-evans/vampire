@@ -71,8 +71,6 @@ namespace config{
 
       // Data buffers for parallel i/o
       std::vector<double> local_buffer(0);
-      //for Spin-lattice simulations - Modified by Mara Strungaru 2022
-      //std::vector<double> local_buffer_sld(0);
 
       std::vector<double> collated_buffer(0);
 
