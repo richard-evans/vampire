@@ -125,10 +125,10 @@ void mm::calculate_llg_spin_fields(const double temperature,
 		const double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
 		const double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
 
-      x_total_spin_field_array[cell] = exchange_field[0] - one_o_chi_perp[cell]*mx*me*ku_x[cell] + hsttx;
-      y_total_spin_field_array[cell] = exchange_field[1] - one_o_chi_perp[cell]*my*me*ku_y[cell] + hstty;
-      z_total_spin_field_array[cell] = exchange_field[2] - one_o_chi_perp[cell]*mz*me*ku_z[cell] + hsttz;
-
+      x_total_spin_field_array[cell] = exchange_field[0] + ku[ cell ] * ku_x[ cell ] * ( mx * ku_x[ cell ] + my * ku_y[ cell ] + mz * ku_z[ cell ] ) / me + hsttx;
+      y_total_spin_field_array[cell] = exchange_field[1] + ku[ cell ] * ku_y[ cell ] * ( mx * ku_x[ cell ] + my * ku_y[ cell ] + mz * ku_z[ cell ] ) / me + hstty;
+      z_total_spin_field_array[cell] = exchange_field[2] + ku[ cell ] * ku_z[ cell ] * ( mx * ku_x[ cell ] + my * ku_y[ cell ] + mz * ku_z[ cell ] ) / me + hsttz;
+      //std::cout << cell << "\t" << y_total_spin_field_array[cell] << std::endl;
    } // end of loop over cells
 
    return;
@@ -148,6 +148,16 @@ void mm::calculate_llg_external_fields(const double temperature,
    const double kB = constants::kB;
 
    // Determine fields for all micromagnetic cells
+
+   //for ( int lc = 0; lc < number_of_micromagnetic_cells; ++lc )
+   //{
+//
+//      const int cell = list_of_micromagnetic_cells[ lc ];
+//      std::cout << "Cell:\t" << cell << std::endl;
+//      std::cout << "Position:\t{ " << cells::pos_array[ 3 * cell ] << ",\t" << cells::pos_array[ 3 * cell + 1 ] << ",\t" << cells::pos_array[ 3 * cell + 2 ] << "}" << std::endl;
+//      std::cout << "Magnetisation:\t{ " << mx_array
+//   }
+
    for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
 
       // determine cell ID of cell
@@ -166,6 +176,7 @@ void mm::calculate_llg_external_fields(const double temperature,
          x_total_external_field_array[cell] += dipole::cells_field_array_x[cell];
          y_total_external_field_array[cell] += dipole::cells_field_array_y[cell];
          z_total_external_field_array[cell] += dipole::cells_field_array_z[cell];
+         //std::cout << "Cell:\t" << cell << "\tField{ " << dipole::cells_field_array_x[cell] << ",\t" << dipole::cells_field_array_y[cell] << ",\t" << dipole::cells_field_array_z[cell] << "}" << std::endl;
       }
 
       // // optionally add bias magnet fields

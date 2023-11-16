@@ -97,6 +97,8 @@ namespace dipole{
                   dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
                   dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
          	   }
+               //std::cout << "======================\t" << "LC\t" << lc << "\tj\t" << j << "\t=====================" << std::endl;
+               //std::cout << "rijxx\t" << rij_tensor_xx[lc][j] << "\trijxy\t" << rij_tensor_xy[lc][j] << "\trijxz\t" << rij_tensor_xz[lc][j] << std::endl;
             }
             // Multiply the cells B-field by mu_B * mu_0/(4*pi) /1e-30  <-- (9.27400915e-24 * 1e-7 / 1e30)
             // where the last term accounts for the fact that the volume was calculated in Angstrom

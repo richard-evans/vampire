@@ -85,7 +85,7 @@ void initialize(int num_local_cells,
    #endif
 
    /** @todo is it possible to move these somewhere else? */
-   mm::A.resize(num_cells*num_cells,0.0);
+   mm::A.resize(num_cells*num_cells,0.0); /** @todo Is this even right?? Probably only true for large number of cells. */
    mm::alpha.resize(num_cells,0.0);
    mm::one_o_chi_perp.resize(num_cells,0.0);
    mm::one_o_chi_para.resize(num_cells,0.0);
@@ -132,10 +132,12 @@ for (int lc = 0; lc < num_local_cells; lc++){
  ofile<<cell << '\t' <<  mm::ms[cell] << '\t' << mm::alpha[cell] << '\t' << mm::Tc[cell] << '\t' << mm::ku[cell] << '\t' << mm::gamma[cell] << std::endl;
 
 }
-for (int proc = 0; proc < vmpi::num_processors; proc++ ){
- if (vmpi::my_rank == proc)   std::cerr << proc << "\t" << mm::macro_neighbour_list_array.size() << "\t" <<  std::endl;
+   for (int proc = 0; proc < vmpi::num_processors; proc++ )
+   {
 
-}
+      // if (vmpi::my_rank == proc)   std::cerr << proc << "\t" << mm::macro_neighbour_list_array.size() << "\t" << "is it here?" << std::endl;
+
+   }
 
 
 
@@ -218,7 +220,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
       // determine total number of magnetic cells
       int num_magnetic_cells = 0;
       for(int c = 0; c < cells::num_cells; c++){
-         if(mm::ms[c] > 1e-40 && mm::Tc[c] > 0.1){
+         if(mm::ms[c] > 1e-40 && mm::Tc[c] > 0.1){ /** @todo mm::Tc[c] is 0 when single atom. */
             list_of_magnetic_cells.push_back(c);
             num_magnetic_cells++;
          }

@@ -27,7 +27,7 @@
 * We take some components of the exchange field into A, thus A is technically not what is returned;
 * a field coefficient is retunred instead. The field coefficients, C, are given by
 *
-*                 C = [ 2 * A / (M * delta^2)] = [ 2 * A * V / ( m * delta^2 ) ]
+*                 C = [ 2 * A / ( M * delta^2 ) ] = [ 2 * A * V / ( m * delta^2 ) ]
 *                          C = [ A * V * 4 / ( 2 * m * delta^2 ) ]
 *
 * where delta is the inter-microcell distance equal to microcell length in the axial direction

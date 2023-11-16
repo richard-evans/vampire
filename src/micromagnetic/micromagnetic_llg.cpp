@@ -185,7 +185,10 @@ namespace micromagnetic{
          const double H[3] = {x_total_spin_field_array[cell] + x_total_external_field_array[cell],
                               y_total_spin_field_array[cell] + y_total_external_field_array[cell],
                               z_total_spin_field_array[cell] + z_total_external_field_array[cell]};
-
+         //std::cout << "Field Values" << std::endl;
+         //std::cout << "internal x field\t" << x_total_spin_field_array[cell] << "\texternal x field\t" << x_total_external_field_array[cell] << std::endl;
+         //std::cout << "internal y field\t" << y_total_spin_field_array[cell] << "\texternal y field\t" << y_total_external_field_array[cell] << std::endl;
+         //std::cout << "internal z field\t" << z_total_spin_field_array[cell] << "\texternal z field\t" << z_total_external_field_array[cell] << std::endl;
          // calculates the delta S stores in euler array
          x_euler_array[cell] = (one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
          y_euler_array[cell] = (one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));

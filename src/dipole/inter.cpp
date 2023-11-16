@@ -169,6 +169,9 @@ namespace dipole{
 
          }  // End of Inter part calculated atomicstically
 
+            //std::cout << "LC\t" << lc << "\tcellj\t" << cellj << std::endl;
+            //std::cout << "xx\t" << dipole::internal::rij_tensor_xx[lc][cellj] << std::endl;
+
             return;
 
       }  // End of funtion calculating inter component of dipole tensor
