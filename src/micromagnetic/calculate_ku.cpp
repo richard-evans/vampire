@@ -24,7 +24,7 @@ void crossProduct(std::vector<double> vect_A, std::vector < std::vector < double
 {
 
     cross_P[cell][0] = vect_A[1] * vect_B[cell][2] - vect_A[2] * vect_B[cell][1];
-    cross_P[cell][1] = vect_A[0] * vect_B[cell][2] - vect_A[2] * vect_B[cell][0];
+    cross_P[cell][1] = vect_A[2] * vect_B[cell][0] - vect_A[0] * vect_B[cell][2];
     cross_P[cell][2] = vect_A[0] * vect_B[cell][1] - vect_A[1] * vect_B[cell][0];
 }
 
@@ -32,7 +32,7 @@ void crossProduct2(std::vector < std::vector < double > > vect_A, std::vector < 
 {
 
     cross_P[cell][0] = vect_A[cell][1] * vect_B[cell][2] - vect_A[cell][2] * vect_B[cell][1];
-    cross_P[cell][1] = vect_A[cell][0] * vect_B[cell][2] - vect_A[cell][2] * vect_B[cell][0];
+    cross_P[cell][1] = vect_A[cell][2] * vect_B[cell][0] - vect_A[cell][0] * vect_B[cell][2];
     cross_P[cell][2] = vect_A[cell][0] * vect_B[cell][1] - vect_A[cell][1] * vect_B[cell][0];
 }
 
@@ -78,23 +78,43 @@ namespace micromagnetic{
 
 
          //sums over all atoms to add the ku per cell
-         for (int atom = 0; atom < num_atoms; atom++){
-            int cell = cell_array[atom];
-            int mat = type_array[atom];
-            ku[cell] = ku[cell] - anisotropy::internal::mp[mat].ku2;//mp::material[mat].Ku1_SI; //need to add a function here to access anisotropy module
-            ku_x[cell] = ku_x[cell] + anisotropy::internal::mp[mat].ku_vector[0];
-            ku_y[cell] = ku_y[cell] + anisotropy::internal::mp[mat].ku_vector[1];
-            ku_z[cell] = ku_z[cell] + anisotropy::internal::mp[mat].ku_vector[2];
+         for ( int atom = 0; atom < num_atoms; ++atom )
+         {
+
+            const int cell = cell_array[ atom ];
+            const int mat = type_array[ atom ];
+
+            const double k_energy = anisotropy::internal::mp[ mat ].ku2;
+            //std::cout << "k_energy:\t" << k_energy << std::endl;
+            //ku[cell] = ku[cell] - anisotropy::internal::mp[mat].ku2;//mp::material[mat].Ku1_SI; //need to add a function here to access anisotropy module
+            ku_x[ cell ] += k_energy * anisotropy::internal::mp[ mat ].ku_vector[ 0 ];
+            ku_y[ cell ] += k_energy * anisotropy::internal::mp[ mat ].ku_vector[ 1 ];
+            ku_z[ cell ] += k_energy * anisotropy::internal::mp[ mat ].ku_vector[ 2 ];
+
          }
+         //std::cout << "BEFORE energy calculation" << std::endl;
+         for ( int cell = 0; cell < num_cells; ++cell )
+         {
+            
+            // Calculate total anisotropy energy for the cell
+            const double ku_energy = sqrt( ku_x[ cell ] * ku_x[ cell ] + ku_y[ cell ] * ku_y[ cell ] + ku_z[ cell ] * ku_z[ cell ] );
 
+            // Calculate coefficient appropriate for anisotropy field
+            ku[ cell ] = 2.0 * ku_energy / ms[ cell ];
 
+            // Normalise to form anisotropy unit vector
+            ku_x[ cell ] /= ku_energy;
+            ku_y[ cell ] /= ku_energy;
+            ku_z[ cell ] /= ku_energy;
+
+         }
 
          // #ifdef MPICF
          //    MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          //    MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          //    MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          // #endif
-
+         /*
          for (int lc = 0; lc < cells::num_local_cells; lc++){
            int cell = cells::local_cell_array[lc];
 
@@ -119,9 +139,8 @@ namespace micromagnetic{
            ku_y[cell] = ku[cell] * sqrt(e1[cell][1]*e1[cell][1] + e2[cell][1]*e2[cell][1]);
            ku_z[cell] = ku[cell] * sqrt(e1[cell][2]*e1[cell][2] + e2[cell][2]*e2[cell][2]);
            //std::cout << cell << '\t' <<ku[cell] << '\t' <<  ku_x[cell] << '\t' <<  ku_y[cell] << '\t' <<  ku_z[cell] << '\t' << std::endl;
-
-        }
-
+         }
+         */
         #ifdef MPICF
            MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
            MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
