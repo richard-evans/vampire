@@ -61,7 +61,7 @@ namespace micromagnetic{
       if( word == test ){
          internal::homogeneous_isotropic_exchange = true;
          double hio = atof( value.c_str() );
-         vin::check_for_valid_value( hio, word, line, prefix, unit, "energy per unit distance", 1.0 * 10e-25, 1.0 * 10e-15, "input", "1e-25 J / Angstrom to 1e-15 J / Angstrom" );
+         vin::check_for_valid_value( hio, word, line, prefix, unit, "energy per unit distance", 0, 1.0 * 10e-15, "input", "1e-25 J / Angstrom to 1e-15 J / Angstrom" );
          internal::homogeneous_isotropic_exchange_value = hio;
          return true;
       }
