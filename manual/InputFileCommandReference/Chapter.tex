@@ -303,6 +303,16 @@ default fall and rise times are 0, reproducing a square pulse. The time
 dependence of the fractional voltage can be printed in the output file with the
 parameter \textit{output:fractional-electric-field-strength}.
 
+{\zicf sim:program = field-pulse}\phantomsection\addcontentsline{toc}{subsubsection}{field-pulse}
+Simulates the effect of a field pulse from an external applied field. The
+system is first equilibrated at constant temperature with zero field. A
+Gaussian shaped field pulse is applied, with a maximum applied field strength of
+\textit{sim:applied-field-strength} and characteristic time of
+\textit{sim:field-pulse-time}. The default pulse time $\tau_\mathrm{P} = 1$ ns
+with a maximum field at $t = 3\tau_\mathrm{P}$. The time dependence of the
+applied field can be printed in the output file with the parameter
+\textit{output:applied-field-strength}.
+
 {\zicf sim:program = cmc-anisotropy}\phantomsection\addcontentsline{toc}{subsubsection}{cmc-anisotropy} Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques.
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
@@ -510,6 +520,10 @@ Defines the pulse linear rise time in the program \textit{electrical-pulse} with
 Defines the pulse linear fall time in the program \textit{electrical-pulse} with
  default units of seconds and a default pulse time of 0, i.e. an instantaneous
  turning off of the current.
+
+ {\zicf sim:field-pulse-time = float [default $1.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:field-pulse-time}
+ Defines the pulse time in the program \textit{field-pulse} with default
+ units of seconds and a default pulse time of 1 ns.
 
 \section*{Data output}
 \phantomsection\addcontentsline{toc}{section}{Data output}
