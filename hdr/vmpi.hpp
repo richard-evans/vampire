@@ -87,11 +87,15 @@ namespace vmpi{
 	extern std::vector<int> send_start_index_array;
 	extern std::vector<int> send_num_array;
 	extern std::vector<double> send_spin_data_array;
+	extern std::vector<double> send_coord_data_array;
+
 
 	extern std::vector<int> recv_atom_translation_array;
 	extern std::vector<int> recv_start_index_array;
 	extern std::vector<int> recv_num_array;
 	extern std::vector<double> recv_spin_data_array;
+	extern std::vector<double> recv_coord_data_array;
+
 
 	#ifdef MPICF
 		extern std::vector<MPI_Request> requests;
@@ -109,6 +113,9 @@ namespace vmpi{
    extern void mpi_init_halo_swap();
    extern void mpi_complete_halo_swap();
 
+   // functions for sending/receiving halo data
+   extern void mpi_init_halo_swap_coords();
+   extern void mpi_complete_halo_swap_coords();
 	// wrapper functions avoiding MPI library
 	extern void barrier();
    extern uint64_t reduce_sum(uint64_t local);

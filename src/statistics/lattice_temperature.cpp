@@ -125,7 +125,7 @@ void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>&
              
            
 
-           std::fill(lattice_temp.begin(),lattice_temp.end(),0.0);
+    std::fill(lattice_temp.begin(),lattice_temp.end(),0.0);
     double kinetic=0.0;
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
@@ -147,7 +147,6 @@ void lattice_temp_statistic_t::calculate_lattice_temp(const std::vector<double>&
 	    //if(atom==2) std::cout<<"STATS at 2  "<<( 2.0 /(3.0*constants::kB_eV))*kinetic*atoms::mass_spin_array[atom]*0.5<<std::endl;
        //std::cout<<"mask id "<<mask_id<<"\t"<<lattice_temp.size()<<std::endl;
 	}
-	//std::cout<<"lattice temp from SLD"<<sld::compute_laittice_temperature(0,atoms::num_atoms,atoms::type_array, atoms::x_velo_array,atoms::y_velo_array,atoms::z_velo_array)<<std::endl;
     vmpi::barrier();
 
 

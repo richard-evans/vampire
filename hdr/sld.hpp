@@ -18,6 +18,8 @@
 
 // Vampire headers
 #include "sld.hpp"
+#include <vector>
+
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for sld module
@@ -53,9 +55,9 @@ namespace sld{
                const std::vector<double>& coord_array_x0, // coord vectors for atoms
                const std::vector<double>& coord_array_y0,
                const std::vector<double>& coord_array_z0,
-               std::vector<double>& coord_array_x, // coord vectors for atoms
-               std::vector<double>& coord_array_y,
-               std::vector<double>& coord_array_z,
+               const std::vector<double>& coord_array_x, // coord vectors for atoms
+               const std::vector<double>& coord_array_y,
+               const std::vector<double>& coord_array_z,
                std::vector<double>& forces_array_x, //  vectors for forces
                std::vector<double>& forces_array_y,
                std::vector<double>& forces_array_z,
@@ -67,12 +69,12 @@ namespace sld{
                const std::vector<int>& neighbour_list_end_index,
                const std::vector<int>& type_array, // type for atom
                const std::vector<int>& neighbour_list_array, // list of interactions between atom
-               std::vector<double>& coord_array_x, // coord vectors for atoms
-               std::vector<double>& coord_array_y,
-               std::vector<double>& coord_array_z,
-               std::vector<double>& spin_array_x, // coord vectors for atoms
-               std::vector<double>& spin_array_y,
-               std::vector<double>& spin_array_z,
+               const std::vector<double>& coord_array_x, // coord vectors for atoms
+               const std::vector<double>& coord_array_y,
+               const std::vector<double>& coord_array_z,
+               const std::vector<double>& spin_array_x, // coord vectors for atoms
+               const std::vector<double>& spin_array_y,
+               const std::vector<double>& spin_array_z,
                std::vector<double>& forces_array_x, //  vectors for forces
                std::vector<double>& forces_array_y,
                std::vector<double>& forces_array_z,
@@ -164,10 +166,6 @@ namespace sld{
    
    extern double J_eff;
    extern double C_eff;
-   
-    extern std::vector<double> x_seq_coord_array;
-    extern std::vector<double> y_seq_coord_array;
-    extern std::vector<double> z_seq_coord_array;
    
    void suzuki_trotter_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
                          double min_dim[3], double max_dim[3]);

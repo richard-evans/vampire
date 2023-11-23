@@ -89,10 +89,6 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 
 	// set catom_array size
 	catom_array.reserve(num_atoms);
-	
-	sld::x_seq_coord_array.reserve(num_atoms);
-    sld::y_seq_coord_array.reserve(num_atoms);
-    sld::z_seq_coord_array.reserve(num_atoms);
 
 	// Initialise atoms number
 	int atom=0;
@@ -199,17 +195,6 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	}
 
 
-
-   //save the unsorted distances //modified by M Strungaru
-
-    for (int i=0; i<num_atoms;i++){
-    
-			sld::x_seq_coord_array[i]=catom_array[i].x;
-            sld::y_seq_coord_array[i]=catom_array[i].y;
-            sld::z_seq_coord_array[i]=catom_array[i].z;
-            //std::cout<<" COORDS "<<i<<"\t"<<sld::x_seq_coord_array[i]<<"\t"<<sld::y_seq_coord_array[i]<<"\t"<<sld::z_seq_coord_array[i]<<std::endl;
-							
-    }
 
 
 

@@ -37,12 +37,12 @@ namespace sld{
                const std::vector<int>& neighbour_list_end_index,
                const std::vector<int>& type_array, // type for atom
                const std::vector<int>& neighbour_list_array, // list of interactions between atom
-               std::vector<double>& x_coord_array, // coord vectors for atoms
-               std::vector<double>& y_coord_array,
-               std::vector<double>& z_coord_array,
-               std::vector<double>& x_spin_array, // coord vectors for atoms
-               std::vector<double>& y_spin_array,
-               std::vector<double>& z_spin_array,
+               const std::vector<double>& x_coord_array, // coord vectors for atoms
+               const std::vector<double>& y_coord_array,
+               const std::vector<double>& z_coord_array,
+               const std::vector<double>& x_spin_array, // coord vectors for atoms
+               const std::vector<double>& y_spin_array,
+               const std::vector<double>& z_spin_array,
                std::vector<double>& forces_array_x, //  vectors for forces
                std::vector<double>& forces_array_y,
                std::vector<double>& forces_array_z,
@@ -73,9 +73,9 @@ namespace sld{
             // now add external fields //to be modified for other fields
             //these are taken from previous functions in VAMPIRE
 
-
-             /*
-             sim::calculate_external_fields(start_index,end_index);
+           /*
+             
+            sim::calculate_external_fields(start_index,end_index);
 
              //add all the external fields to the fields array in sld_neighbour_list_array
              for(int i=start_index;i<end_index; i++){
@@ -107,12 +107,12 @@ namespace internal{
                const std::vector<int>& neighbour_list_end_index,
                const std::vector<int>& type_array, // type for atom
                const std::vector<int>& neighbour_list_array, // list of interactions between atom
-               std::vector<double>& x_coord_array, // coord vectors for atoms
-               std::vector<double>& y_coord_array,
-               std::vector<double>& z_coord_array,
-               std::vector<double>& x_spin_array, // coord vectors for atoms
-               std::vector<double>& y_spin_array,
-               std::vector<double>& z_spin_array,
+               const std::vector<double>& x_coord_array, // coord vectors for atoms
+               const std::vector<double>& y_coord_array,
+               const std::vector<double>& z_coord_array,
+               const std::vector<double>& x_spin_array, // coord vectors for atoms
+               const std::vector<double>& y_spin_array,
+               const std::vector<double>& z_spin_array,
                std::vector<double>& forces_array_x, //  vectors for forces
                std::vector<double>& forces_array_y,
                std::vector<double>& forces_array_z,
@@ -207,12 +207,17 @@ namespace internal{
 
                  energy += J *  (si_dot_sj);
                  //std::cout<<std::setprecision(15)<<std::endl;
-                 /* std::cout<<"i= "<<i<<" j= "<<j<<" pos  "<<"\t" << rx<<"\t"<<ry<<"\t"<<rz<<"\t"<<x_coord_array[j]<<"\t"<<y_coord_array[j]<<"\t"<<z_coord_array[j]<<std::endl;
+                 /*
+                 if(abs(x_coord_array[i]-20.09)<1e-3 &&abs(y_coord_array[i]-20.09)<1e-3  && abs(z_coord_array[i]-20.09)<1e-3 ){
+                  std::cout<<"i= "<<i<<" j= "<<j<<" pos  "<<"\t" << rx<<"\t"<<ry<<"\t"<<rz<<"\t"<<x_coord_array[j]<<"\t"<<y_coord_array[j]<<"\t"<<z_coord_array[j]<<std::endl;
                  std::cout<<"i= "<<i<<" j= "<<j<<" spin  "<<"\t" << sx<<"\t"<<sy<<"\t"<<sz<<"\t"<<sjx<<"\t"<<sjy<<"\t"<<sjz<<std::endl;
                  std::cout<<i<<" Exchange:   Forces: "<<f_exch * dx *  (si_dot_sj)* inv_rji<<"\t"<<f_exch * dy *  (si_dot_sj)* inv_rji<<"\t"<<f_exch * dz *  (si_dot_sj)* inv_rji<<std::endl;
                  std::cout<<i<<" Exchange:   Fields: "<<J * sjx<<"\t"<<J * sjy<<"\t"<<J * sjz<<std::endl;
-                 std::cout<<"i= "<<i<<" j= "<<j<<"\t"<<" y= "<<y<<"\t"<<"exch_J0_prime: "<<exch_J0_prime<<"exch_J0 "<<exch_J0<<std::endl;
-                 std::cout<<i<<"energ "<<"\t"<<energy<<std::endl;*/
+                 std::cout<<i<<" Exchange:   dxyz: "<<dx<<"\t"<<dy<<"\t"<<dz<<std::endl;
+
+                 //std::cout<<"i= "<<i<<" j= "<<j<<"\t"<<" y= "<<y<<"\t"<<"exch_J0_prime: "<<exch_J0_prime<<"exch_J0 "<<exch_J0<<std::endl;
+                 //std::cout<<i<<"energ "<<"\t"<<energy<<std::endl;
+                 }*/
 
              }//end if cutoff
 
@@ -234,6 +239,15 @@ namespace internal{
        std::cout<<i<<"\t"<<hx<<"\t"<<hy<<"\t"<<hz<<"\t"<<fx<<"\t"<<fy<<"\t"<<fz<<std::endl;*/
        sld::internal::sumJ[i]=sumJ;
        sld::internal::exch_eng[i]=-0.5*energy;
+       
+       /*if(abs(x_coord_array[i]-20.09)<1e-3 &&abs(y_coord_array[i]-20.09)<1e-3  && abs(z_coord_array[i]-20.09)<1e-3 ){
+       std::cout<<std::setprecision(15)<<std::endl;
+       std::cout<<"forces exch "<<forces_array_x[i]<<"\t"<<forces_array_y[i]<<"\t"<<forces_array_z[i]<<"\t"<<std::endl;
+                    std::cout<<"xyz "<<x_coord_array[i]<<"\t"<<y_coord_array[i]<<"\t"<<z_coord_array[i]<<std::endl;
+                    std::cout<<"sxyz "<<x_spin_array[i]<<"\t"<<y_spin_array[i]<<"\t"<<z_spin_array[i]<<std::endl;
+
+
+         }*/
 
 
    }
@@ -247,12 +261,12 @@ namespace internal{
                const std::vector<int>& neighbour_list_end_index,
                const std::vector<int>& type_array, // type for atom
                const std::vector<int>& neighbour_list_array, // list of interactions between atom
-               std::vector<double>& x_coord_array, // coord vectors for atoms
-               std::vector<double>& y_coord_array,
-               std::vector<double>& z_coord_array,
-               std::vector<double>& x_spin_array, // coord vectors for atoms
-               std::vector<double>& y_spin_array,
-               std::vector<double>& z_spin_array,
+               const std::vector<double>& x_coord_array, // coord vectors for atoms
+               const std::vector<double>& y_coord_array,
+               const std::vector<double>& z_coord_array,
+               const std::vector<double>& x_spin_array, // coord vectors for atoms
+               const std::vector<double>& y_spin_array,
+               const std::vector<double>& z_spin_array,
                std::vector<double>& forces_array_x, //  vectors for forces
                std::vector<double>& forces_array_y,
                std::vector<double>& forces_array_z,
@@ -390,13 +404,6 @@ namespace internal{
 
             sld::internal::sumC[i]=sumC;
             sld::internal::coupl_eng[i]=-0.5*energy_c;
-
-/*
-            std::cout<<"i= "<<i<<" pos  "<<"\t" << rx<<"\t"<<ry<<"\t"<<rz<<std::endl;
-			   std::cout<<i<<"energ "<<"\t"<<energy_c<<std::endl;
-			   std::cout<<i<<"\t"<<hc_x<<"\t"<<hc_y<<"\t"<<hc_z<<"\t"<<fc_x<<"\t"<<fc_y<<"\t"<<fc_z<<std::endl;
-*/
-
 
             }
 

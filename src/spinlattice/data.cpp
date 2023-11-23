@@ -33,9 +33,6 @@ namespace sld{
    bool suzuki_trotter_parallel_initialized = false;
    
     
-        std::vector<double> x_seq_coord_array;
-        std::vector<double> y_seq_coord_array;
-        std::vector<double> z_seq_coord_array;
 
    namespace internal{
 
@@ -65,6 +62,10 @@ namespace sld{
       std::vector<double> y0_coord_array;
       std::vector<double> z0_coord_array;
      
+     
+      std::vector <double> x_coord_storage_array;
+      std::vector <double> y_coord_storage_array;
+      std::vector <double> z_coord_storage_array;
 
       std::vector<double> forces_array_x;
       std::vector<double> forces_array_y;

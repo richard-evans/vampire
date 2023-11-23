@@ -23,6 +23,7 @@
 #include "material.hpp"
 #include "sim.hpp"
 #include "random.hpp"
+#include "errors.hpp"
 
 
 // sld module headers
@@ -97,7 +98,7 @@ namespace sld{
       double lambda=mp::material[0].alpha;
       double spin_noise=mp::material[0].H_th_sigma*sqrt(sim::temperature);
       double velo_noise=sld::internal::mp[0].F_th_sigma.get()*sqrt(sim::temperature);
-
+      
       //vectors for thermal noise spin plus lattice
       std::vector <double> Hx_th(atoms::x_spin_array.size());
    	  std::vector <double> Hy_th(atoms::x_spin_array.size());
@@ -111,15 +112,16 @@ namespace sld{
       std::vector <double> Fx_th(atoms::x_spin_array.size());
       std::vector <double> Fy_th(atoms::x_spin_array.size());
       std::vector <double> Fz_th(atoms::x_spin_array.size());
-
+      
       generate (Fx_th.begin(),Fx_th.end(), mtrandom::gaussian);
       generate (Fy_th.begin(),Fy_th.end(), mtrandom::gaussian);
       generate (Fz_th.begin(),Fz_th.end(), mtrandom::gaussian);
 
+
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
       std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
-
+    
       for(int atom=0;atom<num_atoms-1;atom++){
       sld::compute_fields(atom, // first atom for exchange interactions to be calculated
                         atom+1, // last +1 atom to be calculated
@@ -153,7 +155,7 @@ namespace sld{
                   Hx_th, //  vectors for fields
                   Hy_th,
                   Hz_th);
-
+                  
 
       sld::internal::cayley_update(atom,
                   atom+1,
@@ -164,7 +166,7 @@ namespace sld{
                   sld::internal::fields_array_x,
                   sld::internal::fields_array_y,
                   sld::internal::fields_array_z);
-
+                  
       }
 
       int atom=num_atoms-1;
@@ -211,7 +213,6 @@ namespace sld{
 
 
 
-//
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
       std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
@@ -236,7 +237,6 @@ namespace sld{
                            sld::internal::fields_array_y,
                            sld::internal::fields_array_z);
 
-         //add_spin_noise
 
          sld::internal::add_spin_noise(atom,
                      atom+1,
@@ -265,6 +265,8 @@ namespace sld{
       }
 
 
+
+
       //forces are set to 0 for computation
       std::fill(sld::internal::forces_array_x.begin(), sld::internal::forces_array_x.end(), 0.0);
       std::fill(sld::internal::forces_array_y.begin(), sld::internal::forces_array_y.end(), 0.0);
@@ -291,7 +293,6 @@ namespace sld{
                         sld::internal::fields_array_y,
                         sld::internal::fields_array_z);
 
-
       sld::compute_forces(0, // first atom for exchange interactions to be calculated
                         num_atoms, // last +1 atom to be calculated
                         atoms::neighbour_list_start_index,
@@ -308,32 +309,29 @@ namespace sld{
                         sld::internal::forces_array_y,
                         sld::internal::forces_array_z,
                         sld::internal::potential_eng);
+            
 
-//update position, Velocity
+     //update position, Velocity
       for(int atom=0;atom<num_atoms;atom++){
-
-             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
-             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
-             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
-
+      
+             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
+             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
+             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
 
              atoms::x_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::x_velo_array[atom];
              atoms::y_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::y_velo_array[atom];
              atoms::z_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::z_velo_array[atom];
 
-             //std::cout<<"forces x "<<atom<<"\t"<<sld::internal::forces_array_x[atom]<<"\t"<<atoms::x_velo_array[atom]<<std::endl;
-             //std::cout<<"forces y "<<atom<<"\t"<<sld::internal::forces_array_y[atom]<<"\t"<<atoms::y_velo_array[atom]<<std::endl;
-             //std::cout<<"forces z "<<atom<<"\t"<<sld::internal::forces_array_z[atom]<<"\t"<<atoms::z_velo_array[atom]<<std::endl;
-
-            // std::cout<<"thermal "<< Fx_th[atom]<<"\t"<<Fy_th[atom]<<"\t"<<Fz_th[atom]<<std::endl;
-
        }
+      
 
+             
 
        //reset forces to 0 for v integration
         std::fill(sld::internal::forces_array_x.begin(), sld::internal::forces_array_x.end(), 0.0);
         std::fill(sld::internal::forces_array_y.begin(), sld::internal::forces_array_y.end(), 0.0);
         std::fill(sld::internal::forces_array_z.begin(), sld::internal::forces_array_z.end(), 0.0);
+    
 
         sld::compute_fields(0, // first atom for exchange interactions to be calculated
                           num_atoms, // last +1 atom to be calculated
@@ -353,7 +351,7 @@ namespace sld{
                           sld::internal::fields_array_x,
                           sld::internal::fields_array_y,
                           sld::internal::fields_array_z);
-
+                          
 
         sld::compute_forces(0, // first atom for exchange interactions to be calculated
                           num_atoms, // last +1 atom to be calculated
@@ -371,14 +369,17 @@ namespace sld{
                           sld::internal::forces_array_y,
                           sld::internal::forces_array_z,
                           sld::internal::potential_eng);
-   //
+ 
 
       for(int atom=0;atom<num_atoms;atom++){
+      
+
          atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
          atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
          atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
+    
+      
       }
-
 
 
   std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
@@ -429,7 +430,6 @@ namespace sld{
                sld::internal::fields_array_x,
                sld::internal::fields_array_y,
                sld::internal::fields_array_z);
-   //std::cout<<"2 at="<<atom<<"\t"<<sld::internal::fields_array_z[atom]<<std::endl;
 
 
    }
@@ -613,9 +613,9 @@ void add_spin_noise(const int start_index,
             const int end_index,
             double dt,
             const std::vector<int>& type_array, // type for atom
-            std::vector<double>& x_spin_array, // coord vectors for atoms
-            std::vector<double>& y_spin_array,
-            std::vector<double>& z_spin_array,
+            const std::vector<double>& x_spin_array, // coord vectors for atoms
+            const std::vector<double>& y_spin_array,
+            const std::vector<double>& z_spin_array,
             std::vector<double>& fields_array_x, //  vectors for fields
             std::vector<double>& fields_array_y,
             std::vector<double>& fields_array_z,

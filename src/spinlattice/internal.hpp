@@ -129,6 +129,11 @@ namespace sld{
       extern std::vector<double> y0_coord_array;
       extern std::vector<double> z0_coord_array;
       
+      
+      extern std::vector <double> x_coord_storage_array;
+      extern std::vector <double> y_coord_storage_array;
+      extern std::vector <double> z_coord_storage_array;
+      
           
 
       extern std::vector<double> forces_array_x;
@@ -177,9 +182,9 @@ namespace sld{
             const std::vector<double>& x0_coord_array, // coord vectors for atoms
             const std::vector<double>& y0_coord_array,
             const std::vector<double>& z0_coord_array,
-            std::vector<double>& x_coord_array, // coord vectors for atoms
-            std::vector<double>& y_coord_array,
-            std::vector<double>& z_coord_array,
+            const std::vector<double>& x_coord_array, // coord vectors for atoms
+            const std::vector<double>& y_coord_array,
+            const std::vector<double>& z_coord_array,
             std::vector<double>& forces_array_x, //  vectors for forces
             std::vector<double>& forces_array_y,
             std::vector<double>& forces_array_z,
@@ -192,12 +197,12 @@ namespace sld{
             const std::vector<int>& neighbour_list_end_index,
             const std::vector<int>& type_array, // type for atom
             const std::vector<int>& neighbour_list_array, // list of interactions between atom
-            std::vector<double>& x_coord_array, // coord vectors for atoms
-            std::vector<double>& y_coord_array,
-            std::vector<double>& z_coord_array,
-            std::vector<double>& x_spin_array, // coord vectors for atoms
-            std::vector<double>& y_spin_array,
-            std::vector<double>& z_spin_array,
+            const std::vector<double>& x_coord_array, // coord vectors for atoms
+            const std::vector<double>& y_coord_array,
+            const std::vector<double>& z_coord_array,
+            const std::vector<double>& x_spin_array, // coord vectors for atoms
+            const std::vector<double>& y_spin_array,
+            const std::vector<double>& z_spin_array,
             std::vector<double>& forces_array_x, //  vectors for forces
             std::vector<double>& forces_array_y,
             std::vector<double>& forces_array_z,
@@ -211,12 +216,12 @@ namespace sld{
             const std::vector<int>& neighbour_list_end_index,
             const std::vector<int>& type_array, // type for atom
             const std::vector<int>& neighbour_list_array, // list of interactions between atom
-            std::vector<double>& x_coord_array, // coord vectors for atoms
-            std::vector<double>& y_coord_array,
-            std::vector<double>& z_coord_array,
-            std::vector<double>& x_spin_array, // coord vectors for atoms
-            std::vector<double>& y_spin_array,
-            std::vector<double>& z_spin_array,
+            const std::vector<double>& x_coord_array, // coord vectors for atoms
+            const std::vector<double>& y_coord_array,
+            const std::vector<double>& z_coord_array,
+            const std::vector<double>& x_spin_array, // spin  vectors for atoms
+            const std::vector<double>& y_spin_array,
+            const std::vector<double>& z_spin_array,
             std::vector<double>& forces_array_x, //  vectors for forces
             std::vector<double>& forces_array_y,
             std::vector<double>& forces_array_z,
@@ -241,9 +246,9 @@ namespace sld{
                   const int end_index,
                   double dt,
                   const std::vector<int>& type_array, // type for atom
-                  std::vector<double>& x_spin_array, // coord vectors for atoms
-                  std::vector<double>& y_spin_array,
-                  std::vector<double>& z_spin_array,
+                  const std::vector<double>& x_spin_array, // coord vectors for atoms
+                  const std::vector<double>& y_spin_array,
+                  const std::vector<double>& z_spin_array,
                   std::vector<double>& fields_array_x, //  vectors for fields
                   std::vector<double>& fields_array_y,
                   std::vector<double>& fields_array_z,

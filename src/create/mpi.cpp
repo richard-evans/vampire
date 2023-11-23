@@ -147,7 +147,8 @@ namespace create{
          std::vector<double> cpu_range_array(6*vmpi::num_processors,0.0); // Linear Memory for MPI comms
 
          // Determine range+interaction range of all CPU's
-         double max_interaction_range=double(cs::unit_cell.interaction_range);
+         //Modified M Strungaru
+         double max_interaction_range=double(cs::unit_cell.interaction_range);         
 
          // Populate local ranges
          cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell.dimensions[0]-0.01;
@@ -565,6 +566,7 @@ namespace create{
             // Mark atoms appropriately
             if( catom_array[atom].boundary == true ){
                catom_array[atom].mpi_type=1;
+            
             }
 
          }
@@ -833,6 +835,8 @@ namespace create{
          // Resize translation and data arrays
          vmpi::recv_atom_translation_array.resize(num_halo_swaps);
          vmpi::recv_spin_data_array.resize(3*num_halo_swaps);
+         vmpi::recv_coord_data_array.resize(3*num_halo_swaps);
+
 
          // Populate recv_translation_array
          std::vector<int> recv_counter_array(vmpi::num_processors);
@@ -877,6 +881,8 @@ namespace create{
          // Resize translation and data arrays
          vmpi::send_atom_translation_array.resize(num_boundary_swaps);
          vmpi::send_spin_data_array.resize(3*num_boundary_swaps);
+         vmpi::send_coord_data_array.resize(3*num_boundary_swaps);
+
          std::vector<int> recv_data(num_send_data);
          // Send and receive atom numbers requested/to be sent
          requests.resize(0);

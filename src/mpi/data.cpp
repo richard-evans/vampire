@@ -54,11 +54,15 @@ namespace vmpi{
    std::vector<int> send_start_index_array;
    std::vector<int> send_num_array;
    std::vector<double> send_spin_data_array;
+   std::vector<double> send_coord_data_array;
+
 
    std::vector<int> recv_atom_translation_array;
    std::vector<int> recv_start_index_array;
    std::vector<int> recv_num_array;
    std::vector<double> recv_spin_data_array;
+   std::vector<double> recv_coord_data_array;
+
    #ifdef MPICF
    std::vector<MPI_Request> requests(0);
    std::vector<MPI_Status> stati(0);

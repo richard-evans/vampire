@@ -19,6 +19,11 @@
 #include <vector>
 #include <math.h>
 #include "create.hpp"
+#include <iomanip>
+#include <sim.hpp>
+
+#include <errors.hpp>
+
 
 
 
@@ -38,9 +43,9 @@ namespace sld{
                const std::vector<double>& x0_coord_array, // coord vectors for atoms
                const std::vector<double>& y0_coord_array,
                const std::vector<double>& z0_coord_array,
-               std::vector<double>& x_coord_array, // coord vectors for atoms
-               std::vector<double>& y_coord_array,
-               std::vector<double>& z_coord_array,
+               const std::vector<double>& x_coord_array, // coord vectors for atoms
+               const std::vector<double>& y_coord_array,
+               const std::vector<double>& z_coord_array,
                std::vector<double>& forces_array_x, //  vectors for forces
                std::vector<double>& forces_array_y,
                std::vector<double>& forces_array_z,
@@ -82,9 +87,9 @@ void compute_forces_harmonic(const int start_index,
             const std::vector<double>& x0_coord_array, // coord vectors for atoms
             const std::vector<double>& y0_coord_array,
             const std::vector<double>& z0_coord_array,
-            std::vector<double>& x_coord_array, // coord vectors for atoms
-            std::vector<double>& y_coord_array,
-            std::vector<double>& z_coord_array,
+            const std::vector<double>& x_coord_array, // coord vectors for atoms
+            const std::vector<double>& y_coord_array,
+            const std::vector<double>& z_coord_array,
             std::vector<double>& forces_array_x, //  vectors for forces
             std::vector<double>& forces_array_y,
             std::vector<double>& forces_array_z,
@@ -102,7 +107,10 @@ void compute_forces_harmonic(const int start_index,
             double r_sqr_cut=sld::internal::r_cut_pot*sld::internal::r_cut_pot;
             double energy;
 
+
+
             for(int i=start_index;i< end_index; ++i){
+            
                fx = 0.0;
                fy = 0.0;
                fz = 0.0;
@@ -130,43 +138,42 @@ void compute_forces_harmonic(const int start_index,
         	        j = neighbour_list_array[n];
 
         	        if ( j != i){
-                   total_int++;
         		       dx = -x_coord_array[j] + rx;
         		       dy = -y_coord_array[j] + ry;
         		       dz = -z_coord_array[j] + rz;
                    dx0 = -x0_coord_array[j] + rx0;
                    dy0 = -y0_coord_array[j] + ry0;
                    dz0 = -z0_coord_array[j] + rz0;
-
-                  // std::cout<<"before pbc "<<j<<"\t"<<dx<<"\t"<<dy<<"\t"<<dz<<std::endl;
+                  
                    dx = sld::PBC_wrap( dx, cs::system_dimensions[0], cs::pbc[0]);
                    dy = sld::PBC_wrap( dy, cs::system_dimensions[1], cs::pbc[1]);
                    dz = sld::PBC_wrap( dz, cs::system_dimensions[2], cs::pbc[2]);
                    dx0 = sld::PBC_wrap( dx0, cs::system_dimensions[0], cs::pbc[0]);
                    dy0 = sld::PBC_wrap( dy0, cs::system_dimensions[1], cs::pbc[1]);
                    dz0 = sld::PBC_wrap( dz0, cs::system_dimensions[2], cs::pbc[2]);
-                  // std::cout<<"after pbc "<<j<<"\t"<<dx<<"\t"<<dy<<"\t"<<dz<<std::endl;
-
+                   
 
 
         		       rji_sqr = dx*dx + dy*dy + dz*dz;
 
         		       if( rji_sqr < r_sqr_cut){
+        		          
+        		          total_int++;
+
 
         		           rji = sqrt(rji_sqr);
-                       rji0 = sqrt(dx0*dx0 + dy0*dy0 + dz0*dz0);
+                           rji0 = sqrt(dx0*dx0 + dy0*dy0 + dz0*dz0);
         		           inv_rji = 1.0/ rji;
 
                        energy += (rji-rji0)*(rji-rji0);
 
 
-        		           fx -=  (rji-rji0)*dx*inv_rji ; //2 (rji-rj0)*dx*inv_rji -> 2 went at the end
+		               fx -=  (rji-rji0)*dx*inv_rji ; //2 (rji-rj0)*dx*inv_rji -> 2 went at the end
                        fy -=  (rji-rji0)*dy*inv_rji ;
                        fz -=  (rji-rji0)*dz*inv_rji ;
-                       //std::cout<<"i "<<i<<" j "<<j<<" int "<<total_int<<"\t" <<x_coord_array[i]<<"\t" <<y_coord_array[i]<<"\t"<<z_coord_array[i]<<"\t" <<x_coord_array[j]<<"\t" <<y_coord_array[j]<<"\t"<<z_coord_array[j]<<std::endl;
-                       //std::cout<<"i "<<i<<" j "<<j<<" int "<<total_int<<"\t" <<dx<<"\t" <<dy<<"\t"<<dz<<"\t" <<dx0<<"\t" <<dy0<<"\t"<<dz0<<std::endl;
-
-        		      }
+                       
+                     
+                     }
         	   	}
         	    }
 
@@ -175,13 +182,13 @@ void compute_forces_harmonic(const int start_index,
         	    forces_array_y[i] += V0  * 2.0 * fy;
         	    forces_array_z[i] += V0  * 2.0 * fz;
              potential_eng[i] = 0.5 * V0 * energy;
-             //std::cout<<"total int " << i <<"\t"<<total_int<<std::endl;
-             //std::cout<<"V0="<<V0<<"\t"<<i<<"\t"<<potential_eng[i]<<std::endl;
-             //std::cout<<"forces "<<i<<"\t"<<forces_array_x[i]<<"\t"<<forces_array_y[i]<<"\t"<<forces_array_z[i]<<std::endl;
+             
 
 
-        	   }
-                  return;
+  }
+  
+  
+     return;
             }
          } //end of internal
       } // end of sld namespace

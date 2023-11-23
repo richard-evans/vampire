@@ -178,7 +178,7 @@ void sld_energy_statistic_t::calculate(const std::vector<double>& sx,  // spin u
    }
 
    //---------------------------------------------------------------------------
-   // Calculate applied field energy (in Tesla)
+   // Calculate kinetic energy (in Tesla)
    //---------------------------------------------------------------------------
    for( int atom = 0; atom < num_atoms; ++atom ){
       const int mask_id = mask[atom]; // get mask id
