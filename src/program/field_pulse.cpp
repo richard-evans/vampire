@@ -40,8 +40,9 @@ void field_pulse(){
    const double temp = sim::temperature; // current simulation temperature
    sim::temperature = sim::Teq;
 
-   // Save input applied field strength
+   // Save input applied field strength and set to zero for equilibration
    const double max_field = sim::H_applied;
+   sim::H_applied = 0.0;
 
    // Equilibrate system
    while( sim::time < sim::equilibration_time){
