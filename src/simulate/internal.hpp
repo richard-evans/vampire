@@ -55,6 +55,9 @@ namespace sim{
          set_double_t sot_rj;  // spin orbit relaxation torque
          set_double_t sot_pj;  // spin orbit precession torque
          set_double_t vcmak;   // voltage controlled anisotropy coefficient
+         set_double_t lsf_second_order_coefficient; // Second order LSF coefficient
+         set_double_t lsf_fourth_order_coefficient; // Fourth order LSF coefficient
+         set_double_t lsf_sixth_order_coefficient; // Sixth order LSF coefficient
       };
 
       //-----------------------------------------------------------------------------
@@ -77,6 +80,10 @@ namespace sim{
 
       extern std::vector<double> vcmak;   // voltage controlled anisotropy coefficient
 
+      extern std::vector<double> lsf_second_order_coefficient;
+      extern std::vector<double> lsf_fourth_order_coefficient; // LSF coefficients
+      extern std::vector<double> lsf_sixth_order_coefficient;
+
       // shared Functions
       void llg_quantum_step();
 
@@ -85,6 +92,7 @@ namespace sim{
       //-------------------------------------------------------------------------
       extern void initialize_modules();
       extern void increment_time();
+      extern void lsf_step();
 
    } // end of internal namespace
 } // end of sim namespace

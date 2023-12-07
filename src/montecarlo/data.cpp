@@ -26,6 +26,7 @@ namespace montecarlo{
    //------------------------------------------------------------------------------
 
    bool mc_parallel_initialized = false;
+   bool lsf_mc_parallel_initialized = false;
 
    namespace cmc{
       bool masked_cmc = false;       // determine if generic masked constraint is required

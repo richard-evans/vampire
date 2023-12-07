@@ -141,6 +141,28 @@ double spin_magnetostatic_energy(const int atom, const double Sx, const double S
    return -1.0*(dipole::atom_mu0demag_field_array_x[atom]*Sx+dipole::atom_mu0demag_field_array_y[atom]*Sy+dipole::atom_mu0demag_field_array_z[atom]*Sz);
 }
 
+// Calculates LSF energy
+double spin_longitudinal_energy(const int atom){
+
+   // Standard Landau Hamiltonian
+   const int imaterial = atoms::type_array[atom];
+   const double Sx = atoms::x_spin_array[atom];
+   const double Sy = atoms::y_spin_array[atom];
+   const double Sz = atoms::z_spin_array[atom];
+   double spinlength = sqrt(Sx * Sx + Sy * Sy + Sz * Sz);
+   double mod_S2_i = spinlength * spinlength;
+   double mod_S4_i = mod_S2_i * mod_S2_i;
+   double mod_S6_i = mod_S4_i * mod_S2_i;
+
+   double A = sim::internal::lsf_second_order_coefficient[imaterial];
+   double B = sim::internal::lsf_fourth_order_coefficient[imaterial];
+   double C = sim::internal::lsf_sixth_order_coefficient[imaterial];
+
+   double landau_energy = (1 / mp::material[imaterial].mu_s_SI) * ((A * mod_S2_i) + (B * mod_S4_i) + (C * mod_S6_i));
+
+   return landau_energy; // Tesla
+}
+
 /// @brief Calculates the total energy for a single spin.
 ///
 /// @section License
@@ -183,6 +205,11 @@ double calculate_spin_energy(const int atom){
 
    // calculate anisotropy energy for atom
    energy += anisotropy::single_spin_energy(atom, imaterial, Sx, Sy, Sz, sim::temperature);
+
+	// Landau energy
+	if(sim::integrator==sim::lsf_mc){
+		energy += spin_longitudinal_energy(atom);
+	}
 
 	energy+=spin_applied_field_energy(Sx, Sy, Sz);
 	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);
