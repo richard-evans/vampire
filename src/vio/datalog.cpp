@@ -285,6 +285,15 @@ namespace vout{
 			case 77:
 				vout::material_spin_temp(stream, header);
 				break;
+			case 78:
+				vout::mean_system_spin_length(stream,header);
+				break;
+			case 79:
+				vout::mean_material_spin_length(stream,header);
+				break;
+			case 80:
+				vout::mean_height_spin_length(stream,header);
+				break;
 			case 997: //MP
 				vout::material_binder_cumulant(stream,header);
 				break;

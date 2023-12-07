@@ -499,4 +499,20 @@ namespace vout{
    void material_spin_temp(std::ostream& stream, bool header){
       stream << stats::material_spin_temp.output_spin_temp(header);
    }
+
+   // Output Function 78 - with Header
+   void mean_system_spin_length(std::ostream& stream, bool header){
+      stream << stats::system_spin_length.output_mean_spin_length(header);
+   }
+
+   // Output Function 79 - with Header
+   void mean_material_spin_length(std::ostream& stream, bool header){
+      stream << stats::material_spin_length.output_mean_spin_length(header);
+   }
+
+   // Output Function 80 - with Header
+   void mean_height_spin_length(std::ostream& stream, bool header){
+      stream << stats::height_spin_length.output_mean_spin_length(header);
+   }
+
 }
