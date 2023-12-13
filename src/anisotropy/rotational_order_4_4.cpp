@@ -142,7 +142,7 @@ namespace anisotropy{
          const double Sy = sx * gx + sy * gy + sz * gz;
          const double Sy2 = Sy * Sy;
 
-         return - k4r4 * (Sx2 * Sx2 - six * Sx2 * Sy2 + Sy * Sy );
+         return - k4r4 * (Sx2 * Sx2 - six * Sx2 * Sy2 + Sy2 * Sy2 );
 
       }
    }
