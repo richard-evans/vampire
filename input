@@ -29,7 +29,7 @@ material:file = fe.mat
 #------------------------------------------
 sim:temperature = 100.0
 sim:time-steps-increment = 1
-sim:total-time-steps = 50000
+sim:total-time-steps = 5000
 sim:time-step = 0.5 !fs
 sim:equilibration-temperature=0
 sim:equilibration-time-steps=0
@@ -60,16 +60,26 @@ config:sld
 
 output:real-time
 output:magnetisation
+output:material-magnetisation
+
 output:spin-temperature
+output:material-spin-temperature
+
 output:lattice-temperature
-output:kinetic-energy
-output:potential-energy
+output:material-lattice-temperature
+
+output:mean-spin-temperature
+
 output:output-rate=1
 output:precision=15
 
 screen:real-time
 screen:magnetisation
+screen:material-magnetisation
+
 screen:spin-temperature
+screen:material-spin-temperature
+
 screen:lattice-temperature
-screen:kinetic-energy
-screen:potential-energy
+screen:material-lattice-temperature
+

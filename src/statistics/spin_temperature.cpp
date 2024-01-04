@@ -58,6 +58,8 @@ void spin_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in
    mask=in_mask; // copy contents of vector
    spin_temp.resize(in_mask_size, 0.0);
    mean_spin_temp.resize(in_mask_size, 0.0);
+   SxH2.resize(in_mask_size,0.0);
+   SH.resize(in_mask_size,0.0);
    
 
    // determine mask id's with no atoms
@@ -115,6 +117,9 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                                           const std::vector<double>& mm){
 
    std::fill(spin_temp.begin(),spin_temp.end(),0.0);
+   std::fill(SxH2.begin(),SxH2.end(),0.0);
+   std::fill(SH.begin(),SH.end(),0.0);
+
    
    std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
    std::fill(atoms::y_total_spin_field_array.begin(), atoms::y_total_spin_field_array.end(), 0.0);
@@ -140,12 +145,14 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                      atoms::z_total_spin_field_array);
                      
 
-   double SxH2=0.0;
-   double SH=0.0;
+  
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
+   
 
       const int mask_id = mask[atom]; // get mask id
+      
+
 
       // get atomic moment
 		const double mu = mm[atom];
@@ -157,9 +164,9 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 		 double SxHx = S[1]*B[2]-S[2]*B[1];
 		 double SxHy = S[2]*B[0]-S[0]*B[2];
 		 double SxHz = S[0]*B[1]-S[1]*B[0];
-		 SxH2  = SxH2+ SxHx*SxHx + SxHy*SxHy + SxHz*SxHz;
-         SH  = SH + S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
-         spin_temp[mask_id]=0.5* mu /constants::kB * SxH2 / SH;
+		 SxH2[mask_id]  = SxH2[mask_id]+ mu*(SxHx*SxHx + SxHy*SxHy + SxHz*SxHz);
+         SH[mask_id]  = SH[mask_id] + S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
+         spin_temp[mask_id]= SxH2[mask_id] / SH[mask_id];
          
 
 	}
@@ -241,7 +248,7 @@ std::string spin_temp_statistic_t::output_spin_temp(bool header){
          result << name + std::to_string(mask_id) + "_Ts";
       }
       else{
-         result << constants::muB * spin_temp[mask_id ]/  vmpi::num_processors;
+         result << 0.5*constants::muB/constants::kB * spin_temp[mask_id ]/  vmpi::num_processors;
       }
    }
 

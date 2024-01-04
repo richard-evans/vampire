@@ -176,12 +176,14 @@ void compute_forces_harmonic(const int start_index,
                      }
         	   	}
         	    }
+             const unsigned int imat = type_array[i];
 
-             double V0=sld::internal::mp[0].V0.get(); //0.15
+             double V0=sld::internal::mp[imat].V0.get(); //0.15
+             
         	    forces_array_x[i] += V0 * 2.0 * fx;
         	    forces_array_y[i] += V0  * 2.0 * fy;
         	    forces_array_z[i] += V0  * 2.0 * fz;
-             potential_eng[i] = 0.5 * V0 * energy;
+                potential_eng[i] = 0.5 * V0 * energy;
              
 
 

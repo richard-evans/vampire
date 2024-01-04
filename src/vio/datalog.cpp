@@ -297,10 +297,10 @@ namespace vout{
          	    vout::mean_sysspintemp(stream, header);
          	    break;
          	case 84:
-                vout::material_mean_sysspintemp(stream, header);
+         	    vout::material_spin_temp(stream, header);
                 break;
             case 85:
-                vout::material_spin_temp(stream, header);
+                vout::material_mean_sysspintemp(stream, header);
                 break;
             case 86:
          	    vout::syslatticetemp(stream, header);
@@ -309,10 +309,10 @@ namespace vout{
          	    vout::mean_syslatticetemp(stream, header);
          	    break;
          	case 88:
-                vout::material_mean_syslatticetemp(stream, header);
+         	    vout::material_lattice_temp(stream, header);
                 break;
             case 89:
-                vout::material_lattice_temp(stream, header);
+                vout::material_mean_syslatticetemp(stream, header);
                 break;
 			case 999: //AJN
 				vout::standard_deviation(stream,header);

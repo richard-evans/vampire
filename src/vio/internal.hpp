@@ -83,7 +83,9 @@ namespace vout{
          mean_susceptibility,
          mean_torque,
          mean_spin_temp, 
-         mean_lattice_temp
+         mean_lattice_temp,
+         SxH2,
+         SH
       };
 
       // internal variables

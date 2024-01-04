@@ -63,10 +63,12 @@ double compute_kinetic_energy(const int start_index, // first atom for exchange 
                  double vx = atoms::x_velo_array[at];
                  double vy = atoms::y_velo_array[at];
                  double vz = atoms::z_velo_array[at];
-                 kinetic+=vx*vx+vy*vy+vz*vz;
+                 const unsigned int imat = atoms::type_array[at];
+                
+                 kinetic+=sld::internal::mp[imat].mass.get()*(vx*vx+vy*vy+vz*vz);
              }
 
-            kinetic*=sld::internal::mp[0].mass.get()*0.5/(end_index-start_index);
+            kinetic*=0.5/(end_index-start_index);
            // std::cout<<"kinetic en "<<kinetic<<std::endl;
 
    return kinetic;

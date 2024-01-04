@@ -75,7 +75,9 @@ namespace cat{
 		theta(0.0),
 		phi(0.0),
 		spin_temp(0.0),
-		mean_spin_temp(0.0)
+		mean_spin_temp(0.0),
+		SxH2(0.0),
+		SH(0.0)
 	{
 		category_atoms.resize(0,0);
 		

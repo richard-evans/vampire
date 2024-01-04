@@ -46,6 +46,8 @@ namespace cat{
 		
 		double spin_temp;
         double mean_spin_temp;
+        double SxH2;
+        double SH;
 
 		// constraint variables
 		double theta;

@@ -139,6 +139,12 @@ namespace internal{
        double sumJ=0.0;
 
        for(int i=start_index;i<end_index; ++i){
+       
+          const unsigned int imat = atoms::type_array[i];
+          double exch_J0 = sld::internal::mp[imat].J0_ms.get(); //7034.8836847351113; //
+          double exch_J0_prime = sld::internal::mp[imat].J0_prime.get()/1.602176634e-19;
+          
+
           fx = 0.0;
           fy = 0.0;
           fz = 0.0;
@@ -286,13 +292,16 @@ namespace internal{
                   double sj_dot_rji, si_dot_rji;
                   double energy_c;
                   int j, count_int;
-                  double fact=sld::internal::mp[0].C0.get()/1.602176634e-19;//in J, 0.4520;//
-                  double fact_ms= sld::internal::mp[0].C0_ms.get();//3517.4418423675556;
+                  
                   double r_sqr_cut=sld::internal::r_cut_fields*sld::internal::r_cut_fields;
                   double oneover3=1.0/3.0;
                   double sumC;
 
                   for(int i=start_index;i<end_index; ++i){
+                  
+                     const unsigned int imat = atoms::type_array[i];
+                     double fact=sld::internal::mp[imat].C0.get()/1.602176634e-19;//in J, 0.4520;//
+                     double fact_ms= sld::internal::mp[imat].C0_ms.get();//3517.4418423675556;
 
                      count_int=0;
                      fc_x = 0.0;

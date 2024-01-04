@@ -229,13 +229,13 @@ namespace sld{
          sld::internal::mp[mat].J0_ms.set(sld::internal::mp[mat].J0.get()/mp::material[mat].mu_s_SI);
          sld::internal::mp[mat].C0_ms.set(sld::internal::mp[mat].C0.get()/mp::material[mat].mu_s_SI);
          sld::internal::mp[mat].J0_prime.set(3.0*sld::internal::mp[mat].J0.get()/sld::internal::r_cut_fields);
-         sld::internal::mp[mat].F_th_sigma.set(sqrt(2.0*sld::internal::mp[0].damp_lat.get()*constants::kB_eV / (sld::internal::mp[mat].mass.get()*mp::dt_SI*1e12)));
+         sld::internal::mp[mat].F_th_sigma.set(sqrt(2.0*sld::internal::mp[mat].damp_lat.get()*constants::kB_eV / (sld::internal::mp[mat].mass.get()*mp::dt_SI*1e12)));
 
          //now change to ev the following
-         sld::internal::mp[0].V0.set(sld::internal::mp[0].V0.get()*6.242e18);
+         sld::internal::mp[mat].V0.set(sld::internal::mp[mat].V0.get()*6.242e18);
          
          //initialise mass for the rest of the simulations
-         mp::material[mat].mass=sld::internal::mp[0].mass.get();
+         mp::material[mat].mass=sld::internal::mp[mat].mass.get();
        }
 
 

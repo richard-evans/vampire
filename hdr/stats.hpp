@@ -337,6 +337,8 @@ namespace stats
 		std::vector<int> num_atoms_in_mask;
         std::vector<double> spin_temp;
         std::vector<double> mean_spin_temp;
+        std::vector<double> SxH2;
+        std::vector<double> SH;
         std::vector<int> zero_list;
         std::vector<double> normalisation;
         std::string name;

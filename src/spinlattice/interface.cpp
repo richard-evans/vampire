@@ -129,7 +129,7 @@ namespace sld{
       test = "exchange-J0";
       if( word == test ){
          double j0 = vin::str_to_double(value);
-         vin::check_for_valid_value(j0, word, line, prefix, unit, "energy", 1.0e-20, 1.0e20,"input","1E-20 - 1E20");
+         vin::check_for_valid_value(j0, word, line, prefix, unit, "energy", 0, 5,"input","0 - 5 eV");
          sld::internal::mp[super_index].J0.set(j0);
          return true;
       }
@@ -145,7 +145,7 @@ namespace sld{
       test = "coupling-C0";
       if( word == test ){
          double c0 = vin::str_to_double(value);
-         vin::check_for_valid_value(c0, word, line, prefix, unit, "mass", 1.0e-20, 1.0e20,"input","1E-20 - 1E20");
+         vin::check_for_valid_value(c0, word, line, prefix, unit, "mass", 0, 1,"input","0 - 1");
          sld::internal::mp[super_index].C0.set(c0);
          return true;
       }

@@ -509,15 +509,16 @@ namespace vout{
         stream << stats::system_spin_temp.output_mean_spin_temp(header);
      }
      
-  // Output Function 84
+ // Output Function 84
+    void material_spin_temp(std::ostream& stream, bool header){
+       stream << stats::material_spin_temp.output_spin_temp(header);
+    }
+  // Output Function 85
      void material_mean_sysspintemp(std::ostream& stream, bool header){
    stream << stats::material_spin_temp.output_mean_spin_temp(header);
    }
 
-  // Output Function 85
-    void material_spin_temp(std::ostream& stream, bool header){
-   stream << stats::material_spin_temp.output_spin_temp(header);
-   }
+ 
  
   // Output Function 86 - with Header
      void syslatticetemp(std::ostream& stream, bool header){
@@ -529,16 +530,17 @@ namespace vout{
         stream << stats::system_lattice_temp.output_mean_lattice_temp(header);
      }
      
-  // Output Function 88
-     void material_mean_syslatticetemp(std::ostream& stream, bool header){
-   stream << stats::material_lattice_temp.output_mean_lattice_temp(header);
-   }
 
-  // Output Function 89
+
+  // Output Function 88
     void material_lattice_temp(std::ostream& stream, bool header){
    stream << stats::material_lattice_temp.output_lattice_temp(header);
    }
  
+  // Output Function 89
+    void material_mean_syslatticetemp(std::ostream& stream, bool header){
+   stream << stats::material_lattice_temp.output_mean_lattice_temp(header);
+    }
 
 
 }
