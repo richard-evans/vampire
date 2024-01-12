@@ -122,6 +122,11 @@ void write_grain_file(){
                   zgrain << stats::grain_specific_heat.output_mean_specific_heat(sim::temperature, header);
                   break;
                //------------------------------------------
+               //------------------------------------------
+               case grain::mean_spin_temp:
+                  // inline function to output grain data
+                  zgrain << stats::grain_spin_temp.output_spin_temp(header);
+                  break;
 
             } // end of case statement
 
