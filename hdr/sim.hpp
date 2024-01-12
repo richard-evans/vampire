@@ -32,6 +32,10 @@
 #include <valarray>
 #include <vector>
 
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
+
 /// Enumerated lists for code readability
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 

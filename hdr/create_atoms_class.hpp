@@ -15,6 +15,9 @@
 
 #include <cstdint>
 
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
 
 //namespace create{
 namespace cs{

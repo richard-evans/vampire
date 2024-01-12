@@ -32,6 +32,10 @@
 #include <string>
 #include <vector>
 
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
+
 #ifdef MPICF
 	#include <mpi.h>
 #endif

@@ -44,6 +44,10 @@
 #include <iomanip>
 #include <vector>
 
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
+
 // Global Output Streams
 extern std::ofstream zinfo;
 extern std::ofstream zmag;
@@ -95,8 +99,8 @@ namespace vin{
    extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                       const std::vector<double>& range_min, const std::vector<double>& range_max, std::string input_file_type, std::string range_text);
 
-	extern void check_for_valid_bitsequence(std::vector<int>& u, std::string word, int line, std::string prefix, const int range_min, 
-													const int range_max, std::string input_file_type, std::string range_text); 
+	extern void check_for_valid_bitsequence(std::vector<int>& u, std::string word, int line, std::string prefix, const int range_min,
+													const int range_max, std::string input_file_type, std::string range_text);
 
    extern std::vector<double> doubles_from_string(std::string value);
    extern std::vector<int> integers_from_string(std::string value);
@@ -143,7 +147,7 @@ namespace vout{
     extern int fw_size;
     extern int fw_size_int;
     extern int max_header;
-    
+
     extern std::string output_file_name;
 
 //class that creates an object which acts like an output
