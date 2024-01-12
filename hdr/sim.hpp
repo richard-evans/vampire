@@ -26,6 +26,7 @@
 #define SIM_H_
 
 //Headers
+#include <cstdint>
 #include <fstream>
 #include <stdint.h>
 #include <string>

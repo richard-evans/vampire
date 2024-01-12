@@ -25,6 +25,7 @@
 #ifndef VIO_H_
 #define VIO_H_
 
+#include <cstdint>
 #include <fstream>
 #include <string>
 #include <iostream>

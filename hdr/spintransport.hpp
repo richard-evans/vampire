@@ -14,6 +14,7 @@
 #define SPINTRANSPORT_H_
 
 // C++ standard library headers
+#include <cstdint>
 #include <string>
 #include <vector>
 
