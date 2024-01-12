@@ -374,7 +374,7 @@ namespace environment{
           double yi = env::cell_coords_array_y[celli];
           double zi = env::cell_coords_array_z[celli];
           env::neighbour_list_start_index[celli] = array_index;
-          int b = 0;
+          //int b = 0;
           for (int cellj = 0; cellj < env::num_cells; cellj ++){
              int a = 0;
              double xj = env::cell_coords_array_x[cellj];
@@ -389,7 +389,7 @@ namespace environment{
              if (dy == env::cell_size_y[celli]/2.0 +  env::cell_size_y[cellj]/2.0 && dz ==0 && dx == 0) a++;
              if (dz == env::cell_size_z[celli]/2.0 +  env::cell_size_z[cellj]/2.0 && dy ==0 && dx == 0) a++;
              if (a == 1){
-                b++;
+                //b++;
                 env::neighbour_list_array.push_back(cellj);                                        //if the interaction is non zero add the cell to the neighbourlist
                 env::neighbour_list_end_index[celli] = array_index;                                //the end index is updated for each cell so is given the value for the last cell.
                 array_index ++;

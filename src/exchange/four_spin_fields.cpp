@@ -45,7 +45,7 @@ void four_spin_exchange_fields(const int start_index, // first atom for exchange
    	const int natomj = four_spin_neighbour_list_array_j[nn];
    	const int natomk = four_spin_neighbour_list_array_k[nn];
       const int natoml = four_spin_neighbour_list_array_l[nn];
-      const int jmaterial = atoms::type_array[natomj];
+      //const int jmaterial = atoms::type_array[natomj];
       const double Jij = four_spin_exchange_list[nn];
 
       const double sjx = atoms::x_spin_array[natomj];

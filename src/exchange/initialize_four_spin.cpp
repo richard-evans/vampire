@@ -49,9 +49,9 @@ namespace internal{
       double x_b,y_b,z_b;
       double x_c,y_c,z_c;
       int k1=1, k2=1,k3=1;
-      int counter=0;
-      int counter_sort=0;
-      int c1,c2;
+      //int counter=0; // seemingly unused variables
+      //int counter_sort=0;
+      //int c1,c2;
 
       //vectors to store the nearest and next nearest neighbours
       std::vector <int> first_neigh(0);
@@ -111,7 +111,7 @@ namespace internal{
          four_spin_neighbour_list_start_index[i] = n_interactions;
 
          for(int a=start;a<end;a++){
-            const int jmaterial = atoms::type_array[a];
+            //const int jmaterial = atoms::type_array[a];
             for(int b=a;b<end;b++){
                for(int c=b;c<end;c++){
 
