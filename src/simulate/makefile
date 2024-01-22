@@ -9,7 +9,8 @@ increment_time.o \
 initialize.o \
 initialize_modules.o \
 interface.o \
-llg_quantum.o
+llg_quantum.o\
+STDspin.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/simulate/,$(sim_objects))

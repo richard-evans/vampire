@@ -145,6 +145,12 @@ namespace sim{
             return true;
          }
          //--------------------------------------------------------------------
+         test="suzuki-trotter";
+         if( value == test ){
+            sim::integrator = sim::suzuki_trotter_spin;
+            return true;
+         }
+         //--------------------------------------------------------------------
          else{
             terminaltextcolor(RED);
                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -153,6 +159,8 @@ namespace sim{
                std::cerr << "\t\"llg-quantum\"" << std::endl;
                std::cerr << "\t\"monte-carlo\"" << std::endl;
                std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
+               std::cerr << "\t\"suzuki-trotter\"" << std::endl;
+
             terminaltextcolor(WHITE);
             err::vexit();
           }

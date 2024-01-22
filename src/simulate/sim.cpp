@@ -712,6 +712,14 @@ void integrate_serial(uint64_t n_steps){
 				sim::internal::increment_time();
 			}
 			break;
+			
+       case 6: //suzuki-trotter-decomposition for spin
+		for(uint64_t ti=0;ti<n_steps;ti++){
+			sim::STDspin();
+			// increment time
+			sim::internal::increment_time();
+		}
+		break;
 
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
