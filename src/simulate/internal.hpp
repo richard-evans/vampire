@@ -85,6 +85,10 @@ namespace sim{
       //-------------------------------------------------------------------------
       extern void initialize_modules();
       extern void increment_time();
+      
+       //MPI variables
+       extern std::vector<std::vector<int> > c_octants; //Core atoms of each octant
+       extern std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
 
    } // end of internal namespace
 } // end of sim namespace

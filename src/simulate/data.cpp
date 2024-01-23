@@ -111,4 +111,10 @@ namespace sim{
       return sim::internal::stt_pj;
    }
 
+   bool STDspin_parallel_initialized = false;
+   //MPI variables
+   std::vector<std::vector<int> > c_octants; //Core atoms of each octant
+   std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
+
+
 } // end of sim namespace

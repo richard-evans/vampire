@@ -33,6 +33,10 @@ namespace sim{
       sim::internal::sot_pj.resize(num_materials,0.0);
 
       sim::internal::vcmak.resize(num_materials, 0.0);
+      
+      sim::STDspin_parallel_initialized = false;
+      sim::c_octants.resize(8);
+      sim::b_octants.resize(8);
 
       // loop over materials set by user
       for(unsigned int m=0; m < sim::internal::mp.size(); ++m){
