@@ -1,0 +1,31 @@
+#===================================================
+# Sample vampire material file V3+
+#===================================================
+
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=2
+#---------------------------------------------------
+# Material 1 Cobalt Generic
+#---------------------------------------------------
+
+
+
+
+material[1]:material-name=Fe_rh
+material[1]:damping-constant=0.1
+material[1]:atomic-spin-moment=3.15!muB
+material[1]:uniaxial-anisotropy-constant=1.404e-23
+material[1]:initial-spin-direction=0,0,1
+
+material[2]:material-name=Fe_rh
+material[2]:damping-constant=0.1
+material[2]:atomic-spin-moment=3.15!muB
+material[2]:uniaxial-anisotropy-constant=1.404e-23
+material[2]:initial-spin-direction=0,0,-1
+
+
+material[1]:unit-cell-category = 1
+material[2]:unit-cell-category = 2
+

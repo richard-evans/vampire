@@ -55,6 +55,9 @@ void spin_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in
    mask=in_mask; // copy contents of vector
    spin_temp.resize(in_mask_size, 0.0);
    mean_spin_temp.resize(in_mask_size, 0.0);
+   SxH2.resize(in_mask_size,0.0);
+   SH.resize(in_mask_size,0.0);
+   
 
    // determine mask id's with no atoms
    num_atoms_in_mask.resize(in_mask_size,0);
@@ -110,6 +113,8 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                                           const std::vector<double>& mm){
 
    std::fill(spin_temp.begin(),spin_temp.end(),0.0);
+   std::fill(SxH2.begin(),SxH2.end(),0.0);
+   std::fill(SH.begin(),SH.end(),0.0);
 
    // check for Monte Carlo solvers and recalculate fields
   // if(sim::integrator == sim::monte_carlo || sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc || sim::integrator ==sim::llg_heun){
@@ -118,8 +123,7 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
     //  sim::calculate_external_fields(0, num_atoms);
    //}
 
-   double SxH2=0.0;
-   double SH=0.0;
+
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
 
@@ -135,10 +139,10 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 		 double SxHx = S[1]*B[2]-S[2]*B[1];
 		 double SxHy = S[2]*B[0]-S[0]*B[2];
 		 double SxHz = S[0]*B[1]-S[1]*B[0];
-		 SxH2  = SxH2+ SxHx*SxHx + SxHy*SxHy + SxHz*SxHz;
-         SH  = SH + S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
-         //std::cout<<"s"<<S[0]<<"\t"<<S[1]<<"\t"<<S[2]<<"b"<<B[0]<<"\t"<< B[1]<<"\t"<<B[2]<<"mask id:"<<mask_id<<"\t"<<SxH2<<"\t"<<SH<<std::endl;
-         spin_temp[mask_id]=0.5* mu /constants::kB * SxH2 / SH;
+		 SxH2[mask_id]  = SxH2[mask_id]+ mu*(SxHx*SxHx + SxHy*SxHy + SxHz*SxHz);
+         SH[mask_id]  = SH[mask_id] + S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
+         spin_temp[mask_id]= SxH2[mask_id] / SH[mask_id];
+         
 
 	}
 
@@ -220,7 +224,7 @@ std::string spin_temp_statistic_t::output_spin_temp(bool header){
          result << name + std::to_string(mask_id) + "_Ts";
       }
       else{
-         result << constants::muB * spin_temp[mask_id ];
+         result << 0.5*constants::muB/constants::kB * spin_temp[mask_id ]/  vmpi::num_processors;
       }
    }
 

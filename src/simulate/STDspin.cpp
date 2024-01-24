@@ -50,9 +50,9 @@ namespace sim{
       calculate_spin_fields(atom, atom+1);
   	  calculate_external_fields(atom, atom+1);
 
-      atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
+     /* atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
       atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-      atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
+      atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];*/
 
       
       add_spin_noise(atom,
@@ -89,9 +89,9 @@ namespace sim{
        for(int atom=num_atoms-1;atom>=0;atom--){
        calculate_spin_fields(atom, atom+1);
    	   calculate_external_fields(atom,atom+1);
-       atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
+       /*atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
        atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-       atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
+       atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];*/
 
    	   
        add_spin_noise(atom,

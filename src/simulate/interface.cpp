@@ -148,6 +148,8 @@ namespace sim{
          test="suzuki-trotter";
          if( value == test ){
             sim::integrator = sim::suzuki_trotter_spin;
+            // disable thermal field calculation
+        	sim::hamiltonian_simulation_flags[3]=0;
             return true;
          }
          //--------------------------------------------------------------------

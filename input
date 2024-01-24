@@ -8,39 +8,54 @@
 # Creation attributes:
 #------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
-dimensions:system-size-z = 7.7 !nm
+dimensions:system-size-x = 1!nm
+dimensions:system-size-y = 1!nm
+dimensions:system-size-z = 1!nm
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
 
 #------------------------------------------
 # Material Files:
 #------------------------------------------
-material:file = Co.mat
+material:file = ferh.mat
+material:unit-cell-file = file.ucf
+
 
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature = 0.0001
+sim:temperature = 300
 sim:time-steps-increment = 1
-sim:total-time-steps = 10000
-sim:time-step = 0.1!fs
-sim:applied-field-strength=5 !T
+sim:total-time-steps = 500000
+sim:time-step = 0.5!fs
+#sim:applied-field-strength=5 !T
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
 sim:program = time-series
-sim:integrator = suzuki-trotter
+sim:integrator = llg-heun
 
 #------------------------------------------
 # data output
 #------------------------------------------
 output:real-time
 output:magnetisation
-#output:spin-temperature
+output:spin-temperature
+output:material-magnetisation
+output:material-spin-temperature
+
 output:total-energy
 output:precision=15
 
+config:atoms
+config:atoms-output-rate = 10000
+
 screen:real-time
 screen:magnetisation
-#screen:spin-temperature
+screen:spin-temperature
+screen:material-magnetisation
+screen:material-spin-temperature
+
+
