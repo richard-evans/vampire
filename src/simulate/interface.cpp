@@ -157,6 +157,12 @@ namespace sim{
             return true;
          }
          //--------------------------------------------------------------------
+         test="lsf-rk4";
+         if( value == test ){
+            sim::integrator = sim::lsf_rk4;
+            return true;
+         }
+         //--------------------------------------------------------------------
          else{
             terminaltextcolor(RED);
                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -167,6 +173,7 @@ namespace sim{
                std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
                std::cerr << "\t\"lsf\"" << std::endl;
                std::cerr << "\t\"lsf-mc\"" << std::endl;
+               std::cerr << "\t\"lsf-rk4\"" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
           }

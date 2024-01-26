@@ -71,7 +71,7 @@ namespace sim{
 
 	// enumerated list for integrators
 	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
-							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5, lsf = 6, lsf_mc = 7};
+							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5, lsf = 6, lsf_mc = 7, lsf_rk4 = 8};
 
 	extern std::ofstream mag_file;
 	extern uint64_t time;
@@ -195,11 +195,13 @@ namespace sim{
 	extern int LLG_Midpoint_mpi();
 	extern int LLG_Midpoint_cuda();
 	extern int LSF_mpi();
+	extern int LSF_RK4_mpi();
 
 
 	// Integrator initialisers
 	extern int LLGinit();
 	extern int LSFinit();
+	extern int LSF_RK4_init();
 
 	// Field and energy functions
    extern double calculate_spin_energy(const int atom);

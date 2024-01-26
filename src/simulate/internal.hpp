@@ -93,6 +93,7 @@ namespace sim{
       extern void initialize_modules();
       extern void increment_time();
       extern void lsf_step();
+      extern void lsf_rk4_step();
 
    } // end of internal namespace
 } // end of sim namespace

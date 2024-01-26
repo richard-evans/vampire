@@ -12,7 +12,8 @@ mpi_generic.o \
 mpi_comms.o \
 parallel_rng_seed.o \
 wrapper.o \
-LSF-mpi.o
+LSF-mpi.o \
+LSF_RK4-mpi.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/mpi/,$(mpi_objects))

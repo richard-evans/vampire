@@ -729,6 +729,14 @@ void integrate_serial(uint64_t n_steps){
 			}
 			break;
 
+		case sim::lsf_rk4: // LSF-RK4
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sim::internal::lsf_rk4_step();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
          err::vexit();
@@ -867,6 +875,21 @@ int integrate_mpi(uint64_t n_steps){
 																atoms::type_array);
 					#endif
 
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case 8: // LSF-RK4
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+			// Select CUDA version if supported
+				#ifdef CUDA
+					//sim::LSF_RK4_cuda();
+				#else
+					sim::LSF_RK4_mpi();
+				#endif
+			#endif
 				// increment time
 				sim::internal::increment_time();
 			}
