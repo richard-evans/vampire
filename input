@@ -35,7 +35,7 @@ sim:time-step = 0.5!fs
 # Program and integrator details
 #------------------------------------------
 sim:program = time-series
-sim:integrator = llg-heun
+sim:integrator = suzuki-trotter
 
 #------------------------------------------
 # data output
@@ -43,9 +43,10 @@ sim:integrator = llg-heun
 output:real-time
 output:magnetisation
 output:spin-temperature
-output:material-magnetisation
+#output:material-magnetisation
 output:material-spin-temperature
-
+output:mean-spin-temperature
+output:material-mean-spin-temperature
 output:total-energy
 output:precision=15
 
@@ -55,7 +56,7 @@ config:atoms-output-rate = 10000
 screen:real-time
 screen:magnetisation
 screen:spin-temperature
-screen:material-magnetisation
+#screen:material-magnetisation
 screen:material-spin-temperature
 
 

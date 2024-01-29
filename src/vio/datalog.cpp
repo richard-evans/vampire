@@ -280,10 +280,10 @@ namespace vout{
          	    vout::mean_sysspintemp(stream, header);
          	    break;
          	case 76:
-                vout::material_mean_sysspintemp(stream, header);
+         	    vout::material_spin_temp(stream, header);
                 break;
             case 77:
-                vout::material_spin_temp(stream, header);
+                vout::material_mean_sysspintemp(stream, header);
                 break;
                 				
          case 997: //MP

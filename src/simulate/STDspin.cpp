@@ -34,8 +34,8 @@ namespace sim{
       const int num_atoms=atoms::num_atoms;
       double cay_dt=-mp::dt/2.0;//-dt4*consts::gyro - mp::dt contains gamma;
       double dt2=0.5*mp::dt_SI*1e12;
-      double lambda=mp::material[0].alpha;
-      double spin_noise=mp::material[0].H_th_sigma*sqrt(sim::temperature);
+      double lambda;
+      double spin_noise;
 
       std::vector <double> Hx_th(atoms::x_spin_array.size());
    	  std::vector <double> Hy_th(atoms::x_spin_array.size());
@@ -47,6 +47,11 @@ namespace sim{
 
 
       for(int atom=0;atom<num_atoms;atom++){
+      
+      const unsigned int imat = atoms::type_array[atom];
+      lambda=mp::material[imat].alpha;
+      spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
+      
       calculate_spin_fields(atom, atom+1);
   	  calculate_external_fields(atom, atom+1);
 
@@ -87,6 +92,11 @@ namespace sim{
       }
       
        for(int atom=num_atoms-1;atom>=0;atom--){
+       
+       const unsigned int imat = atoms::type_array[atom];
+       lambda=mp::material[imat].alpha;
+       spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
+       
        calculate_spin_fields(atom, atom+1);
    	   calculate_external_fields(atom,atom+1);
        /*atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];

@@ -149,8 +149,8 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
                     
        double cay_dt=-mp::dt/4.0;//-dt4*consts::gyro - mp::dt contains gamma;
        double dt2=0.5*mp::dt_SI*1e12;
-       double lambda=mp::material[0].alpha;
-       double spin_noise=mp::material[0].H_th_sigma*sqrt(sim::temperature);
+       double lambda;
+       double spin_noise;
        
 
        
@@ -186,13 +186,12 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
          
          for (int i=0; i<core_at;i++){
          atom = sim::c_octants[octant][i];
+         const unsigned int imat = atoms::type_array[atom];
+         lambda=mp::material[imat].alpha;
+         spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
+         
          
          calculate_spin_fields(atom, atom+1);
- 	     calculate_external_fields(atom, atom+1);
- 	     
- 	      atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-          atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-          atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
 
 
 
@@ -232,12 +231,11 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
          
          for (int i=0; i<bdry_at;i++){
          atom = sim::b_octants[octant][i];
+         const unsigned int imat = atoms::type_array[atom];
+         lambda=mp::material[imat].alpha;
+         spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
          
          calculate_spin_fields(atom, atom+1);
-     	  calculate_external_fields(atom, atom+1);
-            atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-           atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-           atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
 
          add_spin_noise(atom,
                      atom+1,
@@ -290,13 +288,12 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
             
             for (int i=core_at-1;i>=0;i--){
             atom = sim::c_octants[octant][i];
+            const unsigned int imat = atoms::type_array[atom];
+            lambda=mp::material[imat].alpha;
+            spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
             
             
             calculate_spin_fields(atom, atom+1);
-        	calculate_external_fields(atom, atom+1);
-            atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-            atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-            atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
 
             add_spin_noise(atom,
                         atom+1,
@@ -336,11 +333,11 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
             for (int i=bdry_at-1;i>=0;i--){
             atom = sim::b_octants[octant][i];
             
+            const unsigned int imat = atoms::type_array[atom];
+            lambda=mp::material[imat].alpha;
+            spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
+            
             calculate_spin_fields(atom, atom+1);
-        	  calculate_external_fields(atom, atom+1);
-            atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-            atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-            atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
 
             add_spin_noise(atom,
                         atom+1,
@@ -390,14 +387,13 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
              
              for (int i=0; i<core_at;i++){
              atom = sim::c_octants[octant][i];
+             const unsigned int imat = atoms::type_array[atom];
+             lambda=mp::material[imat].alpha;
+              spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
              
              
              calculate_spin_fields(atom, atom+1);
-         	  calculate_external_fields(atom, atom+1);
-         	     atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-                 atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-                 atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
-
+         	  
 
              add_spin_noise(atom,
                          atom+1,
@@ -437,14 +433,13 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
              
         for (int i=0; i<bdry_at;i++){
         atom = sim::b_octants[octant][i];
+        const unsigned int imat = atoms::type_array[atom];
+        lambda=mp::material[imat].alpha;
+        spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
         
         
         calculate_spin_fields(atom, atom+1);
-    	  calculate_external_fields(atom, atom+1);
-    	     atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-            atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-            atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
-
+    	
 
         add_spin_noise(atom,
                     atom+1,
@@ -495,14 +490,12 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
                 
                 for (int i=core_at-1;i>=0;i--){
                 atom = sim::c_octants[octant][i];
+                const unsigned int imat = atoms::type_array[atom];
+                lambda=mp::material[imat].alpha;
+                spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
                 
                 calculate_spin_fields(atom, atom+1);
-            	calculate_external_fields(atom, atom+1);
-            	   atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-                  atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-                  atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
-
-
+            	
                 add_spin_noise(atom,
                             atom+1,
                             mp::dt_SI*1e12,
@@ -540,12 +533,11 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
                 for (int i=bdry_at-1;i>=0;i--){
                 atom = sim::b_octants[octant][i];
                 
+                const unsigned int imat = atoms::type_array[atom];
+                lambda=mp::material[imat].alpha;
+                spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
                 
                calculate_spin_fields(atom, atom+1);
-           	   calculate_external_fields(atom, atom+1);
-           	      atoms::x_total_spin_field_array[atom]=+atoms::x_total_external_field_array[atom];
-                    atoms::y_total_spin_field_array[atom]=+atoms::y_total_external_field_array[atom];
-                    atoms::z_total_spin_field_array[atom]=+atoms::z_total_external_field_array[atom];
 
 
                add_spin_noise(atom,
