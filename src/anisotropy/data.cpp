@@ -3,9 +3,11 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Jack Collings, Sam Westmoreland and Richard Evans 2017.
+//   All rights reserved.
 //
 //   Email: sw766@york.ac.uk
+//          jbc525@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -39,15 +41,21 @@ namespace anisotropy{
       bool enable_random_anisotropy   = false; // Flag to enable random anisitropy initialisation
 
       // Flags for spherical-harmonic decomposition of magnetocrystalline anisotropy
-      bool enable_uniaxial_second_order   = false; // Flag to enable calculation of second order anisotropy
-      bool enable_rotational_2_2_order    = false; // Flag to enable calculation of second order theta second order phi anisotropy
-      bool enable_uniaxial_fourth_order   = false; // Flag to enable calculation of fourth order anisotropy
-      bool enable_rotational_4_2_order    = false; // Flag to enable calculation of fourth order theta second order phi anisotorpy
-      bool enable_rotational_4_4_order    = false; // Flag to enable calculation of fourth order theta fourth order phi anisotropy
-      bool enable_uniaxial_sixth_order    = false; // Flag to enable calculation of sixth order anisotropy
-      bool enable_rotational_6_2_order    = false; // Flag to enable calculation of sixth order theta second order phi anisotropy
-      bool enable_rotational_6_4_order    = false; // Flag to enable calculation of sixth order theta fourth order phi anisotropy
-      bool enable_rotational_6_6_order    = false; // Flag to enable calculation of sixth order theta sixth order phi anisotropy
+      bool enable_uniaxial_second_order      = false; // Flag to enable calculation of second order anisotropy
+      bool enable_rotational_2_2_order       = false; // Flag to enable calculation of second order theta second order phi anisotropy
+      bool enable_rotational_2_2_order_odd   = false; // Flag to enable calculation of second order theta second order phi odd anisotropy
+      bool enable_uniaxial_fourth_order      = false; // Flag to enable calculation of fourth order anisotropy
+      bool enable_rotational_4_2_order       = false; // Flag to enable calculation of fourth order theta second order phi anisotorpy
+      bool enable_rotational_4_2_order_odd   = false; // Flag to enable calculation of fourth order theta second order phi odd anisotropy
+      bool enable_rotational_4_4_order       = false; // Flag to enable calculation of fourth order theta fourth order phi anisotropy
+      bool enable_rotational_4_4_order_odd   = false; // Flag to enable calculation of fourth order theta fourth order phi odd anisotropy
+      bool enable_uniaxial_sixth_order       = false; // Flag to enable calculation of sixth order anisotropy
+      bool enable_rotational_6_2_order       = false; // Flag to enable calculation of sixth order theta second order phi anisotropy
+      bool enable_rotational_6_2_order_odd   = false; // Flag to enable calculation of sixth order theta second order phi odd anisotropy
+      bool enable_rotational_6_4_order       = false; // Flag to enable calculation of sixth order theta fourth order phi anisotropy
+      bool enable_rotational_6_4_order_odd   = false; // Flag to enable calculation of sixth order theta fourth order phi odd anisotropy
+      bool enable_rotational_6_6_order       = false; // Flag to enable calculation of sixth order theta sixth order phi anisotropy
+      bool enable_rotational_6_6_order_odd   = false; // Flag to enable calculation of sixth order theta sixth order phi odd anisotropy
 
       bool enable_biaxial_fourth_order_simple = false; // Flag to enable calculation of the simple version of the fourth order anisotropy
 
@@ -66,13 +74,19 @@ namespace anisotropy{
       // arrays for storing unrolled anisotropy constants in Tesla
       std::vector<double> ku2(0);
       std::vector<double> k2r2(0);
+      std::vector<double> k2r2_odd(0);
       std::vector<double> ku4(0);
       std::vector<double> k4r2(0);
+      std::vector<double> k4r2_odd(0);
       std::vector<double> k4r4(0);
+      std::vector<double> k4r4_odd(0);
       std::vector<double> ku6(0);
       std::vector<double> k6r2(0);
+      std::vector<double> k6r2_odd(0);
       std::vector<double> k6r4(0);
+      std::vector<double> k6r4_odd(0);
       std::vector<double> k6r6(0);
+      std::vector<double> k6r6_odd(0);
 
       std::vector<double> kc4(0);
       std::vector<double> kc6(0);

@@ -3,9 +3,10 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland 2016. All rights reserved.
+//   (c) Jack Collings and Sam Westmoreland 2016. All rights reserved.
 //
 //   Email: sw766@york.ac.uk
+//          jbc525@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -67,9 +68,19 @@ namespace anisotropy
    double get_anisotropy_constant(const int material);
    double get_ku2(const int material);
    double get_k2r2(const int material);
+   double get_k2r2_odd(const int material);
    double get_ku4(const int material);
    double get_k4r2(const int material);
+   double get_k4r2_odd(const int material);
+   double get_k4r4(const int material);
+   double get_k4r4_odd(const int material);
    double get_ku6(const int material);
+   double get_k6r2(const int material);
+   double get_k6r2_odd(const int material);
+   double get_k6r4(const int material);
+   double get_k6r4_odd(const int material);
+   double get_k6r6(const int material);
+   double get_k6r6_odd(const int material);
    double get_kc4(const int material);
    double get_kc6(const int material);
    std::vector<double> get_ku_vector(const int material);

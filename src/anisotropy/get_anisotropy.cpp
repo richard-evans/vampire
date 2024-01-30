@@ -44,6 +44,14 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get second order theta second order phi odd anisotropy constant for
+   // a given material
+   //--------------------------------------------------------------------------------
+   double get_k2r2_odd(const int material){
+      return internal::mp[material].k2r2_odd;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get fourth order uniaxial anisotropy constant for a given material
    //--------------------------------------------------------------------------------
    double get_ku4(const int material){
@@ -59,11 +67,27 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get fourth order theta second order phi odd anisotropy constant for
+   // a given material
+   //--------------------------------------------------------------------------------
+   double get_k4r2_odd(const int material){
+      return internal::mp[material].k4r2_odd;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get fourth order theta fourth order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
    double get_k4r4(const int material){
       return internal::mp[material].k4r4;
+   }
+
+   //--------------------------------------------------------------------------------
+   // Function to get fourth order theta fourth order phi odd anisotropy constant for
+   // a given material
+   //--------------------------------------------------------------------------------
+   double get_k4r4_odd(const int material){
+      return internal::mp[material].k4r4_odd;
    }
 
    //--------------------------------------------------------------------------------
@@ -82,6 +106,14 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get sixth order theta second order phi odd anisotropy constant for
+   // a given material
+   //--------------------------------------------------------------------------------
+   double get_k6r2_odd(const int material){
+      return internal::mp[material].k6r2_odd;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get sixth order theta fourth order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
@@ -90,11 +122,27 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get sixth order theta fourth order phi odd anisotropy constant for
+   // a given material
+   //--------------------------------------------------------------------------------
+   double get_k6r4_odd(const int material){
+      return internal::mp[material].k6r4_odd;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get sixth order theta sixth order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
    double get_k6r6(const int material){
       return internal::mp[material].k6r4;
+   }
+
+   //--------------------------------------------------------------------------------
+   // Function to get sixth order theta sixth order phi odd anisotropy constant for a
+   // given material
+   //--------------------------------------------------------------------------------
+   double get_k6r6_odd(const int material){
+      return internal::mp[material].k6r4_odd;
    }
 
    //--------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 //   rights reserved.
 //
 //   Email: sw766@york.ac.uk
+//          jbc525@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -125,6 +126,11 @@ namespace anisotropy{
          internal::k2r2.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k2r2[m] = internal::mp[m].k2r2 * inverse_mu_s[m];
       }
+      // Second order theta second order phi odd rotational
+      if(internal::enable_rotational_2_2_order_odd){
+         internal::k2r2_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k2r2_odd[m] = internal::mp[m].k2r2_odd * inverse_mu_s[m];
+      }
       // Fourth order uniaxial
       if(internal::enable_uniaxial_fourth_order){
          internal::ku4.resize(num_materials);
@@ -135,10 +141,20 @@ namespace anisotropy{
          internal::k4r2.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k4r2[m] = internal::mp[m].k4r2 * inverse_mu_s[m];
       }
+      // Fourth order theta second order phi odd rotational
+      if(internal::enable_rotational_4_2_order_odd){
+         internal::k4r2_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r2_odd[m] = internal::mp[m].k4r2_odd * inverse_mu_s[m];
+      }
       // Fourth order theta fourth order phi rotational
       if(internal::enable_rotational_4_4_order){
          internal::k4r4.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k4r4[m] = internal::mp[m].k4r4 * inverse_mu_s[m];
+      }
+      // Fourth order theta fourth order phi odd rotational
+      if(internal::enable_rotational_4_4_order_odd){
+         internal::k4r4_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r4_odd[m] = internal::mp[m].k4r4_odd * inverse_mu_s[m];
       }
       // Sixth order uniaxial
       if(internal::enable_uniaxial_sixth_order){
@@ -150,15 +166,30 @@ namespace anisotropy{
          internal::k6r2.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k6r2[m] = internal::mp[m].k6r2 * inverse_mu_s[m];
       }
+      // Sixth order theta second order phi odd rotational
+      if(internal::enable_rotational_6_2_order_odd){
+         internal::k6r2_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r2_odd[m] = internal::mp[m].k6r2_odd * inverse_mu_s[m];
+      }
       // Sixth order theta fourth order phi rotational
       if(internal::enable_rotational_6_4_order){
          internal::k6r4.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k6r4[m] = internal::mp[m].k6r4 * inverse_mu_s[m];
       }
+      // Sixth order theta fourth order phi odd rotational
+      if(internal::enable_rotational_6_4_order_odd){
+         internal::k6r4_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r4_odd[m] = internal::mp[m].k6r4_odd * inverse_mu_s[m];
+      }
       // Sixth order theta sixth order phi rotational
       if(internal::enable_rotational_6_6_order){
          internal::k6r6.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k6r6[m] = internal::mp[m].k6r6 * inverse_mu_s[m];
+      }
+      // Sixth order theta sixth order phi odd rotational
+      if(internal::enable_rotational_6_6_order_odd){
+         internal::k6r6_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r6_odd[m] = internal::mp[m].k6r6_odd * inverse_mu_s[m];
       }
       // Fourth order biaxial (simple version)
       if(internal::enable_biaxial_fourth_order_simple){
@@ -280,6 +311,7 @@ namespace anisotropy{
                internal::ku4_triaxial_basis3z[mat] = 1;
 
             }
+
          }
 
          //---------------------------------------------------------------------
