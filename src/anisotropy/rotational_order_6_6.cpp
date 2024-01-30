@@ -97,7 +97,7 @@ namespace anisotropy{
             const double Sx2Sy2 = Sx2 * Sy2;
 
             // get reduced anisotropy constant ku/mu_s
-            const double six_k6r6 = six * internal::k6r4[mat];
+            const double six_k6r6 = six * internal::k6r6[mat];
 
             // calculate full form to add to field
             const double fullx = six_k6r6 * Sx * (Sx4 - ten * Sx2Sy2 + five * Sy4);
