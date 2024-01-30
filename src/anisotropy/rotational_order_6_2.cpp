@@ -41,7 +41,7 @@ namespace anisotropy{
       // of the highest order term with an abritrary shift so that E(0) = 0.
       //
       // The rotational term here is given by
-      // E_{62} = -k_{6r2}sin^2{theta}(cos^4{theta} - (9/11)cos^2{theta} + (1/33))cos{2phi}
+      // E_{ 6, 2 } = - k_{ 6 r2 } sin^2{ theta } ( cos^4{ theta } - ( 9 / 11 ) cos^2{ theta } + ( 1 / 33 ) ) cos{ 2 phi }
       //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment 
       // basis and is detailed in an as yet unpublished paper.
@@ -118,7 +118,6 @@ namespace anisotropy{
 
       // Define useful constants
       const double sixteenoeleven = 16.0 / 11.0;
-      const double one = 1.0;
 
       double sixth_order_theta_second_order_phi_energy(const int atom,
                                           const int mat,
@@ -136,6 +135,7 @@ namespace anisotropy{
 
          // calculate sin^2{theta} * ( cos^4{theta} - ( 6 / 11 ) * cos^2{theta} + ( 1 / 33 ) ) * cos{2phi}
          //          = ( sin^4{theta} - ( 16 / 11 ) * sin^2{theta} + 16 / 33 ) * ( 2 * sin^2{theta} cos^2{phi} - sin^2{theta} )
+         //          = ( sin^4{theta} - ( 16 / 11 ) * sin^2{theta} + 16 / 33 ) * ( S_x^2 - S_y^2 )
          const double Sx = sx * fx + sy * fy + sz * fz;
          const double Sx2 = Sx * Sx;
 
