@@ -27,7 +27,7 @@ material:unit-cell-file = file.ucf
 #------------------------------------------
 sim:temperature = 300
 sim:time-steps-increment = 1
-sim:total-time-steps = 500000
+sim:total-time-steps = 100000
 sim:time-step = 0.5!fs
 #sim:applied-field-strength=5 !T
 

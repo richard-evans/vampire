@@ -149,9 +149,7 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
                     
        double cay_dt=-mp::dt/4.0;//-dt4*consts::gyro - mp::dt contains gamma;
        double dt2=0.5*mp::dt_SI*1e12;
-       double lambda;
-       double spin_noise;
-       
+     
 
        
          //vectors for thermal noise spin plus lattice
@@ -186,9 +184,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
          
          for (int i=0; i<core_at;i++){
          atom = sim::c_octants[octant][i];
-         const unsigned int imat = atoms::type_array[atom];
-         lambda=mp::material[imat].alpha;
-         spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
          
          
          calculate_spin_fields(atom, atom+1);
@@ -231,9 +226,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
          
          for (int i=0; i<bdry_at;i++){
          atom = sim::b_octants[octant][i];
-         const unsigned int imat = atoms::type_array[atom];
-         lambda=mp::material[imat].alpha;
-         spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
          
          calculate_spin_fields(atom, atom+1);
 
@@ -288,9 +280,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
             
             for (int i=core_at-1;i>=0;i--){
             atom = sim::c_octants[octant][i];
-            const unsigned int imat = atoms::type_array[atom];
-            lambda=mp::material[imat].alpha;
-            spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
             
             
             calculate_spin_fields(atom, atom+1);
@@ -333,9 +322,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
             for (int i=bdry_at-1;i>=0;i--){
             atom = sim::b_octants[octant][i];
             
-            const unsigned int imat = atoms::type_array[atom];
-            lambda=mp::material[imat].alpha;
-            spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
             
             calculate_spin_fields(atom, atom+1);
 
@@ -387,9 +373,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
              
              for (int i=0; i<core_at;i++){
              atom = sim::c_octants[octant][i];
-             const unsigned int imat = atoms::type_array[atom];
-             lambda=mp::material[imat].alpha;
-              spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
              
              
              calculate_spin_fields(atom, atom+1);
@@ -433,9 +416,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
              
         for (int i=0; i<bdry_at;i++){
         atom = sim::b_octants[octant][i];
-        const unsigned int imat = atoms::type_array[atom];
-        lambda=mp::material[imat].alpha;
-        spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
         
         
         calculate_spin_fields(atom, atom+1);
@@ -490,9 +470,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
                 
                 for (int i=core_at-1;i>=0;i--){
                 atom = sim::c_octants[octant][i];
-                const unsigned int imat = atoms::type_array[atom];
-                lambda=mp::material[imat].alpha;
-                spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
                 
                 calculate_spin_fields(atom, atom+1);
             	
@@ -533,9 +510,6 @@ void STDspin_step_parallel(std::vector<double> &x_spin_array,
                 for (int i=bdry_at-1;i>=0;i--){
                 atom = sim::b_octants[octant][i];
                 
-                const unsigned int imat = atoms::type_array[atom];
-                lambda=mp::material[imat].alpha;
-                spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
                 
                calculate_spin_fields(atom, atom+1);
 
