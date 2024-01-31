@@ -54,6 +54,14 @@ E^{\mathrm{BQ}} = \sum_{i<j} \Jij^{\mathrm{BQ}} \left( \sms_i \cdot \sms_j \righ
 % Magnetic anisotropy parameters
 %--------------------------------
 \noindent For details on how anisotropy has been implemented into VAMPIRE in the real spherical harmonic (tesseral harmonic) form, consult 10.1103/PhysRevB.107.064413.
+\noindent In general the tesseral harmonic can be added via the following.
+
+{\zicf material:()-()-anisotropy-constant = float [default 0.0 J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:l-m-anisotropy-constant} Defines the local single-ion magnetocrystalline anisotropy constant for an atomic site. The anisotropy energy is given by the expression
+\begin{equation*}
+  E_{l,m} = -k_{l,m}T_{l,m}(\theta, \phi),
+\end{equation*}
+replace $l$ and $m$ with appropriate values for the desired tesseral harmonic.
+E.g., for the $ l = 2 $, $ m = -2 $ harmonic, use "material[n]:2--2-anisotropy-constant = ".
 
 {\zicf material:uniaxial-anisotropy-constant = float [default 0.0 J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-constant} Defines the local second order single-ion magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
 
