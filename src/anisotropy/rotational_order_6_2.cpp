@@ -5,7 +5,7 @@
 //
 //   (c) Jack Collings and Richard Evans 2022. All rights reserved.
 //
-//   Email: richard.evans@york.ac.uk
+//   Email: jbc525@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -41,49 +41,52 @@ namespace anisotropy{
       // of the highest order term with an abritrary shift so that E(0) = 0.
       //
       // The rotational term here is given by
-      // E_{ 6, 2 } = - k_{ 6 r2 } sin^2{ theta } ( cos^4{ theta } - ( 9 / 11 ) cos^2{ theta } + ( 1 / 33 ) ) cos{ 2 phi }
+      // E_{ 6r2 } = - k_{ 6r2 } sin^2{ theta } ( cos^4{ theta } - ( 9 / 11 ) cos^2{ theta } + ( 1 / 33 ) ) cos{ 2 phi }
       //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment 
-      // basis and is detailed in an as yet unpublished paper.
+      // basis.
       //
       //--------------------------------------------------------------------------------------------------------------
 
       // define useful consts
       const double thirtytwooeleven = 32.0 / 11.0;
-      const double sixteenothirtythree = 16.0 / 33.0;
+      const double one = 1.0;
       const double two = 2.0;
       const double three = 3.0;
+      const double six = 6.0;
 
-      void sixth_order_theta_second_order_phi_fields(std::vector<double>& spin_array_x,
-                                        std::vector<double>& spin_array_y,
-                                        std::vector<double>& spin_array_z,
-                                        std::vector<int>&    atom_material_array,
-                                        std::vector<double>& field_array_x,
-                                        std::vector<double>& field_array_y,
-                                        std::vector<double>& field_array_z,
-                                        const int start_index,
-                                        const int end_index){
+      void sixth_order_theta_second_order_phi_fields( std::vector< double >& spin_array_x,
+                                                      std::vector< double >& spin_array_y,
+                                                      std::vector< double >& spin_array_z,
+                                                      std::vector< int >&    atom_material_array,
+                                                      std::vector< double >& field_array_x,
+                                                      std::vector< double >& field_array_y,
+                                                      std::vector< double >& field_array_z,
+                                                      const int start_index,
+                                                      const int end_index )
+      {
 
          // if not enabled then do nothing
-         if(!internal::enable_rotational_6_2_order) return;
+         if( !internal::enable_rotational_6_2_order ) return;
 
          // Loop over all atoms between start and end index
-         for(int atom = start_index; atom < end_index; ++atom){
+         for( int atom = start_index; atom < end_index; ++atom )
+         {
 
             // get atom material
-            const int mat = atom_material_array[atom];
+            const int mat = atom_material_array[ atom ];
 
-            const double sx = spin_array_x[atom]; // store spin direction in temporary variables
-            const double sy = spin_array_y[atom];
-            const double sz = spin_array_z[atom];
+            const double sx = spin_array_x[ atom ]; // store spin direction in temporary variables
+            const double sy = spin_array_y[ atom ];
+            const double sz = spin_array_z[ atom ];
 
-            const double fx = internal::kr_vector[mat].x;
-            const double fy = internal::kr_vector[mat].y;
-            const double fz = internal::kr_vector[mat].z;
+            const double fx = internal::kr_vector[ mat ].x;
+            const double fy = internal::kr_vector[ mat ].y;
+            const double fz = internal::kr_vector[ mat ].z;
 
-            const double gx = internal::kl_vector[mat].x;
-            const double gy = internal::kl_vector[mat].y;
-            const double gz = internal::kl_vector[mat].z;
+            const double gx = internal::kl_vector[ mat ].x;
+            const double gy = internal::kl_vector[ mat ].y;
+            const double gz = internal::kl_vector[ mat ].z;
 
             // calculate S_x and S_x^3 parts
             const double Sx = sx * fx + sy * fy + sz * fz;
@@ -96,15 +99,15 @@ namespace anisotropy{
             const double Sx2pSy2 = Sx2 + Sy2;
 
             // get reduced anisotropy constant ku/mu_s
-            const double two_k6r2 = two * internal::k6r2[mat];
+            const double two_k6r2 = two * internal::k6r2[ mat ];
 
             // calculate full form to add to field
-            const double fullx = two_k6r2 * Sx * ( Sx2pSy2 * ( three * Sx2 - Sy2 ) - ( thirtytwooeleven * Sx2 - sixteenothirtythree ) );
-            const double fully = two_k6r2 * Sy * ( Sx2pSy2 * ( Sx2 - three * Sy2 ) + ( thirtytwooeleven * Sy2 - sixteenothirtythree ) );
+            const double x_component = two_k6r2 * ( Sy * Sx2pSy2 * ( three * Sx2 - Sy2 ) + sixteenothirtythree * Sx * ( - six * Sx2 + one ) );
+            const double y_component = two_k6r2 * ( Sx * Sx2pSy2 * ( Sx2 - three * Sy2 ) + sixteenothirtythree * Sy * ( six * Sy2 - one ) );
 
-            field_array_x[atom] += fullx * fx + fully * gx;
-            field_array_y[atom] += fullx * fy + fully * gy;
-            field_array_z[atom] += fullx * fz + fully * gz;
+            field_array_x[ atom ] += x_component * fx + y_component * gx;
+            field_array_y[ atom ] += x_component * fy + y_component * gy;
+            field_array_z[ atom ] += x_component * fz + y_component * gz;
 
          }
 
@@ -118,20 +121,22 @@ namespace anisotropy{
 
       // Define useful constants
       const double sixteenoeleven = 16.0 / 11.0;
+      const double sixteenothirtythree = 16.0 / 33.0;
 
-      double sixth_order_theta_second_order_phi_energy(const int atom,
-                                          const int mat,
-                                          const double sx,
-                                          const double sy,
-                                          const double sz){
+      double sixth_order_theta_second_order_phi_energy(  const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz )
+      {
 
-         const double fx = internal::kr_vector[mat].x;
-         const double fy = internal::kr_vector[mat].y;
-         const double fz = internal::kr_vector[mat].z;
+         const double fx = internal::kr_vector[ mat ].x;
+         const double fy = internal::kr_vector[ mat ].y;
+         const double fz = internal::kr_vector[ mat ].z;
 
-         const double gx = internal::kl_vector[mat].x;
-         const double gy = internal::kl_vector[mat].y;
-         const double gz = internal::kl_vector[mat].z;
+         const double gx = internal::kl_vector[ mat ].x;
+         const double gy = internal::kl_vector[ mat ].y;
+         const double gz = internal::kl_vector[ mat ].z;
 
          // calculate sin^2{theta} * ( cos^4{theta} - ( 6 / 11 ) * cos^2{theta} + ( 1 / 33 ) ) * cos{2phi}
          //          = ( sin^4{theta} - ( 16 / 11 ) * sin^2{theta} + 16 / 33 ) * ( 2 * sin^2{theta} cos^2{phi} - sin^2{theta} )
@@ -145,9 +150,9 @@ namespace anisotropy{
          const double sintheta2 = Sx2 + Sy2;
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
-         const double k6r2 = internal::k6r2[mat];
+         const double k6r2 = internal::k6r2[ mat ];
 
-         return - k6r2 * (sintheta2 * sintheta2 - sixteenoeleven * sintheta2 + sixteenothirtythree ) * (Sx2 - Sy2);
+         return - k6r2 * ( sintheta2 * sintheta2 - sixteenoeleven * sintheta2 + sixteenothirtythree ) * ( Sx2 - Sy2 );
 
       }
    }
