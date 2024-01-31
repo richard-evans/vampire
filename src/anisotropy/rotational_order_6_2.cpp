@@ -49,7 +49,7 @@ namespace anisotropy{
       //--------------------------------------------------------------------------------------------------------------
 
       // define useful consts
-      const double thirtytwooeleven = 32.0 / 11.0;
+      const double sixteenothirtythree = 16.0 / 33.0;
       const double one = 1.0;
       const double two = 2.0;
       const double three = 3.0;
@@ -121,7 +121,6 @@ namespace anisotropy{
 
       // Define useful constants
       const double sixteenoeleven = 16.0 / 11.0;
-      const double sixteenothirtythree = 16.0 / 33.0;
 
       double sixth_order_theta_second_order_phi_energy(  const int atom,
                                                          const int mat,
