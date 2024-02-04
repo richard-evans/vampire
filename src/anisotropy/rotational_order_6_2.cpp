@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Jack Collings and Richard Evans 2022. All rights reserved.
+//   (c) Jack Collings 2024. All rights reserved.
 //
 //   Email: jbc525@york.ac.uk
 //
@@ -102,8 +102,8 @@ namespace anisotropy{
             const double two_k6r2 = two * internal::k6r2[ mat ];
 
             // calculate full form to add to field
-            const double x_component = two_k6r2 * ( Sy * Sx2pSy2 * ( three * Sx2 - Sy2 ) + sixteenothirtythree * Sx * ( - six * Sx2 + one ) );
-            const double y_component = two_k6r2 * ( Sx * Sx2pSy2 * ( Sx2 - three * Sy2 ) + sixteenothirtythree * Sy * ( six * Sy2 - one ) );
+            const double x_component = two_k6r2 * Sx * ( Sx2pSy2 * ( three * Sx2 - Sy2 ) + sixteenothirtythree * ( one - six * Sx2 ) );
+            const double y_component = two_k6r2 * Sy * ( Sx2pSy2 * ( Sx2 - three * Sy2 ) + sixteenothirtythree * ( six * Sy2 - one ) );
 
             field_array_x[ atom ] += x_component * fx + y_component * gx;
             field_array_y[ atom ] += x_component * fy + y_component * gy;
