@@ -111,7 +111,7 @@ namespace anisotropy{
 
             // calculate full form to add to field
             const double x_component = k6r5 * Sz * five * ( sixteen * Sx4 + twelve * Sx2Sz2 + Sz4 - two * ( six * Sx2 + Sz2 ) + one );
-            const double z_component = k6r5_odd * Sx * ( sixteen * Sx4 + sixty * Sx2Sz2 + twentyfive * Sz4 - ten * ( two * Sx2 + three * Sz2 ) + five );
+            const double z_component = k6r5 * Sx * ( sixteen * Sx4 + sixty * Sx2Sz2 + twentyfive * Sz4 - ten * ( two * Sx2 + three * Sz2 ) + five );
             
             field_array_x[ atom ] += z_component * ex + x_component * fx;
             field_array_y[ atom ] += z_component * ey + x_component * fy;
