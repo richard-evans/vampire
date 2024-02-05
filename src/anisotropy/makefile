@@ -1,4 +1,4 @@
-#---#--------------------------------------------------------------
+#--------------------------------------------------------------
 #          Makefile for anisotropy module
 #--------------------------------------------------------------
 
@@ -34,6 +34,7 @@ rotational_order_4_4_odd.o\
 uniaxial_order_6.o \
 rotational_order_6_2.o \
 rotational_order_6_2_odd.o\
+rotational_order_6_3_odd.o\
 rotational_order_6_4.o \
 rotational_order_6_4_odd.o\
 rotational_order_6_5.o\

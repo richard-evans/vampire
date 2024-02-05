@@ -53,6 +53,7 @@ namespace anisotropy{
       if(internal::enable_uniaxial_sixth_order)          energy += internal::uniaxial_sixth_order_energy (atom, mat, sx, sy, sz);
       if(internal::enable_rotational_6_2_order)          energy += internal::sixth_order_theta_second_order_phi_energy(atom, mat, sx, sy, sz);
       if(internal::enable_rotational_6_2_order_odd)      energy += internal::sixth_order_theta_second_order_phi_odd_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_rotational_6_3_order_odd)      energy += internal::sixth_order_theta_third_order_phi_odd_energy(atom, mat, sx, sy, sz);
       if(internal::enable_rotational_6_4_order)          energy += internal::sixth_order_theta_fourth_order_phi_energy(atom, mat, sx, sy, sz);
       if(internal::enable_rotational_6_4_order_odd)      energy += internal::sixth_order_theta_fourth_order_phi_odd_energy(atom, mat, sx, sy, sz);
       if(internal::enable_rotational_6_5_order)      		energy += internal::sixth_order_theta_fifth_order_phi_energy(atom, mat, sx, sy, sz);
