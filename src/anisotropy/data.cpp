@@ -56,6 +56,7 @@ namespace anisotropy{
       bool enable_rotational_4_4_order       = false; // Flag to enable calculation of fourth order theta fourth order phi anisotropy
       bool enable_rotational_4_4_order_odd   = false; // Flag to enable calculation of fourth order theta fourth order phi odd anisotropy
       bool enable_uniaxial_sixth_order       = false; // Flag to enable calculation of sixth order anisotropy
+      bool enable_rotational_6_1_order_odd   = false; // Flag to enable calculation of sixth order theta first order phi anisotropy
       bool enable_rotational_6_2_order       = false; // Flag to enable calculation of sixth order theta second order phi anisotropy
       bool enable_rotational_6_2_order_odd   = false; // Flag to enable calculation of sixth order theta second order phi odd anisotropy
       bool enable_rotational_6_3_order       = false; // Flag to enable calculation of sixth order theta third order phi anisotropy
@@ -97,6 +98,7 @@ namespace anisotropy{
       std::vector<double> k4r4(0);
       std::vector<double> k4r4_odd(0);
       std::vector<double> ku6(0);
+      std::vector<double> k6r1_odd(0);
       std::vector<double> k6r2(0);
       std::vector<double> k6r2_odd(0);
       std::vector<double> k6r3(0);
