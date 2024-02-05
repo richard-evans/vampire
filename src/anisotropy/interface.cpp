@@ -463,6 +463,16 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      test = "6-5-order-anisotropy-constant";
+      test2 = "sixth-order-theta-fifth-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
+         double k6r5 = atof(value.c_str());
+         vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r5 = k6r5;
+         internal::enable_rotational_6_5_order = true;
+         return true;
+      }
+      //------------------------------------------------------------
       test = "6--5-order-anisotropy-constant";
       test2 = "sixth-order-theta-fifth-order-phi-odd-anisotropy-constant";
       if( (word == test) || (word == test2) ){

@@ -106,6 +106,7 @@ namespace anisotropy{
             double k6r2_odd;  // sixth order theta second order phi odd anisotropy constant
             double k6r4;      // sixth order theta fourth order phi anisotropy constant
             double k6r4_odd;  // sixth order theta fourth order phi odd anisotropy constant
+            double k6r5;      // sixth order theta fifth order phi anisotropy constant
             double k6r5_odd;  // sixth order theta fifth order phi odd anisotropy constant
             double k6r6;      // sixth order theta sixth order phi anisotropy constant
             double k6r6_odd;  // sixth order theta sixth order phi odd anisotropy constant
@@ -157,6 +158,7 @@ namespace anisotropy{
                k6r2_odd( 0.0 ),  // set initial value of k6r2_odd to zero
                k6r4( 0.0 ),      // set initial value of k6r4 to zero
                k6r4_odd( 0.0 ),  // set initial value of k6r4_odd to zero
+               k6r5( 0.0 ),      // set initial value of k6r5 to zero
                k6r5_odd( 0.0 ),  // set initial value of k6r5_odd to zero
                k6r6( 0.0 ),      // set initial value of k6r6 to zero
                k6r6_odd( 0.0 ),  // set initial value of k6r6_odd to zero
@@ -258,6 +260,7 @@ namespace anisotropy{
       extern bool enable_rotational_6_2_order_odd; // Flag to enable calculation of sixth order theta second order phi odd anisotropy
       extern bool enable_rotational_6_4_order;     // Flag to enable calculation of sixth order theta fourth order phi anisotropy
       extern bool enable_rotational_6_4_order_odd; // Flag to enable calculation of sixth order theta fourth order phi odd anisotropy
+      extern bool enable_rotational_6_5_order;     // Flag to enable calculation of sixth order theta fifth order phi anisotropy
       extern bool enable_rotational_6_5_order_odd; // Flag to enable calculation of sixth order theta fifth order phi odd anisotropy
       extern bool enable_rotational_6_6_order;     // Flag to enable calculation of sixth order theta fourth order phi anisotropy
       extern bool enable_rotational_6_6_order_odd; // Flag to enable calculation of sixth order theta fourth order phi odd anisotropy
@@ -304,6 +307,7 @@ namespace anisotropy{
       extern std::vector< double > k6r2_odd;
       extern std::vector< double > k6r4;
       extern std::vector< double > k6r4_odd;
+      extern std::vector< double > k6r5;
       extern std::vector< double > k6r5_odd;
       extern std::vector< double > k6r6;
       extern std::vector< double > k6r6_odd;
@@ -559,6 +563,16 @@ namespace anisotropy{
                                                             const int start_index,
                                                             const int end_index );
 
+      void sixth_order_theta_fifth_order_phi_fields(  std::vector<double>& spin_array_x,
+                                                      std::vector<double>& spin_array_y,
+                                                      std::vector<double>& spin_array_z,
+                                                      std::vector<int>&    atom_material_array,
+                                                      std::vector<double>& field_array_x,
+                                                      std::vector<double>& field_array_y,
+                                                      std::vector<double>& field_array_z,
+                                                      const int start_index,
+                                                      const int end_index );
+
       void sixth_order_theta_fifth_order_phi_odd_fields( std::vector<double>& spin_array_x,
                                                          std::vector<double>& spin_array_y,
                                                          std::vector<double>& spin_array_z,
@@ -805,6 +819,12 @@ namespace anisotropy{
                                                             const double sx,
                                                             const double sy,
                                                             const double sz );
+
+      double sixth_order_theta_fifth_order_phi_energy(   const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz );
 
       double sixth_order_theta_fifth_order_phi_odd_energy(  const int atom,
                                                             const int mat,

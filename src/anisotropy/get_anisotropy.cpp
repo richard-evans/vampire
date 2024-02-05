@@ -178,6 +178,14 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get sixth order theta fifth order phi anisotropy constant for a
+   // given material
+   //--------------------------------------------------------------------------------
+   double get_k6r5(const int material){
+      return internal::mp[material].k6r5;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get sixth order theta fifth order phi odd anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------
@@ -190,7 +198,7 @@ namespace anisotropy{
    // given material
    //--------------------------------------------------------------------------------
    double get_k6r6(const int material){
-      return internal::mp[material].k6r4;
+      return internal::mp[material].k6r6;
    }
 
    //--------------------------------------------------------------------------------

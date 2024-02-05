@@ -36,6 +36,7 @@ rotational_order_6_2.o \
 rotational_order_6_2_odd.o\
 rotational_order_6_4.o \
 rotational_order_6_4_odd.o\
+rotational_order_6_5.o\
 rotational_order_6_5_odd.o\
 rotational_order_6_6.o \
 rotational_order_6_6_odd.o\
