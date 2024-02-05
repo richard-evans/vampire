@@ -95,6 +95,7 @@ namespace anisotropy{
             double ku4;       // fourth order uniaxial anisotropy constant ( ~Ku2 )
             double k4r2;      // fourth order theta second order phi anisotropy constant
             double k4r2_odd;  // fourth order theta second order phi odd anisotropy constant
+            double k4r3;      // fourth order theta third order phi odd anisotropy constant
             double k4r3_odd;  // fourth order theta third order phi odd anisotropy constant
             double k4r4;      // fourth order theta fourth order phi anisotropy constant
             double k4r4_odd;  // fourth order theta fourth order phi odd anisotropy constant
@@ -142,6 +143,7 @@ namespace anisotropy{
                ku4( 0.0 ),       // set initial value of ku4 to zero
                k4r2( 0.0 ),      // set intital value of k4r2 to zero
                k4r2_odd( 0.0 ),  // set initial value of k4r2_odd to zero
+               k4r3( 0.0 ),      // set initial value of k4r3_odd to zero
                k4r3_odd( 0.0 ),  // set initial value of k4r3_odd to zero
                k4r4( 0.0 ),      // set initial value of k4r4 to zero
                k4r4_odd( 0.0 ),  // set initial value of k4r4_odd to zero
@@ -239,6 +241,7 @@ namespace anisotropy{
       extern bool enable_uniaxial_fourth_order;    // Flag to enable calculation of fourth order uniaxial anisotropy
       extern bool enable_rotational_4_2_order;     // Flag to enable calculation of fourth order theta second order phi anisotropy
       extern bool enable_rotational_4_2_order_odd; // Flag to enable calculation of fourth order theta second order phi odd anisotropy
+      extern bool enable_rotational_4_3_order;     // Flag to enable calculation of fourth order theta third order phi anisotropy
       extern bool enable_rotational_4_3_order_odd; // Flag to enable calculation of fourth order theta third order phi odd anisotropy
       extern bool enable_rotational_4_4_order;     // Flag to enable calculation of fourth order theta fourth order phi anisotropy
       extern bool enable_rotational_4_4_order_odd; // Flag to enable calculation of fourth order theta fourth order phi odd anisotropy
@@ -281,6 +284,7 @@ namespace anisotropy{
       extern std::vector< double > ku4;
       extern std::vector< double > k4r2;
       extern std::vector< double > k4r2_odd;
+      extern std::vector< double > k4r3;
       extern std::vector< double > k4r3_odd;
       extern std::vector< double > k4r4;
       extern std::vector< double > k4r4_odd;
@@ -432,6 +436,16 @@ namespace anisotropy{
                                                             std::vector<double>& field_array_z,
                                                             const int start_index,
                                                             const int end_index );
+
+      void fourth_order_theta_third_order_phi_fields( std::vector<double>& spin_array_x,
+                                                      std::vector<double>& spin_array_y,
+                                                      std::vector<double>& spin_array_z,
+                                                      std::vector<int>&    atom_material_array,
+                                                      std::vector<double>& field_array_x,
+                                                      std::vector<double>& field_array_y,
+                                                      std::vector<double>& field_array_z,
+                                                      const int start_index,
+                                                      const int end_index );
 
       void fourth_order_theta_third_order_phi_odd_fields(   std::vector<double>& spin_array_x,
                                                             std::vector<double>& spin_array_y,
@@ -689,6 +703,12 @@ namespace anisotropy{
                                                             const double sx,
                                                             const double sy,
                                                             const double sz );
+
+      double fourth_order_theta_third_order_phi_energy(  const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz );
 
       double fourth_order_theta_fourth_order_phi_energy( const int atom,
                                                          const int mat,

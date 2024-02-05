@@ -65,6 +65,9 @@ namespace anisotropy{
       // fourth order theta second order phi odd anisotropy
       internal::fourth_order_theta_second_order_phi_odd_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
+      // fourth order theta third order phi anisotropy
+      internal::fourth_order_theta_third_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
       // fourth order theta third order phi odd anisotropy
       internal::fourth_order_theta_third_order_phi_odd_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);      
 
