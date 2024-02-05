@@ -99,6 +99,14 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get fourth order theta third order phi odd anisotropy constant for
+   // a given material
+   //--------------------------------------------------------------------------------
+   double get_k4r3_odd(const int material){
+      return internal::mp[material].k4r3_odd;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get fourth order theta fourth order phi odd anisotropy constant for
    // a given material
    //--------------------------------------------------------------------------------

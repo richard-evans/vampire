@@ -156,6 +156,11 @@ namespace anisotropy{
          internal::k4r2_odd.resize(num_materials);
          for(int m = 0; m < num_materials; ++m) internal::k4r2_odd[m] = internal::mp[m].k4r2_odd * inverse_mu_s[m];
       }
+      // Fourth order theta third order phi odd rotational
+      if(internal::enable_rotational_4_3_order_odd){
+         internal::k4r3_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r3_odd[m] = internal::mp[m].k4r3_odd * inverse_mu_s[m];
+      }
       // Fourth order theta fourth order phi rotational
       if(internal::enable_rotational_4_4_order){
          internal::k4r4.resize(num_materials);
