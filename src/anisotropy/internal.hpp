@@ -88,6 +88,7 @@ namespace anisotropy{
 
             // variables
             double ku2;       // second order uniaxial anisotropy constant ( - Ku1 )
+            double k2r1_odd;  // second order theta first order phi odd anisotropy constant
             double k2r2;      // second order theta second order phi anisotropy constant
             double k2r2_odd;  // seconf order theta second order phi odd anisotropy constant
             double ku4;       // fourth order uniaxial anisotropy constant ( ~Ku2 )
@@ -132,6 +133,7 @@ namespace anisotropy{
             // constructor
             mp_t ( const unsigned int max_materials = 100 ):
             	ku2( 0.0 ),       // set initial value of ku2 to zero
+               k2r1_odd( 0.0 ),  // set initial value of k2r1_odd to zero
                k2r2( 0.0 ),      // set initial value of k2r2 to zero
                k2r2_odd( 0.0 ),  // set initial value of k2r2_odd to zero
                ku4( 0.0 ),       // set initial value of ku4 to zero
@@ -226,6 +228,7 @@ namespace anisotropy{
 
       // Flags for tesseral harmonic (or real spherical harmonic) expansion anisotorpy terms 
       extern bool enable_uniaxial_second_order;    // Flag to enable calculation of second order uniaxial anisotropy
+      extern bool enable_rotational_2_1_order_odd; // Flag to enable calculation of second order theta first order phi odd anisotropy
       extern bool enable_rotational_2_2_order;     // Flag to enable calculation of second order theta second order phi anisotropy
       extern bool enable_rotational_2_2_order_odd; // Flag to enable calculation of second order theta second order phi odd anisotropy
       extern bool enable_uniaxial_fourth_order;    // Flag to enable calculation of fourth order uniaxial anisotropy
@@ -265,6 +268,7 @@ namespace anisotropy{
 
       // arrays for storing unrolled spherical-harmonic anisotropy constants in Tesla
       extern std::vector< double > ku2;
+      extern std::vector< double > k2r1_odd;
       extern std::vector< double > k2r2;
       extern std::vector< double > k2r2_odd;
       extern std::vector< double > ku4;
@@ -349,6 +353,16 @@ namespace anisotropy{
                                           std::vector<double>& field_array_z,
                                           const int start_index,
                                           const int end_index );
+
+      void second_order_theta_first_order_phi_odd_fields(   std::vector<double>& spin_array_x,
+                                                            std::vector<double>& spin_array_y,
+                                                            std::vector<double>& spin_array_z,
+                                                            std::vector<int>&    atom_material_array,
+                                                            std::vector<double>& field_array_x,
+                                                            std::vector<double>& field_array_y,
+                                                            std::vector<double>& field_array_z,
+                                                            const int start_index,
+                                                            const int end_index );
 
       void second_order_theta_second_order_phi_fields(   std::vector<double>& spin_array_x,
                                                          std::vector<double>& spin_array_y,
@@ -598,7 +612,13 @@ namespace anisotropy{
                                              const double sx,
                                              const double sy,
                                              const double sz );
-      
+
+      double second_order_theta_first_order_phi_odd_energy( const int atom,
+                                                            const int mat,
+                                                            const double sx,
+                                                            const double sy,
+                                                            const double sz );
+
       double second_order_theta_second_order_phi_energy( const int atom,
                                                          const int mat,
                                                          const double sx,

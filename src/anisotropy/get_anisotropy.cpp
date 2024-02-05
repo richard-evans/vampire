@@ -36,6 +36,14 @@ namespace anisotropy{
    }
 
    //--------------------------------------------------------------------------------
+   // Function to get second order theta first order phi odd anisotropy constant for
+   // a given material
+   //--------------------------------------------------------------------------------
+   double get_k2r1_odd(const int material){
+      return internal::mp[material].k2r1_odd;
+   }
+
+   //--------------------------------------------------------------------------------
    // Function to get second order theta second order phi anisotropy constant for a
    // given material
    //--------------------------------------------------------------------------------

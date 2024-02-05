@@ -18,6 +18,7 @@ interface.o \
 lattice.o \
 neel.o \
 uniaxial_order_2.o \
+rotational_order_2_1_odd.o\
 rotational_order_2_2.o \
 rotational_order_2_2_odd.o\
 uniaxial_order_4.o \
