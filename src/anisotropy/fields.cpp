@@ -44,6 +44,9 @@ namespace anisotropy{
       // second order uniaxial anisotropy
       internal::uniaxial_second_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
+      // second order theta first order phi anisotropy
+      internal::second_order_theta_first_order_phi_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
       // second order theta first order phi odd anisotropy
       internal::second_order_theta_first_order_phi_odd_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 

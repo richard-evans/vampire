@@ -122,7 +122,18 @@ namespace anisotropy{
          return true;
       }
 
-      // Second order theta second order phi anisotropy constant
+      // Second order theta first order phi anisotropy constant
+      test  = "2-1-order-anisotropy-constant";
+      test2 = "second-order-theta-first-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
+         double k2r1 = atof(value.c_str());
+         vin::check_for_valid_value(k2r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k2r1 = k2r1;
+         internal::enable_rotational_2_1_order = true;
+         return true;
+      }
+
+      // Second order theta first order phi odd anisotropy constant
       test  = "2--1-order-anisotropy-constant";
       test2 = "second-order-theta-first-order-phi-odd-anisotropy-constant";
       if( (word == test) || (word == test2) ){
