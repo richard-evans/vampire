@@ -50,6 +50,7 @@ namespace anisotropy{
       
       // Define useful constants
 		const double two = 2.0;
+		const double three = 3.0;
       const double five = 5.0;
 		const double six = 6.0;
 		const double ten = 10.0;
@@ -108,8 +109,8 @@ namespace anisotropy{
             const double k6r5_odd = internal::k6r5_odd[ mat ];
 
             // calculate full form to add to field
-            const double y_component = k6r5_odd * Sz * five * ( sixteen * Sy4 + twelve * Sy2Sz2 + Sz4 - two * ( six * Sy2 - Sz2 ) + five );
-            const double z_component = k6r5_odd * Sy * ( sixteen * Sy4 + sixty * Sy2Sz2 + twentyfive * Sz4 + twenty * ( Sz2 - Sy2 ) + five );
+            const double y_component = k6r5_odd * Sz * five * ( sixteen * Sy4 + twelve * Sy2Sz2 + Sz4 - two * ( six * Sy2 + Sz2 ) + five );
+            const double z_component = k6r5_odd * Sy * ( sixteen * Sy4 + sixty * Sy2Sz2 + twentyfive * Sz4 - ten * ( two * Sy2 + three * Sz2 ) + five );
             
             field_array_x[ atom ] += z_component * ex + y_component * gx;
             field_array_y[ atom ] += z_component * ey + y_component * gy;
@@ -150,7 +151,7 @@ namespace anisotropy{
          // get reduced anisotropy constant ku/mu_s (Tesla)
          const double k6r5_odd = internal::k6r5_odd[ mat ];
 
-         return - k6r5_odd * Sy * Sz * ( sixteen * Sy2 * Sy2 + twenty * Sy2 * Sz2 + five * Sz2 * Sz2 - ten * ( two * Sy2 - Sz2 ) + five );
+         return - k6r5_odd * Sy * Sz * ( sixteen * Sy2 * Sy2 + twenty * Sy2 * Sz2 + five * Sz2 * Sz2 - ten * ( two * Sy2 + Sz2 ) + five );
 
       }
 
