@@ -55,7 +55,6 @@ namespace anisotropy{
 		const double eight = 8.0;
 		const double twelve = 12.0;
 		const double fourteen = 14.0;
-		const double twentythree = 23.0;
 		const double fortytwo = 42.0;
 		const double oneoeleven = 1.0 / 11.0;
 		const double threeoeleven = 3.0 / 11.0;
