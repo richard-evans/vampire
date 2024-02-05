@@ -463,10 +463,20 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      test = "6--5-order-anisotropy-constant";
+      test2 = "sixth-order-theta-fifth-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
+         double k6r5_odd = atof(value.c_str());
+         vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r5_odd = k6r5_odd;
+         internal::enable_rotational_6_5_order_odd = true;
+         return true;
+      }
+      //------------------------------------------------------------
       test = "6-6-order-anisotropy-constant";
       test2 = "sixth-order-theta-sixth-order-phi-anisotropy-constant";
       test3 = "sixth-order-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) || word == test3 ){
+      if( (word == test) || (word == test2) || (word == test3) ){
          double k6r6 = atof(value.c_str());
          vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6 = k6r6;
