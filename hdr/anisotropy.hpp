@@ -72,6 +72,7 @@ namespace anisotropy
    double get_k2r2(const int material);
    double get_k2r2_odd(const int material);
    double get_ku4(const int material);
+   double get_k4r1(const int material);
    double get_k4r1_odd(const int material);
    double get_k4r2(const int material);
    double get_k4r2_odd(const int material);

@@ -23,6 +23,7 @@ rotational_order_2_1_odd.o\
 rotational_order_2_2.o \
 rotational_order_2_2_odd.o\
 uniaxial_order_4.o \
+rotational_order_4_1.o\
 rotational_order_4_1_odd.o\
 rotational_order_4_2.o \
 rotational_order_4_2_odd.o\

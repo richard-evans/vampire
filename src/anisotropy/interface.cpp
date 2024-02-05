@@ -320,6 +320,16 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      test = "4-1-order-anisotropy-constant";
+      test2 = "fourth-order-theta-first-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) ){
+         double k4r1 = atof(value.c_str());
+         vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r1 = k4r1;
+         internal::enable_rotational_4_1_order = true;
+         return true;
+      }
+      //------------------------------------------------------------
       test = "4--1-order-anisotropy-constant";
       test2 = "fourth-order-theta-first-order-phi-odd-anisotropy-constant";
       if( (word == test) || (word == test2) ){
