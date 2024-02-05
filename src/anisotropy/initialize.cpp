@@ -191,6 +191,11 @@ namespace anisotropy{
          internal::ku6.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku6[m] = internal::mp[m].ku6 * inverse_mu_s[m];
       }
+      // Sixth order theta first order phi rotational
+      if(internal::enable_rotational_6_1_order){
+         internal::k6r1.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r1[m] = internal::mp[m].k6r1 * inverse_mu_s[m];
+      }
       // Sixth order theta first order phi odd rotational
       if(internal::enable_rotational_6_1_order_odd){
          internal::k6r1_odd.resize(num_materials);
