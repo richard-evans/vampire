@@ -25,6 +25,7 @@
 #include "atoms.hpp"
 
 #include <vector>
+#include <cstdint>
 
 //==========================================================
 // Namespace atom variables

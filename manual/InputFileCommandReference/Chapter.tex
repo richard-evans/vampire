@@ -5,17 +5,35 @@ The \textit{input} file can accept a large number of commands, and this chapter 
 \phantomsection\addcontentsline{toc}{section}{System Generation}
 The following commands control generation of the simulated system, including dimensions, crystal structures etc.
 
-{\zicf create:full}\phantomsection\addcontentsline{toc}{subsection}{create:full} Uses the entire generated system without any truncation or consideration of the \textit{create:particle-size} parameter. \textit{create:full} should be used when importing a complete system, such as a complete nanoparticle and where a further definition of the system shape is not required. This is the default if no system truncation is defined.
+{\zicf create:full}\phantomsection\addcontentsline{toc}{subsection}{create:full}
+Uses the entire generated system without any truncation or consideration of the
+\textit{create:particle-size} parameter. \textit{create:full} should be used when
+importing a complete system, such as a complete nanoparticle and where a further
+definition of the system shape is not required. This is the default if no system
+truncation is defined.
 
-{\zicf create:cube}\phantomsection\addcontentsline{toc}{subsection}{create:cube} Cuts a cuboid particle of size \textit{$l_x$ = $l_y$ = $l_z$ = create:particle-size} from the defined crystal lattice.
+{\zicf create:cube}\phantomsection\addcontentsline{toc}{subsection}{create:cube}
+Cuts a cuboid particle of size \textit{$l_x$ = $l_y$ = $l_z$ = create:particle-size}
+from the defined crystal lattice.
 
-{\zicf create:cylinder}\phantomsection\addcontentsline{toc}{subsection}{create:cylinder} Cuts a cylindrical particle of diameter \textit{create:particle-size} from the defined crystal lattice. The height of the cylinder extends to the whole extent of the system size \textit{create:system-size-z} in the $z$-direction.
+{\zicf create:cylinder}\phantomsection\addcontentsline{toc}{subsection}{create:cylinder}
+Cuts a cylindrical particle of diameter \textit{create:particle-size} from the
+defined crystal lattice. The height of the cylinder extends to the whole extent
+of the system size \textit{create:system-size-z} in the $z$-direction.
 
-{\zicf create:ellipsoid}\phantomsection\addcontentsline{toc}{subsection}{create:ellipsoid} Cuts an ellipsoid particle of diameter \textit{create:particle-size} with fractional diameters of \textit{dimensions:particle-shape- factor-x},\textit{dimensions:particle-shape-factor-y}, \textit{dimensions:particle-shape-factor-z} from the defined crystal lattice.
+{\zicf create:ellipsoid}\phantomsection\addcontentsline{toc}{subsection}{create:ellipsoid}
+Cuts an ellipsoid particle of diameter \textit{create:particle-size} with fractional
+diameters of \textit{dimensions:particle-shape- factor-x},
+\textit{dimensions:particle-shape-factor-y},
+\textit{dimensions:particle-shape-factor-z} from the defined crystal lattice.
 
-{\zicf create:sphere}\phantomsection\addcontentsline{toc}{subsection}{create:sphere} Cuts a spherical particle of diameter \textit{create:particle-size} from the defined crystal lattice.
+{\zicf create:sphere}\phantomsection\addcontentsline{toc}{subsection}{create:sphere}
+Cuts a spherical particle of diameter \textit{create:particle-size} from the
+defined crystal lattice.
 
-{\zicf create:truncated-octahedron}\phantomsection\addcontentsline{toc}{subsection}{create:truncated-octahedron} Cuts a truncated octahedron particle of diameter \textit{create:particle-size} from the defined crystal lattice.
+{\zicf create:truncated-octahedron}\phantomsection\addcontentsline{toc}{subsection}{create:truncated-octahedron}
+Cuts a truncated octahedron particle of diameter \textit{create:particle-size}
+from the defined crystal lattice.
 
 % tear drop
 
@@ -109,79 +127,172 @@ spin positions that are generated.\\
 
 {\zicf dimensions:unit-cell-size-z}\phantomsection\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-z} Defines the size of the unit cell if asymmetric.
 
-{\zicf dimensions:system-size}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size} Defines the size of the symmetric bulk crystal.
+{\zicf dimensions:system-size = float [0.0 - 10 $\mu$ m, default 7.7 nm}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size}
+Defines the size of the symmetric bulk crystal in $x$, $y$ and $z$. Note that
+large system sizes will generate large numbers of atoms and will require
+supercomputing resources.
 
-{\zicf dimensions:system-size-x}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size-x} Defines the total size if the system along the $x$-axis.
+{\zicf dimensions:system-size-x = float [0.0 - 10 $\mu$ m, default 7.7 nm}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size-x}
+Defines the total size if the system along the $x$-axis. Note that
+large system sizes will generate large numbers of atoms and will require
+supercomputing resources.
 
-{\zicf dimensions:system-size-y}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size-y} Defines the total size if the system along the $y$-axis.
+{\zicf dimensions:system-size-y = float [0.0 - 10 $\mu$ m, default 7.7 nm}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size-y}
+Defines the total size if the system along the $y$-axis. Note that
+large system sizes will generate large numbers of atoms and will require
+supercomputing resources.
 
-{\zicf dimensions:system-size-z}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size-z} Defines the total size if the system along the $z$-axis.
+{\zicf dimensions:system-size-z = float [0.0 - 10 $\mu$ m, default 7.7 nm}\phantomsection\addcontentsline{toc}{subsection}{dimensions:system-size-z}
+Defines the total size if the system along the $z$-axis. Note that
+large system sizes will generate large numbers of atoms and will require
+supercomputing resources.
 
 {\zicf dimensions:particle-size = float}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-size} Defines the size of particles cut from the bulk crystal.
 
 {\zicf dimensions:particle-spacing}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-spacing} Defines the spacing between particles in particle arrays or voronoi media.
 
 
-{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]} \phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-x} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $x$ direction. This property scales the as a fraction of the particle-size along the $x$-direction.
+{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]} \phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-x}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $x$
+direction. This property scales the as a fraction of the particle-size along the
+$x$-direction.
 
-{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]} \phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $y$ direction. This property scales the as a fraction of the particle-size along the $y$-direction.
+{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]} \phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $y$
+direction. This property scales the as a fraction of the particle-size along the
+$y$-direction.
 
-{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $z$ direction. This property scales the as a fraction of the particle-size along the $z$-direction.
+{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $z$
+direction. This property scales the as a fraction of the particle-size along the
+$z$-direction.
 
-{\zicf dimensions:particle-array-offset-x [0-10$^4$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-x} Translates the 2-D particle array the chosen distance along the x-direction.
+{\zicf dimensions:particle-array-offset-x [0-10$^4$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-x}
+Translates the 2-D particle array the chosen distance along the x-direction.
 
-{\zicf dimensions:particle-array-offset-y}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y} Translates the 2-D particle array the chosen distance along the y-direction.
+{\zicf dimensions:particle-array-offset-y}\phantomsection\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}
+Translates the 2-D particle array the chosen distance along the y-direction.
 
-{\zicf dimensions:double macro-cell-size}\phantomsection\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation leads to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will lead to significant errors in the demagnetisation field calculation.
+{\zicf dimensions:double macro-cell-size}\phantomsection\addcontentsline{toc}{subsection}{dimensions:macro-cell-size}
+Determines the macro cell size for calculation of the demagnetizing field and
+output of the magnetic configuration. Finer discretisation leads to more
+accurate results at the cost of significantly longer run times. The cell size
+should always be less than the system size, as highly asymmetric cells will lead
+to significant errors in the demagnetisation field calculation.
 
-\section*{Exchange calculation}\phantomsection\addcontentsline{toc}{section}{Exchange calculation} The following commands control the calculation of built-in exchange interactions for the system.
+\section*{Exchange calculation}\phantomsection\addcontentsline{toc}{section}{Exchange calculation}
+The following commands control the calculation of built-in exchange interactions
+for the system.
 
-{\zicf exchange:interaction-range}\phantomsection\addcontentsline{toc}{subsection}{exchange:interaction-range double default [1.0]} Determines the cutoff range exchange interactions for built-in crystal structures in terms of the nearest neighbour range. Larger ranges will enable more interactions via an exchange function which can include 2nd-10th nearest neighbour interaction shells or exponential functions. Note that longer ranged interactions are slower to calculate. In shell mode the computed interaction shells are printed in the log file.
+{\zicf exchange:interaction-range}\phantomsection\addcontentsline{toc}{subsection}{exchange:interaction-range double default [1.0]}
+Determines the cutoff range exchange interactions for built-in crystal structures
+in terms of the nearest neighbour range. Larger ranges will enable more interactions
+via an exchange function which can include 2nd-10th nearest neighbour interaction
+shells or exponential functions. Note that longer ranged interactions are slower
+to calculate. In shell mode the computed interaction shells are printed in the
+log file.
 
-{\zicf exchange:function}\phantomsection\addcontentsline{toc}{subsection}{exchange:function string default [nearest-neighbour]} Determines the type of interaction to be used in the spin Hamiltonian. The default \textit{nearest-neighbour} option forces nearest neighbour interactions only. The \textit{shell} option groups neighbours at the same interaction distance into shells which can then be assigned different exchange constants. The \textit{exponential} option implements an exponential decay that is useful for simulating spin glasses and systems such as NdFeB where there are no well-defined neighbour shells. The \textit{material-exponential} function is similar to \textit{exponential}, however it allows different exponential exchange functions to be defined for different inter-material type (for materials as defined in the unit-cell module) interactions e.g. in NdFeB Nd-Fe interactions can have a different function defined vs Fe-Fe interactions.
+{\zicf exchange:function}\phantomsection\addcontentsline{toc}{subsection}{exchange:function string default [nearest-neighbour]}
+Determines the type of interaction to be used in the spin Hamiltonian. The
+default \textit{nearest-neighbour} option forces nearest neighbour interactions
+only. The \textit{shell} option groups neighbours at the same interaction
+distance into shells which can then be assigned different exchange constants.
+The \textit{exponential} option implements an exponential decay that is useful
+for simulating spin glasses and systems such as NdFeB where there are no
+well-defined neighbour shells. The \textit{material-exponential} function is
+similar to \textit{exponential}, however it allows different exponential
+exchange functions to be defined for different inter-material type (for
+materials as defined in the unit-cell module) interactions e.g. in NdFeB
+Nd-Fe interactions can have a different function defined vs Fe-Fe interactions.
 
-{\zicf exchange:decay-multiplier}\phantomsection\addcontentsline{toc}{subsection}{exchange:decay-multiplier double default [1.0]} Determines the value of $A$ to be used in $A\exp{-r/B}+C$ for \textit{exchange:function} = \textit{exponential}.
+{\zicf exchange:decay-multiplier}\phantomsection\addcontentsline{toc}{subsection}{exchange:decay-multiplier double default [1.0]}
+Determines the value of $A$ to be used in $A\exp{-r/B}+C$ for
+\textit{exchange:function} = \textit{exponential}.
 
-{\zicf exchange:decay-length}\phantomsection\addcontentsline{toc}{subsection}{exchange:decay-length double default [0.4]} Determines the value of $B$ to be used in $A\exp{-r/B}+C$ for \textit{exchange:function} = \textit{exponential}.
+{\zicf exchange:decay-length}\phantomsection\addcontentsline{toc}{subsection}{exchange:decay-length double default [0.4]}
+Determines the value of $B$ to be used in $A\exp{-r/B}+C$ for
+\textit{exchange:function} = \textit{exponential}.
 
-{\zicf exchange:decay-shift}\phantomsection\addcontentsline{toc}{subsection}{exchange:decay-shift double default [0.0]} Determines the value of $C$ to be used in $A\exp{-r/B}+C$ for \textit{exchange:function} = \textit{exponential}.
+{\zicf exchange:decay-shift}\phantomsection\addcontentsline{toc}{subsection}{exchange:decay-shift double default [0.0]}
+Determines the value of $C$ to be used in $A\exp{-r/B}+C$ for
+\textit{exchange:function} = \textit{exponential}.
 
-{\zicf exchange:ucc-exchange-parameters[i][j]}\phantomsection\addcontentsline{toc}{subsection}{exchange:ucc-exchange-parameters[i][j] std::vector < std::vector <exchange\_parameters\_t> > [i][j] default [1.0, 0.4, 0.0]} This is used in conjunction with \textit{exchange:function} = \textit{material-exchange}. i and j represent the unit cell category (material as per unit cell module) of the interacting atoms that the user wishes to set the exponential exchange function for. This variable is set to the three comma separated values: $A$, \textit{exchange:decay-multiplier}; $B$, \textit{exchange:decay-length}; $C$, \textit{exchange:decay-shift} in this order.
+{\zicf exchange:ucc-exchange-parameters[i][j]}\phantomsection\addcontentsline{toc}{subsection}{exchange:ucc-exchange-parameters[i][j] default [1.0, 0.4, 0.0]}
+This is used in conjunction with \textit{exchange:function} =
+\textit{material-exchange}. i and j represent the unit cell category (material
+as per unit cell module) of the interacting atoms that the user wishes to set
+the exponential exchange function for. This variable is set to the three comma
+separated values: $A$, \textit{exchange:decay-multiplier}; $B$,
+\textit{exchange:decay-length}; $C$, \textit{exchange:decay-shift} in this order.
 
-{\zicf exchange:dmi-cutoff-range}\phantomsection\addcontentsline{toc}{subsection}{exchange:dmi-cutoff-range double default [1.0]} Determines the cutoff range for i-j-k interactions for the built-in DMI in \vampire.
+{\zicf exchange:dmi-cutoff-range}\phantomsection\addcontentsline{toc}{subsection}{exchange:dmi-cutoff-range double default [1.0]}
+Determines the cutoff range for i-j-k interactions for the built-in DMI in \vampire.
 
 {\zicf exchange:ab-initio}\phantomsection\addcontentsline{toc}{subsection}{exchange:ab-initio flag default false}
 Interprets exchange constants in the ab-initio sense and applies a factor 2 increase
 in the strength of the exchange constants.\\
 
 \section*{Anisotropy calculation}
-\phantomsection\addcontentsline{toc}{section}{Anisotropy calculation} The following commands control the calculation of the magnetic anisotropy energy for the system.
+\phantomsection\addcontentsline{toc}{section}{Anisotropy calculation}
+The following commands control the calculation of the magnetic anisotropy energy
+for the system.
 
 {\zicf anisotropy:surface-anisotropy-threshold = integer [default native]}\phantomsection\addcontentsline{toc}
-{subsection}{anisotropy:surface-anisotropy-threshold} Determines minimal number of neighbours to classify as surface atom. The default value is the number of neighbours specified by the crystal or unit cell file. You can set this as a lower threshold.
+{subsection}{anisotropy:surface-anisotropy-threshold} Determines minimal number
+of neighbours to classify as surface atom. The default value is the number of
+neighbours specified by the crystal or unit cell file. You can set this as a
+lower threshold.
 
 {\zicf anisotropy:surface-anisotropy-nearest-neighbour-range = float [default $\infty$]}\phantomsection\addcontentsline{toc}
-{subsection}{anisotropy:surface-anisotropy-nearest-neighbour-range} Sets the interaction range for the nearest neighbour list used for the surface anisotropy calculation.
+{subsection}{anisotropy:surface-anisotropy-nearest-neighbour-range} Sets the
+interaction range for the nearest neighbour list used for the surface anisotropy
+calculation.
 
 {\zicf anisotropy:enable-bulk-neel-anisotropy = bool [default false]}\phantomsection\addcontentsline{toc}
-{subsection}{anisotropy:enable-bulk-neel-anisotropy} Enables calculation of the N\'eel pair anisotropy in the bulk, irrespective of the number of neighbours, enabling the effect of localised spin-orbit interactions. Internally this sets a large threshold, and so specifying anisotropy:surface-anisotropy-threshold will override this flag.
+{subsection}{anisotropy:enable-bulk-neel-anisotropy} Enables calculation of the
+N\'eel pair anisotropy in the bulk, irrespective of the number of neighbours,
+enabling the effect of localised spin-orbit interactions. Internally this sets a
+large threshold, and so specifying anisotropy:surface-anisotropy-threshold will
+override this flag.
 
 {\zicf anisotropy:neel-anisotropy-exponential-range = float [default $2.5$]}\phantomsection\addcontentsline{toc}
-{subsection}{anisotropy:neel-anisotropy-exponential-range} Enables an exponentially range dependent N\'eel pair anisotropy so that lattice distortions and strains change the magnetoelastic compling strength. In the usual form the method only takes into account the symmetry ($L_{ij}(r) = const$). The value should be set to the typical lattice parameter otherwise the total anisotropy will be significantly higher or lower than expected. The functional form of the range dependence is
+{subsection}{anisotropy:neel-anisotropy-exponential-range} Enables an
+exponentially range dependent N\'eel pair anisotropy so that lattice distortions
+and strains change the magnetoelastic compling strength. In the usual form the
+method only takes into account the symmetry ($L_{ij}(r) = const$). The value
+should be set to the typical lattice parameter otherwise the total anisotropy
+will be significantly higher or lower than expected. The functional form of the
+range dependence is
 
 \begin{equation}
    L_{ij}(r_{ij}) = L_0 \exp\left(-F\frac{r_{ij} - r_0}{r_{0}}\right)
 \end{equation}
 
-\noindent where $r_{ij}$ is the pair separation, $r_0$ is the exponential range, $F$ is the exponential factor and $L_0$ is the usual N\'eel anisotropy constant. The functional form assures that at the first neighbour distance the value of the N\'eel anisotropy constant is the same as would be without the range-dependent form.
+\noindent where $r_{ij}$ is the pair separation, $r_0$ is the exponential range,
+$F$ is the exponential factor and $L_0$ is the usual N\'eel anisotropy constant.
+The functional form assures that at the first neighbour distance the value of
+the N\'eel anisotropy constant is the same as would be without the
+range-dependent form.
 
 {\zicf anisotropy:neel-anisotropy-exponential-factor = float [default $5.52$]}\phantomsection\addcontentsline{toc}
-{subsection}{anisotropy:neel-anisotropy-exponential-factor} Enables an exponentially range dependent N\'eel pair anisotropy so that lattice distortions and strains change the magnetoelastic compling strength. In the usual form the method only takes into account the symmetry ($L_{ij}(r)
-= const$). The prefactor controls the falloff with increasing range.
+{subsection}{anisotropy:neel-anisotropy-exponential-factor} Enables an
+exponentially range dependent N\'eel pair anisotropy so that lattice distortions
+and strains change the magnetoelastic compling strength. In the usual form the
+method only takes into account the symmetry ($L_{ij}(r) = const$). The prefactor
+controls the falloff with increasing range.
 
 \section*{Dipole field calculation}
 \phantomsection\addcontentsline{toc}{section}{Dipole field calculation}
-The following commands control the calculation of the dipole-dipole field. By default the dipole fields are disabled for performance reasons, but for large systems (> 10 nm) the interactions can become important. The \vampire code implements several different solvers balancing accuracy and performance. The default in V5+ is the tensor method, which approximates the dipole dipole interactions at the macrocell level but calculating a dipole-dipole tensor which is exact if the magnetic moments in each cell are aligned.
+The following commands control the calculation of the dipole-dipole field. By
+default the dipole fields are disabled for performance reasons, but for large
+systems (> 10 nm) the interactions can become important. The \vampire code
+implements several different solvers balancing accuracy and performance. The
+default in V5+ is the tensor method, which approximates the dipole dipole
+interactions at the macrocell level but calculating a dipole-dipole tensor which
+is exact if the magnetic moments in each cell are aligned.
 
 {\zicf dipole:solver = exclusive string [default tensor]}\phantomsection\addcontentsline{toc}{subsection}{dipole:solver}
 Declares the solver to be used for the dipole calculation. Available options are:
@@ -303,6 +414,16 @@ default fall and rise times are 0, reproducing a square pulse. The time
 dependence of the fractional voltage can be printed in the output file with the
 parameter \textit{output:fractional-electric-field-strength}.
 
+{\zicf sim:program = field-pulse}\phantomsection\addcontentsline{toc}{subsubsection}{field-pulse}
+Simulates the effect of a field pulse from an external applied field. The
+system is first equilibrated at constant temperature with zero field. A
+Gaussian shaped field pulse is applied, with a maximum applied field strength of
+\textit{sim:applied-field-strength} and characteristic time of
+\textit{sim:field-pulse-time}. The default pulse time $\tau_\mathrm{P} = 1$ ns
+with a maximum field at $t = 3\tau_\mathrm{P}$. The time dependence of the
+applied field can be printed in the output file with the parameter
+\textit{output:applied-field-strength}.
+
 {\zicf sim:program = cmc-anisotropy}\phantomsection\addcontentsline{toc}{subsubsection}{cmc-anisotropy} Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques.
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
@@ -325,11 +446,7 @@ The margin between the edge of the system and the written tracks in cross-track 
 \textit{hamr:track-padding}, while \textit{hamr:NPS}/\textit{hamr:NFT-to-pole-spacing}
 set the shift between the centre of application of the external field and temperature pulse.
 
-{\zicf sim:enable-dipole-fields flag}\phantomsection\addcontentsline{toc}{subsection}{sim:enable-dipole-fields} Enables calculation of the demagnetising field.
-
 {\zicf sim:enable-fmr-field}\phantomsection\addcontentsline{toc}{subsection}{sim:enable-fmr-field}
-
-{\zicf sim:enable-fast-dipole-fields = Bool [default false]}\phantomsection\addcontentsline{toc}{subsection}{sim:enable-fast-dipole-fields} Enables fast calculation of the demag field by pre calculation of the interaction matrix.
 
 {\zicf sim:dipole-field-update-rate = integer [default 1000]}\phantomsection\addcontentsline{toc}{subsection}{sim:dipole-field-update-rate}
 Number of timesteps between recalculation of the demag field. Default value is suitable for slow calculations, fast dynamics will generally require much faster update rates.
@@ -510,6 +627,10 @@ Defines the pulse linear rise time in the program \textit{electrical-pulse} with
 Defines the pulse linear fall time in the program \textit{electrical-pulse} with
  default units of seconds and a default pulse time of 0, i.e. an instantaneous
  turning off of the current.
+
+ {\zicf sim:field-pulse-time = float [default $1.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:field-pulse-time}
+ Defines the pulse time in the program \textit{field-pulse} with default
+ units of seconds and a default pulse time of 1 ns.
 
 \section*{Data output}
 \phantomsection\addcontentsline{toc}{section}{Data output}

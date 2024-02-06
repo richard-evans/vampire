@@ -181,7 +181,7 @@ namespace dipole{
         std::vector<int> list_cpu_to_send_to;
         std::vector<int> list_cells_to_send;
         std::vector<int> list_cells_to_recv;
-        int num_send_atoms;
+        //int num_send_atoms;
         std::vector<int> mpi_send_atoms_cell;
         std::vector<int> mpi_send_num_atoms_in_cell;
         std::vector<int> mpi_send_atoms_id;
@@ -240,9 +240,9 @@ namespace dipole{
 
         //loop to calcualte if two cells are within the dipole cut off range.
          for(int cpu=0; cpu<vmpi::num_processors; cpu++){
-            num_send_atoms = 0;
+            //num_send_atoms = 0;
             int size = ceil(cells_pos_and_mom_array.size()/4.0);
-            int counter = 0;
+            //int counter = 0;
             std::vector<bool> bool_array(cells_num_cells,1); /// bool arrays to check whether a cell has been already considered
             for(int lc=cells_num_cells; lc<size; lc++){
                int cpu_recv = proc_cell_index_array1D[lc];
@@ -260,7 +260,7 @@ namespace dipole{
                               list_cpu_to_send_to.push_back(cpu_recv);
                               list_cells_to_send.push_back(i);
                               list_cells_to_recv.push_back(lc);
-                              counter++;
+                              //counter++;
                               bool_array[i]=0;
                            }
                         } // end if statement for comparison of distance
@@ -495,7 +495,7 @@ namespace dipole{
 
          int cell = 0;
          for(int lc=0; lc<num_recv_cells; lc++){
-            int cell_recv_counter=0;
+            //int cell_recv_counter=0;
             // resize arrays
          //   std::cout <<lc << '\t' <<  mpi_recv_cells_pos_mom[4*lc+0] << '\t' << mpi_recv_cells_pos_mom[4*lc+1] << '\t' << mpi_recv_cells_pos_mom[4*lc+2] << '\t' << mpi_recv_cells_pos_mom[4*lc+3] <<std::endl;
             for(unsigned int i=cells_num_cells; i<proc_cell_index_array1D.size(); i++){
@@ -512,7 +512,7 @@ namespace dipole{
                   //std::cout << lc << '\t' << cell << std::endl;// "\t" << cells_num_cells << '\t' << proc_cell_index_array1D.size() << "\t" << num_recv_cells<< std::endl;
 
 
-                  cell_recv_counter++;
+                  //cell_recv_counter++;
                   bool_array[lc]=0;
                }
                else if((mpi_recv_cells_pos_mom[4*lc+0] == cells_pos_and_mom_array[4*cell+0]) &&

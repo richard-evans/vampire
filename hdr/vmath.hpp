@@ -12,6 +12,11 @@
 
 #include <vector>
 #include <cmath>
+#include <cstdint>
+
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
 
 /// @namespace ns
 /// @brief vmath namespace containing sundry math functions for vampire.

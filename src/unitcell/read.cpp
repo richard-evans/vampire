@@ -99,11 +99,11 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				iss >> num_uc_atoms;
 				//std::cout << "Reading in " << num_uc_atoms << " atoms" << std::endl;
 				// resize unit_cell.atom array if within allowable bounds
-				if( (num_uc_atoms >0) && (num_uc_atoms <= 1000000)) unit_cell.atom.resize(num_uc_atoms);
+				if( (num_uc_atoms >0) && (num_uc_atoms <= 100000000)) unit_cell.atom.resize(num_uc_atoms);
 				else {
 					terminaltextcolor(RED);
 					std::cerr << "Error! Requested number of atoms " << num_uc_atoms << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-1,000,000. Exiting" << std::endl; err::vexit();
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-100,000,000. Exiting" << std::endl; err::vexit();
 					terminaltextcolor(WHITE);
 				}
 

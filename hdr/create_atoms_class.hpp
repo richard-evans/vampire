@@ -13,6 +13,12 @@
 #ifndef CREATE_ATOMS_CLASS_H_
 #define CREATE_ATOMS_CLASS_H_
 
+#include <cstdint>
+
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
+
 //namespace create{
 namespace cs{
 

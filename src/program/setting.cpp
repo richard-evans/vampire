@@ -116,7 +116,7 @@ namespace program{
 
          for( int i = 0; i <4; i ++){
             //       std::cout << Local_Sub[l] << "\t" << Local_Sub[l] << std::endl;
-            if ((Local_Sub[l] > Max_atoms[j]) & (Local_Sub[l] != 0)){
+            if ((Local_Sub[l] > Max_atoms[j]) && (Local_Sub[l] != 0)){
                Largest_Sublattice[j] = i;
                Max_atoms[j] =Local_Sub[l];
             }

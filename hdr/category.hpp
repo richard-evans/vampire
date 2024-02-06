@@ -39,9 +39,11 @@ namespace cat{
 		double my;
 		double mz;
 
-		// energy and toque variables
+		// energy and torque variables
 		double torque;
 		double mean_torque;
+		double spin_temp;
+      double mean_spin_temp;
 		double energy;
 
 		// constraint variables

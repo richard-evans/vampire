@@ -10,6 +10,8 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <cstdint>
+
 
 // Vampire headers
 #include "hamr.hpp"

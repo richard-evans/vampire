@@ -27,8 +27,13 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "exchange.hpp"
+
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
 
 // unit vector type
 class uvec_t{

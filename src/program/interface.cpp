@@ -65,11 +65,6 @@ namespace program{
             program::program=5;
             return true;
          }
-         test="localised-field-cool";
-         if(value==test){
-            program::program=16;
-            return true;
-         }
          test="laser-pulse";
          if(value==test){
             program::program=6;
@@ -120,6 +115,21 @@ namespace program{
             program::program=15;
             return true;
          }
+         test="localised-field-cool";
+         if(value==test){
+            program::program=16;
+            return true;
+         }
+         test="electrical-pulse";
+         if(value==test){
+            program::program = 17;
+            return true;
+         }
+         test="field-pulse";
+         if(value==test){
+            program::program = 18;
+            return true;
+         }
          test="diagnostic-boltzmann";
          if(value==test){
             program::program=50;
@@ -138,11 +148,6 @@ namespace program{
          test="exchange-stiffness";
          if(value==test){
             program::program=53;
-            return true;
-         }
-         test="electrical-pulse";
-         if(value==test){
-            program::program = 17;
             return true;
          }
          test="mm-A-calculation";
@@ -177,6 +182,7 @@ namespace program{
             std::cerr << "\t\"electrical-pulse\"" << std::endl;
             std::cerr << "\t\"exchange-stiffness\"" << std::endl;
             std::cerr << "\t\"field-cool\"" << std::endl;
+            std::cerr << "\t\"field-pulse\"" << std::endl;
             std::cerr << "\t\"laser-pulse\"" << std::endl;
             std::cerr << "\t\"localised-field-cool\"" << std::endl;
             std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
@@ -234,6 +240,16 @@ namespace program{
          double ai = atof(value.c_str()); // convert string to uint64_t
          vin::check_for_valid_value(ai, word, line, prefix, unit, "", 1.0, 90.0,"input","1 - 90 degrees");
          program::internal::exchange_stiffness_delta_constraint_angle = ai;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test = "field-pulse-time";
+      if(word == test){
+         double pt = atof(value.c_str()); // convert string to uint64_t
+         // Test for valid range
+         vin::check_for_valid_positive_value(pt, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
+         // save sanitized value
+         program::internal::field_pulse_time = pt;
          return true;
       }
       //--------------------------------------------------------------------

@@ -15,6 +15,7 @@ effective_damping.o \
 electrical_pulse.o \
 exchange_stiffness.o \
 field_cool.o \
+field_pulse.o \
 field_sweep.o \
 fmr.o \
 local_field_cool.o \

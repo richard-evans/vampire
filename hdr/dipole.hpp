@@ -14,6 +14,11 @@
 // C++ standard library headers
 #include <string>
 #include <vector>
+#include <cstdint>
+
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
 
 // Vampire headers
 #include "dipole.hpp"

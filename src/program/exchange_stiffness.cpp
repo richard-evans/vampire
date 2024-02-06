@@ -171,8 +171,8 @@ void exchange_stiffness(){
 
 	// set constraint phi component
 	const double constraint_phi = 90.0;
-	const double cosphi = cos(constraint_phi*pi180);
-	const double sinphi = sin(constraint_phi*pi180);
+	//const double cosphi = cos(constraint_phi*pi180);
+	//const double sinphi = sin(constraint_phi*pi180);
 
 	// loop over constraint angles ct (constraint_theta)
 	for(double constraint_theta = 0.0; constraint_theta < mt; constraint_theta += dt){

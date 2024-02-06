@@ -26,11 +26,16 @@
 #define SIM_H_
 
 //Headers
+#include <cstdint>
 #include <fstream>
 #include <stdint.h>
 #include <string>
 #include <valarray>
 #include <vector>
+
+// Load standard forms of fixed-width types (needed for some compilers)
+using std::uint64_t;
+using std::int64_t;
 
 /// Enumerated lists for code readability
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
@@ -200,12 +205,26 @@ namespace sim{
 	extern int LLGinit();
 
 	// Field and energy functions
-	extern double calculate_spin_energy(const int atom);
+   extern double calculate_spin_energy(const int atom);
    extern double spin_applied_field_energy(const double, const double, const double);
    extern double spin_magnetostatic_energy(const int, const double, const double, const double);
 
 	void calculate_spin_fields(const int start_index,const int end_index);
 	void calculate_external_fields(const int start_index,const int end_index);
+
+	//spin temperature
+	extern double compute_spin_temperature(const int start_index, // first atom for exchange interactions to be calculated
+														const int end_index,
+														const std::vector<int>& type_array, // type for atom
+														std::vector<double>& x_spin_array, // coord vectors for atoms
+														std::vector<double>& y_spin_array,
+														std::vector<double>& z_spin_array,
+														std::vector<double>& fields_array_x, //  vectors for fields
+														std::vector<double>& fields_array_y,
+														std::vector<double>& fields_array_z,
+														std::vector<double>& mu_s_array);
+
+	extern double spin_temperature;
 
    // LaGrange multiplier variables
    extern double lagrange_lambda_x;

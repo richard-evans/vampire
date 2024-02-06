@@ -128,7 +128,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		grain_vertices_array.push_back(std::vector <std::vector <double> >());
 		grain_coord_array[grain].push_back(initial_grain_pos_x);
 		grain_coord_array[grain].push_back(initial_grain_pos_y);
-		int num_active_grains = 1;
+		//int num_active_grains = 1;
 		grain++;
 		double PI = 3.14159265;
 		file << initial_grain_pos_x << '\t' << initial_grain_pos_y << '\t' << initial_grain_r << std::endl;
@@ -218,7 +218,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					      grains_y.push_back(y);
 					      grains_r.push_back(r);
 					      active.push_back(true);
-							num_active_grains ++;
+							//num_active_grains++;
 							grain++;
 							added = true;
 						}

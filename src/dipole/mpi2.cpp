@@ -644,7 +644,7 @@ namespace internal{
 
             MPI_Request req = MPI_REQUEST_NULL; // temporary variable for push_back operations
 
-            int recv_message_ID = 0;
+            //int recv_message_ID = 0;
             // loop over all processors and dispatch only necessary sends and recieves
             for ( int cpu = 0; cpu < vmpi::num_processors; cpu++){
                // check that atoms are to be sent or receieved, and post receives for atom and cell data
@@ -657,12 +657,12 @@ namespace internal{
                   MPI_Irecv(&list_of_cells_to_send_2D[cpu][0], num_cells_to_send[cpu], MPI_INT, cpu, 650, MPI_COMM_WORLD, &requests.back());
 
                   // increment message ID counter
-                  recv_message_ID++;
+                  //recv_message_ID++;
 
                }
             }
 
-            int send_message_ID = 0;
+            //int send_message_ID = 0;
             // loop over all processors and dispatch only necessary sends and recieves
             for ( int cpu = 0; cpu < vmpi::num_processors; cpu++){
                if ( num_cells_to_recv[cpu] > 0 ){
@@ -674,7 +674,7 @@ namespace internal{
                   MPI_Isend(&cells_i_need_from_cpu[cpu][0], num_cells_to_recv[cpu], MPI_INT, cpu, 650, MPI_COMM_WORLD, &requests.back());
 
                   // increment message ID counter
-                  send_message_ID++;
+                  //send_message_ID++;
 
                }
             }

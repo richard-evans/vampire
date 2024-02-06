@@ -31,7 +31,6 @@ namespace program{
       //------------------------------------------------------------------------
       // Shared variables inside program module
       //------------------------------------------------------------------------
-
       bool enabled = true; // bool to enable module
 
       //------------------------------------------------------------------------
@@ -41,6 +40,11 @@ namespace program{
       double electrical_pulse_rise_time = 0.0;    // linear rise time for electrical pulse (0.0 default)
       double electrical_pulse_fall_time = 0.0;    // linear fall time for electrical pulse (0.0 default)
       int num_electrical_pulses         = 1;
+
+      //------------------------------------------------------------------------
+      // Field pulse program
+      //------------------------------------------------------------------------
+      double field_pulse_time      = 1.0e-9; // length of field pulses (1 ns default)
 
       //------------------------------------------------------------------------
       // Exchange stiffness program
