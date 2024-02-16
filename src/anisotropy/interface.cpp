@@ -110,64 +110,747 @@ namespace anisotropy{
       //------------------------------------------------------------
       // Check for material properties
       //------------------------------------------------------------
-      //Minimal orthogonality TBD
+
+      // Single-ion anisotropy energy in terms of orthogonal tesseral harmonics
+      // A simple orthogonal version is given, as well as an orthonormal version
+
+      // Second order uniaxial anisotropy constant (negative of standard K_1)
       std::string test  = "2-0-order-anisotropy-constant";
       std::string test2 = "second-order-uniaxial-anisotropy-constant";
       std::string test3 = "uniaxial-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
-      if( (word == test) || (word == test2) || (word == test3) ){
+      if( (word == test) || (word == test2) || (word == test3) )
+      {
+
          double ku2 = atof(value.c_str());
          vin::check_for_valid_value(ku2, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].ku2 = ku2;
          internal::enable_uniaxial_second_order = true; // Switch on second order tensor calculation for all spins
          return true;
+
+      }
+
+      // Second order theta uniaxial anisotropy constant (orthonormal)
+      test = "2-0-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if ( word == test )
+      {
+
+         double ku2 = - atof( value.c_str() ) * ( 3.0 / 4.0 ) * sqrt( 5.0 / M_PI );
+         vin::check_for_valid_value(ku2, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].ku2 = ku2;
+         internal::enable_uniaxial_second_order = true; // Switch on second order tensor calculation for all spins
+         return true;
+
       }
 
       // Second order theta first order phi anisotropy constant
       test  = "2-1-order-anisotropy-constant";
       test2 = "second-order-theta-first-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
+      if( (word == test) || (word == test2) )
+      {
+
          double k2r1 = atof(value.c_str());
          vin::check_for_valid_value(k2r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1 = k2r1;
          internal::enable_rotational_2_1_order = true;
          return true;
+
+      }
+
+      // Second order theta first order phi anisotropy constant (orthonormal)
+      test = "2-1-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if ( word == test )
+      {
+
+         double k2r1 = - atof( value.c_str() ) * ( 0.25 ) * sqrt( 15.0 / M_PI );
+         vin::check_for_valid_value(k2r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k2r1 = k2r1;
+         internal::enable_rotational_2_1_order = true;
+         return true;
+
       }
 
       // Second order theta first order phi odd anisotropy constant
       test  = "2--1-order-anisotropy-constant";
       test2 = "second-order-theta-first-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
+      if( (word == test) || (word == test2) )
+      {
+
          double k2r1_odd = atof(value.c_str());
          vin::check_for_valid_value(k2r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1_odd = k2r1_odd;
          internal::enable_rotational_2_1_order_odd = true;
          return true;
+
+      }
+
+      // Second order theta first order phi anisotropy constant (orthonormal)
+      test = "2--1-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k2r1_odd = - atof( value.c_str() ) * ( 0.25 ) * sqrt( 15.0 / M_PI );
+         vin::check_for_valid_value(k2r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k2r1_odd = k2r1_odd;
+         internal::enable_rotational_2_1_order_odd = true;
+         return true;
+
       }
 
       // Second order theta second order phi anisotropy constant
       test  = "2-2-order-anisotropy-constant";
       test2 = "second-order-theta-second-order-phi-anisotropy-constant";
       test3 = "second-order-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) || (word == test3) ){
+      if( (word == test) || (word == test2) || (word == test3) )
+      {
+
          double k2r2 = atof(value.c_str());
          vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2 = k2r2;
          internal::enable_rotational_2_2_order = true;
          return true;
+
+      }
+
+      // Second order theta second order phi anisotropy constant (orthonormal)
+      test = "2-2-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k2r2 = - atof( value.c_str() ) * 0.25 * sqrt( 15.0 / M_PI );
+         vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k2r2 = k2r2;
+         internal::enable_rotational_2_2_order = true;
+         return true;
+
       }
 
       // Second order theta second order phi odd anisotropy constant
       test  = "2--2-order-anisotropy-constant";
       test2 = "second-order-theta-second-order-phi-odd-anisotropy-constant";
       test3 = "second-order-odd-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) || (word == test3) ){
+      if( (word == test) || (word == test2) || (word == test3) )
+      {
+
          double k2r2_odd = atof(value.c_str());
          vin::check_for_valid_value(k2r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2_odd = k2r2_odd;
          internal::enable_rotational_2_2_order_odd = true;
          return true;
+
       }
 
+      // Second order theta second order phi odd anisotropy constant (orthonormal)
+      test = "2--2-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k2r2_odd = - atof( value.c_str() ) * 0.25 * sqrt( 15.0 / M_PI );
+         vin::check_for_valid_value(k2r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k2r2_odd = k2r2_odd;
+         internal::enable_rotational_2_2_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order uniaxial anisotropy constant
+      test  = "4-0-order-anisotropy-constant";
+      test2 = "fourth-order-uniaxial-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double ku4 = atof( value.c_str() );
+         vin::check_for_valid_value(ku4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].ku4 = ku4;
+         internal::enable_uniaxial_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
+         return true;
+
+      }
+
+      // Fourth order uniaxial anisotropy constant (orthonormal)
+      test = "4-0-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double ku4 = - atof( value.c_str() ) * ( 3.0 * 35.0 / 16.0 ) * sqrt( 1.0 / M_PI );
+         vin::check_for_valid_value(ku4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].ku4 = ku4;
+         internal::enable_uniaxial_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
+         return true;
+
+      }
+
+      // Fourth order theta first order phi anisotropy constant
+      test = "4-1-order-anisotropy-constant";
+      test2 = "fourth-order-theta-first-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k4r1 = atof(value.c_str());
+         vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r1 = k4r1;
+         internal::enable_rotational_4_1_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta first order phi anisotropy constant (orthonormal)
+      test = "4-1-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r1 = - atof( value.c_str() ) * ( 3.0 * 7.0 / 8.0 ) * sqrt( 10.0 / M_PI );
+         vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r1 = k4r1;
+         internal::enable_rotational_4_1_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta first order phi odd anisotropy constant
+      test = "4--1-order-anisotropy-constant";
+      test2 = "fourth-order-theta-first-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k4r1_odd = atof(value.c_str());
+         vin::check_for_valid_value(k4r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r1_odd = k4r1_odd;
+         internal::enable_rotational_4_1_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order theta first order phi odd anisotropy constant (orthonormal)
+      test = "4--1-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r1_odd = - atof( value.c_str() ) * ( 3.0 * 7.0 / 8.0 ) * sqrt( 10.0 / M_PI );
+         vin::check_for_valid_value(k4r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r1_odd = k4r1_odd;
+         internal::enable_rotational_4_1_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order theta second order phi anisotropy constant
+      test = "4-2-order-anisotropy-constant";
+      test2 = "fourth-order-theta-second-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k4r2 = atof(value.c_str());
+         vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r2 = k4r2;
+         internal::enable_rotational_4_2_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta second order phi anisotropy constant (orthonormal)
+      test = "4-2-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r2 = - atof( value.c_str() ) * ( 3.0 * 7.0 ) * sqrt( 5.0 / M_PI );
+         vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r2 = k4r2;
+         internal::enable_rotational_4_2_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta second order phi odd anisotropy constant
+      test = "4--2-order-anisotropy-constant";
+      test2 = "fourth-order-theta-second-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k4r2_odd = atof(value.c_str());
+         vin::check_for_valid_value(k4r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r2_odd = k4r2_odd;
+         internal::enable_rotational_4_2_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order theta second order phi odd anisotropy constant (orthonormal)
+      test = "4--2-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r2_odd = - atof( value.c_str() ) * ( 3.0 * 7.0 ) * sqrt( 5.0 / M_PI );
+         vin::check_for_valid_value(k4r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r2_odd = k4r2_odd;
+         internal::enable_rotational_4_2_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order theta third order phi anisotropy constant
+      test = "4-3-order-anisotropy-constant";
+      test2 = "fourth-order-theta-third-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k4r3 = atof(value.c_str());
+         vin::check_for_valid_value(k4r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r3 = k4r3;
+         internal::enable_rotational_4_3_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta third order phi anisotropy constant (orthonormal)
+      test = "4-3-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r3 = - atof( value.c_str() ) * ( 3.0 / 8.0 ) * sqrt( 70.0 / M_PI );
+         vin::check_for_valid_value(k4r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r3 = k4r3;
+         internal::enable_rotational_4_3_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta third order phi odd anisotropy constant
+      test = "4--3-order-anisotropy-constant";
+      test2 = "fourth-order-theta-third-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k4r3_odd = atof(value.c_str());
+         vin::check_for_valid_value(k4r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r3_odd = k4r3_odd;
+         internal::enable_rotational_4_3_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order theta third order phi odd anisotropy constant (orthonormal)
+      test = "4--3-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r3_odd = - atof( value.c_str() ) * ( 3.0 / 8.0 ) * sqrt( 70.0 / M_PI );
+         vin::check_for_valid_value(k4r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r3_odd = k4r3_odd;
+         internal::enable_rotational_4_3_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order theta fourth order phi rotational anisotropy constant
+      test = "4-4-order-anisotropy-constant";
+      test2 = "fourth-order-theta-fourth-order-phi-anisotropy-constant";
+      test3 = "fourth-order-rotational-anisotropy-constant";
+      if( (word == test) || (word == test2) || (word == test3) )
+      {
+
+         double k4r4 = atof(value.c_str());
+         vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r4 = k4r4;
+         internal::enable_rotational_4_4_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta fourth order phi rotational anisotropy constant (orthonormal)
+      test = "4-4-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r4 = - atof( value.c_str() ) * ( 3.0 / 16.0 ) * sqrt( 35.0 / M_PI );
+         vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r4 = k4r4;
+         internal::enable_rotational_4_4_order = true;
+         return true;
+
+      }
+
+      // Fourth order theta fourth order phi odd anisotropy constant
+      test = "4--4-order-anisotropy-constant";
+      test2 = "fourth-order-theta-fourth-order-phi-odd-anisotropy-constant";
+      test3 = "fourth-order-odd-rotational-anisotropy-constant";
+      if( (word == test) || (word == test2) || (word == test3) )
+      {
+
+         double k4r4_odd = atof(value.c_str());
+         vin::check_for_valid_value(k4r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r4_odd = k4r4_odd;
+         internal::enable_rotational_4_4_order_odd = true;
+         return true;
+
+      }
+
+      // Fourth order theta fourth order phi odd anisotropy constant (orthonormal)
+      test = "4--4-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k4r4_odd = atof( value.c_str() ) * ( 3.0 / 16.0 ) * sqrt( 35.0 / M_PI );
+         vin::check_for_valid_value(k4r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k4r4_odd = k4r4_odd;
+         internal::enable_rotational_4_4_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order uniaxial anisotropy constant
+      test = "6-0-order-anisotropy-constant";
+      test2 = "sixth-order-uniaxial-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double ku6 = atof(value.c_str());
+         vin::check_for_valid_value(ku6, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].ku6 = ku6;
+         internal::enable_uniaxial_sixth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
+         return true;
+
+      }
+
+      // Sixth order uniaxial anisotropy constant (orthonormal)
+      test = "6-0-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if ( word == test )
+      {
+
+         double ku6 = - atof( value.c_str() ) * ( 231.0 / 32.0 ) * sqrt( 13.0 / M_PI );
+         vin::check_for_valid_value(ku6, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].ku6 = ku6;
+         internal::enable_uniaxial_sixth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
+         return true;
+
+      }
+
+      // Sixth order theta first order phi anisotropy constant
+      test = "6-1-order-anisotropy-constant";
+      test2 = "sixth-order-theta-first-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r1 = atof(value.c_str());
+         vin::check_for_valid_value(k6r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r1 = k6r1;
+         internal::enable_rotational_6_1_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta first order phi anisotropy constant (orthonormal)
+      test = "6-1-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r1 = - atof( value.c_str() ) * ( 33.0 / 16.0 ) * sqrt( 273.0 / M_PI );
+         vin::check_for_valid_value(k6r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r1 = k6r1;
+         internal::enable_rotational_6_1_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta first order phi odd anisotropy constant
+      test = "6--1-order-anisotropy-constant";
+      test2 = "sixth-order-theta-first-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r1_odd = atof(value.c_str());
+         vin::check_for_valid_value(k6r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r1_odd = k6r1_odd;
+         internal::enable_rotational_6_1_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta first order phi odd anisotropy constant (orthonormal)
+      test = "6--1-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( (word == test) )
+      {
+
+         double k6r1_odd = - atof( value.c_str() ) * ( 33.0 / 16.0 ) * sqrt( 273.0 / M_PI );
+         vin::check_for_valid_value(k6r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r1_odd = k6r1_odd;
+         internal::enable_rotational_6_1_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta second order phi anisotropy constant
+      test = "6-2-order-anisotropy-constant";
+      test2 = "sixth-order-theta-second-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r2 = atof( value.c_str() );
+         vin::check_for_valid_value(k6r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r2 = k6r2;
+         internal::enable_rotational_6_2_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta second order phi anisotropy constant (orthonormal)
+      test = "6-2-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r2 = - atof( value.c_str() ) * ( 33.0 / 64.0 ) * sqrt( 2730.0 / M_PI );
+         vin::check_for_valid_value(k6r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r2 = k6r2;
+         internal::enable_rotational_6_2_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta second order phi odd anisotropy constant
+      test = "6--2-order-anisotropy-constant";
+      test2 = "sixth-order-theta-second-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r2_odd = atof( value.c_str() );
+         vin::check_for_valid_value(k6r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r2_odd = k6r2_odd;
+         internal::enable_rotational_6_2_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta second order phi odd anisotropy constant (orthonormal)
+      test = "6--2-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r2_odd = - atof( value.c_str() ) * ( 33.0 / 64.0 ) * sqrt( 2730.0 / M_PI );
+         vin::check_for_valid_value(k6r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r2_odd = k6r2_odd;
+         internal::enable_rotational_6_2_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta third order phi anisotropy constant
+      test = "6-3-order-anisotropy-constant";
+      test2 = "sixth-order-theta-third-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r3 = atof( value.c_str() );
+         vin::check_for_valid_value(k6r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r3 = k6r3;
+         internal::enable_rotational_6_3_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta third order phi anisotropy constant
+      test = "6-3-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r3 = - atof( value.c_str() ) * ( 11.0 / 32.0 ) * sqrt( 2730.0 / M_PI );
+         vin::check_for_valid_value(k6r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r3 = k6r3;
+         internal::enable_rotational_6_3_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta third order phi odd anisotropy constant
+      test = "6--3-order-anisotropy-constant";
+      test2 = "sixth-order-theta-third-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r3_odd = atof( value.c_str() );
+         vin::check_for_valid_value(k6r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r3_odd = k6r3_odd;
+         internal::enable_rotational_6_3_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta third order phi odd anisotropy constant (orthonormal)
+      test = "6--3-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r3_odd = - atof( value.c_str() ) * ( 11.0 / 32.0 ) * sqrt( 2730.0 / M_PI );
+         vin::check_for_valid_value(k6r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r3_odd = k6r3_odd;
+         internal::enable_rotational_6_3_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta fourth order phi anisotropy constant
+      test = "6-4-order-anisotropy-constant";
+      test2 = "sixth-order-theta-fourth-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r4 = atof(value.c_str());
+         vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r4 = k6r4;
+         internal::enable_rotational_6_4_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta fourth order phi anisotropy constant (orthonormal)
+      test = "6-4-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r4 = - atof( value.c_str() ) * ( 3.0 * 11.0 / 32.0 ) * sqrt( 91.0 / M_PI );
+         vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r4 = k6r4;
+         internal::enable_rotational_6_4_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta fourth order phi odd anisotropy constant
+      test = "6--4-order-anisotropy-constant";
+      test2 = "sixth-order-theta-fourth-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r4_odd = atof( value.c_str() );
+         vin::check_for_valid_value(k6r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r4_odd = k6r4_odd;
+         internal::enable_rotational_6_4_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta fourth order phi odd anisotropy constant (orthonormal)
+      test = "6--4-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r4_odd = - atof( value.c_str() ) * ( 3.0 * 11.0 / 32.0 ) * sqrt( 91.0 / M_PI );
+         vin::check_for_valid_value(k6r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r4_odd = k6r4_odd;
+         internal::enable_rotational_6_4_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta fifth order phi anisotropy constant
+      test = "6-5-order-anisotropy-constant";
+      test2 = "sixth-order-theta-fifth-order-phi-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r5 = atof( value.c_str() );
+         vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r5 = k6r5;
+         internal::enable_rotational_6_5_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta fifth order phi anisotropy constant (orthonormal)
+      test = "6-5-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r5 = - atof( value.c_str() ) * ( 3.0 / 32.0 ) * sqrt( 2002.0 / M_PI );
+         vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r5 = k6r5;
+         internal::enable_rotational_6_5_order = true;
+         return true;
+
+      }
+
+      // Sxith order theta fifth order phi odd anisotropy constant
+      test = "6--5-order-anisotropy-constant";
+      test2 = "sixth-order-theta-fifth-order-phi-odd-anisotropy-constant";
+      if( (word == test) || (word == test2) )
+      {
+
+         double k6r5_odd = atof( value.c_str() );
+         vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r5_odd = k6r5_odd;
+         internal::enable_rotational_6_5_order_odd = true;
+         return true;
+
+      }
+
+      // Sxith order theta fifth order phi odd anisotropy constant (orthonormal)
+      test = "6--5-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r5_odd = - atof( value.c_str() ) * ( 3.0 / 32.0 ) * sqrt( 2002.0 / M_PI );
+         vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r5_odd = k6r5_odd;
+         internal::enable_rotational_6_5_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta sixth order phi anisotropy constant
+      test = "6-6-order-anisotropy-constant";
+      test2 = "sixth-order-theta-sixth-order-phi-anisotropy-constant";
+      test3 = "sixth-order-rotational-anisotropy-constant";
+      if( (word == test) || (word == test2) || (word == test3) )
+      {
+
+         double k6r6 = atof( value.c_str() );
+         vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r6 = k6r6;
+         internal::enable_rotational_6_6_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta sixth order phi anisotropy constant (orthonormal)
+      test = "6-6-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r6 = - atof( value.c_str() ) * ( 1.0 / 64.0 ) * sqrt( 6006.0 / M_PI );
+         vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r6 = k6r6;
+         internal::enable_rotational_6_6_order = true;
+         return true;
+
+      }
+
+      // Sixth order theta sixth order phi odd anisotropy constant
+      test = "6--6-order-anisotropy-constant";
+      test2 = "sixth-order-theta-sixth-order-phi-odd-anisotropy-constant";
+      test3 = "sixth-order-odd-rotational-anisotropy-constant";
+      if( (word == test) || (word == test2) || (word == test3) )
+      {
+
+         double k6r6_odd = atof( value.c_str() );
+         vin::check_for_valid_value(k6r6_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r6_odd = k6r6_odd;
+         internal::enable_rotational_6_6_order_odd = true;
+         return true;
+
+      }
+
+      // Sixth order theta sixth order phi odd anisotropy constant (orthonormal)
+      test = "6--6-orthonormal-tesseral-harmonic-anisotropy-constant";
+      if( word == test )
+      {
+
+         double k6r6_odd = - atof( value.c_str() ) * ( 1.0 / 64.0 ) * sqrt( 6006.0 / M_PI );
+         vin::check_for_valid_value(k6r6_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
+         internal::mp[super_index].k6r6_odd = k6r6_odd;
+         internal::enable_rotational_6_6_order_odd = true;
+         return true;
+
+      }
+
+      //------------------------------------------------------------
       // Triaxial anisotropy in second and fourth order
       test="second-order-triaxial-anisotropy-vector";
       if(word == test){
@@ -308,99 +991,7 @@ namespace anisotropy{
 
       }
 
-      //------------------------------------------------------------
-      //Minimal orthogonality TBD
-      test  = "4-0-order-anisotropy-constant";
-      test2 = "fourth-order-uniaxial-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double ku4 = atof(value.c_str());
-         vin::check_for_valid_value(ku4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
-         internal::mp[super_index].ku4 = ku4;
-         internal::enable_uniaxial_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4-1-order-anisotropy-constant";
-      test2 = "fourth-order-theta-first-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k4r1 = atof(value.c_str());
-         vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r1 = k4r1;
-         internal::enable_rotational_4_1_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4--1-order-anisotropy-constant";
-      test2 = "fourth-order-theta-first-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k4r1_odd = atof(value.c_str());
-         vin::check_for_valid_value(k4r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r1_odd = k4r1_odd;
-         internal::enable_rotational_4_1_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4-2-order-anisotropy-constant";
-      test2 = "fourth-order-theta-second-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k4r2 = atof(value.c_str());
-         vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r2 = k4r2;
-         internal::enable_rotational_4_2_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4--2-order-anisotropy-constant";
-      test2 = "fourth-order-theta-second-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k4r2_odd = atof(value.c_str());
-         vin::check_for_valid_value(k4r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r2_odd = k4r2_odd;
-         internal::enable_rotational_4_2_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4-3-order-anisotropy-constant";
-      test2 = "fourth-order-theta-third-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k4r3 = atof(value.c_str());
-         vin::check_for_valid_value(k4r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r3 = k4r3;
-         internal::enable_rotational_4_3_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4--3-order-anisotropy-constant";
-      test2 = "fourth-order-theta-third-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k4r3_odd = atof(value.c_str());
-         vin::check_for_valid_value(k4r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r3_odd = k4r3_odd;
-         internal::enable_rotational_4_3_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4-4-order-anisotropy-constant";
-      test2 = "fourth-order-theta-fourth-order-phi-anisotropy-constant";
-      test3 = "fourth-order-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) || (word == test3) ){
-         double k4r4 = atof(value.c_str());
-         vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r4 = k4r4;
-         internal::enable_rotational_4_4_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "4--4-order-anisotropy-constant";
-      test2 = "fourth-order-theta-fourth-order-phi-odd-anisotropy-constant";
-      test3 = "fourth-order-odd-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) || (word == test3) ){
-         double k4r4_odd = atof(value.c_str());
-         vin::check_for_valid_value(k4r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k4r4_odd = k4r4_odd;
-         internal::enable_rotational_4_4_order_odd = true;
-         return true;
-      }
+
       //------------------------------------------------------------
       //Implementation of biaxial fourth-order anisotropy (simple version)
       test = "fourth-order-biaxial-anisotropy-constant";
@@ -411,140 +1002,7 @@ namespace anisotropy{
          internal::enable_biaxial_fourth_order_simple = true;
          return true;
       }
-      //------------------------------------------------------------
-      //Minimal orthogonality
-      test = "6-0-order-anisotropy-constant";
-      test2 = "sixth-order-uniaxial-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double ku6 = atof(value.c_str());
-         vin::check_for_valid_value(ku6, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
-         internal::mp[super_index].ku6 = ku6;
-         internal::enable_uniaxial_sixth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6-1-order-anisotropy-constant";
-      test2 = "sixth-order-theta-first-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r1 = atof(value.c_str());
-         vin::check_for_valid_value(k6r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r1 = k6r1;
-         internal::enable_rotational_6_1_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6--1-order-anisotropy-constant";
-      test2 = "sixth-order-theta-first-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r1_odd = atof(value.c_str());
-         vin::check_for_valid_value(k6r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r1_odd = k6r1_odd;
-         internal::enable_rotational_6_1_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6-2-order-anisotropy-constant";
-      test2 = "sixth-order-theta-second-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r2 = atof(value.c_str());
-         vin::check_for_valid_value(k6r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r2 = k6r2;
-         internal::enable_rotational_6_2_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6--2-order-anisotropy-constant";
-      test2 = "sixth-order-theta-second-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r2_odd = atof(value.c_str());
-         vin::check_for_valid_value(k6r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r2_odd = k6r2_odd;
-         internal::enable_rotational_6_2_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6-3-order-anisotropy-constant";
-      test2 = "sixth-order-theta-third-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r3 = atof(value.c_str());
-         vin::check_for_valid_value(k6r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r3 = k6r3;
-         internal::enable_rotational_6_3_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6--3-order-anisotropy-constant";
-      test2 = "sixth-order-theta-third-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r3_odd = atof(value.c_str());
-         vin::check_for_valid_value(k6r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r3_odd = k6r3_odd;
-         internal::enable_rotational_6_3_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6-4-order-anisotropy-constant";
-      test2 = "sixth-order-theta-fourth-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r4 = atof(value.c_str());
-         vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r4 = k6r4;
-         internal::enable_rotational_6_4_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6--4-order-anisotropy-constant";
-      test2 = "sixth-order-theta-fourth-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r4_odd = atof(value.c_str());
-         vin::check_for_valid_value(k6r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r4_odd = k6r4_odd;
-         internal::enable_rotational_6_4_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6-5-order-anisotropy-constant";
-      test2 = "sixth-order-theta-fifth-order-phi-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r5 = atof(value.c_str());
-         vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r5 = k6r5;
-         internal::enable_rotational_6_5_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6--5-order-anisotropy-constant";
-      test2 = "sixth-order-theta-fifth-order-phi-odd-anisotropy-constant";
-      if( (word == test) || (word == test2) ){
-         double k6r5_odd = atof(value.c_str());
-         vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r5_odd = k6r5_odd;
-         internal::enable_rotational_6_5_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6-6-order-anisotropy-constant";
-      test2 = "sixth-order-theta-sixth-order-phi-anisotropy-constant";
-      test3 = "sixth-order-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) || (word == test3) ){
-         double k6r6 = atof(value.c_str());
-         vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r6 = k6r6;
-         internal::enable_rotational_6_6_order = true;
-         return true;
-      }
-      //------------------------------------------------------------
-      test = "6--6-order-anisotropy-constant";
-      test2 = "sixth-order-theta-sixth-order-phi-odd-anisotropy-constant";
-      test3 = "sixth-order-odd-rotational-anisotropy-constant";
-      if( (word == test) || (word == test2) || word == test3 ){
-         double k6r6_odd = atof(value.c_str());
-         vin::check_for_valid_value(k6r6_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
-         internal::mp[super_index].k6r6_odd = k6r6_odd;
-         internal::enable_rotational_6_6_order_odd = true;
-         return true;
-      }
-      //------------------------------------------------------------
+      
       //Minimal orthogonality
       test = "fourth-order-cubic-anisotropy-constant"; // new form (preferred)
       test2  = "cubic-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
