@@ -269,7 +269,48 @@ void fast_collate(std::vector<double>& input, std::vector<double>& output, std::
 
 }
 
+//------------------------------------------------------------------------------
+// MPI broadcast with support for large messages
+//------------------------------------------------------------------------------
+void broadcast(std::vector<char>& message, int source_rank){
 
-//MPI_Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_x_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+#ifdef MPICF
+   // get message size
+   const uint64_t message_size = message.size();
+
+   // for normal messages (<int max), do a standard broadcast
+   if(message_size < 2000000000UL){
+      MPI_Bcast(message.data(), message_size, MPI_CHAR, source_rank, MPI_COMM_WORLD);
+      return;
+   }
+
+   //----------------------------------------------------
+   // otherwise break into chunks and send in a sequence
+   //----------------------------------------------------
+
+   // assume a large but not too large chunk size 2^31
+   const uint64_t chunk_size = 1073741824UL;
+
+   // determine number of additional chunks (before the last one)
+   const uint64_t num_chunks = ceil(message_size / chunk_size);
+   const uint64_t final_chunk_size = message_size - (num_chunks * chunk_size);
+
+   // define offset for each chunk
+   uint64_t offset = 0;
+
+   // now loop over chunks, broadcasting with offset
+   for(uint64_t i = 0; i < num_chunks; i++){
+      MPI_Bcast(&message[offset], chunk_size, MPI_CHAR, source_rank, MPI_COMM_WORLD);
+      offset += chunk_size;
+   }
+
+   // finally send the last chunk
+   MPI_Bcast(&message[offset], final_chunk_size, MPI_CHAR, source_rank, MPI_COMM_WORLD);
+#endif
+
+   // if not MPI, then do nothing
+   return;
+
+}
 
 }
