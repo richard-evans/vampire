@@ -50,6 +50,14 @@ namespace sld{
       double dr_init; // initial conditions
       double th_velo;
 
+      double morse_beta;
+      double morse_factor;
+      double alpha_m;
+      double r0_m;
+      double morse_D;
+      
+      
+      bool morse;
       bool harmonic; //flag for harmonic potential
       bool pseudodipolar;
 

@@ -59,7 +59,14 @@ namespace sld{
     //initialise exchange, coupling parameters
      sld::internal::initialise_sld_parameters();
      
-
+     //for the morse potential:
+     
+     sld::internal::alpha_m= 1.3885;
+     sld::internal::r0_m=2.845;
+     sld::internal::morse_D=0.4174;;
+     sld::internal::morse_beta=exp( sld::internal::alpha_m * sld::internal::r0_m);
+     sld::internal::morse_factor=-2.0 *sld::internal::morse_D * sld::internal::alpha_m;
+     
      
      sld::internal::thermal_velocity(atoms::x_velo_array, atoms::y_velo_array,atoms::z_velo_array);
      

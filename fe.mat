@@ -5,7 +5,7 @@
 #---------------------------------------------------
 # Number of Materials
 #---------------------------------------------------
-material:num-materials=2
+material:num-materials=1
 #---------------------------------------------------
 # Material 1 Cobalt Generic
 #---------------------------------------------------
@@ -20,18 +20,18 @@ material[1]:exchange-J0=0.904 !eV
 material[1]:harmonic-potential-V0=0.15 !eV
 material[1]:coupling-C0=0.5
 material[1]:minimum-height=0.0
-material[1]:maximum-height=0.5
+material[1]:maximum-height=1.0
 
 
-material[2]:material-name=Co
-material[2]:damping-constant=0.01
-material[2]:atomic-spin-moment=2.22 !muB
-material[2]:initial-spin-direction=0,0,1
+#material[2]:material-name=Co
+#material[2]:damping-constant=0.01
+#material[2]:atomic-spin-moment=2.22 !muB
+#material[2]:initial-spin-direction=0,0,1
 #material[2]:uniaxial-anisotropy-constant=1.0e-24
-material[2]:mass=5.7915e-3
-material[2]:damping-constant-lattice=0.6
-material[2]:exchange-J0=0.000001 !eV
-material[2]:harmonic-potential-V0=0.1 !eV
-material[2]:coupling-C0=0.0
-material[2]:minimum-height=0.5
-material[2]:maximum-height=1.0
+#material[2]:mass=5.7915e-3
+#material[2]:damping-constant-lattice=0.6
+#material[2]:exchange-J0=0.000001 !eV
+#material[2]:harmonic-potential-V0=0.1 !eV
+#material[2]:coupling-C0=0.0
+#material[2]:minimum-height=0.5
+#material[2]:maximum-height=1.0

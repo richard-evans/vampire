@@ -51,6 +51,11 @@ namespace sld{
           sld::internal::harmonic=true;
           return true;
          }
+          test="morse";
+          if( value == test ){
+           sld::internal::morse=true;
+           return true;
+          }
       }
 
       test = "coupling";

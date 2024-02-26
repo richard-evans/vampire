@@ -27,9 +27,9 @@ material:file = fe.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature = 100.0
+sim:temperature = 300.0
 sim:time-steps-increment = 1
-sim:total-time-steps = 5000
+sim:total-time-steps = 10000
 sim:time-step = 0.5 !fs
 sim:equilibration-temperature=0
 sim:equilibration-time-steps=0
@@ -45,41 +45,41 @@ sim:integrator = spin-lattice
 spin-lattice:potential-cutoff-range=7.8 !A
 spin-lattice:fields-cutoff-range=3.75!A
 spin-lattice:coupling=pseudodipolar
-spin-lattice:potential=harmonic
+spin-lattice:potential=morse
 
 
-spin-lattice:initial-random-displacement=0.1
-spin-lattice:initial-thermal-velocity=100
+#spin-lattice:initial-random-displacement=0.1
+#spin-lattice:initial-thermal-velocity=100
 
 ###exchange int range is in units of nearest neigh distances
 exchange:interaction-range = 3
 
 config:atoms
-config:atoms-output-rate=100
+config:atoms-output-rate=1000
 config:sld
 
 output:real-time
 output:magnetisation
-output:material-magnetisation
+#output:material-magnetisation
 
 output:spin-temperature
-output:material-spin-temperature
+#output:material-spin-temperature
 
 output:lattice-temperature
-output:material-lattice-temperature
+#output:material-lattice-temperature
 
-output:mean-spin-temperature
+#output:mean-spin-temperature
 
 output:output-rate=1
 output:precision=15
 
 screen:real-time
 screen:magnetisation
-screen:material-magnetisation
+#screen:material-magnetisation
 
 screen:spin-temperature
-screen:material-spin-temperature
+#screen:material-spin-temperature
 
 screen:lattice-temperature
-screen:material-lattice-temperature
+#screen:material-lattice-temperature
 
