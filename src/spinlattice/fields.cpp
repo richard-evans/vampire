@@ -28,6 +28,8 @@
 
 // sld module headers
 #include "internal.hpp"
+#include "anisotropy.hpp"
+
 
 namespace sld{
 
@@ -70,25 +72,36 @@ namespace sld{
 
 
             
-            // now add external fields //to be modified for other fields
-            //these are taken from previous functions in VAMPIRE
-
-           /*
-             
-            sim::calculate_external_fields(start_index,end_index);
-
+            //the following functions are taken from previous functions in VAMPIRE
+           
+           
+            // add external fields 
+            // only after equilibration
+            
+            if (sim::time > sim::equilibration_time) {
+            
+            const double Hx=sim::H_vec[0]*sim::H_applied;
+            const double Hy=sim::H_vec[1]*sim::H_applied;
+            const double Hz=sim::H_vec[2]*sim::H_applied;
              //add all the external fields to the fields array in sld_neighbour_list_array
-             for(int i=start_index;i<end_index; i++){
-             
-                //std::cout<<"bef fields external "<< i<<"\t"<< atoms::z_total_external_field_array[i]<<"\t"<<sld::internal::fields_array_z[i]<<std::endl;
+            for(int i=start_index;i<end_index; i++){
+
+               fields_array_x[i]+=Hx;
+               fields_array_y[i]+=Hy;
+               fields_array_z[i]+=Hz;
+
+           }
+            }
+
+           // add anisotropy
 
 
-               fields_array_x[i]+=atoms::x_total_external_field_array[i];
-               fields_array_y[i]+=atoms::y_total_external_field_array[i];
-               fields_array_z[i]+=atoms::z_total_external_field_array[i];
-               //std::cout<<"fields external "<< i<<"\t"<< atoms::z_total_external_field_array[i]<<"\t"<<sld::internal::fields_array_z[i]<<std::endl;
 
-            }*/
+            anisotropy::fields(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::type_array,
+                    fields_array_x, fields_array_y, fields_array_z,
+                    start_index, end_index, sim::temperature);
+                    
+           
 
       return;
 
