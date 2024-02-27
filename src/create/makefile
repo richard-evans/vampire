@@ -40,6 +40,7 @@ voronoi.o \
 voronoi_grain_rounding.o \
 voronoi_substructure.o \
 voronoi_vertex_points.o \
+voronoi_radical.o \
 write_grain_vertices.o
 
 # Append module objects to global tree

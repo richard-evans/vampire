@@ -14,6 +14,7 @@
 #include "create.hpp"
 #include "vio.hpp"
 #include "voronoi.hpp"
+#include "voronoi_radical.hpp"
 #include "random.hpp"
 // Internal sim header
 #include "internal.hpp"
@@ -141,6 +142,11 @@ namespace create{
          cs::system_creation_flags[2]=3;
          return true;
       }
+      test="laguerre-voronoi-film";
+      if(word==test){
+         cs::system_creation_flags[2]=5;
+         return true;
+      }
       test="voronoi-grain-substructure";
       if(word==test){
          create::internal::generate_voronoi_substructure = true;
@@ -156,6 +162,7 @@ namespace create{
          double vsd=atof(value.c_str());
          vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
          create_voronoi::voronoi_sd=vsd;
+         create_radical_voronoi::voronoi_sd=vsd;
          return true;
       }
       //--------------------------------------------------------------------
@@ -175,6 +182,7 @@ namespace create{
       test="voronoi-rounded-grains";
       if(word==test || word == "rounded-grains"){
          create_voronoi::rounded=true;
+         create_radical_voronoi::rounded=true;
          return true;
       }
       test="voronoi-include-boundary-grains";
@@ -441,6 +449,14 @@ namespace create{
          double pspacing=atof(value.c_str());
          vin::check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
          create::internal::voronoi_grain_spacing=pspacing;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="voronoi-tiny-grain-chance";
+      if(word==test){
+         double tgchance=atof(value.c_str());
+         vin::check_for_valid_value(tgchance, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         create::internal::voronoi_tiny_grain_chance=tgchance;
          return true;
       }
       //--------------------------------------------------------------------

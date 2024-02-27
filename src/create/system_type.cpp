@@ -115,6 +115,10 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			err::vexit();
 			break;
 
+		case 5: // Radical Voronoi Granular Film
+			voronoi_radical_film(catom_array);
+			break;
+
 		default:{
 			std::cerr << "Unknown system type requested, exiting" << std::endl;
 			err::vexit();

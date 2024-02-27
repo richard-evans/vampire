@@ -44,6 +44,8 @@ namespace create{
          double voronoi_grain_size = 50.0;
          double voronoi_grain_spacing = 10.0;
 
+         double voronoi_tiny_grain_chance = 0.0;
+
          double bubble_radius = 0.3333;
          double bubble_nucleation_height = 0.0;
 

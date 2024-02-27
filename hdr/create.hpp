@@ -179,6 +179,8 @@ int create_crystal_structure(std::vector<cs::catom_t> &);
 
 int voronoi_film(std::vector<cs::catom_t> &);
 
+int voronoi_radical_film(std::vector<cs::catom_t> &);
+
 void generate_multilayers(std::vector<cs::catom_t> & catom_array);
 
 }

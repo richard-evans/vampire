@@ -29,8 +29,8 @@ MPIICC=mpiicpc -DMPICF
 LIBS= -lstdc++
 #-lm $(FFTLIBS) -L/opt/local/lib/
 
-CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
-CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
+CCC_CFLAGS=-I./hdr -I./src/qvoronoi -I./src/voro++ -O0
+CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -I./src/voro++ -O0
 
 export LANG=C
 export LC_ALL=C
@@ -40,41 +40,41 @@ export LC_ALL=C
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 
 # Debug Flags
-ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
-ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
+ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi -I./src/voro++
+ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi -I./src/voro++
 
-GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi -Wsign-compare
-GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi -Wsign-compare
+GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi -I./src/voro++ -Wsign-compare
+GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi -I./src/voro++ -Wsign-compare
 
-PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
-PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
-IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
-IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
+PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi -I./src/voro++
+PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi -I./src/voro++
+IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi -I./src/voro++
+IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi -I./src/voro++
 
-LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi -Wsign-compare
-LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi -Wsign-compare
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi -I./src/voro++ -Wsign-compare
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi -I./src/voro++ -Wsign-compare
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
-ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
+ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi -I./src/voro++
+ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -I./src/voro++ -axCORE-AVX2
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
-LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
+LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi -I./src/voro++
+LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -I./src/voro++
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++11 -Wsign-compare
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -Wsign-compare
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -I./src/voro++ -std=c++11 -Wsign-compare
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -I./src/voro++ -Wsign-compare
 
-PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
-PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
+PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi -I./src/voro++
+PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -I./src/voro++ -O2 -march=barcelona -ipa
 
 
-IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
-IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
+IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi -I./src/voro++
+IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -I./src/voro++ -O5 -qarch=450 -qtune=450
 
-CRAY_CFLAGS= -O3 -hfp3 -I./hdr -I./src/qvoronoi
-CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi
+CRAY_CFLAGS= -O3 -hfp3 -I./hdr -I./src/qvoronoi -I./src/voro++
+CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi -I./src/voro++
 
 
 # Save git commit in simple function
@@ -153,6 +153,7 @@ include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
 include src/environment/makefile
+include src/voro++/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
