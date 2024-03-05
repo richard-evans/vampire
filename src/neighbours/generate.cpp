@@ -278,8 +278,8 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
 		// Loop over all interactions in exchange template
 		for(unsigned int i = 0; i < num_interactions; i++){
 
-			const int atom=exchange.interaction[i].i;
-			const int natom=exchange.interaction[i].j;
+			const int atom  = exchange.interaction[i].i;
+			const int natom = exchange.interaction[i].j;
 
 			int nx = exchange.interaction[i].dx + scc[0];
 			int ny = exchange.interaction[i].dy + scc[1];

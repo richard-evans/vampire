@@ -146,8 +146,8 @@ namespace create{
          // Array to store all interaction ranges
          std::vector<double> cpu_range_array(6*vmpi::num_processors,0.0); // Linear Memory for MPI comms
 
-         // Determine range+interaction range of all CPU's
-         double max_interaction_range=double(cs::unit_cell.interaction_range);
+         // Determine range+interaction range of all CPU's (need +1 for interactions at different ends of the unit cell)
+         double max_interaction_range=double(cs::unit_cell.interaction_range+1);
 
          // Populate local ranges
          cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell.dimensions[0]-0.01;

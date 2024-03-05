@@ -176,6 +176,7 @@ int create(){
 
    // Determine number of local atoms
    #ifdef MPICF
+		vmpi::num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
       // set number of core atoms for serial code (to allow wraper functions to work seamlessly)
       vmpi::num_core_atoms = atoms::num_atoms;
