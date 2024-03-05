@@ -132,6 +132,8 @@ namespace create{
       extern double voronoi_grain_size;
       extern double voronoi_grain_spacing;
 
+      extern double voronoi_tiny_grain_chance;
+
       extern double bubble_radius;
       extern double bubble_nucleation_height;
 
