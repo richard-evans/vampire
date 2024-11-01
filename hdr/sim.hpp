@@ -33,7 +33,7 @@
 #include <vector>
 
 /// Enumerated lists for code readability
-enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
+enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square, multilayer_two_temperature};
 
 namespace sim{
 
@@ -150,6 +150,17 @@ namespace sim{
 	extern double TTG;  ///electron coupling constant
 	extern double TTTe; /// electron temperature
 	extern double TTTp; /// phonon temperature
+	
+	//Modified by M Strungaru
+	extern double TTcutofftime; //cutoff time for the laser pulse (in s)
+	extern double TTdamp; //damping after the TTcutofftime
+	extern double TTephrat; //ratio between the new electron-phonon coupling and old one
+    extern double TT_afterpp;
+	//for substrate
+	extern double TTCe_sub; ///electron specific heat
+	extern double TTCl_sub; ///phonon specific heat
+	extern double TTG_sub;  ///electron coupling constant
+
 
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];

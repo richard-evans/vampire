@@ -54,6 +54,7 @@ double two_temperature_function(double ftime);
 double double_pump_two_temperature_function(double ftime);
 double square_temperature_function(double ftime);
 double double_pump_square_temperature_function(double ftime);
+double multilayer_two_temperature_function(double ftime);
 
 /// Selects appropriate temperature pulse function according to user input
 double temperature_pulse_function(double function_time){
@@ -74,6 +75,10 @@ double temperature_pulse_function(double function_time){
 
 		case(double_pump_square):
 			return double_pump_square_temperature_function(function_time);
+			break;
+			
+		case (multilayer_two_temperature):
+		   return multilayer_two_temperature_function(function_time);
 			break;
 
 		default:
@@ -225,6 +230,76 @@ double double_pump_square_temperature_function(double ftime){
 	else return sim::Teq;
 
 }
+
+//modified by M Strungaru
+double multilayer_two_temperature_function(double ftime){
+
+   const double i_pump_time = 1.0/sim::pump_time;
+   const double reduced_time = (ftime-3.*sim::pump_time)*i_pump_time;
+   const double four_ln_2 = 2.77258872224; // 4 ln 2
+   // 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
+   const double two_delta_sqrt_pi_ln_2 = 9394372.787;
+   const double pump=sim::pump_power*two_delta_sqrt_pi_ln_2*
+   						exp(-four_ln_2*reduced_time*reduced_time)*i_pump_time;
+
+   const double Te = sim::TTTe;
+   const double Tp = sim::TTTp;
+   const double G  = sim::TTG;
+   const double Ce = sim::TTCe;
+   const double Cl = sim::TTCl;
+   const double dt = mp::dt_SI;
+
+	//two temperature model parameters for substrate
+	double G1  = sim::TTG_sub;
+	const double Ce1 = sim::TTCe_sub;
+	const double Cl1 = sim::TTCl_sub;
+	
+
+   if(ftime>=sim::TTcutofftime){
+   //pump=sim::TT_afterpp;
+   //G=sim::TTG*sim::TTephrat;
+
+   //std::cout<<"ftime22 "<<sim::TTcutofftime<<"\t"<<pump<<"\t"<<sim::TTephrat<<"\t"<< sim::TTdamp<<std::endl;
+   //std::cout<<"2 Hth "<<mp::material[0].H_th_sigma<<std::endl;
+   for(unsigned int mat=0;mat<mp::material.size();mat++){
+	   mp::material[mat].alpha=sim::TTdamp;
+   mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
+		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
+		mp::material[mat].H_th_sigma= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23 / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*mp::dt));
+   }
+   }
+	// integrate two temperature model (floor in free elecron approximation (c prop to T) for low temperatures)
+   //normal integration of 22TM without heat sink coupling
+	if(ftime<sim::TTcutofftime){
+
+	if(Te>1.0) sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
+	else sim::TTTe =       (-G*(Te-Tp)+pump)*dt/Ce + Te;
+	sim::TTTp =            ( G*(Te-Tp)     )*dt/Cl + Tp; //- (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
+   }
+	else {
+	//integrate the other parameters for 2ttm
+		if(Te>1.0) sim::TTTe = (-G1*(Te-Tp)+pump)*dt/(Ce1*Te) + Te;
+		else sim::TTTe =       (-G1*(Te-Tp)+pump)*dt/Ce1 + Te;
+		sim::TTTp =            ( G1*(Te-Tp)     )*dt/Cl1 + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
+	   }
+
+
+   // Optionally set material specific temperatures
+   if(sim::local_temperature==true){
+      for(unsigned int mat=0;mat<mp::material.size();mat++){
+         if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=sim::TTTp;
+         else mp::material[mat].temperature=sim::TTTe;
+      }
+   }
+
+    if(ftime<sim::TTcutofftime)
+   return sim::TTTe;
+        else
+        return sim::TTTp;
+      
+
+}
+
 
 namespace program{
 /// @brief Function to calculate a time series with two temperature model heating/cooling profile
