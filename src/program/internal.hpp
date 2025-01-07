@@ -20,6 +20,7 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
+#include <string>
 #include <vector>
 
 // Vampire headers
@@ -28,72 +29,83 @@
 // program module headers
 #include "internal.hpp"
 
-namespace program{
+namespace program {
 
-   namespace internal{
+namespace internal {
 
-      //-------------------------------------------------------------------------
-      // Internal data type definitions
-      //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+// Internal data type definitions
+//-------------------------------------------------------------------------
 
-      //-----------------------------------------------------------------------------
-      // internal materials class for storing material parameters
-      //-----------------------------------------------------------------------------
-      class mp_t{
+//-----------------------------------------------------------------------------
+// internal materials class for storing material parameters
+//-----------------------------------------------------------------------------
+class mp_t {
 
-          private:
+private:
+public:
+  //------------------------------
+  // material parameter variables
+  //------------------------------
+  double test;
 
-          public:
+  // constructor
+  mp_t(const unsigned int max_materials = 100)
+      : test(0.0) // constructor initialisation of test variable
+  {
+    // constructor body for initialising more complex data/arrays
+  }; // end of constructor
 
-             //------------------------------
-             // material parameter variables
-             //------------------------------
-             double test;
+}; // end of internal::mp class
 
-             // constructor
-             mp_t (const unsigned int max_materials = 100):
-                test(0.0) // constructor initialisation of test variable
-             {
-                // constructor body for initialising more complex data/arrays
-             }; // end of constructor
+//-------------------------------------------------------------------------
+// Internal shared variables
+//-------------------------------------------------------------------------
+extern bool enabled; // bool to enable module
 
-       }; // end of internal::mp class
+//------------------------------------------------------------------------
+// Electrial pulse program
+//------------------------------------------------------------------------
+extern double
+    electrical_pulse_time; // length of electrical pulses (1 ns default)
+extern double electrical_pulse_rise_time; // linear rise time for electrical
+                                          // pulse (0.0 default)
+extern double electrical_pulse_fall_time; // linear fall time for electrical
+                                          // pulse (0.0 default)
+extern double electrical_strength;        // pulse strength
 
-      //-------------------------------------------------------------------------
-      // Internal shared variables
-      //-------------------------------------------------------------------------
-      extern bool enabled; // bool to enable module
+extern double electrical_duration;
 
-      //------------------------------------------------------------------------
-      // Electrial pulse program
-      //------------------------------------------------------------------------
-      extern double electrical_pulse_time;      // length of electrical pulses (1 ns default)
-      extern double electrical_pulse_rise_time; // linear rise time for electrical pulse (0.0 default)
-      extern double electrical_pulse_fall_time; // linear fall time for electrical pulse (0.0 default)
-      extern int num_electrical_pulses;
+extern double electrical_begin_time;
 
-      //------------------------------------------------------------------------
-      // Field pulse program
-      //------------------------------------------------------------------------
-      extern double field_pulse_time; // length of field pulses (1 ns default)
+extern double electrical_consistent_time;
 
-      //------------------------------------------------------------------------
-      // Exchange stiffness program
-      //------------------------------------------------------------------------
-      extern double exchange_stiffness_max_constraint_angle; // degrees
-      extern double exchange_stiffness_delta_constraint_angle; // degrees
+extern std::string electrical_pulse_shape; // pulse shape (square and gaussian)
 
-      //------------------------------------------------------------------------
-      // Material level parameters
-      //------------------------------------------------------------------------
-      extern std::vector<internal::mp_t> mp; // array of material properties
+extern int num_electrical_pulses;
 
-      //-------------------------------------------------------------------------
-      // Internal function declarations
-      //-------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Field pulse program
+//------------------------------------------------------------------------
+extern double field_pulse_time; // length of field pulses (1 ns default)
 
-   } // end of internal namespace
+//------------------------------------------------------------------------
+// Exchange stiffness program
+//------------------------------------------------------------------------
+extern double exchange_stiffness_max_constraint_angle;   // degrees
+extern double exchange_stiffness_delta_constraint_angle; // degrees
 
-} // end of program namespace
+//------------------------------------------------------------------------
+// Material level parameters
+//------------------------------------------------------------------------
+extern std::vector<internal::mp_t> mp; // array of material properties
 
-#endif //PROGRAM_INTERNAL_H_
+//-------------------------------------------------------------------------
+// Internal function declarations
+//-------------------------------------------------------------------------
+
+} // namespace internal
+
+} // namespace program
+
+#endif // PROGRAM_INTERNAL_H_
