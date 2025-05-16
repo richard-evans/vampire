@@ -140,6 +140,7 @@ include src/program/makefile
 include src/qvoronoi/makefile
 include src/simulate/makefile
 include src/spinlattice/makefile
+include src/spintextures/makefile
 include src/spintransport/makefile
 include src/spinwaves/makefile
 include src/statistics/makefile
