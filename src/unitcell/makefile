@@ -27,6 +27,7 @@ honeycomb-a.o \
 honeycomb-b.o \
 kagome.o \
 mn2au.o \
+perovskite.o \
 nd2fe14b.o\
 rocksalt.o \
 smfe12n.o\
