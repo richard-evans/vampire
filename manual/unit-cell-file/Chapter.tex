@@ -1,14 +1,27 @@
 \chapter{Unit Cell Files}\label{chap:unitcellfiles}
-\vampire provides a selection of built-in unit cell crystal structures which can be specified with the 
-create:crystal-structure keyword. However, there are many more crystal structures and magnetic materials than the code could possibly support, and so an advanced mode is available where the user can specify any atomic structure and exchange interactions which are then imported into the code and can be used to generate large systems and/or cut into the standard geometric shapes. It is also possible to simulate complex non-periodic structures such as nanoparticles obtained from molecular dynamics simulations with the same approach. The unit cell file is specified in the main input file using the keyword:
+\vampire provides a selection of built-in unit cell crystal structures which can
+be specified with the create:crystal-structure keyword. However, there are many
+more crystal structures and magnetic materials than the code could possibly
+support, and so an advanced mode is available where the user can specify any
+atomic structure and exchange interactions which are then imported into the code
+and can be used to generate large systems and/or cut into the standard geometric
+shapes. It is also possible to simulate complex non-periodic structures such as
+nanoparticles obtained from molecular dynamics simulations with the same
+approach. The unit cell file is specified in the main input file using the
+keyword:
 
 \noindent\textit{material:unit-cell-file = file.ucf}
 
-\noindent where "file.ucf" is the filename. 
+\noindent where "file.ucf" is the filename.
 
 \section*{The unit cell file format}
 \phantomsection\addcontentsline{toc}{section}{The unit cell file format}
-The unit cell file is split into two main parts. The first part specifies the unit cell shape, the atoms in the unit cell, and their material associations and categorisation for statistics purposes. The second part specifies all atomic exchange interactions within and between neighbouring unit cells. The general plain text format is as follows:
+The unit cell file is split into two main parts. The first part specifies the
+unit cell shape, the atoms in the unit cell, and their material associations and
+categorisation for statistics purposes. The second part specifies all atomic
+exchange interactions within and between neighbouring unit cells. The final part
+details all the biquadratic exchange interactions. The general plain text format
+is as follows:
 
 \begin{verbatim}
 1 # Unit cell size:
@@ -23,13 +36,20 @@ The unit cell file is split into two main parts. The first part specifies the un
 10 ...
 11    ...
 12 # Interactions
-13 num_interactions [exchange_type] 
+13 num_interactions [exchange_type]
 14 IID i j dx dy dz | Jij
                     | Jx Jy Jz
                     | Jxx Jxy Jxz Jyx Jyy Jyz Jzx Jzy Jzz
+15 num_BQ_interactions [biquadratic_exchange_type]
+16 IID i j dx dy dz | Jij
+                    | Jx Jy Jz
+                    | Jxx Jxy Jxz Jyx Jyy Jyz Jzx Jzy Jzz
+
 \end{verbatim}
 
-In general this format now allows the specification of any system we want, but clearly complex multi- layered systems require large file sizes. Working through line by line:
+In general this format now allows the specification of any system we want, but
+clearly complex multi- layered systems require large file sizes. Working through
+line by line:
 
 \noindent
 \begin{longtable}{ l p{8cm} }
@@ -45,12 +65,13 @@ $.$	 & cat\_id  category id of the atom, used for calculating properties not cat
 $.$	 & hcat\_id Height category id used for calculating properties as a function of height\\
 $12$   & Defines the total number of interactions for the unit cell and the expected type of exchange
 (isotropic, vectorial, tensorial, normalized-isotropic, normalized-vectorial, normalized-tensorial). No lines are allowed between this line and the list of interactions.\\
-$13$   & These lines list all the interactions.\\
+$13$   & These lines list all the (bilinear) exchange interactions.\\
 $.$	   & IID Interaction ID is only used for accounting purposes, starts at 0.\\
 $.$	   & i Atom number of atom in local unit cell\\
 $.$    & j Atom number of atom in local/remote unit cell\\
 $.$    & dxuc,dyuc,dzuc relative integer coordinates of unit cell for atom j\\
 $.$    & Jij, Jxx... Exchange values specified in Joules. \\
+$14$   & These lines list all the biquadratic exchange interactions.\\
 \end{longtable}
 
 \section*{Example: Simple Cubic System}
@@ -76,9 +97,13 @@ As an example, here is a complete sample file for a simple cubic system with a s
 17 5
 \end{verbatim}
 
-Here only easy axis anisotropy and isotropic exchange are defined. Since there is only a single atom in the unit cell, all i-j pairs are 0-0, but over the neighbouring unit cells $\pm 1$ in all directions. This generally
-leads to a large number of interactions for increasing numbers of atoms in the unit cell, and in future I will write a program to generate some different lattices and interaction lists.
- 
+Here only easy axis anisotropy and isotropic exchange are defined. Since there
+is only a single atom in the unit cell, all i-j pairs are 0-0, but over the
+neighbouring unit cells $\pm 1$ in all directions. This generally leads to a
+large number of interactions for increasing numbers of atoms in the unit cell,
+and in future I will write a program to generate some different lattices and
+interaction lists.
+
 
 
 

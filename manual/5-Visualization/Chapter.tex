@@ -94,7 +94,7 @@ to render using the following flags:
 \noindent
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{povray +KFF[initial frame number] +KFI[final frame number]}
+\textit{povray +KFI[initial frame number] +KFF[final frame number]}
 \end{minipage}
 
 For example, to render frame 9 only, you could use:
@@ -105,7 +105,7 @@ For example, to render frame 9 only, you could use:
 \textit{povray -W3600 -H2700 +A0.3 +KFI9 +KFF9 spins.pov}
 \end{minipage}
 
-\noindent where the "-W" and "-H" flags define the width and heigh of the image
+\noindent where the "-W" and "-H" flags define the width and height of the image
 (the resolution), and "+A" is used for antialiasing.
 
 Output from \vdc can be customised in several ways, either by passing parameters
@@ -381,7 +381,19 @@ spins while their spin direction remains antiferromagnetic.
 
 \section*{Micromagnetic visualization with POV-Ray}
 \phantomsection\addcontentsline{toc}{section}{Micromagnetic visualization with POV-Ray}
-cell2povray
+
+\vdc also includes the ability to generate data in micromagnetic-like format
+with
+\noindent
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{vdc --povray-cells}
+\end{minipage}
+
+which will average the atomistic data into cubic cells similar to a finite-
+difference micromagnetic visualisation. These will be displays as cubes and is
+useful for visualising large-scale magnetic textures where atomistic scalae data
+would be prohibitive.
 
 %macros
 
@@ -389,5 +401,5 @@ cell2povray
 
 %colouring options
 
-\section*{Visualization Movies}
-\phantomsection\addcontentsline{toc}{section}{Visualization Movies}
+%\section*{Visualization Movies}
+%\phantomsection\addcontentsline{toc}{section}{Visualization Movies}
