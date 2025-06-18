@@ -333,6 +333,7 @@ namespace sim{
          sim::internal::mp[super_index].stt_pv.x = u[0];
          sim::internal::mp[super_index].stt_pv.y = u[1];
          sim::internal::mp[super_index].stt_pv.z = u[2];
+         sim::internal::enable_local_stt_polarizers = true;
          return true;
       }
       //------------------------------------------------------------
@@ -342,6 +343,7 @@ namespace sim{
          // Test for valid range
          vin::check_for_valid_int(mid, word, line, prefix, 1, mp::max_materials,"material","1 - 100");
          sim::internal::mp[super_index].stt_pm = mid;
+         sim::internal::enable_local_stt_polarizers = true;
          return true;
       }
       //------------------------------------------------------------
@@ -390,6 +392,7 @@ namespace sim{
          sim::internal::mp[super_index].sot_pv.x = u[0];
          sim::internal::mp[super_index].sot_pv.y = u[1];
          sim::internal::mp[super_index].sot_pv.z = u[2];
+         sim::internal::enable_local_sot_polarizers = true;
          return true;
       }
       //------------------------------------------------------------
@@ -399,6 +402,7 @@ namespace sim{
          // Test for valid range
          vin::check_for_valid_int(mid, word, line, prefix, 1, mp::max_materials,"material","1 - 100");
          sim::internal::mp[super_index].sot_pm = mid;
+         sim::internal::enable_local_sot_polarizers = true;
          return true;
       }
       //------------------------------------------------------------

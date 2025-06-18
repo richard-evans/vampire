@@ -466,6 +466,10 @@ void set_torque_polarization_vectors(){
 		}
 	}
 	else{
+
+		// Default is the polarisers are set at initialisation for each material
+		// ...
+
 		// for local polarisers check for dynamic ones
 		for(int m = 0 ; m < mp::num_materials ; m++){
 
@@ -495,6 +499,10 @@ void set_torque_polarization_vectors(){
 		}
 	}
 	else{
+
+		// Default is the polarisers are set at initialisation for each material
+		// ...
+
 		// for local polarisers check for dynamic ones
 		for(int m = 0 ; m < mp::num_materials ; m++){
 
