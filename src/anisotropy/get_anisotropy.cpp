@@ -271,5 +271,13 @@ namespace anisotropy{
       return internal::mp[material].kl_vector;
    }
 
-
+   //--------------------------------------------------------------------------------
+   // Function to get pointer to neel tensor
+   //--------------------------------------------------------------------------------
+   std::vector<double>* get_neel_tensor() {
+      return &internal::neel_tensor;
+   }
+   bool is_neel_enabled() {
+      return internal::enable_neel_anisotropy;
+   }
 } // end of anisotropy namespace

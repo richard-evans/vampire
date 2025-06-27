@@ -142,6 +142,8 @@ namespace vcuda{
       cu_real_t *d_y_mu0H_dip_field;
       cu_real_t *d_z_mu0H_dip_field;
 
+      cu_real_t *d_neel_tensor;
+
 
       /*cu_real_array_t x_total_spin_field_array(0UL);
       cu_real_array_t y_total_spin_field_array(0UL);

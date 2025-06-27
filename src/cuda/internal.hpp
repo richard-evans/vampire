@@ -55,6 +55,7 @@ namespace vcuda{
        */
       bool __initialize_atoms ();
       bool __initialize_fields ();
+      bool __initialize_neel ();
       bool __initialize_cells ();
       bool __initialize_dipole ();
       bool __initialize_hamr ();
@@ -79,6 +80,7 @@ namespace vcuda{
       void update_hamr_field ();
       void update_global_thermal_field ();
       void update_applied_fields ();
+      void update_neel_fields ();
 
 
 
@@ -167,7 +169,17 @@ namespace vcuda{
             const cu_real_t Hx, const cu_real_t Hy, const cu_real_t Hz,
             int *  material, vcuda::internal::material_parameters_t * material_params,
             const int n_atoms);
-      
+
+      __global__ void update_neel_fields_kernel (
+         cu_real_t * d_neel_tensor,
+         cu_real_t * x_spin,
+         cu_real_t * y_spin,
+         cu_real_t * z_spin,
+         cu_real_t * x_sp_field,
+         cu_real_t * y_sp_field,
+         cu_real_t * z_sp_field,
+         int n_atoms
+         );
 
       namespace stats{
          extern bool use_cpu;

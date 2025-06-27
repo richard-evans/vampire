@@ -82,6 +82,12 @@ namespace internal{
       cu_real_t H_th_sigma;
    };
 
+   // TODO: Add struct for rotational params
+
+   // struct for rotational material parameters
+   // struct material_parameters_rotational_t {
+   // };
+
    // Type definition for array of material parameters
    //typedef thrust::device_vector<material_parameters_t> cu_material_array_t;
 

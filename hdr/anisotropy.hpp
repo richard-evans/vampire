@@ -114,6 +114,9 @@ namespace anisotropy
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index, const int max_materials);
 
+   std::vector<double>* get_neel_tensor();
+   bool is_neel_enabled();
+
 } // end of anisotropy namespace
 
 #endif //ANISOTROPY_H_

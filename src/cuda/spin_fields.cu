@@ -11,6 +11,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "anisotropy.hpp"
 #include "cuda.hpp"
 
 // Local cuda headers
@@ -43,6 +44,9 @@ void update_spin_fields ()
    cu::exchange::calculate_exchange_fields ();
 
    check_cuda_errors (__FILE__, __LINE__);
+
+   //If neel fields are enabled, execute the kernel
+   if (anisotropy::is_neel_enabled()) cu::update_neel_fields();
 
    // Call kernel to calculate non-exchange spin fields
    cu::update_non_exchange_spin_fields_kernel <<< cu::grid_size, cu::block_size >>> (

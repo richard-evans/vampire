@@ -133,6 +133,7 @@ namespace vcuda{
 
       success = success && cu::__initialize_atoms ();
       success = success && cu::__initialize_fields ();
+      success = success && cu::__initialize_neel ();
       success = success && cu::__initialize_cells ();
       success = success && cu::__initialize_materials ();
       success = success && cu::__initialize_topology ();
@@ -355,6 +356,19 @@ namespace vcuda{
          cudaMemcpy(cu::d_y_mu0H_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
          std::copy(::dipole::atom_mu0demag_field_array_z.begin(), ::dipole::atom_mu0demag_field_array_z.end(), tmp_buffer.begin());
          cudaMemcpy(cu::d_z_mu0H_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+
+         return true;
+      }
+
+      bool __initialize_neel() {
+         //Skip if neel is not enabled
+         if (!anisotropy::is_neel_enabled()) return true;
+
+         std::vector<cu_real_t>* neel_tensor_p = anisotropy::get_neel_tensor();
+         size_t num_bytes = neel_tensor_p->size() * sizeof(cu_real_t);
+
+         cudaMalloc((void**)&cu::d_neel_tensor,num_bytes);
+         cudaMemcpy(cu::d_neel_tensor, neel_tensor_p->data(), num_bytes, cudaMemcpyHostToDevice);
 
          return true;
       }

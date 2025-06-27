@@ -23,6 +23,7 @@ CUDA_OBJECTS= \
 	obj/cuda/internal.o \
 	obj/cuda/llg_heun.o \
 	obj/cuda/monte_carlo.o \
+	obj/cuda/neel.o \
 	obj/cuda/spin_fields.o \
 	obj/cuda/statistics.o \
 	obj/cuda/thermal_fields.o \

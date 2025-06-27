@@ -139,6 +139,8 @@ namespace vcuda
       extern cu_real_t *d_y_mu0H_dip_field;
       extern cu_real_t *d_z_mu0H_dip_field;
 
+      extern cu_real_t *d_neel_tensor;
+
 
       /*
        * Required by the total external field calculator
