@@ -142,7 +142,9 @@ __global__ void update_non_exchange_spin_fields_kernel (
       field_y += scale * ey * (ek2 + ek4 + ek6);
       field_z += scale * ez * (ek2 + ek4 + ek6);
 
-      //Cubic Anisotropy
+      /*
+       * Cubic Anisotropy
+       */
 
       // scale factor from derivative of E = -1/2 (sx^4 + sy^4 + sz^4)
       const cu_real_t scalec = 0.5*4.0;
@@ -154,9 +156,9 @@ __global__ void update_non_exchange_spin_fields_kernel (
       const cu_real_t sy2 = sy*sy;
       const cu_real_t sz2 = sz*sz;
 
-      field_x += sx * ((scalec * sx2 * kc4) + (-scalec * sy2 * sz2 * kc6));
-      field_y += sy * ((scalec * sy2 * kc4) + (-scalec * sz2 * sx2 * kc6));
-      field_z += sz * ((scalec * sz2 * kc4) + (-scalec * sx2 * sy2 * kc6));
+      field_x += scalec * sx * ((sx2 * kc4) + (-sy2 * sz2 * kc6));
+      field_y += scalec * sy * ((sy2 * kc4) + (-sz2 * sx2 * kc6));
+      field_z += scalec * sz * ((sz2 * kc4) + (-sx2 * sy2 * kc6));
 
       /*
        * Lattice anisotropy
