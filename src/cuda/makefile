@@ -5,6 +5,9 @@
 NVCC_VERSION=$(shell nvcc --version | tail -n 1 | cut -b 38-)
 NVCC=nvcc -DCOMP='"NVCC $(NVCC_VERSION)"'
 
+# Correct incompatibility with -Wsign-compare flag and nvcc
+GCC_LDFLAGS := $(filter-out -Wsign-compare,$(GCC_LDFLAGS))
+
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse -lcurand
 
 # List module object filenames
@@ -26,7 +29,6 @@ CUDA_OBJECTS= \
 	obj/cuda/transfer.o 
 
 CUDA_ARCH=\
--gencode arch=compute_35,code=sm_35 \
 -gencode arch=compute_50,code=sm_50 \
 -gencode arch=compute_50,code=compute_50 \
 -gencode arch=compute_61,code=sm_61 \
@@ -52,7 +54,7 @@ CUDA_MATRIX_TYPE = CSR
 #CUDA 8.0+
 #CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++11 -Wno-deprecated-gpu-targets
 #CUDA 10.0 +
-CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++14 -Wno-deprecated-gpu-targets
+CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++14 -Wno-deprecated-gpu-targets -diag-suppress 549
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -dc -o $@ $(CUDA_CFLAGS) $(CUDA_PR) -DCUDA_MATRIX=$(CUDA_MATRIX_TYPE)

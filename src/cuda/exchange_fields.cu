@@ -272,7 +272,7 @@ namespace vcuda
                                     CUSPARSE_OPERATION_NON_TRANSPOSE,
                                     &alpha, J_matrix_d, vecX, &beta, vecY,
                                     CUSPARSE_REAL,
-                                    CUSPARSE_CSRMV_ALG1,
+                                    CUSPARSE_SPMV_CSR_ALG1,
                                     &buffer_size);
 
                 cudaMalloc(&spmv_buffer_d, buffer_size);
@@ -395,7 +395,7 @@ namespace vcuda
                                         &beta,
                                         vecY,
                                         CUSPARSE_REAL,
-                                        CUSPARSE_CSRMV_ALG1,
+                                        CUSPARSE_SPMV_CSR_ALG1,
                                         spmv_buffer_d);
 
                 if (status != CUSPARSE_STATUS_SUCCESS) {

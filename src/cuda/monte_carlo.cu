@@ -217,7 +217,7 @@ namespace vcuda
 
                 std::cout << "Trying a step..."<< std::endl;
 
-                cudaThreadSynchronize();
+                cudaDeviceSynchronize();
                 cudaError_t error = cudaGetLastError();
                 if(error != cudaSuccess)
                 {
