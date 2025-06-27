@@ -75,6 +75,7 @@ namespace internal{
       cu_real_t applied_field_unit_y;
       cu_real_t applied_field_unit_z;
       cu_real_t kc4;
+      cu_real_t kc6;
       cu_real_t temperature;
       cu_real_t temperature_rescaling_alpha;
       cu_real_t temperature_rescaling_Tc;

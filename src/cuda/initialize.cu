@@ -540,7 +540,7 @@ namespace vcuda{
             double ku4 = ::anisotropy::get_ku4(i); // fourth order uniaxial anisotropy constant (Ku2)
             double ku6 = ::anisotropy::get_ku6(i); // sixth order uniaxial anisotropy constant  (Ku3)
             double kc4 = ::anisotropy::get_kc4(i); // fourth order cubic anisotropy constant (Kc1)
-            //double kc6 = ::anisotropy::get_kc6(i); // sixth order cubic anisotropy constant (Kc2)
+            double kc6 = ::anisotropy::get_kc6(i); // sixth order cubic anisotropy constant (Kc2)
 
             std::vector<double> ku_vector = ::anisotropy::get_ku_vector(i); // unit vector defining axis for uniaxial anisotropy
 
@@ -554,6 +554,7 @@ namespace vcuda{
             _materials[i].sh4 = ku4 * _materials[i].i_mu_s_si;
             _materials[i].sh6 = ku6 * _materials[i].i_mu_s_si;
             _materials[i].kc4 = kc4 * _materials[i].i_mu_s_si;
+            _materials[i].kc6 = kc6 * _materials[i].i_mu_s_si;
             _materials[i].anisotropy_unit_x = ku_vector[0];
             _materials[i].anisotropy_unit_y = ku_vector[1];
             _materials[i].anisotropy_unit_z = ku_vector[2];
