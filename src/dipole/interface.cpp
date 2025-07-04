@@ -112,6 +112,13 @@ namespace dipole{
          dipole::internal::output_atomistic_dipole_field = true;
          return true;
       }
+      //-------------------------------------------------------------------
+      test="output-dipole-field";
+      if(word==test){
+         // set flag to output atomistic dipole field
+         dipole::internal::output_dipole_field = true;
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

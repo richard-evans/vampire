@@ -64,12 +64,13 @@ namespace dipole{
       std::vector < int > cell_dy;
       std::vector < int > cell_dz;
       std::vector < std::vector < std::vector<int> > > idarray;
-      //std::ofstream output_field;
+
       //------------------------------------------------------------------------
       // Shared variables inside dipole module
       //------------------------------------------------------------------------
       bool initialised=false;
       bool output_atomistic_dipole_field = false; // flag to toggle output of atomic resolution dipole field
+      bool output_dipole_field = false; // flag to toggle output of dipole field
 
       int update_time=-1; /// last update time
 

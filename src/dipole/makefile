@@ -20,6 +20,7 @@ memory.o \
 mpi.o \
 mpi2.o \
 output_atomistic_field.o \
+output_dipole_fields.o \
 tensor.o \
 update.o \
 fft_macrocell.o \

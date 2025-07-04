@@ -41,6 +41,7 @@ namespace dipole{
       //-------------------------------------------------------------------------
       extern bool initialised;
       extern bool output_atomistic_dipole_field; // flag to toggle output of atomic resolution dipole field
+      extern bool output_dipole_field; // flag to toggle output of dipole field
 
       // enumerated list of different dipole solvers
       enum solver_t{
@@ -52,6 +53,7 @@ namespace dipole{
          fft            = 5, // fft method wit tranlational invariance
          atomisticfft   = 6   // atomistic dipole dipole with fft
       };
+
       extern std::vector < int > cell_dx;
       extern std::vector < int > cell_dy;
       extern std::vector < int > cell_dz;
@@ -330,9 +332,10 @@ namespace dipole{
                                         std::vector<double>& moments_array);
 
        //-----------------------------------------------------------------
-       // Function to output atomic resolution dipole field
+       // Functions to output dipole fields
        //-----------------------------------------------------------------
        void output_atomistic_dipole_fields();
+       void output_dipole_fields();
 
        //-----------------------------------------------------------------
        // Function to output solver memory information
