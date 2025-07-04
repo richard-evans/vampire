@@ -35,7 +35,7 @@ namespace cells{
    double macro_cell_size_x = 10.0; /// macro-cells size (A)
    double macro_cell_size_y = 10.0; /// macro-cells size (A)
    double macro_cell_size_z = 10.0; /// macro-cells size (A)
-
+   double atomic_volume = 0.0; // volume of each magnetic moment for atomistic dipole self term
 
    std::vector <int> local_cell_array;
    std::vector<int> num_atoms_in_cell; /// number of atoms in each cell

@@ -43,6 +43,9 @@ namespace dipole{
       extern bool output_atomistic_dipole_field; // flag to toggle output of atomic resolution dipole field
       extern bool output_dipole_field; // flag to toggle output of dipole field
 
+      // parameters for atomistic calculation
+      extern double atomistic_atomic_volume; // volume of each magnetic moment for atomistic self term
+
       // enumerated list of different dipole solvers
       enum solver_t{
          macrocell      = 0, // original bare macrocell method (cheap but inaccurate)
