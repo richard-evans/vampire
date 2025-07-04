@@ -15,7 +15,6 @@
 // Vampire headers
 #include "cells.hpp"
 #include "dipole.hpp"
-//#include "errors.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 
@@ -47,6 +46,7 @@ void output_dipole_fields(){
 
       for (int i = 0 ; i < dipole::internal::cells_num_cells; i ++){
          dp_fields << i << "\t" <<  // cell ID
+         cells::num_atoms_in_cell[i] << "\t" << // num atoms in cell
          cells::pos_and_mom_array[4*i+0] << "\t" << // x
          cells::pos_and_mom_array[4*i+1] << "\t" << // y
          cells::pos_and_mom_array[4*i+2] << "\t" << // z

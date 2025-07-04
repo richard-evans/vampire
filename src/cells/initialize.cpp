@@ -116,7 +116,7 @@ namespace cells{
                supercell_array[i][j][k]=cell;
                // increment cell number
 
-               
+
                cell++;
             }
          }
@@ -285,7 +285,7 @@ namespace cells{
             cells::pos_array[3*local_cell+0] = cells::pos_array[3*local_cell+0]/cells::num_atoms_in_cell[local_cell];
             cells::pos_array[3*local_cell+1] = cells::pos_array[3*local_cell+1]/cells::num_atoms_in_cell[local_cell];
             cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/cells::num_atoms_in_cell[local_cell];
-         
+
          }
 
       }
