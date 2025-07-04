@@ -30,6 +30,7 @@ mn2au.o \
 perovskite.o \
 nd2fe14b.o\
 rocksalt.o \
+rocksalt-supercell.o \
 smfe12n.o\
 spinel.o \
 spinel-layered.o \
