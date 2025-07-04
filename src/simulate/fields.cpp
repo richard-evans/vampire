@@ -144,8 +144,8 @@ void calculate_external_fields(const int start_index,const int end_index){
    else if(program::program==13){
 
       // Local thermal Fields
-      ltmp::get_localised_thermal_fields(atoms::x_total_external_field_array,atoms::y_total_external_field_array,
-            atoms::z_total_external_field_array, start_index, end_index);
+      ltmp::get_localised_thermal_fields(atoms::x_thermal_field_array,atoms::y_thermal_field_array,
+            atoms::z_thermal_field_array, start_index, end_index);
 
       // Applied Fields
       if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
@@ -285,7 +285,7 @@ int calculate_thermal_fields(const int start_index,const int end_index){
    sigma_prefactor.reserve(mp::material.size());
 
    // Calculate material temperature (with optional rescaling)
-   for(unsigned int mat=0;mat<mp::material.size();mat++){
+   for(unsigned int mat=0;mat<mp::material.size();mat++) {
       double temperature = sim::temperature;
       // Check for localised temperature
       if(sim::local_temperature) temperature = mp::material[mat].temperature;
@@ -296,20 +296,21 @@ int calculate_thermal_fields(const int start_index,const int end_index){
       double rescaled_temperature = temperature < Tc ? Tc*pow(temperature/Tc,alpha) : temperature;
       double sqrt_T=sqrt(rescaled_temperature);
       sigma_prefactor.push_back(sqrt_T*mp::material[mat].H_th_sigma);
-   }
+    }
 
-   generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-   generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-   generate (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::x_thermal_field_array.begin()+start_index,atoms::x_thermal_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::y_thermal_field_array.begin()+start_index,atoms::y_thermal_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::z_thermal_field_array.begin()+start_index,atoms::z_thermal_field_array.begin()+end_index, mtrandom::gaussian);
+
 
    for(int atom=start_index;atom<end_index;atom++){
 
       const int imaterial=atoms::type_array[atom];
       const double H_th_sigma = sigma_prefactor[imaterial];
 
-      atoms::x_total_external_field_array[atom] *= H_th_sigma;
-		atoms::y_total_external_field_array[atom] *= H_th_sigma;
-		atoms::z_total_external_field_array[atom] *= H_th_sigma;
+      	atoms::x_thermal_field_array[atom] *= H_th_sigma;
+		atoms::y_thermal_field_array[atom] *= H_th_sigma;
+		atoms::z_thermal_field_array[atom] *= H_th_sigma;
 	}
 
    return EXIT_SUCCESS;

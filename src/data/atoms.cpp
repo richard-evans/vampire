@@ -76,6 +76,11 @@ namespace atoms{
 	std::vector <double> y_total_external_field_array(0);	/// Total external fields
 	std::vector <double> z_total_external_field_array(0);	/// Total external fields
 
+	std::vector <double> x_thermal_field_array(0);	/// Total external fields
+	std::vector <double> y_thermal_field_array(0);	/// Total external fields
+	std::vector <double> z_thermal_field_array(0);	/// Total external fields
+
+
 	std::vector <zval_t> i_exchange_list(0);
 	std::vector <zvec_t> v_exchange_list(0);
 	std::vector <zten_t> t_exchange_list(0);

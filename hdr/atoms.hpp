@@ -107,6 +107,9 @@ namespace atoms
 	extern std::vector <double> x_total_external_field_array;	/// Total external fields
 	extern std::vector <double> y_total_external_field_array;	/// Total external fields
 	extern std::vector <double> z_total_external_field_array;	/// Total external fields
+	extern std::vector <double> x_thermal_field_array;	/// Total external fields
+	extern std::vector <double> y_thermal_field_array;	/// Total external fields
+	extern std::vector <double> z_thermal_field_array;	/// Total external fields
 
 	extern std::vector <zval_t> i_exchange_list;
 	extern std::vector <zvec_t> v_exchange_list;
