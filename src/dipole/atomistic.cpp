@@ -289,9 +289,9 @@ namespace dipole{
          }
 
          // save total dipole field to atomic field array
-         dipole::atom_dipolar_field_array_x[atom_i] = prefactor * bx + bx_self;
-         dipole::atom_dipolar_field_array_y[atom_i] = prefactor * by + by_self;
-         dipole::atom_dipolar_field_array_z[atom_i] = prefactor * bz + bz_self;
+         dipole::atom_dipolar_field_array_x[atom_i] = prefactor * (bx + bx_self);
+         dipole::atom_dipolar_field_array_y[atom_i] = prefactor * (by + by_self);
+         dipole::atom_dipolar_field_array_z[atom_i] = prefactor * (bz + bz_self);
 
       }
 
