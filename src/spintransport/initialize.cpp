@@ -220,7 +220,29 @@ namespace spin_transport{
       // determine initial start and end cell of each stack
       for(uint64_t s = 0; s < st::internal::num_stacks; s++){
          st::internal::stack_start_index[s] = s*num_cells_in_stack;
-         st::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack; // loop to less than this number
+         st::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack - 1; // loop to less than or equal to this number
+      }
+
+      //---------------------------------------------------------------------------------
+      // set up current direction for increment
+      //---------------------------------------------------------------------------------
+      if(st::internal::current_direction == st::internal::px ||
+         st::internal::current_direction == st::internal::py ||
+         st::internal::current_direction == st::internal::pz){
+         // positive loop for the current
+         st::internal::cell_increment = +1;
+      }
+      else{
+         // negative loop for the current
+         st::internal::cell_increment = -1;
+         // loop over stacks and swap start and end cell IDs
+         for(uint64_t s = 0; s < st::internal::num_stacks; s++){
+            int ssi = st::internal::stack_start_index[s];
+            int sfi = st::internal::stack_final_index[s];
+            st::internal::stack_start_index[s] = sfi;
+            st::internal::stack_final_index[s] = ssi;
+         }
+
       }
 
       // calculate total number of cells
