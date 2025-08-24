@@ -48,6 +48,9 @@ void update_spin_fields ()
    //If neel fields are enabled, execute the kernel
    if (anisotropy::is_neel_enabled()) cu::update_neel_fields();
 
+   //If rotational fields are enabled, execute the kernel
+   if (anisotropy::is_rotational_enabled()) cu::update_rotational_fields();
+
    // Call kernel to calculate non-exchange spin fields
    cu::update_non_exchange_spin_fields_kernel <<< cu::grid_size, cu::block_size >>> (
          cu::atoms::d_materials, cu::mp::d_material_params,

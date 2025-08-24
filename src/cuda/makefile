@@ -24,6 +24,7 @@ CUDA_OBJECTS= \
 	obj/cuda/llg_heun.o \
 	obj/cuda/monte_carlo.o \
 	obj/cuda/neel.o \
+	obj/cuda/rotational_anisotropy.o \
 	obj/cuda/spin_fields.o \
 	obj/cuda/statistics.o \
 	obj/cuda/thermal_fields.o \

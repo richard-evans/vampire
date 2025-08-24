@@ -136,6 +136,7 @@ namespace vcuda{
       success = success && cu::__initialize_neel ();
       success = success && cu::__initialize_cells ();
       success = success && cu::__initialize_materials ();
+      success = success && cu::__initialize_materials_rotational ();
       success = success && cu::__initialize_topology ();
       success = success && cu::__initialize_curand ();
       success = success && cu::__initialize_stats ();
@@ -540,7 +541,6 @@ namespace vcuda{
 
       bool __initialize_materials ()
       {
-
          /*
           * Serialize material data
           */
@@ -590,6 +590,86 @@ namespace vcuda{
           */
           cudaMalloc((void**)&cu::mp::d_material_params, num_mats * sizeof(material_parameters_t));
           cudaMemcpy(cu::mp::d_material_params, _materials.data(), num_mats * sizeof(material_parameters_t), cudaMemcpyHostToDevice);
+
+         return true;
+      }
+
+      bool __initialize_materials_rotational() {
+         //If no rotational parameters are defined, skip this function
+         if (!::anisotropy::is_rotational_enabled()) return true;
+
+         size_t num_mats = ::mp::num_materials;
+         std::vector<material_parameters_rotational_t> _materials_r(num_mats);
+
+         for (size_t i = 0; i < num_mats; i++)
+         {
+            double mu_s_SI = ::mp::material[i].mu_s_SI;
+            double i_mu_s_SI = 1.0 / mu_s_SI;
+
+            std::vector<double> kr_vector = ::anisotropy::get_kr_vector(i);
+            std::vector<double> kl_vector = ::anisotropy::get_kl_vector(i);
+
+            double k2r1 = ::anisotropy::get_k2r1(i);
+            double k2r1_odd = ::anisotropy::get_k2r1_odd(i);
+            double k2r2 = ::anisotropy::get_k2r2(i);
+            double k2r2_odd = ::anisotropy::get_k2r2_odd(i);
+            double k4r1 = ::anisotropy::get_k4r1(i);
+            double k4r1_odd = ::anisotropy::get_k4r1_odd(i);
+            double k4r2 = ::anisotropy::get_k4r2(i);
+            double k4r2_odd = ::anisotropy::get_k4r2_odd(i);
+            double k4r3 = ::anisotropy::get_k4r3(i);
+            double k4r3_odd = ::anisotropy::get_k4r3_odd(i);
+            double k4r4 = ::anisotropy::get_k4r4(i);
+            double k4r4_odd = ::anisotropy::get_k4r4_odd(i);
+            double k6r1 = ::anisotropy::get_k6r1(i);
+            double k6r1_odd = ::anisotropy::get_k6r1_odd(i);
+            double k6r2 = ::anisotropy::get_k6r2(i);
+            double k6r2_odd = ::anisotropy::get_k6r2_odd(i);
+            double k6r3 = ::anisotropy::get_k6r3(i);
+            double k6r3_odd = ::anisotropy::get_k6r3_odd(i);
+            double k6r4 = ::anisotropy::get_k6r4(i);
+            double k6r4_odd = ::anisotropy::get_k6r4_odd(i);
+            double k6r5 = ::anisotropy::get_k6r5(i);
+            double k6r5_odd = ::anisotropy::get_k6r5_odd(i);
+            double k6r6 = ::anisotropy::get_k6r6(i);
+            double k6r6_odd = ::anisotropy::get_k6r6_odd(i);
+
+            _materials_r[i].rotational_anisotropy_unit_x = kr_vector[0];
+            _materials_r[i].rotational_anisotropy_unit_y = kr_vector[1];
+            _materials_r[i].rotational_anisotropy_unit_z = kr_vector[2];
+
+            _materials_r[i].last_axis_anisotropy_unit_x = kl_vector[0];
+            _materials_r[i].last_axis_anisotropy_unit_y = kl_vector[1];
+            _materials_r[i].last_axis_anisotropy_unit_z = kl_vector[2];
+
+            _materials_r[i].k2r1 = k2r1 * i_mu_s_SI;
+            _materials_r[i].k2r1_odd = k2r1_odd * i_mu_s_SI;
+            _materials_r[i].k2r2 = k2r2 * i_mu_s_SI;
+            _materials_r[i].k2r2_odd = k2r2_odd * i_mu_s_SI;
+            _materials_r[i].k4r1 = k4r1 * i_mu_s_SI;
+            _materials_r[i].k4r1_odd = k4r1_odd * i_mu_s_SI;
+            _materials_r[i].k4r2 = k4r2 * i_mu_s_SI;
+            _materials_r[i].k4r2_odd = k4r2_odd * i_mu_s_SI;
+            _materials_r[i].k4r3 = k4r3 * i_mu_s_SI;
+            _materials_r[i].k4r3_odd = k4r3_odd * i_mu_s_SI;
+            _materials_r[i].k4r4 = k4r4 * i_mu_s_SI;
+            _materials_r[i].k4r4_odd = k4r4_odd * i_mu_s_SI;
+            _materials_r[i].k6r1 = k6r1 * i_mu_s_SI;
+            _materials_r[i].k6r1_odd = k6r1_odd * i_mu_s_SI;
+            _materials_r[i].k6r2 = k6r2 * i_mu_s_SI;
+            _materials_r[i].k6r2_odd = k6r2_odd * i_mu_s_SI;
+            _materials_r[i].k6r3 = k6r3 * i_mu_s_SI;
+            _materials_r[i].k6r3_odd = k6r3_odd * i_mu_s_SI;
+            _materials_r[i].k6r4 = k6r4 * i_mu_s_SI;
+            _materials_r[i].k6r4_odd = k6r4_odd * i_mu_s_SI;
+            _materials_r[i].k6r5 = k6r5 * i_mu_s_SI;
+            _materials_r[i].k6r5_odd = k6r5_odd * i_mu_s_SI;
+            _materials_r[i].k6r6 = k6r6 * i_mu_s_SI;
+            _materials_r[i].k6r6_odd = k6r6_odd * i_mu_s_SI;
+
+         }
+         cudaMalloc((void**)&cu::mp::d_material_params_r, num_mats * sizeof(material_parameters_rotational_t));
+         cudaMemcpy(cu::mp::d_material_params_r, _materials_r.data(), num_mats * sizeof(material_parameters_rotational_t), cudaMemcpyHostToDevice);
 
          return true;
       }

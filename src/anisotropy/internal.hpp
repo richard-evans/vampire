@@ -296,6 +296,7 @@ namespace anisotropy{
       extern bool enable_neel_anisotropy; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
       extern bool enable_lattice_anisotropy; // Flag to turn on lattice anisotropy calculation
       extern bool enable_random_anisotropy; // Flag to enable random anisitropy initialisation
+      extern bool enable_rotational_anisotropy; // Flag for CUDA to store rotational data
 
       // arrays for storing 1D collapsed Neel tensor
       extern std::vector< double > neel_tensor;

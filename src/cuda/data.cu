@@ -13,6 +13,7 @@
  */
 
 #include "data.hpp"
+#include "typedefs.hpp"
 
 namespace vcuda{
 
@@ -120,6 +121,7 @@ namespace vcuda{
       namespace mp
       {
          material_parameters_t *d_material_params;
+         material_parameters_rotational_t *d_material_params_r;
       } /* mp */
 
       // Back to the top namespace

@@ -117,6 +117,7 @@ namespace anisotropy
    std::vector<double>* get_neel_tensor();
    bool is_neel_enabled();
 
+   bool is_rotational_enabled();
 } // end of anisotropy namespace
 
 #endif //ANISOTROPY_H_

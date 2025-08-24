@@ -152,6 +152,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1 = k2r1;
          internal::enable_rotational_2_1_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -165,6 +166,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1 = k2r1;
          internal::enable_rotational_2_1_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -179,6 +181,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1_odd = k2r1_odd;
          internal::enable_rotational_2_1_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -192,6 +195,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1_odd = k2r1_odd;
          internal::enable_rotational_2_1_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -207,6 +211,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2 = k2r2;
          internal::enable_rotational_2_2_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -220,6 +225,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2 = k2r2;
          internal::enable_rotational_2_2_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -235,6 +241,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2_odd = k2r2_odd;
          internal::enable_rotational_2_2_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -248,6 +255,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k2r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2_odd = k2r2_odd;
          internal::enable_rotational_2_2_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -289,6 +297,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1 = k4r1;
          internal::enable_rotational_4_1_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -302,6 +311,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1 = k4r1;
          internal::enable_rotational_4_1_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -316,6 +326,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1_odd = k4r1_odd;
          internal::enable_rotational_4_1_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -329,6 +340,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1_odd = k4r1_odd;
          internal::enable_rotational_4_1_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -343,6 +355,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2 = k4r2;
          internal::enable_rotational_4_2_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -356,6 +369,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2 = k4r2;
          internal::enable_rotational_4_2_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -370,6 +384,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2_odd = k4r2_odd;
          internal::enable_rotational_4_2_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -383,6 +398,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2_odd = k4r2_odd;
          internal::enable_rotational_4_2_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -397,6 +413,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3 = k4r3;
          internal::enable_rotational_4_3_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -410,6 +427,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3 = k4r3;
          internal::enable_rotational_4_3_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -424,6 +442,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3_odd = k4r3_odd;
          internal::enable_rotational_4_3_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -437,6 +456,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3_odd = k4r3_odd;
          internal::enable_rotational_4_3_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -452,6 +472,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4 = k4r4;
          internal::enable_rotational_4_4_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -465,6 +486,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4 = k4r4;
          internal::enable_rotational_4_4_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -480,6 +502,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4_odd = k4r4_odd;
          internal::enable_rotational_4_4_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -493,6 +516,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k4r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4_odd = k4r4_odd;
          internal::enable_rotational_4_4_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -534,6 +558,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1 = k6r1;
          internal::enable_rotational_6_1_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -547,6 +572,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1 = k6r1;
          internal::enable_rotational_6_1_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -561,6 +587,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1_odd = k6r1_odd;
          internal::enable_rotational_6_1_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -574,6 +601,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1_odd = k6r1_odd;
          internal::enable_rotational_6_1_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -588,6 +616,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2 = k6r2;
          internal::enable_rotational_6_2_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -601,6 +630,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2 = k6r2;
          internal::enable_rotational_6_2_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -615,6 +645,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2_odd = k6r2_odd;
          internal::enable_rotational_6_2_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -628,6 +659,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2_odd = k6r2_odd;
          internal::enable_rotational_6_2_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -642,6 +674,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3 = k6r3;
          internal::enable_rotational_6_3_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -655,6 +688,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3 = k6r3;
          internal::enable_rotational_6_3_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -669,6 +703,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3_odd = k6r3_odd;
          internal::enable_rotational_6_3_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -682,6 +717,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3_odd = k6r3_odd;
          internal::enable_rotational_6_3_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -696,6 +732,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4 = k6r4;
          internal::enable_rotational_6_4_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -709,6 +746,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4 = k6r4;
          internal::enable_rotational_6_4_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -723,6 +761,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4_odd = k6r4_odd;
          internal::enable_rotational_6_4_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -736,6 +775,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4_odd = k6r4_odd;
          internal::enable_rotational_6_4_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -750,6 +790,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5 = k6r5;
          internal::enable_rotational_6_5_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -763,6 +804,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5 = k6r5;
          internal::enable_rotational_6_5_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -777,6 +819,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5_odd = k6r5_odd;
          internal::enable_rotational_6_5_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -790,6 +833,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5_odd = k6r5_odd;
          internal::enable_rotational_6_5_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -805,6 +849,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6 = k6r6;
          internal::enable_rotational_6_6_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -818,6 +863,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6 = k6r6;
          internal::enable_rotational_6_6_order = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -833,6 +879,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r6_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6_odd = k6r6_odd;
          internal::enable_rotational_6_6_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }
@@ -846,6 +893,7 @@ namespace anisotropy{
          vin::check_for_valid_value(k6r6_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6_odd = k6r6_odd;
          internal::enable_rotational_6_6_order_odd = true;
+         internal::enable_rotational_anisotropy = true;
          return true;
 
       }

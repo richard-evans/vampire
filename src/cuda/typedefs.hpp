@@ -85,8 +85,38 @@ namespace internal{
    // TODO: Add struct for rotational params
 
    // struct for rotational material parameters
-   // struct material_parameters_rotational_t {
-   // };
+   struct material_parameters_rotational_t {
+      cu_real_t rotational_anisotropy_unit_x;
+      cu_real_t rotational_anisotropy_unit_y;
+      cu_real_t rotational_anisotropy_unit_z;
+      cu_real_t last_axis_anisotropy_unit_x;
+      cu_real_t last_axis_anisotropy_unit_y;
+      cu_real_t last_axis_anisotropy_unit_z;
+      cu_real_t k2r1;
+      cu_real_t k2r1_odd;
+      cu_real_t k2r2;
+      cu_real_t k2r2_odd;
+      cu_real_t k4r1;
+      cu_real_t k4r1_odd;
+      cu_real_t k4r2;
+      cu_real_t k4r2_odd;
+      cu_real_t k4r3;
+      cu_real_t k4r3_odd;
+      cu_real_t k4r4;
+      cu_real_t k4r4_odd;
+      cu_real_t k6r1;
+      cu_real_t k6r1_odd;
+      cu_real_t k6r2;
+      cu_real_t k6r2_odd;
+      cu_real_t k6r3;
+      cu_real_t k6r3_odd;
+      cu_real_t k6r4;
+      cu_real_t k6r4_odd;
+      cu_real_t k6r5;
+      cu_real_t k6r5_odd;
+      cu_real_t k6r6;
+      cu_real_t k6r6_odd;
+   };
 
    // Type definition for array of material parameters
    //typedef thrust::device_vector<material_parameters_t> cu_material_array_t;

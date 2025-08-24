@@ -60,6 +60,7 @@ namespace vcuda{
       bool __initialize_dipole ();
       bool __initialize_hamr ();
       bool __initialize_materials ();
+      bool __initialize_materials_rotational();
       bool __initialize_topology ();
       bool __initialize_curand ();
       bool __initialize_stats ();
@@ -81,6 +82,7 @@ namespace vcuda{
       void update_global_thermal_field ();
       void update_applied_fields ();
       void update_neel_fields ();
+      void update_rotational_fields ();
 
 
 
@@ -178,6 +180,15 @@ namespace vcuda{
          cu_real_t * x_sp_field,
          cu_real_t * y_sp_field,
          cu_real_t * z_sp_field,
+         int n_atoms
+         );
+
+      __global__ void update_rotational_fields_kernel (
+         int * material,
+         material_parameters_t * material_params,
+         material_parameters_rotational_t * material_params_r,
+         cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
+         cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
          int n_atoms
          );
 

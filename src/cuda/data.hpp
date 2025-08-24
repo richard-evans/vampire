@@ -119,6 +119,7 @@ namespace vcuda
       namespace mp
       {
          extern material_parameters_t *d_material_params;
+         extern material_parameters_rotational_t *d_material_params_r;
       } /* mp */
 
       extern cu_real_t *d_x_spin_field;
