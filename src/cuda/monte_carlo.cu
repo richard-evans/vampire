@@ -75,6 +75,10 @@ namespace vcuda
             cu_real_t *d_rand_spin;
             cu_real_t *d_rand_accept;
 
+            // Variable to ensure length of d_rand_spin is always even no matter the number of atoms
+            // This is a restriction required by the cuRAND pseudorandom number generator
+            int d_rand_spin_length;
+
             int colour_split()
             {
 
@@ -189,12 +193,14 @@ namespace vcuda
 
             int initialise()
             {
+                //There should be 3 spins per atom with a redundant spin in the case of an odd number of atoms
+                d_rand_spin_length = (3*::atoms::num_atoms) + (::atoms::num_atoms % 2);
 
                 curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
                 curandSetPseudoRandomGeneratorSeed(gen, mtrandom::integration_seed);
 
 
-                cudaMalloc((void**)&d_rand_spin, 3*::atoms::num_atoms * sizeof(cu_real_t));
+                cudaMalloc((void**)&d_rand_spin, d_rand_spin_length * sizeof(cu_real_t));
                 cudaMalloc((void**)&d_rand_accept, ::atoms::num_atoms * sizeof(cu_real_t));
 
                 cudaMalloc((void**)&d_sl_atoms, ::atoms::num_atoms * sizeof(int));
@@ -512,10 +518,10 @@ namespace vcuda
 
                 // generate 3 random doubles per atom for the trial spin and 1 for the acceptance
                 #ifdef CUDA_DP
-                    curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
+                    curandGenerateNormalDouble( gen, d_rand_spin, d_rand_spin_length, 0.0, 1.0);
                     curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
                 #else
-                    curandGenerateNormal( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
+                    curandGenerateNormal( gen, d_rand_spin, d_rand_spin_length, 0.0, 1.0);
                     curandGenerateUniform( gen, d_rand_accept, ::atoms::num_atoms);
                 #endif
 

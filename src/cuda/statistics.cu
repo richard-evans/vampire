@@ -10,12 +10,15 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "atoms.hpp"
 #include "cuda.hpp"
 
 // Local cuda headers
 #include "cuda_utils.hpp"
 #include "internal.hpp"
+#include "sim.hpp"
 #include "statistics.hpp"
+#include "stats.hpp"
 #include "typedefs.hpp"
 
 #ifdef CUDA
@@ -51,6 +54,11 @@ namespace stats{
          // call cpu statistics functions
          //---------------------------------------------------------------
 
+         // update energy statistics
+         if(::stats::calculate_system_energy) ::stats::system_energy.calculate(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array, ::atoms::type_array , ::sim::temperature);
+         if (::stats::calculate_grain_energy) ::stats::grain_energy.calculate(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array, ::atoms::type_array, ::sim::temperature);
+         if(::stats::calculate_material_energy) ::stats::material_energy.calculate(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array, ::atoms::type_array, ::sim::temperature);
+
          // update magnetization statistics
          if(::stats::calculate_system_magnetization)          ::stats::system_magnetization.calculate_magnetization(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array);
          if(::stats::calculate_material_magnetization)        ::stats::material_magnetization.calculate_magnetization(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array);
@@ -66,9 +74,9 @@ namespace stats{
          //if(stats::calculate_material_torque)        stats::material_torque.calculate_torque(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
 
          // update specific heat statistics
-         //if(stats::calculate_system_specific_heat)         stats::system_specific_heat.calculate(stats::system_energy.get_total_energy());
-         //if(stats::calculate_grain_specific_heat)          stats::grain_specific_heat.calculate(stats::grain_energy.get_total_energy());
-         //if(stats::calculate_material_specific_heat)       stats::material_specific_heat.calculate(stats::material_energy.get_total_energy());
+         if(::stats::calculate_system_specific_heat)         ::stats::system_specific_heat.calculate(::stats::system_energy.get_total_energy());
+         if(::stats::calculate_grain_specific_heat)          ::stats::grain_specific_heat.calculate(::stats::grain_energy.get_total_energy());
+         if(::stats::calculate_material_specific_heat)       ::stats::material_specific_heat.calculate(::stats::material_energy.get_total_energy());
 
          // standard deviation in time-step
          if(::stats::calculate_material_standard_deviation)  ::stats::material_standard_deviation.update(::stats::system_magnetization.get_magnetization());
@@ -100,9 +108,9 @@ namespace stats{
       if(vcuda::internal::stats::use_cpu){
 
          // reset energy statistics
-         //if(stats::calculate_system_energy)                 stats::system_energy.reset_averages();
-         //if(stats::calculate_grain_energy)                  stats::grain_energy.reset_averages();
-         //if(stats::calculate_material_energy)               stats::material_energy.reset_averages();
+         if(::stats::calculate_system_energy)                 ::stats::system_energy.reset_averages();
+         if(::stats::calculate_grain_energy)                  ::stats::grain_energy.reset_averages();
+         if(::stats::calculate_material_energy)               ::stats::material_energy.reset_averages();
 
          // reset magnetization statistics
          if(::stats::calculate_system_magnetization)          ::stats::system_magnetization.reset_magnetization_averages();
@@ -122,9 +130,9 @@ namespace stats{
          if(::stats::calculate_material_standard_deviation)     ::stats::material_standard_deviation.reset_averages();
 
          // reset specific_heat statistics
-         //if(stats::calculate_system_specific_heat)   stats::system_specific_heat.reset_averages();
-         //if(stats::calculate_grain_specific_heat)    stats::grain_specific_heat.reset_averages();
-         //if(stats::calculate_material_specific_heat) stats::material_specific_heat.reset_averages();
+         if(::stats::calculate_system_specific_heat)   ::stats::system_specific_heat.reset_averages();
+         if(::stats::calculate_grain_specific_heat)    ::stats::grain_specific_heat.reset_averages();
+         if(::stats::calculate_material_specific_heat) ::stats::material_specific_heat.reset_averages();
 
          // reset susceptibility statistics
          if(::stats::calculate_system_susceptibility)   ::stats::system_susceptibility.reset_averages();
