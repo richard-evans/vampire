@@ -7,17 +7,17 @@
 #---------------------------------------------------
 material:num-materials=1
 #---------------------------------------------------
-# Material 1 Cobalt Generic
+# Material 1 Cobalt Generic (llg-quantum)
 #---------------------------------------------------
 material[1]:material-name=Co
 material[1]:damping-constant=1.0
-material[1]:exchange-matrix[1]=11.2e-21
+material[1]:exchange-matrix[1]=2.6e-21
 material[1]:atomic-spin-moment=1.72 !muB
 material[1]:second-order-uniaxial-anisotropy-constant=1.0e-24
 material[1]:material-element=Ag
 material[1]:minimum-height=0.0
 material[1]:maximum-height=1.0
-material[1]:A=4.56e5
-material[1]:Gamma= 56.7
-material[1]:omega0= 84.8
-material[1]:S0=7.63
+material[1]:A=8.38e5
+material[1]:Gamma= 154.2
+material[1]:omega0= 225.46
+material[1]:S0=1.72

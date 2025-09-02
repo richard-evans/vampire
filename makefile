@@ -11,8 +11,8 @@
 LIBS=
 FFTW=
 
-LIBS= -lm -lfftw3 -L/opt/local/lib/
-FFTW= -DFFT -I/opt/local/include/
+#LIBS= -lm -lfftw3 -L/opt/local/lib/
+#FFTW= -DFFT -I/opt/local/include/
 # Uncomment these to add FFTW for spin waves, quantum thermostat and FFT dipole
 
 # Add the CUDA libraries
