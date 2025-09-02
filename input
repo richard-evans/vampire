@@ -22,14 +22,15 @@ material:file = Co.mat
 #------------------------------------------
 sim:temperature = 300.0
 sim:time-steps-increment = 1000
-sim:total-time-steps = 10000
-sim:time-step = 1 !fs
+sim:total-time-steps = 100000
+sim:time-step = 0.1 !fs
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program = benchmark
-sim:integrator = llg-heun
+sim:program=time-series
+sim:integrator=llg-quantum
+sim:noise-type=semiquantum	
 
 #------------------------------------------
 # data output

@@ -48,7 +48,7 @@ namespace sim{
    void precompute_sqrt_PSD(int n, double dt, double T);
    double PSD(const double& omega, const double& T);
    double estimate_cutoff_omega_cdf(double T, double target_frac);
-   double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, int atom_idx);
+   double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, size_t atom_idx);
  
 
     int LLGQ_mpi_init(){
@@ -159,7 +159,7 @@ namespace sim{
 		//----------------------------------------
 
 		calculate_spin_fields(pre_comm_si,pre_comm_ei);
-        calculate_external_fields(pre_comm_si,pre_comm_ei);
+        calculate_external_fields(pre_comm_si,post_comm_ei);
 
         //----------------------------------------
         // Store initial spin positions (all)
@@ -182,9 +182,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_z[atom]);
 
             // Calculate K1
             spinDynamics(y_in_storage[atom].data(), H.data(), k1_storage[atom].data());
@@ -200,11 +200,6 @@ namespace sim{
             y_pred_storage[atom][0] *= inv_mag;
             y_pred_storage[atom][1] *= inv_mag;
             y_pred_storage[atom][2] *= inv_mag;
-
-            // Update spin for field calculation
-            atoms::x_spin_array[atom] = y_pred_storage[atom][0];
-            atoms::y_spin_array[atom] = y_pred_storage[atom][1];
-            atoms::z_spin_array[atom] = y_pred_storage[atom][2];
         
         }
 
@@ -226,9 +221,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=post_comm_si;atom<post_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_z[atom]);
 
             // Calculate K1
             spinDynamics(y_in_storage[atom].data(), H.data(), k1_storage[atom].data());
@@ -244,7 +239,13 @@ namespace sim{
             y_pred_storage[atom][0] *= inv_mag;
             y_pred_storage[atom][1] *= inv_mag;
             y_pred_storage[atom][2] *= inv_mag;
+        }
 
+        //------------------------------------------
+        // Update spin positions (all)
+        //------------------------------------------
+
+        for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
             // Update spin for field calculation
             atoms::x_spin_array[atom] = y_pred_storage[atom][0];
             atoms::y_spin_array[atom] = y_pred_storage[atom][1];
@@ -267,9 +268,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
 
             // Calculate K2
             spinDynamics(y_pred_storage[atom].data(), H.data(), k2_storage[atom].data());
@@ -285,11 +286,6 @@ namespace sim{
             y_pred_storage[atom][0] *= inv_mag;
             y_pred_storage[atom][1] *= inv_mag;
             y_pred_storage[atom][2] *= inv_mag;
-
-            // Update spin for field calculation
-            atoms::x_spin_array[atom] = y_pred_storage[atom][0];
-            atoms::y_spin_array[atom] = y_pred_storage[atom][1];
-            atoms::z_spin_array[atom] = y_pred_storage[atom][2];
         }
 
         //------------------------------------------
@@ -309,9 +305,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=post_comm_si;atom<post_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
 
             // Calculate K2
             spinDynamics(y_pred_storage[atom].data(), H.data(), k2_storage[atom].data());
@@ -327,7 +323,13 @@ namespace sim{
             y_pred_storage[atom][0] *= inv_mag;
             y_pred_storage[atom][1] *= inv_mag;
             y_pred_storage[atom][2] *= inv_mag;
+        }
 
+        //------------------------------------------
+        // Update spin positions (all)
+        //------------------------------------------
+
+        for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
             // Update spin for field calculation
             atoms::x_spin_array[atom] = y_pred_storage[atom][0];
             atoms::y_spin_array[atom] = y_pred_storage[atom][1];
@@ -350,9 +352,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
 
             // Calculate K3
             spinDynamics(y_pred_storage[atom].data(), H.data(), k3_storage[atom].data());
@@ -368,11 +370,6 @@ namespace sim{
             y_pred_storage[atom][0] *= inv_mag;
             y_pred_storage[atom][1] *= inv_mag;
             y_pred_storage[atom][2] *= inv_mag;
-
-            // Update spin for field calculation
-            atoms::x_spin_array[atom] = y_pred_storage[atom][0];
-            atoms::y_spin_array[atom] = y_pred_storage[atom][1];
-            atoms::z_spin_array[atom] = y_pred_storage[atom][2];
         }
 
         //------------------------------------------
@@ -392,9 +389,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=post_comm_si;atom<post_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
 
             // Calculate K3
             spinDynamics(y_pred_storage[atom].data(), H.data(), k3_storage[atom].data());
@@ -410,7 +407,13 @@ namespace sim{
             y_pred_storage[atom][0] *= inv_mag;
             y_pred_storage[atom][1] *= inv_mag;
             y_pred_storage[atom][2] *= inv_mag;
+        }
 
+        //------------------------------------------
+        // Update spin positions (all)
+        //------------------------------------------
+
+        for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
             // Update spin for field calculation
             atoms::x_spin_array[atom] = y_pred_storage[atom][0];
             atoms::y_spin_array[atom] = y_pred_storage[atom][1];
@@ -433,9 +436,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_z[atom]);
 
             // Calculate K4
             spinDynamics(y_pred_storage[atom].data(), H.data(), k4_storage[atom].data());
@@ -458,9 +461,9 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=post_comm_si;atom<post_comm_ei;atom++){
-            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_x[atom]);
-            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_y[atom]);
-            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + 0*get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_z[atom]);
+            H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_x[atom]);
+            H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_y[atom]);
+            H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_z[atom]);
 
             // Calculate K4
             spinDynamics(y_pred_storage[atom].data(), H.data(), k4_storage[atom].data());

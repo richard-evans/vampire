@@ -17,3 +17,7 @@ material[1]:second-order-uniaxial-anisotropy-constant=1.0e-24
 material[1]:material-element=Ag
 material[1]:minimum-height=0.0
 material[1]:maximum-height=1.0
+material[1]:A=4.56e5
+material[1]:Gamma= 56.7
+material[1]:omega0= 84.8
+material[1]:S0=7.63
