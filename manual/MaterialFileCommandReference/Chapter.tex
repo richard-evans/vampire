@@ -287,6 +287,47 @@ The following commands are specific for the spin-lattice module and needed to in
 
 {\zicf material:coupling-C0=float [ 0-1 : default 0.5]}\phantomsection\addcontentsline{toc}{subsection}{material:coupling-C0}  prefactor for the coupling function for SLD module; various coupling options available such as pseudodipolar or full-neel.
 
+The following parameters define the Lorentzian spectral density, $I(\omega)$, which models the coupling between the spin system and the thermal bath. \textbf{Note that while these parameters are derived from physical quantities, the code requires them to be entered as unitless values.} The conversion is done by scaling with an effective Larmor frequency, $\tilde{\omega}_L$, defined for a 1~T field:
+\begin{equation*}
+    \tilde{\omega}_L = |\gamma| \cdot 1\,\text{T} \approx 0.176\,\text{rad}\cdot\text{THz}
+\end{equation*}
+where $|\gamma| \approx 1.76 \times 10^{11}$ rad$\cdot$s$^{-1}\cdot$T$^{-1}$ is the gyromagnetic ratio.
+
+{\zicf material:omega0 = float [unitless]}\phantomsection\addcontentsline{toc}{subsection}{material:omega0}
+Defines the center frequency, $\omega_0$, of the Lorentzian spectral density. Along with \texttt{material:Gamma}, this parameter is typically determined by fitting a Lorentzian lineshape to the material's phonon density of states (DOS). To convert a frequency $f_0$ from THz to rad$\cdot$THz, use the relation $\omega_0 = 2\pi f_0$.
+
+The value entered into the material file must be the unitless parameter $\tilde{\omega}_0$, calculated as:
+\begin{equation*}
+    \tilde{\omega}_0 = \frac{\omega_0}{\tilde{\omega}_L}
+\end{equation*}
+
+{\zicf material:Gamma = float [unitless]}\phantomsection\addcontentsline{toc}{subsection}{material:Gamma}
+Defines the width, $\Gamma$, of the Lorentzian spectral density. This value is also obtained from a fit to the phonon DOS. The conversion from a frequency width $\Delta f$ in THz is $\Gamma = 2\pi \Delta f$.
+
+The value entered into the material file must be the unitless parameter $\tilde{\Gamma}$, calculated as:
+\begin{equation*}
+    \tilde{\Gamma} = \frac{\Gamma}{\tilde{\omega}_L}
+\end{equation*}
+
+{\zicf material:A = float [unitless]}\phantomsection\addcontentsline{toc}{subsection}{material:A}
+Defines the amplitude, $A$, which represents the coupling strength between the spin system and the bath. It can be calculated from the material's Gilbert damping constant, $\alpha_G$, and the other Lorentzian parameters:
+\begin{equation*}
+    A = \frac{\alpha_G \cdot \omega_0^4}{\Gamma}
+\end{equation*}
+Here, $\alpha_G$ is dimensionless, while $\Gamma$ and $\omega_0$ must be in units of rad$\cdot$THz, giving $A$ in units of rad$^3\cdot$THz$^3$.
+
+The value entered into the material file must be the unitless parameter $\tilde{A}$, calculated as:
+\begin{equation*}
+    \tilde{A} = \frac{A}{\tilde{\omega}_L^3}
+\end{equation*}
+
+{\zicf material:S0 = float [units: $\mu_B$]}\phantomsection\addcontentsline{toc}{subsection}{material:S0}
+Defines the length of the classical spin vector, $S_0$, used in the os-LLG formalism. This parameter is crucial for determining the "quantumness" of the system's thermodynamic behavior.
+\begin{itemize}
+    \item Smaller values of $S_0$ (e.g., for Ni, with a low spin moment) lead to a more pronounced quantum character, with a flatter magnetization curve at low temperatures.
+    \item Larger values of $S_0$ (e.g., for Gd) cause the system's behavior to approach the classical limit.
+\end{itemize}
+It's recommended to set this value to the material's atomic spin moment (\texttt{material:atomic-spin-moment}).
 
 %\section*{Example material files}
 %\phantomsection\addcontentsline{toc}{section}{Example material files}
