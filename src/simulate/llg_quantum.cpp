@@ -67,7 +67,7 @@ namespace sim{
    void precompute_sqrt_PSD(int n, double dt, double T);
    double PSD(const double& omega, const double& T);
    double estimate_cutoff_omega_cdf(double T, double target_frac);
-   double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, int atom_idx);
+   double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, size_t atom_idx);
 
 
 
@@ -100,7 +100,6 @@ namespace sim{
       // Disable external thermal field calculations
       sim::hamiltonian_simulation_flags[3] = 0;
 
-
       // --- Interpolation Setup ---
       const double dt_fine = mp::dt;
       const int n_fine = static_cast<int>(sim::equilibration_time) + 1;
@@ -109,12 +108,10 @@ namespace sim{
       double omega_cutoff = estimate_cutoff_omega_cdf(sim::temperature, 0.99999);
       M_decimation = static_cast<int>(std::ceil((M_PI / omega_cutoff) / dt_fine));
 
-      
       const int n_coarse = (n_fine > 0) ? ((n_fine - 1) / M_decimation + 1) : 0;
       double mem_red = 100.0 * (1.0 - static_cast<double>(n_coarse) / n_fine);
       std::cout << "Quantum noise interpolation enabled." << std::endl;
       std::cout << "Decimation factor M=" << M_decimation << ", estimated memory reduction=" << std::fixed << std::setprecision(1) << mem_red << "%" << std::endl;
-
 
       // Assign unique indices for random fields
       assign_unique_indices(n_coarse);
@@ -177,7 +174,6 @@ namespace sim{
 
          // K1 Step
          for (int atom = 0; atom < num_atoms; ++atom) {
-            // Update fields for k1 with interpolated noise at time t
             H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
             H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_y[atom]);
             H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_z[atom]);
@@ -209,9 +205,6 @@ namespace sim{
          // K2 Step
          for (int atom = 0; atom < num_atoms; ++atom) {
             // Update fields for k2 with interpolated noise at time t + dt/2
-            const int r_x = atom_idx_x[atom];
-            const int r_y = atom_idx_y[atom];
-            const int r_z = atom_idx_z[atom];
             H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
             H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
             H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
@@ -244,9 +237,6 @@ namespace sim{
          // K3 Step
          for (int atom = 0; atom < num_atoms; ++atom) {
             // Update fields for k3 with interpolated noise at time t + dt/2
-            const int r_x = atom_idx_x[atom];
-            const int r_y = atom_idx_y[atom];
-            const int r_z = atom_idx_z[atom];
             H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_x[atom]);
             H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_y[atom]);
             H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index+0.5, M, atom_idx_z[atom]);
@@ -278,9 +268,6 @@ namespace sim{
          //K4 step
          for (int atom = 0; atom < num_atoms; ++atom) {
             // Update fields for k4 with interpolated noise at t+dt
-            const int r_x = atom_idx_x[atom];
-            const int r_y = atom_idx_y[atom];
-            const int r_z = atom_idx_z[atom];
             H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_x[atom]);
             H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_y[atom]);
             H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index + 1.0, M, atom_idx_z[atom]);
@@ -320,7 +307,6 @@ namespace sim{
       }
 
       void spinDynamics(const double* y, const double* H, double* dydt) {
-         // Correctly access parameters using 
          const double A = sim::internal::mp[0].A.get();
          const double Gamma = sim::internal::mp[0].Gamma.get();
          const double omega0 = sim::internal::mp[0].omega0.get();
@@ -347,20 +333,24 @@ namespace sim{
    void assign_unique_indices(int n_coarse) {
       const int num_atoms = atoms::num_atoms;
 
+      std::cout << "Assigning indices for " << num_atoms << " atoms with " << n_coarse << " coarse steps." << std::endl;
 
       LLGQ_arrays::atom_idx_x.resize(num_atoms);
       LLGQ_arrays::atom_idx_y.resize(num_atoms);
       LLGQ_arrays::atom_idx_z.resize(num_atoms);
 
       for (int atom = 0; atom < num_atoms; atom++) {
-         LLGQ_arrays::atom_idx_x[atom] = 3 * atom * n_coarse;
-         LLGQ_arrays::atom_idx_y[atom] = 3 * atom * n_coarse + n_coarse;
-         LLGQ_arrays::atom_idx_z[atom] = 3 * atom * n_coarse + 2*n_coarse;
+         // Use 64-bit arithmetic to prevent overflow
+         const size_t atom_ll = static_cast<size_t>(atom);
+         const size_t n_coarse_ll = static_cast<size_t>(n_coarse);
+         LLGQ_arrays::atom_idx_x[atom] = 3 * atom_ll * n_coarse_ll;
+         LLGQ_arrays::atom_idx_y[atom] = 3 * atom_ll * n_coarse_ll + n_coarse_ll;
+         LLGQ_arrays::atom_idx_z[atom] = 3 * atom_ll * n_coarse_ll + 2*n_coarse_ll;
       }
    }
 
    void calculate_random_fields(int realizations, int n_fine, double dt_fine, int M, double T, int n_coarse) {
-      // Correctly access parameters using 
+      
       if (n_coarse < 0) {
          n_coarse = (n_fine > 0) ? ((n_fine - 1) / M + 1) : 0;
       }
@@ -368,23 +358,33 @@ namespace sim{
       // Check if realizations is valid
       if (realizations <= 0 || n_fine <= 0 || M <= 0 || n_coarse <= 0) {
          std::cerr << "Error: Invalid parameters for quantum noise generation." << std::endl;
+         std::cerr << "realizations=" << realizations << ", n_fine=" << n_fine 
+                   << ", M=" << M << ", n_coarse=" << n_coarse << std::endl;
          return;
       }
 
-      // Check if FFTW is available
+      // Additional memory check with detailed output using 64-bit arithmetic
+      const long long total_elements = static_cast<long long>(realizations) * static_cast<long long>(n_coarse);
+      const long long memory_bytes = total_elements * sizeof(double);
+      std::cout << "Memory allocation request: " << memory_bytes / (1024*1024) << " MB for " 
+                << total_elements << " elements" << std::endl;
+      
+      // Check for potential overflow before allocation
+      if (total_elements > static_cast<long long>(std::vector<double>().max_size())) {
+         std::cerr << "Error: Requested vector size (" << total_elements 
+                   << ") exceeds maximum allowed size (" << std::vector<double>().max_size() << ")" << std::endl;
+         err::vexit();
+      }
 
-     #ifdef FFT
+      // Check if FFTW is available
+      #ifdef FFT
       if (n_fine <= 0) return; // Do not generate noise if there are no steps
 
-      // Correctly access S0 using 
       const double S0 = sim::internal::mp[0].S0.get();
       const double inv_sqrt_S0 = (S0 > 0) ? 1.0 / std::sqrt(S0) : 1.0;
 
       // Calculate coarse time step
       const double dt_coarse = dt_fine * M;
-
-      // --- Optimized Memory Allocation for Coarse Grid FFT ---
-      std::cout << "Generating quantum noise fields with FFTW on coarse grid..." << std::endl;
 
       double* __restrict in = (double*)fftw_malloc(sizeof(double) * n_coarse);
       fftw_complex* __restrict out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * (n_coarse/2 + 1));
@@ -406,7 +406,21 @@ namespace sim{
       static thread_local std::mt19937 gen(rd());
       std::normal_distribution<> dist(0.0, 1.0 / std::sqrt(dt_fine));
 
-      LLGQ_arrays::coarse_noise_field.resize(realizations*n_coarse);
+      try {
+         // Use 64-bit arithmetic to avoid overflow
+         const size_t safe_size = static_cast<size_t>(total_elements);
+         LLGQ_arrays::coarse_noise_field.resize(safe_size);
+         std::cout << "Successfully allocated noise field vector with size: " << safe_size 
+                   << " (" << (safe_size*sizeof(double))/(1024*1024) << " MB)" << std::endl;
+      } catch (const std::length_error& e) {
+         std::cerr << "std::length_error during resize: " << e.what() << std::endl;
+         std::cerr << "Requested size: " << total_elements << std::endl;
+         std::cerr << "Max size: " << LLGQ_arrays::coarse_noise_field.max_size() << std::endl;
+         err::vexit();
+      } catch (const std::bad_alloc& e) {
+         std::cerr << "std::bad_alloc during resize: " << e.what() << std::endl;
+         err::vexit();
+      }
 
       // Progress bar setup
       const int bar_width = 50;
@@ -444,12 +458,14 @@ namespace sim{
          // Scale to preserve fine-time-step variance and store coarse noise
          const double scale = std::sqrt(dt_fine / dt_coarse);
          for (int j = 0; j < n_coarse; ++j) {
-            LLGQ_arrays::coarse_noise_field[j+r*n_coarse] = result[j] * norm_factor * inv_sqrt_S0 * scale;
+            // Use 64-bit arithmetic to prevent array index overflow
+            const size_t index = static_cast<size_t>(j) + static_cast<size_t>(r) * static_cast<size_t>(n_coarse);
+            LLGQ_arrays::coarse_noise_field[index] = result[j] * norm_factor * inv_sqrt_S0 * scale;
          }
 
-         // Progress bar update
-         int current_percent = static_cast<int>(std::round((r + 1) * 100.0 / realizations));
-         if (current_percent > last_printed_percent) {
+         // Progress bar update - show progress every 5%
+         int current_percent = static_cast<int>((r + 1) * 100.0 / realizations);
+         if (current_percent >= last_printed_percent + 5 || r == realizations - 1) {
             float progress = static_cast<float>(r + 1) / realizations;
             int pos = static_cast<int>(bar_width * progress);
 
@@ -459,7 +475,7 @@ namespace sim{
                else if (i == pos) std::cout << ">";
                else std::cout << " ";
             }
-            std::cout << "] " << std::setw(3) << current_percent << "%";
+            std::cout << "] " << std::setw(3) << current_percent << "% (" << (r + 1) << "/" << realizations << ")";
             std::cout.flush();
 
             last_printed_percent = current_percent;
@@ -473,16 +489,15 @@ namespace sim{
       fftw_free(out);
       fftw_free(result);
 
+      std::cout << std::endl; // New line after progress bar
+
       #else
          std::cerr << "Error - quantum thermostat requires the FFTW library to function. Please recompile with the FFT library linked" << std::endl;
          err::vexit();
       #endif
-
-      std::cout << std::endl;
    }
 
    double PSD(const double& omega, const double& T) {
-      // Correctly access parameters using 
       const double A = sim::internal::mp[0].A.get();
       const double Gamma = sim::internal::mp[0].Gamma.get();
       const double omega0 = sim::internal::mp[0].omega0.get();
@@ -513,7 +528,6 @@ namespace sim{
 
    void precompute_sqrt_PSD(int n, double dt, double T) {
       if (n <= 0) return;
-      // Correctly access sqrt_PSD_buffer from the namespace
       LLGQ_arrays::sqrt_PSD_buffer.resize(n/2 + 1);
       double df = 1.0 / (n * dt);
       for (int i = 0; i <= n/2; ++i) {
@@ -551,13 +565,15 @@ namespace sim{
 
    
 
-   double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, int atom_idx) {
+   double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, size_t atom_idx) {
           double coarse_idx_float = fine_step_idx / M;
-          int j = static_cast<int>(coarse_idx_float);
+          size_t j = static_cast<size_t>(coarse_idx_float);
           double frac = coarse_idx_float - j;
 
-          // Linear interpolation
-          return coarse_noise[j+atom_idx] * (1.0 - frac) + coarse_noise[j + atom_idx + 1] * frac;
+          // Linear interpolation with safe index calculation
+          const size_t index1 = j + atom_idx;
+          const size_t index2 = j + atom_idx + 1;
+          return coarse_noise[index1] * (1.0 - frac) + coarse_noise[index2] * frac;
     }
 
 } // end of sim namespace
