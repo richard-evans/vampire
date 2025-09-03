@@ -60,6 +60,76 @@ namespace vcuda{
          cu::exchange::finalise_exchange();
 
          check_cuda_errors (__FILE__, __LINE__);
+         // Free all device memory
+
+         // Free rand states
+         cudaFree(d_rand_state);
+         // Free atom topologies
+         cudaFree(atoms::d_neighbours);
+         cudaFree(atoms::d_limits);
+         // Free material parameters
+         cudaFree(mp::d_material_params_r);
+         cudaFree(mp::d_material_params);
+         // Free dipole variables
+         cudaFree(cells::d_tensor_zz);
+         cudaFree(cells::d_tensor_yz);
+         cudaFree(cells::d_tensor_yy);
+         cudaFree(cells::d_tensor_xz);
+         cudaFree(cells::d_tensor_xy);
+         cudaFree(cells::d_tensor_xx);
+
+         cudaFree(cells::d_num_atoms_in_cell);
+
+         cudaFree(cells::d_z_cell_mu0H_field);
+         cudaFree(cells::d_y_cell_mu0H_field);
+         cudaFree(cells::d_x_cell_mu0H_field);
+         cudaFree(cells::d_z_cell_field);
+         cudaFree(cells::d_y_cell_field);
+         cudaFree(cells::d_x_cell_field);
+         // Free cell variables
+         cudaFree(cells::d_cell_id_array);
+         cudaFree(cells::d_num_atoms);
+         cudaFree(cells::d_volume);
+
+         cudaFree(cells::d_z_mag);
+         cudaFree(cells::d_y_mag);
+         cudaFree(cells::d_x_mag);
+
+         cudaFree(cells::d_z_coord);
+         cudaFree(cells::d_y_coord);
+         cudaFree(cells::d_x_coord);
+         // Free neel tensor
+         cudaFree(d_neel_tensor);
+         // Free field variables
+         cudaFree(d_z_mu0H_dip_field);
+         cudaFree(d_y_mu0H_dip_field);
+         cudaFree(d_x_mu0H_dip_field);
+         cudaFree(d_z_dip_field);
+         cudaFree(d_y_dip_field);
+         cudaFree(d_x_dip_field);
+         cudaFree(d_z_external_field);
+         cudaFree(d_y_external_field);
+         cudaFree(d_x_external_field);
+         cudaFree(d_z_spin_field);
+         cudaFree(d_y_spin_field);
+         cudaFree(d_x_spin_field);
+         cudaFree(d_spin_field);
+         // Free atom variables
+         cudaFree(atoms::d_cells);
+         cudaFree(atoms::d_materials);
+         // Free atom coords
+         cudaFree(atoms::d_z_coord);
+         cudaFree(atoms::d_y_coord);
+         cudaFree(atoms::d_x_coord);
+         // Free spin transfer buffers
+         cudaFree(h_z_spin_transfer_buffer);
+         cudaFree(h_y_spin_transfer_buffer);
+         cudaFree(h_x_spin_transfer_buffer);
+         // Free atom spins
+         cudaFree(atoms::d_z_spin);
+         cudaFree(atoms::d_y_spin);
+         cudaFree(atoms::d_x_spin);
+         cudaFree(atoms::d_spin);
          /*
          cu::atoms::x_spin_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::y_spin_array.cu_real_array_t::~cu_real_array_t ();
