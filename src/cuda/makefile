@@ -63,18 +63,29 @@ $(CUDA_OBJECTS): obj/%.o: src/%.cu
 
 # Target to link the CUDA enabled vampire
 ifeq ($(shell uname -s), Darwin)
-cuda: GCC_CFLAGS=$(LLVM_CFLAGS)
-cuda: GCC_LDFLAGS=$(LLVM_LDFLAGS)
-cuda: CUDALIBS=-lcudart -lcusparse -lcurand
+cuda-build: GCC_CFLAGS=$(LLVM_CFLAGS)
+cuda-build: GCC_LDFLAGS=$(LLVM_LDFLAGS)
+cuda-build: CUDALIBS=-lcudart -lcusparse -lcurand
 endif
-cuda: GCC_CFLAGS += -DCUDA
-cuda: $(OBJECTS) $(CUDA_OBJECTS)
+cuda-build: GCC_CFLAGS += -DCUDA
+cuda-build: $(OBJECTS) $(CUDA_OBJECTS)
 	$(NVCC) $(CUDA_CFLAGS) $(GCC_LDFLAGS) $(LIBS) ${CUDALIBS} $(OBJECTS) $(CUDA_OBJECTS) -o $(CUDAEXECUTABLE)
+
+# CUDA default target - cleans before building
+.PHONY: cuda
+cuda:
+	$(MAKE) clean
+	$(MAKE) cuda-build
 
 # CUDA debug target
 cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG
-cuda-debug: cuda
+cuda-debug: cuda-build
 
 # CUDA debug target
 cuda-profile: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG --profile
-cuda-profile: cuda
+cuda-profile: cuda-build
+
+# CUDA dev target - use to build without cleaning first
+.PHONY: cuda-dev
+cuda-dev:
+	$(MAKE) cuda-build
