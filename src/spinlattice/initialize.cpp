@@ -47,6 +47,46 @@ namespace sld{
 
       std::cout<<"*******************************************************"<<std::endl;
 
+
+      sld::internal::coupling_field_x.resize(atoms::num_atoms, 0.0);
+      sld::internal::coupling_field_y.resize(atoms::num_atoms, 0.0);
+      sld::internal::coupling_field_z.resize(atoms::num_atoms, 0.0);
+      
+      if (sld::internal::linear_pump_enabled) {
+
+          // Print a debug message to confirm this block is being executed.
+          std::cout << "DEBUG (Initialize): Preparing phonon pump parameters..." << std::endl;
+
+          // Define constants for the calculation
+          const double epsilon = 1.0e-12; // A small number to prevent division by zero
+          const double two_pi = 6.28318530718;
+
+          
+          // The formula is k = (2*pi / lambda) * direction_vector.
+
+          if (std::abs(sld::internal::phonon_wave_lambda[0]) > epsilon) {
+              sld::internal::phonon_wavevector[0] = two_pi / sld::internal::phonon_wave_lambda[0] * sld::internal::phonon_wave_direction[0];
+          } else {
+              sld::internal::phonon_wavevector[0] = 0.0;
+          }
+
+          if (std::abs(sld::internal::phonon_wave_lambda[1]) > epsilon) {
+              sld::internal::phonon_wavevector[1] = two_pi / sld::internal::phonon_wave_lambda[1] * sld::internal::phonon_wave_direction[1];
+          } else {
+              sld::internal::phonon_wavevector[1] = 0.0;
+          }
+
+          if (std::abs(sld::internal::phonon_wave_lambda[2]) > epsilon) {
+              sld::internal::phonon_wavevector[2] = two_pi / sld::internal::phonon_wave_lambda[2] * sld::internal::phonon_wave_direction[2];
+          } else {
+              sld::internal::phonon_wavevector[2] = 0.0;
+          }
+
+
+
+      }
+
+
     //initialise exchange, coupling parameters
      sld::internal::initialise_sld_parameters();
 

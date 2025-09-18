@@ -31,7 +31,8 @@ namespace sld{
 
       // Check for valid key, if no match return false
       std::string prefix="spin-lattice";
-      if(key!=prefix) return false;
+      std::string prefix2="phonon"; //NEW
+      if(key!=prefix && key!=prefix2) return false;
       //------------------------------------------------------------------------
       // If spin-transport parameter is requested, then enable module
       //------------------------------------------------------------------------
@@ -40,6 +41,105 @@ namespace sld{
 
       //----------------------------------
       // Now test for all valid options
+      //----------------------------------
+
+
+      std::string test = "linear-pump";
+      if (word == test) {
+          sld::internal::linear_pump_enabled = true; // This is a boolean flag 
+          return true; // We successfully matched the keyword
+      }
+
+      test = "frequency";
+        if (word == test) {
+            double val = atof(value.c_str());
+            // Check for units in the 'unit' string provided by the parser
+            if (unit == "THz") {
+                val *= 1.0e12;
+            } else if (unit == "GHz") {
+                val *= 1.0e9;
+            } // else, assume base units (Hz)
+            sld::internal::phonon_frequency = val;
+            return true;
+        }
+
+      test = "pulse-start-time";
+        if (word == test) {
+        double val = atof(value.c_str());
+        // Check for units in the 'unit' string provided by the parser
+        if (unit == "ps") {
+            val *= 1.0e-12;
+        } else if (unit == "fs") {
+            val *= 1.0e-15;
+        } // else, assume base units (s)
+        sld::internal::phonon_pulse_start_time = val;
+        return true;
+    }
+
+      test = "pulse-end-time";
+        if (word == test) {
+        double val = atof(value.c_str());
+        // Check for units in the 'unit' string provided by the parser
+        if (unit == "ps") {
+            val *= 1.0e-12;
+        } else if (unit == "fs") {
+            val *= 1.0e-15;
+        } // else, assume base units (s)
+        sld::internal::phonon_pulse_end_time = val;
+        return true;
+    }
+
+    // --- PARSING FOR FORCE AMPLITUDE ---
+    test = "force-amplitude-x";
+    if (word == test) {
+        sld::internal::phonon_force_amplitude[0] = atof(value.c_str());
+        return true;
+    }
+    test = "force-amplitude-y";
+    if (word == test) {
+        sld::internal::phonon_force_amplitude[1] = atof(value.c_str());
+        return true;
+    }
+    test = "force-amplitude-z";
+    if (word == test) {
+        sld::internal::phonon_force_amplitude[2] = atof(value.c_str());
+        return true;
+    }
+
+    // --- PARSING FOR WAVE LAMBDA ---
+    test = "wave-lambda-x";
+    if (word == test) {
+        sld::internal::phonon_wave_lambda[0] = atof(value.c_str());
+        return true;
+    }
+    test = "wave-lambda-y";
+    if (word == test) {
+        sld::internal::phonon_wave_lambda[1] = atof(value.c_str());
+        return true;
+    }
+    test = "wave-lambda-z";
+    if (word == test) {
+        sld::internal::phonon_wave_lambda[2] = atof(value.c_str());
+        return true;
+    }
+
+    // --- PARSING FOR WAVE DIRECTION ---
+    test = "wave-direction-x";
+    if (word == test) {
+        sld::internal::phonon_wave_direction[0] = atof(value.c_str());
+        return true;
+    }
+    test = "wave-direction-y";
+    if (word == test) {
+        sld::internal::phonon_wave_direction[1] = atof(value.c_str());
+        return true;
+    }
+    test = "wave-direction-z";
+    if (word == test) {
+        sld::internal::phonon_wave_direction[2] = atof(value.c_str());
+        return true;
+    }
+
       //----------------------------------
 
       std::string test = "potential";

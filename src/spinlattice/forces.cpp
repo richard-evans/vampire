@@ -22,6 +22,8 @@
 #include "create.hpp"
 #include "sim.hpp"
 #include "errors.hpp"
+#include "material.hpp"
+#include <fstream>
 
 // sld module headers
 #include "internal.hpp"
@@ -69,6 +71,15 @@ namespace sld{
                                                              x_coord_array, y_coord_array, z_coord_array,
                                                              forces_array_x, forces_array_y, forces_array_z, potential_eng);
       }
+      
+      // calculate THz pulse force
+      if(sld::internal::linear_pump_enabled){
+
+        internal::compute_thz(start_index, end_index,
+                                x_coord_array, y_coord_array, z_coord_array,
+                                forces_array_x, forces_array_y, forces_array_z);
+      
+        }
 
       return;
 
@@ -310,5 +321,113 @@ void compute_forces_morse(const int start_index,
 
    return;
           }
-         } //end of internal
-      } // end of sld namespace
+
+void compute_thz(const int start_index,
+                 const int end_index,
+                 const std::vector<double>& x_coord_array,
+                 const std::vector<double>& y_coord_array,
+                 const std::vector<double>& z_coord_array,
+                 std::vector<double>& forces_array_x,
+                 std::vector<double>& forces_array_y,
+                 std::vector<double>& forces_array_z)
+{
+
+   static std::ofstream force_debug_file("force_debug_file.txt", std::ios::out);
+
+    // Calculate the Current Physical Time
+    // Converts the current step number into the actual time in seconds.
+    uint64_t current_step = sim::time; 
+    double dt = mp::dt_SI;             // Get the duration of one step in seconds 
+    double current_time = static_cast<double>(current_step) * dt; // Total elapsed time (seconds)
+
+
+    if (current_time < sld::internal::phonon_pulse_start_time || current_time > sld::internal::phonon_pulse_end_time) {
+        return; // The pulse is off, so do nothing.
+    }
+ 
+    // Calculate the Raw Force for Each Atom
+    // Loop through each atom to calculate the
+    // force from the THz pulse and add it to a running total for later averaging.
+    double sumx = 0.0, sumy = 0.0, sumz = 0.0;
+    std::vector<double> f_thz_temp_x(end_index - start_index); // Temporary storage
+    std::vector<double> f_thz_temp_y(end_index - start_index);
+    std::vector<double> f_thz_temp_z(end_index - start_index);
+
+    // Pre-calculate angular frequency (ω = 2πν) for efficiency
+    const double twopi_niu = sld::internal::phonon_frequency * 6.28318530718;
+    for (int i = start_index; i < end_index; ++i) {
+
+
+        // Calculate the position-dependent part of the wave (k·r)
+        double kr = sld::internal::phonon_wavevector[0] * x_coord_array[i] +
+                    sld::internal::phonon_wavevector[1] * y_coord_array[i] +
+                    sld::internal::phonon_wavevector[2] * z_coord_array[i];
+
+        // Calculate the argument for the main physics equation: cos(ωt - k·r)
+        double arg = current_time * twopi_niu - kr;
+        double cos_factor = std::cos(arg); // The oscillating part of the force
+        double sin_factor = std::sin(arg);
+        
+        // Calculate the raw force and store it temporarily
+        int local_index = i - start_index;
+        f_thz_temp_x[local_index] = sld::internal::phonon_force_amplitude[0] * cos_factor;
+        f_thz_temp_y[local_index] = sld::internal::phonon_force_amplitude[1] * sin_factor;
+        f_thz_temp_z[local_index] = sld::internal::phonon_force_amplitude[2] * cos_factor;
+
+        // Add to the running total
+        sumx += f_thz_temp_x[local_index];
+        sumy += f_thz_temp_y[local_index];
+        sumz += f_thz_temp_z[local_index];
+
+        if (i == 0 && current_step % 200 == 0) { // Using 200 to match your output:output-rate
+            std::cout << "\n--- THz FORCE DEBUG (Step " << current_step << ") ---" << std::endl;
+        std::cout << "  Time (ps)   : " << current_time * 1.0e12 << std::endl;
+        std::cout << "  arg (rad)   : " << arg << std::endl;
+        std::cout << "  cos(arg)    : " << cos_factor << std::endl;
+        std::cout << std::scientific; // Switch to scientific notation for forces
+        std::cout << "  Raw Force X : " << f_thz_temp_x[local_index] << " N" << std::endl;
+        std::cout << "  Sum X : " << sumx << " N" << std::endl;
+
+      }
+      }
+
+    // Calculate the Center-of-Mass Correction
+    // Calculate the average force and will subtract it from each atom's individual force.
+    int counter = end_index - start_index;
+    double avg_fx = 0.0, avg_fy = 0.0, avg_fz = 0.0;
+    if (counter > 0) {
+        avg_fx = sumx / static_cast<double>(counter);
+        avg_fy = sumy / static_cast<double>(counter);
+        avg_fz = sumz / static_cast<double>(counter);
+    }
+  
+    
+    // Apply the Final, Corrected Force 
+    // Loop through the atoms again, retrieve the
+    // temporarily stored raw force, subtract the average
+    for (int i = start_index; i < end_index; ++i) {
+        int local_index = i - start_index;
+        double corrected_fx = f_thz_temp_x[local_index] - avg_fx;
+        double corrected_fy = f_thz_temp_y[local_index] - avg_fy;
+        double corrected_fz = f_thz_temp_z[local_index] - avg_fz;
+
+        // Add the final calculated force to the atom's total force
+        forces_array_x[i] += corrected_fx;
+        forces_array_y[i] += corrected_fy;
+        forces_array_z[i] += corrected_fz;
+
+        // Forced applied to each atom over the simulation period 
+        if (i == 0) {
+            force_debug_file << current_time << "\t" << i << "\t" << local_index << "\t" << corrected_fx << "\t" << f_thz_temp_x[local_index] << "\t" << x_coord_array[i] << "\t" << y_coord_array[i] << "\t" << z_coord_array[i] << std::endl;
+        }
+
+        if (i == 0 && current_step % 200 == 0) {
+        std::cout << "  Corrected Force X : " << corrected_fx << " N" << std::endl;
+       
+      }
+    }
+
+    return;
+}
+}
+} 

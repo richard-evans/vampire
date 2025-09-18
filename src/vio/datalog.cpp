@@ -325,6 +325,9 @@ namespace vout{
 			case 90:
 			   vout::material_mean_syslatticetemp(stream, header);
 			   break;
+			case 91:
+				vout::mean_coupling_field_vec(stream,header);
+				break;
 			case 997: //MP
 				vout::material_binder_cumulant(stream,header);
 				break;
