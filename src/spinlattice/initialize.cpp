@@ -54,9 +54,6 @@ namespace sld{
       
       if (sld::internal::linear_pump_enabled) {
 
-          // Print a debug message to confirm this block is being executed.
-          std::cout << "DEBUG (Initialize): Preparing phonon pump parameters..." << std::endl;
-
           // Define constants for the calculation
           const double epsilon = 1.0e-12; // A small number to prevent division by zero
           const double two_pi = 6.28318530718;

@@ -332,7 +332,6 @@ void compute_thz(const int start_index,
                  std::vector<double>& forces_array_z)
 {
 
-   static std::ofstream force_debug_file("force_debug_file.txt", std::ios::out);
 
     // Calculate the Current Physical Time
     // Converts the current step number into the actual time in seconds.
@@ -372,23 +371,14 @@ void compute_thz(const int start_index,
         int local_index = i - start_index;
         f_thz_temp_x[local_index] = sld::internal::phonon_force_amplitude[0] * cos_factor;
         f_thz_temp_y[local_index] = sld::internal::phonon_force_amplitude[1] * sin_factor;
-        f_thz_temp_z[local_index] = sld::internal::phonon_force_amplitude[2] * cos_factor;
+        f_thz_temp_z[local_index] = sld::internal::phonon_force_amplitude[2];
 
         // Add to the running total
         sumx += f_thz_temp_x[local_index];
         sumy += f_thz_temp_y[local_index];
         sumz += f_thz_temp_z[local_index];
 
-        if (i == 0 && current_step % 200 == 0) { // Using 200 to match your output:output-rate
-            std::cout << "\n--- THz FORCE DEBUG (Step " << current_step << ") ---" << std::endl;
-        std::cout << "  Time (ps)   : " << current_time * 1.0e12 << std::endl;
-        std::cout << "  arg (rad)   : " << arg << std::endl;
-        std::cout << "  cos(arg)    : " << cos_factor << std::endl;
-        std::cout << std::scientific; // Switch to scientific notation for forces
-        std::cout << "  Raw Force X : " << f_thz_temp_x[local_index] << " N" << std::endl;
-        std::cout << "  Sum X : " << sumx << " N" << std::endl;
-
-      }
+        
       }
 
     // Calculate the Center-of-Mass Correction
@@ -415,11 +405,6 @@ void compute_thz(const int start_index,
         forces_array_x[i] += corrected_fx;
         forces_array_y[i] += corrected_fy;
         forces_array_z[i] += corrected_fz;
-
-        // Forced applied to each atom over the simulation period 
-        if (i == 0) {
-            force_debug_file << current_time << "\t" << i << "\t" << local_index << "\t" << corrected_fx << "\t" << f_thz_temp_x[local_index] << "\t" << x_coord_array[i] << "\t" << y_coord_array[i] << "\t" << z_coord_array[i] << std::endl;
-        }
 
         if (i == 0 && current_step % 200 == 0) {
         std::cout << "  Corrected Force X : " << corrected_fx << " N" << std::endl;

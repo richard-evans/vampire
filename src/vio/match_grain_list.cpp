@@ -119,14 +119,7 @@ namespace vout{
          grain::output_list.push_back(grain::material_magnetisation);
          return EXIT_SUCCESS;
       }
-      //--------------------------------------------------------------------
-
-      test="mean-coupling-field-vec";
-      if(word==test){
-         grain::output_list.push_back(grain::mean_coupling_field_vec);
-         return EXIT_SUCCESS;
-      }
-
+     
 
       //--------------------------------------------------------------------
       test="material-height-magnetisation";
