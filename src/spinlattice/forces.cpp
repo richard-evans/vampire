@@ -322,6 +322,9 @@ void compute_forces_morse(const int start_index,
    return;
           }
 
+
+// Author: Muhammad Hamza Asim
+// Applies a time-dependent terahertz (THz) phonon-driven force to atoms
 void compute_thz(const int start_index,
                  const int end_index,
                  const std::vector<double>& x_coord_array,

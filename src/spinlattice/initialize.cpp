@@ -51,7 +51,9 @@ namespace sld{
       sld::internal::coupling_field_x.resize(atoms::num_atoms, 0.0);
       sld::internal::coupling_field_y.resize(atoms::num_atoms, 0.0);
       sld::internal::coupling_field_z.resize(atoms::num_atoms, 0.0);
-      
+
+      // Author: Muhammad Hamza Asim
+      // Calculate phonon wavevector components (k) from wavelength and direction
       if (sld::internal::linear_pump_enabled) {
 
           // Define constants for the calculation
@@ -60,7 +62,6 @@ namespace sld{
 
           
           // The formula is k = (2*pi / lambda) * direction_vector.
-
           if (std::abs(sld::internal::phonon_wave_lambda[0]) > epsilon) {
               sld::internal::phonon_wavevector[0] = two_pi / sld::internal::phonon_wave_lambda[0] * sld::internal::phonon_wave_direction[0];
           } else {
