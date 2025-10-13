@@ -96,30 +96,65 @@ namespace vtype{
 
    };
 
-   //---------------------------------------------
-   // simple initialised class for set variables
-   //---------------------------------------------
+   //---------------------------------------------------------------------------
+   // simple initialised classes for set variables
+   //---------------------------------------------------------------------------
+   // Allows its input status to be set or unset,
+   // allowing for initialising a paremeter to the default or user-set value
+   //---------------------------------------------------------------------------
+
+   //--------------------------
+   // doubles
+   //--------------------------
    class set_double_t{
 
-   private:
-      double value; // value
-      bool setf; // flag specifiying variable has been set
+      private:
+         double value; // value
+         bool setf; // flag specifiying variable has been set
 
-   public:
-      // class functions
-      // constructor
-      set_double_t() : value(0.0), setf(false) { }
+      public:
+         // class functions
+         // constructor
+         set_double_t() : value(0.0), setf(false) { }
 
-      // setting function
-      void set(double in_value){
-         value = in_value;
-         setf = true;
-      };
+         // setting function
+         void set(double in_value){
+            value = in_value;
+            setf = true;
+         };
 
-      // get value function
-      double get(){ return value; };
-      // check if variable is set
-      bool is_set(){ return setf; };
+         // get value function
+         double get(){ return value; };
+         // check if variable is set
+         bool is_set(){ return setf; };
+
+   };
+
+   //--------------------------
+   // ints
+   //--------------------------
+   class set_int_t{
+
+      private:
+         int value; // value
+         bool setf; // flag specifiying variable has been set
+
+      public:
+         // class functions
+         // constructor
+         set_int_t() : value(0), setf(false) { }
+
+         // setting function
+         void set(int in_value){
+            value = in_value;
+            setf = true;
+         };
+
+         // get value function
+         int get(){ return value; };
+
+         // check if variable is set
+         bool is_set(){ return setf; };
 
    };
 
