@@ -31,12 +31,12 @@ namespace sim{
          vtype::set_double_t stt_asm; // spin tranfer torque asymmetry
          vtype::set_double_t stt_rj;  // spin tranfer relaxation torque
          vtype::set_double_t stt_pj;  // spin transfer precession torque
-         int          stt_pm;  // spin transfer polarisation material
+         vtype::set_int_t stt_pm;  // spin transfer polarisation material
          vtype::vec_t stt_pv;  // spin transfer polarisation vector x,y,z
          vtype::set_double_t sot_asm; // spin orbit torque asymmetry
          vtype::set_double_t sot_rj;  // spin orbit relaxation torque
          vtype::set_double_t sot_pj;  // spin orbit precession torque
-         int          sot_pm;  // spin orbit polarisation material
+         vtype::set_int_t sot_pm;  // spin orbit polarisation material
          vtype::vec_t sot_pv;  // spin orbit polarisation vector x,y,z
          vtype::set_double_t vcmak;   // voltage controlled anisotropy coefficient
          vtype::set_double_t lsf_second_order_coefficient; // Second order LSF coefficient

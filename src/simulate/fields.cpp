@@ -476,15 +476,23 @@ void set_torque_polarization_vectors(){
 
 			// overwrite vector with polarising material
 			if(stt_pm[m] > -1){
+
+				// set polarizing material
+				const int pm = stt_pm[m];
+
 				// load material magnetisation components
-				double mx = matmag[4*m+0];
-				double my = matmag[4*m+1];
-				double mz = matmag[4*m+2];
-				double mm = matmag[4*m+3];
+				double mx = matmag[4*pm+0];
+				double my = matmag[4*pm+1];
+				double mz = matmag[4*pm+2];
+				double mm = matmag[4*pm+3];
+
+				//std::cout << "setting STT polarizer for material " << m+1 << " to material " << pm+1 << " ( m = " << mx << "\t" << my << "\t" << mz << " )" << std::endl;
+
 				// non-unit vector to account for temperature effects
-				stt_material_polarization_unit_vector[m].x = mx*mm;
-				stt_material_polarization_unit_vector[m].y = my*mm;
-				stt_material_polarization_unit_vector[m].z = mz*mm;
+				stt_material_polarization_unit_vector[m].x = mx * mm;
+				stt_material_polarization_unit_vector[m].y = my * mm;
+				stt_material_polarization_unit_vector[m].z = mz * mm;
+
 			}
 
 		}
@@ -507,13 +515,16 @@ void set_torque_polarization_vectors(){
 		// for local polarisers check for dynamic ones
 		for(int m = 0 ; m < mp::num_materials ; m++){
 
+			// set polarizing material
+			const int pm = stt_pm[m];
+
 			// overwrite vector with polarising material
 			if(sot_pm[m] > -1){
 				// load material magnetisation components
-				double mx = matmag[4*m+0];
-				double my = matmag[4*m+1];
-				double mz = matmag[4*m+2];
-				double mm = matmag[4*m+3];
+				double mx = matmag[4*pm+0];
+				double my = matmag[4*pm+1];
+				double mz = matmag[4*pm+2];
+				double mm = matmag[4*pm+3];
 				// non-unit vector to account for temperature effects
 				sot_material_polarization_unit_vector[m].x = mx*mm;
 				sot_material_polarization_unit_vector[m].y = my*mm;

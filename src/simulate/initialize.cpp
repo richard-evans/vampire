@@ -52,13 +52,13 @@ namespace sim{
          if(sim::internal::mp[m].stt_asm.is_set()) sim::internal::stt_asm[m] = sim::internal::mp[m].stt_asm.get();
          if(sim::internal::mp[m].stt_rj.is_set())  sim::internal::stt_rj[m]  = sim::internal::mp[m].stt_rj.get();
          if(sim::internal::mp[m].stt_pj.is_set())  sim::internal::stt_pj[m]  = sim::internal::mp[m].stt_pj.get();
-         sim::internal::stt_pm[m] = sim::internal::mp[m].stt_pm;
+         if(sim::internal::mp[m].stt_pm.is_set())     sim::internal::stt_pm[m]  = sim::internal::mp[m].stt_pm.get();
          sim::internal::stt_material_polarization_unit_vector[m]  = sim::internal::mp[m].stt_pv;
 
          if(sim::internal::mp[m].sot_asm.is_set()) sim::internal::sot_asm[m] = sim::internal::mp[m].sot_asm.get();
          if(sim::internal::mp[m].sot_rj.is_set())  sim::internal::sot_rj[m]  = sim::internal::mp[m].sot_rj.get();
          if(sim::internal::mp[m].sot_pj.is_set())  sim::internal::sot_pj[m]  = sim::internal::mp[m].sot_pj.get();
-         sim::internal::stt_pm[m] = sim::internal::mp[m].sot_pm;
+         if(sim::internal::mp[m].sot_pm.is_set())     sim::internal::sot_pm[m]  = sim::internal::mp[m].sot_pm.get();
          sim::internal::sot_material_polarization_unit_vector[m]  = sim::internal::mp[m].sot_pv;
 
          // set vcma coefficients (requires sim::internal::enable_vcma_fields == true) but this should be default
