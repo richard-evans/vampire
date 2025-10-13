@@ -160,7 +160,7 @@ namespace spin_transport{
           // Set resistivity for environment (cells with no atoms)
           double rho = vin::str_to_double(value);
           vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 1.0e-10, 1.0e12,"input","1E-10 - 1E12 Ohm metres");
-          internal::environment_resistivity = rho;
+          internal::environment_resistivity = rho * 1.0e10; // save resistivity and convert to Ohm Angstroms
           return true;
       }
       //------------------------------------------------------------------------
@@ -204,7 +204,7 @@ namespace spin_transport{
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
          vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 1.0e-20, 1.0e20,"input","1E-20 - 1E20 Ohm metres");
-         st::internal::mp[super_index].resistivity.set(rho);
+         st::internal::mp[super_index].resistivity.set(rho * 1.0e10); // save resistivity and convert to Ohm Angstroms
          return true;
       }
       //---------------------------------------------------------------------------
@@ -216,7 +216,7 @@ namespace spin_transport{
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
          vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 0.0, 1.0e20,"input","0.0 - 1E20 Ohm metres");
-         st::internal::mp[super_index].spin_resistivity.set(rho);
+         st::internal::mp[super_index].spin_resistivity.set(rho * 1.0e10); // save resistivity and convert to Ohm Angstroms
          return true;
       }
       //---------------------------------------------------------------------------
