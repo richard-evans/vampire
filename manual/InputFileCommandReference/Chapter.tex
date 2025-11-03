@@ -364,6 +364,68 @@ If ``single-tone-predefined'' is given, a single tone adapted to the system size
 Specifies the bit sequence to be simulated in the program \textit{hamr-simulation}.
 Acceptable values are -1 (opposite to field direction), 0 (zero field) and 1 (along field direction) and by default the vector is empty.
 
+\section*{Spin-Lattice calculations}
+This includes phonons (lattice dynamics) and uses a Suzuki-Trotter decomposition for the integration. Hence it needs the following:
+sim:integrator=suzuki-trotter.
+
+{\zicf spin-lattice:potential-cutoff-range=float}\phantomsection\addcontentsline{toc}{subsubsection}{spin-lattice:potential-cutoff-range=float}
+Distance cutoff for the interatomic potential calculations. Units is Angstrom.  Default value is 7.8 !A;
+
+{\zicf spin-lattice:fields-cutoff-range=float}\phantomsection\addcontentsline{toc}{subsubsection}{spin-lattice:fields-cutoff-range=float}
+Distance cutoff for the interatomic potential calculations. Units is Angstrom.  Default value is 3.75 !A;
+
+{\zicf spin-lattice:coupling=string}\phantomsection\addcontentsline{toc}{subsubsection}{spin-lattice:coupling=string}
+ Flag that sets up the type of spin-lattice coupling. Possible values are : pseudodipolar, {neel-full};
+
+ {\zicf spin-lattice:potential=string}\phantomsection\addcontentsline{toc}{subsubsection}{spin-lattice:potential=string}
+ Flag that sets up the type of potential. Possible values are : harmonic, morse, embedded;
+
+
+\section*{Phonon Pump Parameters}
+The following commands control an external, time-dependent force pump designed to excite specific phonon modes in the lattice. This is used to simulate the effects of THz laser pulses on the spin-lattice system. All parameters are defined using the \textit{phonon:} prefix.
+
+{\zicf phonon:linear-pump = boolean}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:linear-pump = boolean}
+Flag to enable the linearly polarized phonon pump. If enabled, a force is applied to the atoms according to the parameters below. Default value is false.
+
+{\zicf phonon:frequency = float ! string}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:frequency = float}
+Specifies the frequency of the driving force. The value is converted to base SI units (Hz). It is recommended to specify units. Supported units: THz, GHz. Example: \textit{phonon:frequency = 8.3 ! THz}.
+
+{\zicf phonon:pulse-start-time = float ! string}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:pulse-start-time = float}
+Specifies the simulation time at which the force pump turns on. The value is converted to base SI units (s). It is recommended to specify units. Supported units: ps, fs. Example: \textit{phonon:pulse-start-time = 5.0 ! ps}.
+
+{\zicf phonon:pulse-end-time = float ! string}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:pulse-end-time = float}
+Specifies the simulation time at which the force pump turns off. The value is converted to base SI units (s). It is recommended to specify units. Supported units: ps, fs. Example: \textit{phonon:pulse-end-time = 80.0 ! ps}.
+
+{\zicf phonon:force-amplitude-x = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:force-amplitude-x = float}
+The amplitude of the force component applied in the x-direction. For a linear pump, this is the main driving force. For a chiral pump, this could be the amplitude of the cosine component. Units are Newtons (N).
+
+{\zicf phonon:force-amplitude-y = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:force-amplitude-y = float}
+The amplitude of the force component applied in the y-direction. For a chiral pump, this could be the amplitude of the sine component. Units are Newtons (N).
+
+{\zicf phonon:force-amplitude-z = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:force-amplitude-z = float}
+The amplitude of the force component applied in the z-direction. Units are Newtons (N).
+
+{\zicf phonon:wave-lambda-x = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-lambda-x = float}
+The wavelength ($\lambda_x$) of the force wave in the x-direction. Used to calculate the final k-vector. Units are in Angstrom. 
+
+{\zicf phonon:wave-lambda-y = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-lambda-y = float}
+The wavelength ($\lambda_y$) of the force wave in the y-direction. Units are in Angstrom.
+
+{\zicf phonon:wave-lambda-z = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-lambda-z = float}
+The wavelength ($\lambda_z$) of the force wave in the z-direction. Units are in Angstrom. 
+
+\{\zicf phonon:wave-direction-x = float\}\phantomsection\textbackslash{}addcontentsline\{toc\}{subsubsection\}{phonon:wave-direction-x = float\} The x-component of the unit vector that defines the direction of propagation for the force wave. 
+
+\{\zicf phonon:wave-direction-y = float\}\phantomsection\textbackslash{}addcontentsline\{toc\}{subsubsection\}{phonon:wave-direction-y = float\} The y-component of the unit vector that defines the direction of propagation. 
+
+\{\zicf phonon:wave-direction-z = float\}\phantomsection\textbackslash{}addcontentsline\{toc\}{subsubsection\}{phonon:wave-direction-z = float\} The z-component of the unit vector that defines the direction of propagation. 
+
+
+
+
+
+
+
 \section*{Simulation Control}
 \phantomsection\addcontentsline{toc}{section}{Simulation Control}
 The following commands control the simulation, including the program, maximum temperatures, applied field strength etc.
@@ -375,6 +437,7 @@ The following commands control the simulation, including the program, maximum te
   \item[] llg-midpoint
   \item[] constrained-monte-carlo
   \item[] hybrid-constrained-monte-carlo
+  \item[] suzuki-trotter
 \end{itemize}
 
 {\zicf sim:program = exclusive string}\phantomsection\addcontentsline{toc}{subsection}{sim:program} Defines the simulation program to be used.
@@ -769,6 +832,15 @@ C_{\mathrm{v}} = \frac{\left(\langle U^2 \rangle - \langle U \rangle^2 \right)}{
 {\zicf output:fractional-electric-field-strength}\phantomsection\addcontentsline{toc}{subsection}{output:fractional-electric-field-strength}
 Outputs the fractional electric field strngth (or voltage) during an \textit{electrical-pulse} simulation.
 
+
+{\zicf output:spin-temperature}\phantomsection\addcontentsline{toc}{subsection}{output:spin-temperature} outputs the spin-temperature. Also possible to output the time-averaged values: mean-spin-temperature and material specific values: material-spin-temperature, mean-material-spin-temperature
+
+{\zicf output:lattice-temperature}\phantomsection\addcontentsline{toc}{subsection}{output:lattice-temperature} outputs the lattice-temperature. Also possible to output the time-averaged values: mean-lattice-temperature and material specific values: material-lattice-temperature, mean-material-lattice-temperature
+
+
+
+Outputs the fractional electric field strngth (or voltage) during an \textit{electrical-pulse} simulation.
+
 {\zicf output:mpi-timings}\phantomsection\addcontentsline{toc}{subsection}{output:mpi-timings}
 
 {\zicf output:gnuplot-array-format}\phantomsection\addcontentsline{toc}{subsection}{output:gnuplot-array-format}
@@ -780,6 +852,9 @@ Outputs the fractional electric field strngth (or voltage) during an \textit{ele
 {\zicf output:fixed-width = flag [default false]}\phantomsection\addcontentsline{toc}{subsection}{output:fixed-width} Controls the formatting to be used for data written to the output file or printed to screen. The default is false which ignores trailing zeros in the output.
 
 {\zicf output:column-headers= flag [default false]}\phantomsection\addcontentsline{toc}{subsection}{output:column-headers} Controls the headers at the top of output columns in the output file. The default is false which writes no headers.
+
+{\zicf output:mean-coupling-field-vec}\phantomsection\addcontentsline{toc}{subsection}{output:mean-coupling-field-vec}Outputs the three vector components of the mean pseudodipolar coupling field ($H_c$) averaged over all atoms. The output consists of three columns: Mean\_Hc\_x(T), Mean\_Hc\_y(T), and Mean\_Hc\_z(T). Units are Tesla (T).
+
 
 \section*{Configuration output}
 \phantomsection\addcontentsline{toc}{section}{Configuration output} These options enable the output of spin configuration snapshots during the simulation. The configurations can then be visualised using povray or other software generated with the vampire data converter (vdc) utility.

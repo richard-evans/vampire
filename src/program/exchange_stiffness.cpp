@@ -538,9 +538,9 @@ void calculate_torque(const std::vector<int>& mask,
 										 atoms::y_spin_array[atom],
 										 atoms::z_spin_array[atom]};
 
-			const double H[3] = { atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom],
-										 atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom],
-										 atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] };
+			const double H[3] = { atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + atoms::x_thermal_field_array[atom],
+										 atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + atoms::y_thermal_field_array[atom],
+										 atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom]  + atoms::z_thermal_field_array[atom] };
 
 			// compute torques
 			const double ttx = mu*(S[1]*H[2] - S[2]*H[1]);

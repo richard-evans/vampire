@@ -1,11 +1,14 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This source file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-// (c) R F L Evans 2020. All rights reserved.
+//   (c) Richard F L Evans 2025. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//   Email: richard.evans@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 
 // C++ standard library headers
 #include <iostream>
@@ -26,11 +29,15 @@ namespace sim{
       sim::internal::stt_asm.resize(num_materials,0.0);
       sim::internal::stt_rj.resize(num_materials,0.0);
       sim::internal::stt_pj.resize(num_materials,0.0);
+      sim::internal::stt_pm.resize(num_materials,-1); // set to -1 indicating unset
+      sim::internal::stt_material_polarization_unit_vector.resize(num_materials);
 
       // unroll spin orbit torque arrays
       sim::internal::sot_asm.resize(num_materials,0.0);
       sim::internal::sot_rj.resize(num_materials,0.0);
       sim::internal::sot_pj.resize(num_materials,0.0);
+      sim::internal::sot_pm.resize(num_materials,-1); // set to -1 indicating unset
+      sim::internal::sot_material_polarization_unit_vector.resize(num_materials);
 
       sim::internal::vcmak.resize(num_materials, 0.0);
 
@@ -45,10 +52,14 @@ namespace sim{
          if(sim::internal::mp[m].stt_asm.is_set()) sim::internal::stt_asm[m] = sim::internal::mp[m].stt_asm.get();
          if(sim::internal::mp[m].stt_rj.is_set())  sim::internal::stt_rj[m]  = sim::internal::mp[m].stt_rj.get();
          if(sim::internal::mp[m].stt_pj.is_set())  sim::internal::stt_pj[m]  = sim::internal::mp[m].stt_pj.get();
+         if(sim::internal::mp[m].stt_pm.is_set())     sim::internal::stt_pm[m]  = sim::internal::mp[m].stt_pm.get();
+         sim::internal::stt_material_polarization_unit_vector[m]  = sim::internal::mp[m].stt_pv;
 
          if(sim::internal::mp[m].sot_asm.is_set()) sim::internal::sot_asm[m] = sim::internal::mp[m].sot_asm.get();
          if(sim::internal::mp[m].sot_rj.is_set())  sim::internal::sot_rj[m]  = sim::internal::mp[m].sot_rj.get();
          if(sim::internal::mp[m].sot_pj.is_set())  sim::internal::sot_pj[m]  = sim::internal::mp[m].sot_pj.get();
+         if(sim::internal::mp[m].sot_pm.is_set())     sim::internal::sot_pm[m]  = sim::internal::mp[m].sot_pm.get();
+         sim::internal::sot_material_polarization_unit_vector[m]  = sim::internal::mp[m].sot_pv;
 
          // set vcma coefficients (requires sim::internal::enable_vcma_fields == true) but this should be default
          if(sim::internal::mp[m].vcmak.is_set()){

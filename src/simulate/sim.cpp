@@ -68,6 +68,7 @@
 #include "vmpi.hpp"
 #include "vutil.hpp"
 #include "micromagnetic.hpp"
+#include "sld.hpp"
 
 // sim module headers
 #include "internal.hpp"
@@ -210,6 +211,13 @@ int run(){
    montecarlo::initialize(atoms::num_atoms, grains::num_grains, atoms::grain_array);
 
    anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
+
+   #ifdef MPICF
+   if(sld::suzuki_trotter_parallel_initialized == false && sld::enabled) {
+      sld::suzuki_trotter_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                                   	    vmpi::min_dimensions, vmpi::max_dimensions);
+   }
+   #endif
 
    // now seed generator
 	mtrandom::grnd.seed(vmpi::parallel_rng_seed(mtrandom::integration_seed));
@@ -547,6 +555,16 @@ int run(){
 			}
 			program::spin_waves();
 			break;
+		//------------------------------------------------------------------------
+		case 75:
+			if(vmpi::my_rank==0){
+				std::cout << "HAMR cool..." << std::endl;
+				zlog << "HAMR cool..." << std::endl;
+			}
+			program::hamr_cool();
+			break;
+
+		//------------------------------------------------------------------------
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
 			zlog << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
@@ -752,6 +770,12 @@ void integrate_serial(uint64_t n_steps){
 			}
 			break;
 
+		case sim::suzuki_trotter: // spin-lattice Dynamics
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sld::suzuki_trotter();
+			}
+			break;
+
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
          err::vexit();
@@ -910,6 +934,18 @@ int integrate_mpi(uint64_t n_steps){
 			}
 			break;
 
+		case 9: // Suzuki Trotter decomposition
+ 			for(uint64_t ti=0;ti<n_steps;ti++){
+ 				#ifdef MPICF
+
+                sld::suzuki_trotter_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                                             atoms::type_array);
+             #endif
+ 				// increment time
+ 				sim::internal::increment_time();
+ 			}
+ 			break;
+
 		default:{
 			terminaltextcolor(RED);
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
@@ -924,6 +960,10 @@ int integrate_mpi(uint64_t n_steps){
 
 } // Namespace sim
 
+void spin_lattice_simulation(){
+	sld::suzuki_trotter();
+	sim::internal::increment_time();
+}
 
 void multiscale_simulation_steps(int n_steps){
 

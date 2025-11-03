@@ -11,23 +11,21 @@
 //
 
 // C++ standard library headers
-
-// Vampire headers
-#include "spinwaves.hpp"
-#include "vmpi.hpp"
-// sw module headers
-#include "internal.hpp"
-#include "iostream"
 #include <iomanip>
+#include <vector>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 #include <sstream>
 
-//sergiu for SW
-#include "unitcell.hpp"
-#include "vector"
-#include <cmath>
-#include "fstream"
+// Vampire headers
 #include "atoms.hpp"
+#include "spinwaves.hpp"
+#include "unitcell.hpp"
+#include "vmpi.hpp"
 
+// sw module headers
+#include "internal.hpp"
 
 namespace spinwaves {
 

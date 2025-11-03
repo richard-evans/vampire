@@ -80,6 +80,7 @@ namespace program
 	extern void boltzmann_dist();
   	extern void setting_process();
   	extern void boltzmann_dist_micromagnetic_llg();
+	extern void hamr_cool();
 
 }
 

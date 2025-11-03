@@ -13,10 +13,12 @@ specific_heat.o \
 standard_deviation.o\
 reset.o \
 susceptibility.o \
-binder_cumulant.o\
+binder_cumulant.o \
 torque.o \
-spin_temperature.o \
 update.o \
+energy_sld.o \
+spin_temperature.o \
+lattice_temperature.o \
 spin_length.o
 
 # Append module objects to global tree

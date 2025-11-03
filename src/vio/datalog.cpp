@@ -20,6 +20,7 @@
 #include "gpu.hpp"
 #include "grains.hpp"
 #include "sim.hpp"
+#include "sld.hpp"
 #include "vio.hpp"
 #include "micromagnetic.hpp"
 
@@ -272,7 +273,7 @@ namespace vout{
 				break;
 			case 72:
 			   vout::fractional_electric_field_strength(stream, header);
-				break;
+   			break;
 			case 74:
 				vout::sysspintemp(stream, header);
 				break;
@@ -293,6 +294,39 @@ namespace vout{
 				break;
 			case 80:
 				vout::mean_height_spin_length(stream,header);
+				break;
+			case 81:
+				vout::potential_energy(stream, header);
+				break;
+			case 82:
+				vout::kinetic_energy(stream, header);
+				break;
+			case 83:
+				vout::sld_exchange_energy(stream, header);
+				break;
+			case 84:
+				vout::sld_coupling_energy(stream, header);
+				break;
+			case 85:
+				vout::sld_total_energy(stream, header);
+				break;
+			//case 86:
+				//vout::sld_total_spin_energy(stream, header);
+				//break;
+			case 87:
+				vout::syslatticetemp(stream, header);
+				break;
+			case 88:
+				vout::mean_syslatticetemp(stream, header);
+				break;
+			case 89:
+				vout::material_lattice_temp(stream, header);
+				break;
+			case 90:
+			   vout::material_mean_syslatticetemp(stream, header);
+			   break;
+			case 91:
+				vout::mean_coupling_field_vec(stream,header);
 				break;
 			case 997: //MP
 				vout::material_binder_cumulant(stream,header);

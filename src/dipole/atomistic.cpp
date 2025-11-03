@@ -13,6 +13,7 @@
 #include <iostream>
 
 // Vampire headers
+#include "cells.hpp"
 #include "dipole.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -151,6 +152,7 @@ namespace dipole{
                                          std::vector<double>& z_spin_array){
 
        const double prefactor = 0.9274009994; // mu_o_4pi * muB / Angstrom^3 = 1.0e-7 * 9.274009994e-24 / 1.0e-30 = 0.9274009994
+       const double eight_pi_o_three = 8.0 * M_PI / 3.0;
 
        // cast number of local atoms to a local constant
        const int num_atoms_on_my_processor = dp::num_local_atoms;
@@ -184,6 +186,11 @@ namespace dipole{
          #else
           int atom_i_in_total_list_j = atom_i;
          #endif
+
+         // self term for atom  i (+2/3 mu_s * V_atom) * mu_0 / 4 pi
+         const double bx_self = eight_pi_o_three * dp::sx[atom_i] * dp::sm[atom_i] / cells::atomic_volume;
+         const double by_self = eight_pi_o_three * dp::sy[atom_i] * dp::sm[atom_i] / cells::atomic_volume;
+         const double bz_self = eight_pi_o_three * dp::sz[atom_i] * dp::sm[atom_i] / cells::atomic_volume;
 
          // get coordinates of atom i
          const double xi = dp::cx[atom_i_in_total_list_j];
@@ -282,9 +289,9 @@ namespace dipole{
          }
 
          // save total dipole field to atomic field array
-         dipole::atom_dipolar_field_array_x[atom_i] = prefactor * bx;
-         dipole::atom_dipolar_field_array_y[atom_i] = prefactor * by;
-         dipole::atom_dipolar_field_array_z[atom_i] = prefactor * bz;
+         dipole::atom_dipolar_field_array_x[atom_i] = prefactor * (bx + bx_self);
+         dipole::atom_dipolar_field_array_y[atom_i] = prefactor * (by + by_self);
+         dipole::atom_dipolar_field_array_z[atom_i] = prefactor * (bz + bz_self);
 
       }
 

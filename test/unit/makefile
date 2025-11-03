@@ -11,22 +11,29 @@ GCC=g++
 LIBS=-lstdc++
 
 # Flags
-GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/
+GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/ -I../../src/
 
 # Objects
 TEST_OBJECTS= \
 obj/unit_tests.o \
 obj/utility/units_test.o \
-obj/utility/utility_test.o
+obj/utility/utility_test.o\
+obj/utility/spin_temperature_test.o
+
 
 VAMPIRE_OBJECTS= \
 ../../obj/main/githash.o \
 ../../obj/main/version.o \
+../../obj/main/material.o \
 ../../obj/utility/errors.o \
 ../../obj/utility/units.o \
 ../../obj/vio/data.o \
 ../../obj/vio/globalio.o \
-../../obj/vio/timestamp.o
+../../obj/vio/timestamp.o\
+../../obj/constants/constants.o\
+../../obj/spinlattice/temperatures.o\
+../../obj/spinlattice/data.o
+
 
 EXECUTABLE=unit_tests
 

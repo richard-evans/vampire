@@ -63,7 +63,7 @@ namespace exchange{
                   std::vector<double> Jij = internal::bilinear_exchange_constants.get_exchange_values(imaterial, jmaterial, shell);
                   // set exchange field, normalising to mu_s^i
                   atoms::i_exchange_list[nn].Jij = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * Jij[0] * imus;
-   					// reset interation id to neighbour number - causes segfault if nn out of range
+   					// reset interaction id to neighbour number - causes segfault if nn out of range
    					atoms::neighbour_interaction_type_array[nn] = nn;
    				}
    			}
@@ -165,7 +165,7 @@ namespace exchange{
                      err::vexit();
                   }
 
-                  // reset interation id to neighbour number - causes segfault if nn out of range
+                  // reset interaction id to neighbour number - causes segfault if nn out of range
                   atoms::neighbour_interaction_type_array[nn] = nn;
 
                } // end of neighbour loop

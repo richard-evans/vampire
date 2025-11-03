@@ -21,6 +21,7 @@
 #include "random.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "sld.hpp"
 
 // Add internal module header file
 #include "internal.hpp"
@@ -58,6 +59,7 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
    atoms::m_spin_array.resize(atoms::num_atoms,0.0);
 
+
    atoms::type_array.resize(     atoms::num_atoms,0);
    atoms::category_array.resize( atoms::num_atoms,0);
    atoms::grain_array.resize(    atoms::num_atoms,0);
@@ -68,9 +70,28 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_spin_field_array.resize(atoms::num_atoms,0.0);
+
+   // For spin lattice only
+   if(sld::enabled){
+
+      atoms::mass_spin_array.resize(atoms::num_atoms,0.0);
+
+      atoms::x_total_spin_forces_array.resize(atoms::num_atoms,0.0);
+      atoms::y_total_spin_forces_array.resize(atoms::num_atoms,0.0);
+      atoms::z_total_spin_forces_array.resize(atoms::num_atoms,0.0);
+
+      atoms::x_velo_array.resize(atoms::num_atoms,0.0);
+      atoms::y_velo_array.resize(atoms::num_atoms,0.0);
+      atoms::z_velo_array.resize(atoms::num_atoms,0.0);
+
+   }
+
 	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);
+	atoms::x_thermal_field_array.resize(atoms::num_atoms,0.0);
+	atoms::y_thermal_field_array.resize(atoms::num_atoms,0.0);
+	atoms::z_thermal_field_array.resize(atoms::num_atoms,0.0);
 //	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
 //	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
 //	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);

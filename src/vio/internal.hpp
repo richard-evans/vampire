@@ -82,7 +82,12 @@ namespace vout{
          mean_magnetisation_length,
          mean_specific_heat,
          mean_susceptibility,
-         mean_torque
+         mean_torque,
+         mean_spin_temp,
+         mean_lattice_temp,
+         SxH2,
+         SH,
+         mean_coupling_field_vec
       };
 
       // internal variables
@@ -136,6 +141,7 @@ namespace vout{
    void material_mean_systorque(std::ostream& stream,bool header);
    void material_torque(std::ostream& stream, bool header);
    void standard_deviation(std::ostream& stream,bool header);
+
    void mean_system_susceptibility(std::ostream& stream,bool header);
    void system_binder_cumulant(std::ostream& stream,bool header);
    void phonon_temperature(std::ostream& stream,bool header);
@@ -184,9 +190,36 @@ namespace vout{
    void current(std::ostream& stream, bool header);
    void domain_wall_position(std::ostream& stream,bool header);
    void MRresistance(std::ostream& stream, bool header);
+
    void mean_system_spin_length(std::ostream& stream,bool header);
    void mean_material_spin_length(std::ostream& stream,bool header);
    void mean_height_spin_length(std::ostream& stream,bool header);
+
+   void spin_temperature(std::ostream& stream, bool header);
+   void lattice_temperature(std::ostream& stream, bool header);
+
+   void material_spin_temp(std::ostream& stream, bool header);
+   void sysspintemp(std::ostream& stream,bool header);
+   void mean_sysspintemp(std::ostream& stream,bool header);
+   void material_mean_sysspintemp(std::ostream& stream,bool header);
+
+   void syslatticetemp(std::ostream& stream,bool header);
+   void material_lattice_temp(std::ostream& stream, bool header);
+   void mean_syslatticetemp(std::ostream& stream,bool header);
+   void material_mean_syslatticetemp(std::ostream& stream,bool header);
+   void mean_coupling_field_vec(std::ostream& stream, bool header); 
+
+   void potential_energy(std::ostream& stream, bool header);
+   void kinetic_energy(std::ostream& stream, bool header);
+   void sld_exchange_energy(std::ostream& stream, bool header);
+   void sld_coupling_energy(std::ostream& stream, bool header);
+   void sld_total_energy(std::ostream& stream, bool header);
+
+   void mean_potential_energy(std::ostream& stream, bool header);
+   void mean_kinetic_energy(std::ostream& stream, bool header);
+   void mean_sld_exchange_energy(std::ostream& stream, bool header);
+   void mean_sld_coupling_energy(std::ostream& stream, bool header);
+   void mean_sld_total_energy(std::ostream& stream, bool header);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp

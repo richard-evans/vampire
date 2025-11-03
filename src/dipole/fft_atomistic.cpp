@@ -116,16 +116,14 @@ namespace dipole{
 
 #ifdef FFT
 
-                if( fftw_init_threads() == 0)
-                    std::cout << "Error initialising threads for FFTW!" << std::endl;
+                #ifdef FFTW_OMP
+                   int Nthreads = 1;
+                   if( fftw_init_threads() == 0) std::cout << "Error initialising threads for FFTW!" << std::endl;
+                   Nthreads = omp_get_max_threads();
+                   std::cout << "Planning FFT with Nthreads = " << Nthreads << std::endl;
+                   fftw_plan_with_nthreads(Nthreads);
+                #endif
 
-                int Nthreads = 1;
-
-#ifdef FFTW_OMP
-                Nthreads = omp_get_max_threads();
-                std::cout << "Planning FFT with Nthreads = " << Nthreads << std::endl;
-#endif
-                fftw_plan_with_nthreads(Nthreads);
 
                 const double prefactor = 0.9274009994; // mu_0 * muB / (4*pi*Angstrom^3) = 1.0e-7 * 9.274009994e-24 / 1.0e-30 = 0.9274009994
 
@@ -220,7 +218,7 @@ namespace dipole{
                 // loop over the system mesh to
                 // construct the interaction matrix
                 // w(r) = (\mu_0 / 4 pi r^5) (3 r \outer r - I r*r)
-                int ind = 0;
+                //int ind = 0;
                 for( int i = 0 ; i < Nx; i++) {
                     for( int j = 0; j < Ny; j++) {
                         for( int k = 0; k < Nz; k++) {
@@ -412,7 +410,9 @@ namespace dipole{
                 fftw_destroy_plan(plan_M);
                 fftw_destroy_plan(plan_H);
 
-                fftw_cleanup_threads();
+                #ifdef FFTW_OMP
+                  fftw_cleanup_threads();
+               #endif
 #endif
                 return;
 

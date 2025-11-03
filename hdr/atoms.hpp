@@ -99,6 +99,7 @@ namespace atoms
 	extern std::vector <double> y_spin_array;
 	extern std::vector <double> z_spin_array;
    extern std::vector <double> m_spin_array; /// Array of atomic spin moments
+   extern std::vector <double> mass_spin_array; /// Array of mass of atoms
 
 	extern std::vector <double> x_total_spin_field_array;		/// Total spin dependent fields
 	extern std::vector <double> y_total_spin_field_array;		/// Total spin dependent fields
@@ -106,6 +107,9 @@ namespace atoms
 	extern std::vector <double> x_total_external_field_array;	/// Total external fields
 	extern std::vector <double> y_total_external_field_array;	/// Total external fields
 	extern std::vector <double> z_total_external_field_array;	/// Total external fields
+	extern std::vector <double> x_thermal_field_array;	/// Total external fields
+	extern std::vector <double> y_thermal_field_array;	/// Total external fields
+	extern std::vector <double> z_thermal_field_array;	/// Total external fields
 
 	extern std::vector <zval_t> i_exchange_list;
 	extern std::vector <zvec_t> v_exchange_list;
@@ -115,6 +119,14 @@ namespace atoms
    extern std::vector <bool> magnetic; // flag to identify atom as being magnetic
 
    extern std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
+
+	extern std::vector <double> x_total_spin_forces_array;		/// Total spin dependent fields
+	extern std::vector <double> y_total_spin_forces_array;		/// Total spin dependent fields
+	extern std::vector <double> z_total_spin_forces_array;		/// Total spin dependent fields
+
+	extern std::vector <double> x_velo_array;		/// Total spin dependent fields
+	extern std::vector <double> y_velo_array;		/// Total spin dependent fields
+	extern std::vector <double> z_velo_array;		/// Total spin dependent fields
 
 }
 

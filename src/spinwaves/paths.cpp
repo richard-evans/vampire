@@ -11,6 +11,13 @@
 //
 
 // C++ standard library headers
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <cmath>
 
 // Vampire headers
 #include "spinwaves.hpp"
@@ -21,18 +28,6 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 #include "sim.hpp"
-
-
-// sw module headers
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <cmath>
-
-
 
 namespace spinwaves{
 
@@ -296,9 +291,9 @@ namespace spinwaves{
                 zlog << "[" << kx0 << ", " << ky0 << ", " << kz0 << "] and ";
                 zlog << "[" << kx1 << ", " << ky1 << ", " << kz1 << "]" << std::endl;
 
-                double kx=kx0;
-                double ky=ky0;
-                double kz=kz0;
+                kx=kx0;
+                ky=ky0;
+                kz=kz0;
 
                 // make sure you always finish at the points specified by user.
 

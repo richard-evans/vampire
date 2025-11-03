@@ -30,6 +30,7 @@ namespace internal
 
 // Forward function declarations
 double write_data_text(std::string filename, const std::vector<double> &buffer);
+double write_data_text_sld(std::string filename, const std::vector<double> &buffer_sld);
 double write_data_binary(std::string filename, const std::vector<double> &buffer);
 
 //--------------------------------------------------------------------------------------------------------
@@ -86,6 +87,10 @@ double write_data(std::string filename, const std::vector<double> &buffer){
 
       case config::internal::text:
          io_time = write_data_text(filename, buffer);
+
+      //case config::internal::text_sld:
+      // io_time = write_data_text_sld(filename, buffer);
+
          break;
 
    }
@@ -119,6 +124,7 @@ double write_data_text(std::string filename, const std::vector<double> &buffer){
    // output buffer to disk
    for(unsigned int index = 0; index < data_size; ++index){
 
+      // add to anable high recision output: std::setprecision(17)
       ofile << buffer[3 * index + 0] << "\t"
             << buffer[3 * index + 1] << "\t"
             << buffer[3 * index + 2] << "\n";

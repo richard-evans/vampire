@@ -51,6 +51,8 @@ namespace cat{
 		// spin temperature variables
 		double spin_temp;
 		double mean_spin_temp;
+		double SxH2;
+		double SH;
 
 		// member functions
 		category_t(); /// constructor

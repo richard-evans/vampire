@@ -206,7 +206,7 @@ namespace spinwaves{
                   // if (value == "all")
 
                   while (std::getline(iss, token, ',')){
-                     uint64_t tt = std::stoi(token);
+                     //uint64_t tt = std::stoi(token);
 
                      std::cout << i << " " << std::stoi(token)-1 << std::endl;
                      internal::mat.push_back(std::stoi(token)-1);

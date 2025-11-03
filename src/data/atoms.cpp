@@ -57,14 +57,29 @@ namespace atoms{
 	std::vector <double> x_spin_array(0);
 	std::vector <double> y_spin_array(0);
 	std::vector <double> z_spin_array(0);
-    std::vector <double> m_spin_array(0);
+   std::vector <double> m_spin_array(0);
+   std::vector <double> mass_spin_array(0);
 
 	std::vector <double> x_total_spin_field_array(0);		/// Total spin dependent fields
 	std::vector <double> y_total_spin_field_array(0);		/// Total spin dependent fields
 	std::vector <double> z_total_spin_field_array(0);		/// Total spin dependent fields
+
+	std::vector <double> x_total_spin_forces_array(0);		/// Total spin dependent forces
+   std::vector <double> y_total_spin_forces_array(0);		/// Total spin dependent forces
+   std::vector <double> z_total_spin_forces_array(0);		/// Total spin dependent forces
+
+   std::vector <double> x_velo_array(0);		///  velocities
+   std::vector <double> y_velo_array(0);		///
+   std::vector <double> z_velo_array(0);		///
+
 	std::vector <double> x_total_external_field_array(0);	/// Total external fields
 	std::vector <double> y_total_external_field_array(0);	/// Total external fields
 	std::vector <double> z_total_external_field_array(0);	/// Total external fields
+
+	std::vector <double> x_thermal_field_array(0);	/// Total external fields
+	std::vector <double> y_thermal_field_array(0);	/// Total external fields
+	std::vector <double> z_thermal_field_array(0);	/// Total external fields
+
 
 	std::vector <zval_t> i_exchange_list(0);
 	std::vector <zvec_t> v_exchange_list(0);

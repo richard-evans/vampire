@@ -111,6 +111,7 @@ namespace vin{
 
    // simple functions to extract variables from strings
    extern uint64_t str_to_uint64(std::string input_str);
+   extern int str_to_int(std::string input_str);
    extern double str_to_double(std::string input_str);
 
    extern std::vector<mp::materials_t> read_material;

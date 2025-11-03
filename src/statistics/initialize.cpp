@@ -75,6 +75,45 @@ namespace stats{
       }
 
       //------------------------------------------------------------------------
+      // system SLD energy
+      //------------------------------------------------------------------------
+      if(stats::calculate_system_sld_energy){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+            // all other atoms are included
+            else mask[atom] = 0;
+         }
+         stats::system_sld_energy.set_mask(1+1,mask);
+      }
+
+      //------------------------------------------------------------------------
+      // SLD grain energy
+      //------------------------------------------------------------------------
+      if(stats::calculate_grain_sld_energy){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_grains;
+            // other atoms assigned to material level masks
+            else mask[atom] = grain_array[atom];
+         }
+         stats::grain_sld_energy.set_mask(num_grains+1,mask);
+      }
+
+      //------------------------------------------------------------------------
+      // SLD material energy
+      //------------------------------------------------------------------------
+      if(stats::calculate_material_sld_energy){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_materials;
+            // other atoms assigned to material level masks
+            else mask[atom] = material_type_array[atom];
+         }
+         stats::material_sld_energy.set_mask(num_materials+1,mask);
+      }
+
+      //------------------------------------------------------------------------
       // system magnetization
       //------------------------------------------------------------------------
       if(stats::calculate_system_magnetization){
@@ -297,6 +336,46 @@ namespace stats{
             else mask[atom] = material_type_array[atom];
          }
          stats::material_spin_temp.set_mask(num_materials+1,mask,magnetic_moment_array);
+      }
+
+      //------------------------------------------------------------------------
+      // system lattice temperature
+      //------------------------------------------------------------------------
+      if(stats::calculate_system_lattice_temp){
+       for(int atom=0; atom < stats::num_atoms; ++atom){
+
+          // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+          if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+          // all other atoms are included
+          else mask[atom] = 0;
+       }
+       stats::system_lattice_temp.set_mask(1+1,mask,magnetic_moment_array);
+      }
+
+      //------------------------------------------------------------------------
+      // grain lattice temp
+      //------------------------------------------------------------------------
+      if(stats::calculate_grain_lattice_temp){
+       for(int atom=0; atom < stats::num_atoms; ++atom){
+          // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+          if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_grains;
+          // all other atoms are included
+          else mask[atom] = grain_array[atom];
+       }
+       stats::grain_lattice_temp.set_mask(num_grains+1, mask, magnetic_moment_array);
+      }
+
+      //------------------------------------------------------------------------
+      // material lattice temp
+      //------------------------------------------------------------------------
+      if(stats::calculate_material_lattice_temp){
+       for(int atom=0; atom < stats::num_atoms; ++atom){
+          // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+          if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] =  num_materials;
+          // other atoms assigned to material level masks
+          else mask[atom] = material_type_array[atom];
+       }
+       stats::material_lattice_temp.set_mask(num_materials+1,mask,magnetic_moment_array);
       }
 
       //------------------------------------------------------------------------

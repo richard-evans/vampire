@@ -20,15 +20,16 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
+#include <vector>
 
 // Vampire headers
 #include "spinwaves.hpp"
 
 // sw module headers
 #include "internal.hpp"
+#ifdef FFT
 #include <fftw3.h>
-#include "vector"
-
+#endif
 namespace spinwaves{
 
    namespace internal{
@@ -88,8 +89,7 @@ namespace spinwaves{
       extern std::vector<int> atom_mask;
       extern std::vector<int> spec_mask;
 
-
-      //JRH time variabls
+      //JRH time variables
       extern int nt;
       extern int nk;
 
@@ -128,13 +128,13 @@ namespace spinwaves{
 
 
       // post analysis functions
+      #ifdef FFT
       extern void complex_magnitude(fftw_complex *os);
       extern void one_sided_spectrum(fftw_complex *os);
       extern void write_to_file(fftw_complex *os, int k, int spec);
       extern void normalise_each_kpoint(fftw_complex *os);
       extern void write_intermediate_to_file(fftw_complex *os, int k, int spec);
-
-
+      #endif
 
       // Peak finding at some point?????/
       // extern void write_peaks_to_file();

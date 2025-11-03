@@ -15,6 +15,7 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "config.hpp"
+#include "sld.hpp"
 #include "vio.hpp"
 
 // config module headers
@@ -53,17 +54,19 @@ namespace config{
 
             const double cc[3] = {atoms::x_coord_array[atom], atoms::y_coord_array[atom], atoms::z_coord_array[atom]};
 
-            // check atom within output bounds
-            if ((cc[0] >= minB[0]) && (cc[0] <= maxB[0]))
-            {
-               if ((cc[1] >= minB[1]) && (cc[1] <= maxB[1]))
+            // check atom within local bounds (except for SLD)
+            if(!sld::enabled){
+               if ((cc[0] >= minB[0]) && (cc[0] <= maxB[0]))
                {
-                  if ((cc[2] >= minB[2]) && (cc[2] <= maxB[2]))
+                  if ((cc[1] >= minB[1]) && (cc[1] <= maxB[1]))
                   {
-                     config::internal::local_output_atom_list.push_back(atom);
+                     if ((cc[2] >= minB[2]) && (cc[2] <= maxB[2]))
+                     {
+                        config::internal::local_output_atom_list.push_back(atom);
+                     }
                   }
                }
-            }
+            } // end of sld check
 
          }
 

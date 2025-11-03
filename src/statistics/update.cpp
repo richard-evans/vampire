@@ -52,6 +52,11 @@ namespace stats{
             if(stats::calculate_grain_energy)                  stats::grain_energy.calculate(sx, sy, sz, mm, mat, temperature);
             if(stats::calculate_material_energy)               stats::material_energy.calculate(sx, sy, sz, mm, mat, temperature);
 
+            // update sld energy statistics
+            if(stats::calculate_system_sld_energy)             stats::system_sld_energy.calculate(sx, sy, sz, mm, mat, temperature);
+            if(stats::calculate_grain_sld_energy)              stats::grain_sld_energy.calculate(sx, sy, sz, mm, mat, temperature);
+            if(stats::calculate_material_sld_energy)           stats::material_sld_energy.calculate(sx, sy, sz, mm, mat, temperature);
+
             // update magnetization statistics
             if(stats::calculate_system_magnetization)          stats::system_magnetization.calculate_magnetization(sx,sy,sz,mm);
             if(stats::calculate_grain_magnetization)           stats::grain_magnetization.calculate_magnetization(sx,sy,sz,mm);
@@ -70,6 +75,11 @@ namespace stats{
             if(stats::calculate_system_spin_temp)          stats::system_spin_temp.calculate_spin_temp(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
             if(stats::calculate_grain_spin_temp)           stats::grain_spin_temp.calculate_spin_temp(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
             if(stats::calculate_material_spin_temp)        stats::material_spin_temp.calculate_spin_temp(sx,sy,sz,bxs,bys,bzs,bxe,bye,bze,mm);
+
+            // update lattice temp
+            if(stats::calculate_system_lattice_temp)          stats::system_lattice_temp.calculate_lattice_temp(sx,sy,sz);
+            if(stats::calculate_grain_lattice_temp)           stats::grain_lattice_temp.calculate_lattice_temp(sx,sy,sz);
+            if(stats::calculate_material_lattice_temp)        stats::material_lattice_temp.calculate_lattice_temp(sx,sy,sz);
 
             // update specific heat statistics
             if(stats::calculate_system_specific_heat)         stats::system_specific_heat.calculate(stats::system_energy.get_total_energy());

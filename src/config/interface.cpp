@@ -75,6 +75,13 @@ namespace config{
          internal::output_atoms_config_rate=i;
          return EXIT_SUCCESS;
       }
+      //
+      //-----------------------------------------
+      test="sld";
+      if(word==test){
+         internal::sld_format = true;
+         return EXIT_SUCCESS;
+      }
       //--------------------------------------------------------------------
       test="output-format";
       if(word==test){

@@ -41,6 +41,8 @@ namespace config{
       bool output_atoms_config_end = false; // flag to enable atoms output at the end of simulation
       int output_atoms_config_rate = 1000; // rate to output atoms
 
+      bool sld_format = false; // enable SLD output of latice configurations
+
       bool output_cells_config = false; // flag to enable cells output
       bool output_cells_config_continuous = false; // flag to enable cells output
       bool output_cells_config_end = false; // flag to enable cells output at the end of simulation

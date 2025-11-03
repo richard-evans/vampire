@@ -33,7 +33,7 @@ namespace internal
 {
 
    // enumerated integers for option selection
-   enum format_t{ binary = 0, text = 1};
+   enum format_t{ binary = 0, text = 1 };
    enum mode_t{ legacy = 0, mpi_io = 1, fpprocess = 2, fpnode = 3};
 
    //-------------------------------------------------------------------------
@@ -49,6 +49,8 @@ namespace internal
    extern bool output_atoms_config_continuous; // flag to enable continuous output of atomic configurations
    extern bool output_atoms_config_end; // flag to enable output of atomic configurations at end of simulation
    extern int output_atoms_config_rate; // rate to output atoms
+
+   extern bool sld_format; //flag to enable dynamic positions for SLD
 
    extern bool output_cells_config; // flag to enable cells output
    extern bool output_cells_config_continuous; // flag to enable continuous output of cells configurations
@@ -107,6 +109,7 @@ namespace internal
 
    void atoms();
    void atoms_coords();
+   void atoms_coords_sld();
    void atoms_non_magnetic();
 
    double legacy_atoms();

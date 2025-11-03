@@ -90,7 +90,9 @@ namespace mp
 		std::vector<bool> override_atomsitic;
 
 		double alpha;
+                double alpha_eq;
 		double mu_s_SI;
+	    double mass;
 		double magnetisation;
 
 		double gamma_rel;
@@ -113,6 +115,9 @@ namespace mp
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
 		double H_th_sigma;
+//modified SLD M Strungaru
+                double H_th_sigma_eq;
+
 		bool constrained; /// specifies primary or alternate integrator
 
 		double temperature; /// Kelvin

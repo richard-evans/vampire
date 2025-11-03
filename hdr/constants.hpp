@@ -20,6 +20,7 @@ namespace constants{
 
    extern const double muB; // Bohr Magneton (Joules / Tesla)
    extern const double kB;  // Boltzmann constant (Joules / Kelvin)
+   extern const double kB_eV; //Boltzmann constant in eV
 
 } // end of exchange namespace
 

@@ -20,6 +20,10 @@ namespace stats{
    bool calculate_grain_energy                  = false;
    bool calculate_material_energy               = false;
 
+   bool calculate_system_sld_energy             = false;
+   bool calculate_grain_sld_energy              = false;
+   bool calculate_material_sld_energy           = false;
+
    bool calculate_system_magnetization          = true;
    bool calculate_grain_magnetization           = false;
    bool calculate_material_magnetization        = false;
@@ -35,6 +39,10 @@ namespace stats{
    bool calculate_system_spin_temp              = false;
    bool calculate_grain_spin_temp               = false;
    bool calculate_material_spin_temp            = false;
+
+   bool calculate_system_lattice_temp           = false;
+   bool calculate_grain_lattice_temp            = false;
+   bool calculate_material_lattice_temp         = false;
 
    bool calculate_system_specific_heat          = false;
    bool calculate_grain_specific_heat           = false;
@@ -57,6 +65,10 @@ namespace stats{
    energy_statistic_t grain_energy("g");
    energy_statistic_t material_energy("m");
 
+   sld_energy_statistic_t system_sld_energy("s");
+   sld_energy_statistic_t grain_sld_energy("g");
+   sld_energy_statistic_t material_sld_energy("m");
+
    magnetization_statistic_t system_magnetization("s");
    magnetization_statistic_t grain_magnetization("g");
    magnetization_statistic_t material_magnetization("m");
@@ -72,6 +84,10 @@ namespace stats{
    spin_temp_statistic_t system_spin_temp("s");
    spin_temp_statistic_t grain_spin_temp("g");
    spin_temp_statistic_t material_spin_temp("m");
+
+   lattice_temp_statistic_t system_lattice_temp("s");
+   lattice_temp_statistic_t grain_lattice_temp("g");
+   lattice_temp_statistic_t material_lattice_temp("m");
 
    specific_heat_statistic_t system_specific_heat("s");
    specific_heat_statistic_t grain_specific_heat("g");

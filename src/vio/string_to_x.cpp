@@ -49,6 +49,25 @@ uint64_t str_to_uint64(std::string input_str){
 
 }
 
+//------------------------------------------------------------
+// Simple function to convert string to int
+//------------------------------------------------------------
+int str_to_int(std::string input_str){
+
+   // intermediate double variable
+   double value = 0.0;
+
+   // load value into std::sstream for safe type conversion
+   std::stringstream value_ss(input_str);
+
+   // read value into double
+   value_ss >> value;
+
+   // return int as cast
+   return int(value);
+
+}
+
 //------------------------------------------------------------------------------
 // Simple function to convert string to double
 //------------------------------------------------------------------------------

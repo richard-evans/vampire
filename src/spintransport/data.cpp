@@ -45,6 +45,8 @@ namespace spin_transport{
       double cell_size_y = 10.0; // cell size along y-direction (1 nm default size)
       double cell_size_z = 10.0; // cell size along z-direction (1 nm default size)
 
+      int cell_increment = 1; // cell increment depending on positive or negative current direction
+
       unsigned int num_stacks = 0; // number of stacks perpendicular to current direction
       unsigned int total_num_cells  = 0; // number of cells
 

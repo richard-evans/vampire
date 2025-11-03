@@ -170,10 +170,16 @@ namespace program{
             program::program=73;
             return true;
          }
-         // JRH - Program option for spinwaves 
+         // JRH - Program option for spinwaves
          test="spin-waves";
          if(value==test){
             program::program=74;
+            return true;
+         }
+         // HAMR cool
+         test="hamr-cool";
+         if(value==test){
+            program::program=75;
             return true;
          }
          else{

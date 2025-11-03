@@ -563,7 +563,6 @@ namespace anisotropy{
       //---------------------------------------------------------------------
       if(internal::enable_lattice_anisotropy){
 
-
          // arrays for storing unrolled parameters for lattice anisotropy
          internal::klattice.resize(num_materials);
          internal::klattice_array.resize(num_materials); // anisoptropy constant

@@ -275,6 +275,19 @@ different atoms in the unit cell are defined by the structure. For example, in t
 
 This keyword also works with the \textit{create:crystal-sublattice-materials} flag to allocate different materials to different sites in the simple crystals bcc, fcc, hcp and kagome. This feature is especially useful for simulating simple antiferromagnets and materials with different kinds of defects or site specific alloying.
 
+The following commands are specific for the spin-lattice module and needed to include phonon dynamics.
+
+{\zicf material:mass = float [ 0-1 : default 5.7915e-3 ]}\phantomsection\addcontentsline{toc}{subsection}{material:mass} mass of the atom, for spin-lattice dynamics module; default values for bcc Fe;
+
+{\zicf material:damping-constant-lattice= float [ 0-1 : default 0.6]}\phantomsection\addcontentsline{toc}{subsection}{material:damping-constant-lattice}
+
+{\zicf material:exchange-J0=float [ 0-1 : default 0.904 !eV]}\phantomsection\addcontentsline{toc}{subsection}{material:exchange-J0}  prefactor for the exchange function for SLD module;
+
+{\zicf material:harmonic-potential-V0=float [ 0-1 : default 0.15 !eV]}\phantomsection\addcontentsline{toc}{subsection}{material:exchange-J0}  prefactor for the harmonic potential for SLD module;
+
+{\zicf material:coupling-C0=float [ 0-1 : default 0.5]}\phantomsection\addcontentsline{toc}{subsection}{material:coupling-C0}  prefactor for the coupling function for SLD module; various coupling options available such as pseudodipolar or full-neel.
+
+
 %\section*{Example material files}
 %\phantomsection\addcontentsline{toc}{section}{Example material files}
 

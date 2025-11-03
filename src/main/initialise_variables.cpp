@@ -35,7 +35,6 @@
 #include "unitcell.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
-
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -178,7 +177,7 @@ int default_system(){
 	material[0].mu_s_SI=1.5*9.27400915e-24;
 	material[0].gamma_rel=1.0;
 	material[0].element="Ag ";
-
+	material[0].alpha_eq=0.1;
 	// Disable Error Checking
 	err::check=false;
 
@@ -389,6 +388,7 @@ int set_derived_parameters(){
 		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
 		mp::material[mat].H_th_sigma			    = sqrt(2.0*mp::material[mat].alpha*1.3806503e-23 / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
+      mp::material[mat].H_th_sigma_eq         = sqrt(2.0*mp::material[mat].alpha_eq*1.3806503e-23 / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
 
       // Rename un-named materials with material id
       std::string defname="material#n";

@@ -21,6 +21,7 @@ fmr.o \
 local_field_cool.o \
 localised_temperature_pulse.o \
 hamr.o \
+hamr_cool.o \
 hybrid_cmc.o \
 hysteresis.o \
 initialize.o \

@@ -14,6 +14,7 @@
 #include <sstream>
 
 #include "create.hpp"
+#include "sld.hpp"
 #include "errors.hpp"
 #include "info.hpp"
 #include "material.hpp"
@@ -107,6 +108,9 @@ int main(int argc, char* argv[]){
 
    // Create system
    cs::create();
+
+   //test initialise SLD
+   sld::initialize();
 
    // Simulate system
    sim::run();

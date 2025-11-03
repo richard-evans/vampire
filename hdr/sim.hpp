@@ -76,7 +76,8 @@ namespace sim{
 
 	// enumerated list for integrators
 	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
-							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5, lsf = 6, lsf_mc = 7, lsf_rk4 = 8};
+							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5, lsf = 6,
+							 lsf_mc = 7, lsf_rk4 = 8, suzuki_trotter = 9};
 
 	extern std::ofstream mag_file;
 	extern uint64_t time;
@@ -202,7 +203,6 @@ namespace sim{
 	extern int LSF_mpi();
 	extern int LSF_RK4_mpi();
 
-
 	// Integrator initialisers
 	extern int LLGinit();
 	extern int LSFinit();
@@ -215,6 +215,19 @@ namespace sim{
 
 	void calculate_spin_fields(const int start_index,const int end_index);
 	void calculate_external_fields(const int start_index,const int end_index);
+	//spin temperature
+    extern double compute_spin_temperature(const int start_index, // first atom for exchange interactions to be calculated
+                 const int end_index,
+                 const std::vector<int>& type_array, // type for atom
+                 std::vector<double>& x_spin_array, // coord vectors for atoms
+                 std::vector<double>& y_spin_array,
+                 std::vector<double>& z_spin_array,
+                 std::vector<double>& fields_array_x, //  vectors for fields
+                 std::vector<double>& fields_array_y,
+                 std::vector<double>& fields_array_z,
+                 std::vector<double>& mu_s_array);
+
+   extern double spin_temperature;
 
 	//spin temperature
 	extern double compute_spin_temperature(const int start_index, // first atom for exchange interactions to be calculated

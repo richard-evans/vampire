@@ -1,36 +1,21 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard F L Evans 2025. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-//=============================================================================
-//
-//                                     Fields
-//
-//              Subroutines to calculate fields for the hamiltonian
-//
-//                         Version 1.0 R Evans 20/10/2008
-//
-//====================================================================================================
+
+// C++ standard library headers
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+
+// Vampire headers
 #include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "material.hpp"
@@ -52,9 +37,6 @@
 // sim module header
 #include "internal.hpp"
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
 
 //========================
 //function prototypes
@@ -162,8 +144,8 @@ void calculate_external_fields(const int start_index,const int end_index){
    else if(program::program==13){
 
       // Local thermal Fields
-      ltmp::get_localised_thermal_fields(atoms::x_total_external_field_array,atoms::y_total_external_field_array,
-            atoms::z_total_external_field_array, start_index, end_index);
+      ltmp::get_localised_thermal_fields(atoms::x_thermal_field_array,atoms::y_thermal_field_array,
+            atoms::z_thermal_field_array, start_index, end_index);
 
       // Applied Fields
       if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
@@ -303,7 +285,7 @@ int calculate_thermal_fields(const int start_index,const int end_index){
    sigma_prefactor.reserve(mp::material.size());
 
    // Calculate material temperature (with optional rescaling)
-   for(unsigned int mat=0;mat<mp::material.size();mat++){
+   for(unsigned int mat=0;mat<mp::material.size();mat++) {
       double temperature = sim::temperature;
       // Check for localised temperature
       if(sim::local_temperature) temperature = mp::material[mat].temperature;
@@ -314,20 +296,21 @@ int calculate_thermal_fields(const int start_index,const int end_index){
       double rescaled_temperature = temperature < Tc ? Tc*pow(temperature/Tc,alpha) : temperature;
       double sqrt_T=sqrt(rescaled_temperature);
       sigma_prefactor.push_back(sqrt_T*mp::material[mat].H_th_sigma);
-   }
+    }
 
-   generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-   generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-   generate (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::x_thermal_field_array.begin()+start_index,atoms::x_thermal_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::y_thermal_field_array.begin()+start_index,atoms::y_thermal_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::z_thermal_field_array.begin()+start_index,atoms::z_thermal_field_array.begin()+end_index, mtrandom::gaussian);
+
 
    for(int atom=start_index;atom<end_index;atom++){
 
       const int imaterial=atoms::type_array[atom];
       const double H_th_sigma = sigma_prefactor[imaterial];
 
-      atoms::x_total_external_field_array[atom] *= H_th_sigma;
-		atoms::y_total_external_field_array[atom] *= H_th_sigma;
-		atoms::z_total_external_field_array[atom] *= H_th_sigma;
+      	atoms::x_thermal_field_array[atom] *= H_th_sigma;
+		atoms::y_thermal_field_array[atom] *= H_th_sigma;
+		atoms::z_thermal_field_array[atom] *= H_th_sigma;
 	}
 
    return EXIT_SUCCESS;
@@ -465,11 +448,105 @@ void calculate_lagrange_fields(const int start_index,const int end_index){
 }
 
 //------------------------------------------------------------------------------
+// function to set up localised polarisation vectors for stt and sot
+//------------------------------------------------------------------------------
+void set_torque_polarization_vectors(){
+
+	using namespace sim::internal;
+
+	// get reference to magnetisation of each material
+   std::vector<double> matmag = stats::material_magnetization.get_magnetization();
+
+	//---------------------------------------------------------------------------
+	// spin transfer torque
+	//---------------------------------------------------------------------------
+	// check for global polarizer and overwrite material ones from initialisation
+	if(!enable_local_stt_polarizers){
+		for(int m = 0 ; m < mp::num_materials ; m++){
+			stt_material_polarization_unit_vector[m] = stt_polarization_unit_vector; // stt spin polarization direction
+		}
+	}
+	else{
+
+		// Default is the polarisers are set at initialisation for each material
+		// ...
+
+		// for local polarisers check for dynamic ones
+		for(int m = 0 ; m < mp::num_materials ; m++){
+
+			// overwrite vector with polarising material
+			if(stt_pm[m] > -1){
+
+				// set polarizing material
+				const int pm = stt_pm[m];
+
+				// load material magnetisation components
+				double mx = matmag[4*pm+0];
+				double my = matmag[4*pm+1];
+				double mz = matmag[4*pm+2];
+				double mm = matmag[4*pm+3];
+
+				//std::cout << "setting STT polarizer for material " << m+1 << " to material " << pm+1 << " ( m = " << mx << "\t" << my << "\t" << mz << " )" << std::endl;
+
+				// non-unit vector to account for temperature effects
+				stt_material_polarization_unit_vector[m].x = mx * mm;
+				stt_material_polarization_unit_vector[m].y = my * mm;
+				stt_material_polarization_unit_vector[m].z = mz * mm;
+
+			}
+
+		}
+	}
+
+	//---------------------------------------------------------------------------
+	// spin orbit torque
+	//---------------------------------------------------------------------------
+	// check for global polarizer and overwrite material ones from initialisation
+	if(!enable_local_sot_polarizers){
+		for(int m = 0 ; m < mp::num_materials ; m++){
+			sot_material_polarization_unit_vector[m] = sot_polarization_unit_vector; // stt spin polarization direction
+		}
+	}
+	else{
+
+		// Default is the polarisers are set at initialisation for each material
+		// ...
+
+		// for local polarisers check for dynamic ones
+		for(int m = 0 ; m < mp::num_materials ; m++){
+
+			// set polarizing material
+			const int pm = stt_pm[m];
+
+			// overwrite vector with polarising material
+			if(sot_pm[m] > -1){
+				// load material magnetisation components
+				double mx = matmag[4*pm+0];
+				double my = matmag[4*pm+1];
+				double mz = matmag[4*pm+2];
+				double mm = matmag[4*pm+3];
+				// non-unit vector to account for temperature effects
+				sot_material_polarization_unit_vector[m].x = mx*mm;
+				sot_material_polarization_unit_vector[m].y = my*mm;
+				sot_material_polarization_unit_vector[m].z = mz*mm;
+			}
+
+		}
+	}
+
+	return;
+
+}
+
+//------------------------------------------------------------------------------
 // Master function to calculate fields in large loop
 //------------------------------------------------------------------------------
 void calculate_full_spin_fields(const int start_index,const int end_index){
 
 	using namespace sim::internal;
+
+	// set up dynamic torque polarization
+	set_torque_polarization_vectors();
 
    for(int atom=start_index;atom<end_index;atom++){
 
@@ -492,9 +569,9 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		//----------------------------------------------------------------------------------
 
 		// save polarization to temporary constant
-		const double stpx = stt_polarization_unit_vector[0];
-		const double stpy = stt_polarization_unit_vector[1];
-		const double stpz = stt_polarization_unit_vector[2];
+		const double stpx = stt_material_polarization_unit_vector[material].x;
+		const double stpy = stt_material_polarization_unit_vector[material].y;
+		const double stpz = stt_material_polarization_unit_vector[material].z;
 
 		const double strj = stt_rj[material];
 		const double stpj = stt_pj[material];
@@ -512,9 +589,9 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		//----------------------------------------------------------------------------------
 
 		// save polarization to temporary constant
-		const double sotpx = sot_polarization_unit_vector[0];
-		const double sotpy = sot_polarization_unit_vector[1];
-		const double sotpz = sot_polarization_unit_vector[2];
+		const double sotpx = sot_material_polarization_unit_vector[material].x;
+		const double sotpy = sot_material_polarization_unit_vector[material].y;
+		const double sotpz = sot_material_polarization_unit_vector[material].z;
 
 		const double sotrj = sot_rj[material];
 		const double sotpj = sot_pj[material];

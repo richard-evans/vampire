@@ -29,6 +29,9 @@ namespace stats
    /// Statistics energy types
    enum energy_t { total = 0, exchange = 1, anisotropy = 2, applied_field = 3, magnetostatic = 4};
 
+   /// SLD Statistics energy types
+   enum sld_energy_t { sld_total = 0, sld_exchange = 1, sld_coupling = 2, potential = 3, kinetic = 4};
+
    /// Statistics types
    enum stat_t { atotal=0, mean=1};
 
@@ -58,6 +61,10 @@ namespace stats
 	extern bool calculate_grain_energy;
 	extern bool calculate_material_energy;
 
+	extern bool calculate_system_sld_energy;
+	extern bool calculate_grain_sld_energy;
+	extern bool calculate_material_sld_energy;
+
 	extern bool calculate_system_magnetization;
 	extern bool calculate_grain_magnetization;
 	extern bool calculate_material_magnetization;
@@ -69,6 +76,14 @@ namespace stats
 	extern bool calculate_system_torque;
 	extern bool calculate_grain_torque;
 	extern bool calculate_material_torque;
+
+	extern bool calculate_system_spin_temp;
+	extern bool calculate_grain_spin_temp;
+	extern bool calculate_material_spin_temp;
+
+   extern bool calculate_system_lattice_temp;
+   extern bool calculate_grain_lattice_temp;
+   extern bool calculate_material_lattice_temp;
 
 	extern bool calculate_system_spin_temp;
 	extern bool calculate_grain_spin_temp;
@@ -160,6 +175,70 @@ namespace stats
 
    };
 
+
+   //----------------------------------
+   // Energy class definition for SLD statistics
+   //----------------------------------
+   class sld_energy_statistic_t{
+
+   public:
+      sld_energy_statistic_t (std::string n):initialized(false){
+        name = n;
+      };
+      bool is_initialized();
+      void set_mask(const int in_mask_size, const std::vector<int> in_mask);
+      void get_mask(std::vector<int>& out_mask, std::vector<double>& out_normalisation);
+      void calculate(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
+                     const std::vector<double>& mm, const std::vector<int>& mat, const double temperature);
+
+      void reset_averages();
+
+      void set_sld_total_energy(         std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_sld_exchange_energy(      std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_sld_coupling_energy(    std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_potential_energy( std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+      void set_kinetic_energy( std::vector<double>& new_energy, std::vector<double>& new_mean_energy);
+
+      const std::vector<double>& get_sld_total_energy();
+      const std::vector<double>& get_sld_exchange_energy();
+      const std::vector<double>& get_sld_coupling_energy();
+      const std::vector<double>& get_potential_energy();
+      const std::vector<double>& get_kinetic_energy();
+
+      void update_mean_counter(long counter);
+
+      std::string output_sld_energy(enum sld_energy_t sld_energy_type, bool header);
+      std::string output_mean_sld_energy(enum sld_energy_t sld_energy_type, bool header);
+
+   private:
+      bool initialized;
+      int num_atoms;
+      int mask_size;
+      double mean_counter;
+
+      std::vector<int> mask;
+      std::vector<int> num_atoms_in_mask;
+
+
+      std::vector<double> sld_total_energy;
+      std::vector<double> sld_exchange_energy;
+      std::vector<double> sld_coupling_energy;
+      std::vector<double> potential_energy;
+      std::vector<double> kinetic_energy;
+
+      std::vector<double> mean_sld_total_energy;
+      std::vector<double> mean_sld_exchange_energy;
+      std::vector<double> mean_sld_coupling_energy;
+      std::vector<double> mean_potential_energy;
+      std::vector<double> mean_kinetic_energy;
+
+      std::vector<int> zero_list;
+      std::vector<double> normalisation;
+
+      std::string name;
+
+   };
+
    //----------------------------------
    // Magnetization Class definition
    //----------------------------------
@@ -241,42 +320,80 @@ namespace stats
 
    };
 
-	//----------------------------------
-	// Spin temperature class definition
-	//----------------------------------
-	class spin_temp_statistic_t{
+   //----------------------------------
+  // Spin temperature class definition
+  //----------------------------------
+  class spin_temp_statistic_t{
 
-		public:
-			spin_temp_statistic_t (std::string n):initialized(false){
-				name = n;
-			};
-			bool is_initialized();
-      	void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
-			void get_mask(std::vector<int>& out_mask);
-			void calculate_spin_temp(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
-									 		 const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
-									 	    const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
-									 	 	 const std::vector<double>& mm);
+     public:
+        spin_temp_statistic_t (std::string n):initialized(false){
+          name = n;
+        };
+        bool is_initialized();
+        void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
+        void get_mask(std::vector<int>& out_mask, std::vector<double>& out_normalisation);
+        void calculate_spin_temp(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
+									 const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
+									 const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
+									 const std::vector<double>& mm);
+        void set_spin_temp(std::vector<double>& spin_temp, std::vector<double>& mean_spin_temp, long counter);
+        void reset_spin_temp_averages();
+        const std::vector<double>& get_spin_temp();
+        std::string output_spin_temp(bool header);
+		std::string output_mean_spin_temp(bool header);
 
-			void set_spin_temp(std::vector<double>& spin_temp, std::vector<double>& mean_spin_temp, long counter);
-         void reset_spin_temp_averages();
-         const std::vector<double>& get_spin_temp();
-         std::string output_spin_temp(bool header);
-			std::string output_mean_spin_temp(bool header);
+     private:
+        bool initialized;
+        int num_atoms;
+        int mask_size;
+        double mean_counter;
+        std::vector<int> mask;
+		std::vector<int> num_atoms_in_mask;
+        std::vector<double> spin_temp;
+        std::vector<double> mean_spin_temp;
+        std::vector<double> SxH2;
+        std::vector<double> SH;
+        std::vector<int> zero_list;
+        std::vector<double> normalisation;
+        std::string name;
 
-		private:
-			bool initialized;
-			int num_atoms;
-			int mask_size;
-			double mean_counter;
-			std::vector<int> mask;
-			std::vector<int> num_atoms_in_mask;
-			std::vector<double> spin_temp;
-			std::vector<double> mean_spin_temp;
-			std::vector<int> zero_list;
-			std::string name;
 
-  	};
+  };
+
+     //----------------------------------
+    // lattice temperature class definition
+    //----------------------------------
+    class lattice_temp_statistic_t{
+
+       public:
+          lattice_temp_statistic_t (std::string n):initialized(false){
+            name = n;
+          };
+          bool is_initialized();
+          void set_mask(const int mask_size, std::vector<int> in_mask, const std::vector<double>& mm);
+          void get_mask(std::vector<int>& out_mask, std::vector<double>& out_normalisation);
+
+          void calculate_lattice_temp(const std::vector<double>& vx, const std::vector<double>& vy, const std::vector<double>& vz);
+          void set_lattice_temp(std::vector<double>& lattice_temp, std::vector<double>& mean_lattice_temp, long counter);
+          void reset_lattice_temp_averages();
+          const std::vector<double>& get_lattice_temp();
+          std::string output_lattice_temp(bool header);
+  		std::string output_mean_lattice_temp(bool header);
+
+       private:
+          bool initialized;
+          int num_atoms;
+          int mask_size;
+          double mean_counter;
+          std::vector<int> mask;
+  		std::vector<int> num_atoms_in_mask;
+          std::vector<double> lattice_temp;
+          std::vector<double> mean_lattice_temp;
+          std::vector<int> zero_list;
+           std::vector<double> normalisation;
+          std::string name;
+
+    };
 
 	//----------------------------------
    // Specific Heat Class definition
@@ -428,13 +545,21 @@ namespace stats
 	extern magnetization_statistic_t grain_magnetization;
 	extern magnetization_statistic_t material_magnetization;
 	extern magnetization_statistic_t material_grain_magnetization;
-   extern magnetization_statistic_t height_magnetization;
-   extern magnetization_statistic_t material_height_magnetization;
-   extern magnetization_statistic_t material_grain_height_magnetization;
+	extern magnetization_statistic_t height_magnetization;
+	extern magnetization_statistic_t material_height_magnetization;
+	extern magnetization_statistic_t material_grain_height_magnetization;
 
 	extern torque_statistic_t system_torque;
 	extern torque_statistic_t grain_torque;
 	extern torque_statistic_t material_torque;
+
+	extern spin_temp_statistic_t system_spin_temp;
+    extern spin_temp_statistic_t grain_spin_temp;
+    extern spin_temp_statistic_t material_spin_temp;
+
+    extern lattice_temp_statistic_t system_lattice_temp;
+    extern lattice_temp_statistic_t grain_lattice_temp;
+    extern lattice_temp_statistic_t material_lattice_temp;
 
 	extern spin_temp_statistic_t system_spin_temp;
 	extern spin_temp_statistic_t grain_spin_temp;
@@ -448,7 +573,11 @@ namespace stats
 	extern susceptibility_statistic_t grain_susceptibility;
 	extern susceptibility_statistic_t material_susceptibility;
 
-   extern standard_deviation_statistic_t material_standard_deviation;
+    extern standard_deviation_statistic_t material_standard_deviation;
+
+    extern sld_energy_statistic_t system_sld_energy;
+    extern sld_energy_statistic_t grain_sld_energy;
+    extern sld_energy_statistic_t material_sld_energy;
 
    extern spin_length_statistic_t system_spin_length;
    extern spin_length_statistic_t material_spin_length;

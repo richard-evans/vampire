@@ -4,20 +4,33 @@
 #
 #===================================================================
 
+#----------------------------------------------------------------------
+# Optional libraries
+#----------------------------------------------------------------------
+# Defaults are no extras (for easy compilation)
+LIBS=
+FFTW=
+
+# Uncomment these to add FFTW for spin waves and FFT dipole
+#LIBS= -lm -lfftw3 -L/opt/local/lib/
+#FFTW= -DFFT -I/opt/local/include/
+
+# Add the CUDA libraries
+CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
+
+#----------------------------------------------------------------------
+# Compilers
+#----------------------------------------------------------------------
+
 # Specify compiler for MPI compilation with openmpi
 export OMPI_CXX=g++ -std=c++11
-
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
+
 # Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
 
-# Include the FFTW library by uncommenting the -DFFT (off by default)
-#export incFFT= -DFFT -DFFTW_OMP -fopenmp
-#export FFTLIBS= -lfftw3_omp -lfftw3
-
-# Compilers
 ICC=icc -std=c++11 -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -std=c++11 -DCOMP='"LLVM C++ Compiler"'
@@ -26,34 +39,24 @@ IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
 MPIICC=mpiicpc -DMPICF
 
-LIBS=
-#LIBS= -lstdc++
-#-lm $(FFTLIBS) -L/opt/local/lib/
-
-CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
-CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
-
 export LANG=C
 export LC_ALL=C
-
-# LIBS
-
-CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi -Wsign-compare
-GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi -Wsign-compare
+GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
 
 PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
 PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
+
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
-LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi -Wsign-compare
-LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi -Wsign-compare
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
 
 # Performance Flags
 ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
@@ -61,22 +64,23 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
-#LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
-LLVM_LDFLAGS= -I./hdr -I./src/qvoronoi
+LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW)
+LLVM_LDFLAGS= -I./hdr -I./src/qvoronoi $(FFTW)
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++11 -Wsign-compare
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -Wsign-compare
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW) -std=c++11 -Wsign-compare
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
-
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
 CRAY_CFLAGS= -O3 -hfp3 -I./hdr -I./src/qvoronoi
 CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi
+
+CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
+CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
 
 
 # Save git commit in simple function
@@ -113,6 +117,7 @@ obj/utility/statistics.o \
 obj/utility/units.o \
 obj/utility/vmath.o\
 
+
 # Include supplementary makefiles
 include src/anisotropy/makefile
 include src/cells/makefile
@@ -120,6 +125,7 @@ include src/create/makefile
 include src/config/makefile
 include src/constants/makefile
 include src/dipole/makefile
+include src/environment/makefile
 include src/exchange/makefile
 include src/gpu/makefile
 include src/hamr/makefile
@@ -131,14 +137,15 @@ include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
+include src/qvoronoi/makefile
 include src/simulate/makefile
+include src/spinlattice/makefile
+include src/spintextures/makefile
 include src/spintransport/makefile
+include src/spinwaves/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
-include src/environment/makefile
-include src/qvoronoi/makefile
-include src/spinwaves/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
@@ -179,7 +186,7 @@ all: serial parallel vdc
 
 # Serial Targets
 serial: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS)  $(OBJECTS) $(LIBS) -o $(EXECUTABLE) -lfftw3
+	$(GCC) $(GCC_LDFLAGS)  $(OBJECTS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
@@ -235,7 +242,7 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(MPI_OBJECTS) $(LIBS) -o $(PEXECUTABLE) -lfftw3
+	$(MPICC) $(GCC_LDFLAGS) $(MPI_OBJECTS) $(LIBS) -o $(PEXECUTABLE)
 
 $(MPI_OBJECTS): obj/%_par.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
@@ -277,7 +284,7 @@ $(MPI_IBM_OBJECTS): obj/%_ibm_par.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $(OPTIONS) $<
 
 parallel-debug: $(MPI_GCCDB_OBJECTS)
-	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(PEXECUTABLE)-debug -lfftw3
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(PEXECUTABLE)-debug
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_par.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $(OPTIONS) $<

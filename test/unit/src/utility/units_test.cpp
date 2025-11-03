@@ -56,6 +56,7 @@ int stringerror(const std::string value, const std::string expected_value, const
          int ec = 0; // error count increment
 
          // call function to be tested
+         //convert is from vampire
          units::convert(test_unit, test_value, test_unit_type);
 
          // check for numerical error

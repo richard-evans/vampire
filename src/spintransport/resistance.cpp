@@ -65,7 +65,10 @@ void calculate_magnetoresistance(){
       //------------------------------------------------------------------------------------------------------
       // loop over all other cells in stack starting at cell start+1
       //------------------------------------------------------------------------------------------------------
-      for(unsigned int cell = start+1 ; cell < end ; cell++){
+      //for(unsigned int cell = start+1 ; cell < end ; cell++){
+      const int cell_inc = st::internal::cell_increment;
+      // slightly unsafe loop structure, but designed for allowing forward and backward loops starting one after the first cell
+      for(unsigned int cell = start + cell_inc ; cell != end + cell_inc ; cell += cell_inc){
 
          if(st::internal::magnetic[cell]){
             // calculate next cell reduced magnetization
@@ -128,8 +131,12 @@ void calculate_magnetoresistance(){
       //---------------------------------------------------------
       // Compute cell spin torque fields based on stack currents
       //---------------------------------------------------------
-      // loop over all other cells in stack starting at cell start+1
-      for(unsigned int cell = start+1 ; cell < end ; cell++){
+      // // old loop for positive current only
+      // for(unsigned int cell = start+1 ; cell < end ; cell++){
+      //---------------------------------------------------------
+      // loop over all other cells in stack
+      // slightly unsafe loop structure, but designed for allowing forward and backward loops starting one after the first cell
+      for(unsigned int cell = start + cell_inc ; cell != end + cell_inc ; cell += cell_inc){
          st::internal::cell_spin_torque_fields[3*cell+0] *= je;
          st::internal::cell_spin_torque_fields[3*cell+1] *= je;
          st::internal::cell_spin_torque_fields[3*cell+2] *= je;

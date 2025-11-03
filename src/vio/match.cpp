@@ -41,6 +41,7 @@
 #include "spintransport.hpp"
 #include "unitcell.hpp"
 #include "micromagnetic.hpp"
+#include "sld.hpp"
 #include "spinwaves.hpp" // JRH
 
 // vio module headers
@@ -94,6 +95,7 @@ namespace vin{
         else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(hamr::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(sld::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(spinwaves::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS; // JRH spinwaves input parameters
         //===================================================================
         // Test for create variables
@@ -1458,64 +1460,141 @@ namespace vin{
            output_list.push_back(72);
            return EXIT_SUCCESS;
         }
-        //--------------------------------------------------------------------
-        test="spin-temperature";
-        if(word==test){
+         //--------------------------------------------------------------------
+         test="spin-temperature";
+         if(word==test){
             stats::calculate_system_spin_temp = true;
             output_list.push_back(74);
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="mean-spin-temperature";
-        if(word==test){
+         }
+         //--------------------------------------------------------------------
+         test="mean-spin-temperature";
+         if(word==test){
             stats::calculate_system_spin_temp = true;
             output_list.push_back(75);
             return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="material-spin-temperature";
+         }
+         //--------------------------------------------------------------------
+         test="material-spin-temperature";
+         if(word==test){
+            stats::calculate_material_spin_temp = true;
+            output_list.push_back(77);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="material-mean-spin-temperature";
+         if(word==test){
+            stats::calculate_material_spin_temp = true;
+            output_list.push_back(76);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="mean-spin-length";
+         if(word==test){
+            // Set flags for calculation of spin length
+            stats::calculate_system_spin_length=true;
+            output_list.push_back(78);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="material-mean-spin-length";
+         if(word==test){
+            // Set flags for calculation of spin length
+            stats::calculate_material_spin_length=true;
+            output_list.push_back(79);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="mean-height-spin-length";
+         if(word==test){
+            // Set flags for calculation of spin length
+            stats::calculate_height_spin_length=true;
+            output_list.push_back(80);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="potential-energy";
+         if(word==test){
+            stats::calculate_system_sld_energy = true;
+            output_list.push_back(81);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="kinetic-energy";
+         if(word==test){
+            stats::calculate_system_sld_energy = true;
+            output_list.push_back(82);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="sld-exchange-energy";
+         if(word==test){
+            stats::calculate_system_sld_energy = true;
+            output_list.push_back(83);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="sld-coupling-energy";
+         if(word==test){
+            stats::calculate_system_sld_energy = true;
+            output_list.push_back(84);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="sld-total-energy";
+         if(word==test){
+            stats::calculate_system_sld_energy = true;
+            output_list.push_back(85);
+            return EXIT_SUCCESS;
+         }
+
+         //--------------------------------------------------------------------
+        test="mean-coupling-field-vec";
         if(word==test){
-           stats::calculate_material_spin_temp = true;
-           output_list.push_back(76);
-           return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="material-mean-spin-temperature";
-        if(word==test){
-           stats::calculate_material_spin_temp = true;
-           output_list.push_back(77);
-           return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="mean-spin-length";
-        if(word==test){
-           // Set flags for calculation of spin length
-           stats::calculate_system_spin_length=true;
-           output_list.push_back(78);
-           return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="material-mean-spin-length";
-        if(word==test){
-           // Set flags for calculation of spin length
-           stats::calculate_material_spin_length=true;
-           output_list.push_back(79);
-           return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="mean-height-spin-length";
-        if(word==test){
-           // Set flags for calculation of spin length
-           stats::calculate_height_spin_length=true;
-           output_list.push_back(80);
-           return EXIT_SUCCESS;
-        }
+        output_list.push_back(91);
+         return EXIT_SUCCESS;
+      }
+
+         //--------------------------------------------------------------------
+         //test="sld-total-spin-energy";
+         //if(word==test){
+         //   stats::calculate_system_sld_energy = true;
+         //   output_list.push_back(86);
+         //   return EXIT_SUCCESS;
+         //}
+         //--------------------------------------------------------------------
+         //lattice temperature statistics
+         //--------------------------------------------------------------------
+         test="lattice-temperature";
+         if(word==test){
+            stats::calculate_system_lattice_temp = true;
+            output_list.push_back(87);
+            return EXIT_SUCCESS;
+         }
+         test="mean-lattice-temperature";
+         if(word==test){
+            stats::calculate_system_lattice_temp = true;
+            output_list.push_back(88);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="material-lattice-temperature";
+         if(word==test){
+            stats::calculate_material_lattice_temp = true;
+            output_list.push_back(89);
+            return EXIT_SUCCESS;
+         }
+         //--------------------------------------------------------------------
+         test="material-mean-lattice-temperature";
+         if(word==test){
+            stats::calculate_material_lattice_temp = true;
+            output_list.push_back(90);
+            return EXIT_SUCCESS;
+         }
         //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
-            vout::gnuplot_array_format=true;
-            return EXIT_SUCCESS;
+           vout::gnuplot_array_format=true;
+           return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="output-rate";
@@ -1789,6 +1868,15 @@ namespace vin{
                 double damping=atof(value.c_str());
                 check_for_valid_positive_value(damping, word, line, prefix, unit, "none", 0.0, 10.0,"material","0.0 - 10.0");
                 read_material[super_index].alpha=damping;
+                return EXIT_SUCCESS;
+            }
+            //------------------------------------------------------------
+            else
+            test="equilibration-damping-constant";
+            if(word==test){
+                double damping=atof(value.c_str());
+                check_for_valid_positive_value(damping, word, line, prefix, unit, "none", 0.0, 10.0,"material","0.0 - 10.0");
+                read_material[super_index].alpha_eq=damping;
                 return EXIT_SUCCESS;
             }
             //------------------------------------------------------------
@@ -2347,6 +2435,7 @@ namespace vin{
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(sld::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found
