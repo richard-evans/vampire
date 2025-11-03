@@ -170,6 +170,12 @@ namespace program{
             program::program=73;
             return true;
          }
+         // JRH - Program option for spinwaves 
+         test="spin-waves";
+         if(value==test){
+            program::program=74;
+            return true;
+         }
          else{
             terminaltextcolor(RED);
             std::cout << word << '\t' << test << std::endl;

@@ -3,9 +3,11 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Jack Collings (2022), Sam Westmoreland and Richard Evans 2017. All
+//   rights reserved.
 //
 //   Email: sw766@york.ac.uk
+//          jbc525@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -24,7 +26,59 @@
 namespace anisotropy{
 
    //----------------------------------------------------------------------------
-   // function to initialize anisotropy module
+   // Function to take in two anisotropy basis vectors, check orthogonality,
+   // normalise them, and generate the last basis vector
+   //----------------------------------------------------------------------------
+
+   void set_anisotropy_vectors(  std::vector<double>& v1,
+                                 std::vector<double>& v2,
+                                 std::vector<double>& v3,
+                                 int mat){
+
+      // Set primary axis
+      double e1[3] = {v1[0], v1[1], v1[2]};
+      // Set secondary axis
+      double e2[3] = {v2[0], v2[1], v2[2]};
+
+      // Check that vectors are orthogonal
+      double e1dote2 = e1[0] * e2[0] + e1[1] * e2[1] + e1[2] * e2[2];
+      if (e1dote2 > 1e-9 || e1dote2 < -1e-9){
+         std::cerr << "Anisotropy basis vectors for material " << mat << " are not orthogonal. Exiting." << std::endl;
+         zlog << zTs() << "Anisotropy basis vectors for material " << mat << " are not orthogonal. Exiting" << std::endl;
+         err::vexit();
+      }
+
+      // Set final axis as cross product e1 ^ e2
+      double e3[3] = {e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]};
+
+      // Check for zero vectors
+      double mod_e1 = sqrt(e1[0] * e1[0] + e1[1] * e1[1] + e1[2] * e1[2]);
+      double mod_e2 = sqrt(e2[0] * e2[0] + e2[1] * e2[1] + e2[2] * e2[2]);
+      double mod_e3 = sqrt(e3[0] * e3[0] + e3[1] * e3[1] + e3[2] * e3[2]);
+
+      if (mod_e1 < 1e-9 || mod_e2 < 1e-9 || mod_e3 < 1e-9){
+         std::cerr << "Anisotropy basis vectors for material " << mat << " are too small. Exiting." << std::endl;
+         zlog << zTs() << "Anisotropy basis vectors for material " << mat << " are too small. Exiting" << std::endl;
+         err::vexit();
+      }
+
+      // Normalise vectors to unit length
+      v1[0] = e1[0] / mod_e1;
+      v1[1] = e1[1] / mod_e1;
+      v1[2] = e1[2] / mod_e1;
+
+      v2[0] = e2[0] / mod_e2;
+      v2[1] = e2[1] / mod_e2;
+      v2[2] = e2[2] / mod_e2;
+
+      v3[0] = e3[0] / mod_e3;
+      v3[1] = e3[1] / mod_e3;
+      v3[2] = e3[2] / mod_e3;
+
+   }
+
+   //----------------------------------------------------------------------------
+   // Function to initialize anisotropy module
    //----------------------------------------------------------------------------
    void initialize (const unsigned int   num_atoms, // number of atoms
                     std::vector<int>&    atom_material_array, // atoms::atom_type_array
@@ -35,13 +89,13 @@ namespace anisotropy{
       //---------------------------------------------------------------------
       // get number of materials for simulation
       //---------------------------------------------------------------------
-      int init_num_materials = internal::mp.size();
+      int init_num_materials = mp::num_materials; //internal::mp.size(); 30/04/24 JRH. Possible bug. num_materials was always being set to mp.size() which is 100. See line 107 of src/anisotropy/initialize.cpp
 
       // if no anisotropy constants initialised, then make sure anisotropy array is the correct size
       if(init_num_materials == 0) internal::mp.resize(mu_s_array.size());
 
       // set actual number of materials
-      const int num_materials = internal::mp.size();
+      const int num_materials = mp::num_materials; //internal::mp.size(); 30/04/24 JRH. Possible bug. num_materials was always being set to mp.size() which is 100. See line 107 of src/anisotropy/initialize.cpp
 
       // output informative message
       zlog << zTs() << "Initialising data structures for anisotropy calculation for " << num_materials << " materials" << std::endl;
@@ -67,20 +121,140 @@ namespace anisotropy{
          internal::ku2.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku2[m] = internal::mp[m].ku2 * inverse_mu_s[m];
       }
+      // Second order theta first order phi rotational
+      if(internal::enable_rotational_2_1_order){
+         internal::k2r1.resize(num_materials);
+         for(int m = 0; m < num_materials; m++) internal::k2r1[m] = internal::mp[m].k2r1 * inverse_mu_s[m];
+      }
+      // Second order theta first order phi odd rotational
+      if(internal::enable_rotational_2_1_order_odd){
+         internal::k2r1_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; m++) internal::k2r1_odd[m] = internal::mp[m].k2r1_odd * inverse_mu_s[m];
+      }
+      // Second order theta second order phi rotational
+      if(internal::enable_rotational_2_2_order){
+         internal::k2r2.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k2r2[m] = internal::mp[m].k2r2 * inverse_mu_s[m];
+      }
+      // Second order theta second order phi odd rotational
+      if(internal::enable_rotational_2_2_order_odd){
+         internal::k2r2_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k2r2_odd[m] = internal::mp[m].k2r2_odd * inverse_mu_s[m];
+      }
       // Fourth order uniaxial
       if(internal::enable_uniaxial_fourth_order){
          internal::ku4.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
       }
-      // Fourth order biaxial (simple version)
-      if(internal::enable_biaxial_fourth_order_simple){
-         internal::ku4.resize(num_materials);
-         for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
+      // Fourth order theta first order phi rotational
+      if(internal::enable_rotational_4_1_order){
+         internal::k4r1.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r1[m] = internal::mp[m].k4r1 * inverse_mu_s[m];
+      }
+      // Fourth order theta first order phi odd rotational
+      if(internal::enable_rotational_4_1_order_odd){
+         internal::k4r1_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r1_odd[m] = internal::mp[m].k4r1_odd * inverse_mu_s[m];
+      }
+      // Fourth order theta second order phi rotational
+      if(internal::enable_rotational_4_2_order){
+         internal::k4r2.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r2[m] = internal::mp[m].k4r2 * inverse_mu_s[m];
+      }
+      // Fourth order theta second order phi odd rotational
+      if(internal::enable_rotational_4_2_order_odd){
+         internal::k4r2_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r2_odd[m] = internal::mp[m].k4r2_odd * inverse_mu_s[m];
+      }
+      // Fourth order theta third order phi rotational
+      if(internal::enable_rotational_4_3_order){
+         internal::k4r3.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r3[m] = internal::mp[m].k4r3 * inverse_mu_s[m];
+      }
+      // Fourth order theta third order phi odd rotational
+      if(internal::enable_rotational_4_3_order_odd){
+         internal::k4r3_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r3_odd[m] = internal::mp[m].k4r3_odd * inverse_mu_s[m];
+      }
+      // Fourth order theta fourth order phi rotational
+      if(internal::enable_rotational_4_4_order){
+         internal::k4r4.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r4[m] = internal::mp[m].k4r4 * inverse_mu_s[m];
+      }
+      // Fourth order theta fourth order phi odd rotational
+      if(internal::enable_rotational_4_4_order_odd){
+         internal::k4r4_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k4r4_odd[m] = internal::mp[m].k4r4_odd * inverse_mu_s[m];
       }
       // Sixth order uniaxial
       if(internal::enable_uniaxial_sixth_order){
          internal::ku6.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::ku6[m] = internal::mp[m].ku6 * inverse_mu_s[m];
+      }
+      // Sixth order theta first order phi rotational
+      if(internal::enable_rotational_6_1_order){
+         internal::k6r1.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r1[m] = internal::mp[m].k6r1 * inverse_mu_s[m];
+      }
+      // Sixth order theta first order phi odd rotational
+      if(internal::enable_rotational_6_1_order_odd){
+         internal::k6r1_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r1_odd[m] = internal::mp[m].k6r1_odd * inverse_mu_s[m];
+      }
+      // Sixth order theta second order phi rotational
+      if(internal::enable_rotational_6_2_order){
+         internal::k6r2.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r2[m] = internal::mp[m].k6r2 * inverse_mu_s[m];
+      }
+      // Sixth order theta second order phi odd rotational
+      if(internal::enable_rotational_6_2_order_odd){
+         internal::k6r2_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r2_odd[m] = internal::mp[m].k6r2_odd * inverse_mu_s[m];
+      }
+      // Sixth order theta third order phi rotational
+      if(internal::enable_rotational_6_3_order){
+         internal::k6r3.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r3[m] = internal::mp[m].k6r3 * inverse_mu_s[m];
+      }
+      // Sixth order theta third order phi odd rotational
+      if(internal::enable_rotational_6_3_order_odd){
+         internal::k6r3_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r3_odd[m] = internal::mp[m].k6r3_odd * inverse_mu_s[m];
+      }
+      // Sixth order theta fourth order phi rotational
+      if(internal::enable_rotational_6_4_order){
+         internal::k6r4.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r4[m] = internal::mp[m].k6r4 * inverse_mu_s[m];
+      }
+      // Sixth order theta fourth order phi odd rotational
+      if(internal::enable_rotational_6_4_order_odd){
+         internal::k6r4_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r4_odd[m] = internal::mp[m].k6r4_odd * inverse_mu_s[m];
+      }
+      // Sixth order theta fifth order phi rotational
+      if(internal::enable_rotational_6_5_order){
+         internal::k6r5.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r5[m] = internal::mp[m].k6r5 * inverse_mu_s[m];
+      }
+      // Sixth order theta fifth order phi odd rotational
+      if(internal::enable_rotational_6_5_order_odd){
+         internal::k6r5_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r5_odd[m] = internal::mp[m].k6r5_odd * inverse_mu_s[m];
+      }
+      // Sixth order theta sixth order phi rotational
+      if(internal::enable_rotational_6_6_order){
+         internal::k6r6.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r6[m] = internal::mp[m].k6r6 * inverse_mu_s[m];
+      }
+      // Sixth order theta sixth order phi odd rotational
+      if(internal::enable_rotational_6_6_order_odd){
+         internal::k6r6_odd.resize(num_materials);
+         for(int m = 0; m < num_materials; ++m) internal::k6r6_odd[m] = internal::mp[m].k6r6_odd * inverse_mu_s[m];
+      }
+      // Fourth order biaxial (simple version)
+      if(internal::enable_biaxial_fourth_order_simple){
+         internal::ku4.resize(num_materials);
+         for(int m = 0; m < num_materials; m++) internal::ku4[m] = internal::mp[m].ku4 * inverse_mu_s[m];
       }
       // Fourth order cubic
       if(internal::enable_cubic_fourth_order || internal::enable_cubic_fourth_order_rotation){
@@ -91,11 +265,6 @@ namespace anisotropy{
       if(internal::enable_cubic_sixth_order){
          internal::kc6.resize(num_materials);
          for(int m = 0; m < num_materials; m++) internal::kc6[m] = internal::mp[m].kc6 * inverse_mu_s[m];
-      }
-      // Fourth order rotational
-      if(internal::enable_fourth_order_rotational){
-         internal::k4r.resize(num_materials);
-         for(int m = 0; m < num_materials; m++) internal::k4r[m] = internal::mp[m].k4r * inverse_mu_s[m];
       }
 
       //------------------------------------------------------------------------
@@ -202,6 +371,7 @@ namespace anisotropy{
                internal::ku4_triaxial_basis3z[mat] = 1;
 
             }
+
          }
 
          //---------------------------------------------------------------------
@@ -345,63 +515,46 @@ namespace anisotropy{
       }
 
       //---------------------------------------------------------------------
-      // initialise axes for each material
+      // Initialise anisotropy basis axes for each material
       //---------------------------------------------------------------------
+
       internal::ku_vector.resize(num_materials);
+      internal::kr_vector.resize(num_materials);
+      internal::kl_vector.resize(num_materials);
 
-      for(int m = 0; m < num_materials; m++){
+      // Loop through all materials
+      for(int m = 0; m < num_materials; ++m){
 
-         // unroll uniaxial easy axes
+         // Vectors defining the anisotropy basis directions
+
+         // Check orthogonality, set orthonormality and generate the last anisotropy vector
+         set_anisotropy_vectors(internal::mp[m].ku_vector, internal::mp[m].kr_vector, internal::mp[m].kl_vector, m);
+
+         // Uniaxial easy/hard [0,0,1] (z) axis
          internal::ku_vector[m].x = internal::mp[m].ku_vector[0];
          internal::ku_vector[m].y = internal::mp[m].ku_vector[1];
          internal::ku_vector[m].z = internal::mp[m].ku_vector[2];
 
+         // Rotational [1,0,0] (x) axis
+         internal::kr_vector[m].x = internal::mp[m].kr_vector[0];
+         internal::kr_vector[m].y = internal::mp[m].kr_vector[1];
+         internal::kr_vector[m].z = internal::mp[m].kr_vector[2];
+
+         // Last axis [0,1,0] (y) axis
+         internal::kl_vector[m].x = internal::mp[m].kl_vector[0];
+         internal::kl_vector[m].y = internal::mp[m].kl_vector[1];
+         internal::kl_vector[m].z = internal::mp[m].kl_vector[2];
+
       }
 
       //---------------------------------------------------------------------
-      // initialise rotated axis directions for each material
+      // Initialise cubic anisotropy basis axes for each material
       //---------------------------------------------------------------------
 
-      for(int mat = 0; mat < num_materials; mat++){
+      for(int mat = 0; mat < num_materials; ++mat){
 
-         // Vectors defining the easy axis in cubic anisotropy (Roberto was here)
-         double e1[3] = { internal::mp[mat].kc_vector1[0],
-                          internal::mp[mat].kc_vector1[1],
-                          internal::mp[mat].kc_vector1[2] };
-
-         double e2[3] = { internal::mp[mat].kc_vector2[0],
-                          internal::mp[mat].kc_vector2[1],
-                          internal::mp[mat].kc_vector2[2] };
-
-         // calculate e3 as vector product e1 ^ e2
-         double e3[3] = { (internal::mp[mat].kc_vector1[1]*internal::mp[mat].kc_vector2[2] - internal::mp[mat].kc_vector1[2]*internal::mp[mat].kc_vector2[1]),
-                          (internal::mp[mat].kc_vector1[2]*internal::mp[mat].kc_vector2[0] - internal::mp[mat].kc_vector1[0]*internal::mp[mat].kc_vector2[2]),
-                          (internal::mp[mat].kc_vector1[0]*internal::mp[mat].kc_vector2[1] - internal::mp[mat].kc_vector1[1]*internal::mp[mat].kc_vector2[0])};
-
-         // Calculate vector lengths
-         double mod_e1 = sqrt(e1[0]*e1[0] + e1[1]*e1[1] + e1[2]*e1[2]);
-         double mod_e2 = sqrt(e2[0]*e2[0] + e2[1]*e2[1] + e2[2]*e2[2]);
-         double mod_e3 = sqrt(e3[0]*e3[0] + e3[1]*e3[1] + e3[2]*e3[2]);
-
-         // check for zero vectors and exit with error
-         if(mod_e1 < 1e-9 || mod_e2 < 1e-9 || mod_e3 < 1e-9){
-            std::cerr << "Error! Rotated cubic anisotropy vectors for material " << mat << " are not orthogonal. Exiting" << std::endl;
-            zlog << zTs() << "Error! Rotated cubic anisotropy vectors for material " << mat << " are not orthogonal. Exiting" << std::endl;
-            err::vexit();
-         }
-
-         // normalise vectors to unit length
-         internal::mp[mat].kc_vector1[0] = e1[0] / mod_e1;
-         internal::mp[mat].kc_vector1[1] = e1[1] / mod_e1;
-         internal::mp[mat].kc_vector1[2] = e1[2] / mod_e1;
-
-         internal::mp[mat].kc_vector2[0] = e2[0] / mod_e2;
-         internal::mp[mat].kc_vector2[1] = e2[1] / mod_e2;
-         internal::mp[mat].kc_vector2[2] = e2[2] / mod_e2;
-
-         internal::mp[mat].kc_vector3[0] = e3[0] / mod_e3;
-         internal::mp[mat].kc_vector3[1] = e3[1] / mod_e3;
-         internal::mp[mat].kc_vector3[2] = e3[2] / mod_e3;
+         // Check orthogonality, set orthonormality, and generate the last anisotropy vector
+         set_anisotropy_vectors(internal::mp[mat].kc_vector1, internal::mp[mat].kc_vector2, internal::mp[mat].kc_vector3, mat);
 
       }
 

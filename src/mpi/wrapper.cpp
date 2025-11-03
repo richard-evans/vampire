@@ -149,7 +149,8 @@ void collate(std::vector<double>& input, std::vector<double>& output){
          disp += counts[p]; // add number of counts to be recieved
       }
       // Check output array is correct size on master to hold collated data, if not then exit disgracefully
-      if( output.size() != disp ){
+      const int op_size = output.size();
+      if( op_size != disp ){
          std::cerr << "Programmer error in vmpi::collate() due to output array being the wrong size." << std::endl;
          std::cerr << "\t Function call requires " << disp << " elements in output buffer which only has " << output.size() << " elements on master process" << std::endl;
          err::vexit();
@@ -215,7 +216,8 @@ void counts_and_displacements(std::vector<double>& input, std::vector<double>& o
          disp += counts[p]; // add number of counts to be recieved
       }
       // Check output array is correct size on master to hold collated data, if not then exit disgracefully
-      if( output.size() != disp ){
+      const int op_size = output.size();
+      if( op_size != disp ){
          std::cerr << "Programmer error in vmpi::collate() due to output array being the wrong size." << std::endl;
          std::cerr << "\t Function call requires " << disp << " elements in output buffer which only has " << output.size() << " elements on master process" << std::endl;
          err::vexit();

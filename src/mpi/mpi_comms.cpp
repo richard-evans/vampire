@@ -90,7 +90,7 @@ void mpi_init_halo_swap(){
 	//----------------------------------------------------------
 
 	vmpi::requests.resize(0);
-	MPI_Request req;
+	MPI_Request req = 0;
 
 	for (int p=0;p<vmpi::num_processors;p++){
 		if(vmpi::send_num_array[p]!=0){

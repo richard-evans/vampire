@@ -70,6 +70,7 @@ namespace unitcell{
             std::string cs=value;
             cs.erase(std::remove(cs.begin(), cs.end(), '\"'), cs.end());
             uc::internal::crystal_structure=cs;
+            uc::sw_crystal_structure=cs;
             return true;
          }
          //--------------------------------------------------------------------
@@ -222,7 +223,7 @@ namespace unitcell{
 
    // Overloaded match_input_parameter to take in functionalities with super and sub indicies
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line, int superIndex, int subIndex){
-      
+
       std::string prefix = "exchange";
       std::string test = "";
 
@@ -246,7 +247,7 @@ namespace unitcell{
             range_max.push_back(10000);
 
             vin::check_for_valid_vector(u, word, line, prefix, unit, "length", range_min, range_max, "input", "A = 0.0 - 10000, B = 0.001 - 100, C = -10000 - 10000");
-            
+
             // Set values
             internal::material_exchange_parameters[superIndex][subIndex].decay_multiplier = u.at(0);
             internal::material_exchange_parameters[superIndex][subIndex].decay_length = u.at(1);

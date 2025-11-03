@@ -35,10 +35,12 @@ void four_spin_exchange_fields(const int start_index, // first atom for exchange
                                std::vector<double>& field_array_y,
                                std::vector<double>& field_array_z){ // last +1 atom to be calculated){
 
-   std::vector < int > numbers(atoms::num_atoms,0);
+   //std::vector < int > numbers(atoms::num_atoms,0);
+
+   const int num_four_spin_neighbours = four_spin_neighbour_list_array_l.size();
 
    // loop over all neighbours
-	for(int nn = 0; nn < four_spin_neighbour_list_array_l.size(); ++nn){
+	for(int nn = 0; nn < num_four_spin_neighbours; ++nn){
 
       // get neighbouring atom number
    	const int atom = four_spin_neighbour_list_array_i[nn];

@@ -22,3 +22,6 @@ timestamp.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/vio/,$(vio_objects))
+
+# Add specific options for qvoronoi
+obj/vio/nullify%.o : OPTIONS = -w

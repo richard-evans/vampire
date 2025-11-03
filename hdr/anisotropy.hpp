@@ -3,9 +3,10 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland 2016. All rights reserved.
+//   (c) Jack Collings and Sam Westmoreland 2016. All rights reserved.
 //
 //   Email: sw766@york.ac.uk
+//          jbc525@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -26,6 +27,15 @@
 //--------------------------------------------------------------------------------
 namespace anisotropy
 {
+   //-----------------------------------------------------------------------------
+   // Function to check orthogonality, set orthonormality and generate last
+   // last anisotropy vector
+   //-----------------------------------------------------------------------------
+   void set_anisotropy_vectors(  std::vector<double>& v1, 
+                                 std::vector<double>& v2,
+                                 std::vector<double>& v3,
+                                 int mat);
+
    //-----------------------------------------------------------------------------
    // function to initialize anisotropy module
    //-----------------------------------------------------------------------------
@@ -57,11 +67,37 @@ namespace anisotropy
    //-----------------------------------------------------------------------------
    double get_anisotropy_constant(const int material);
    double get_ku2(const int material);
+   double get_k2r1(const int material);
+   double get_k2r1_odd(const int material);
+   double get_k2r2(const int material);
+   double get_k2r2_odd(const int material);
    double get_ku4(const int material);
+   double get_k4r1(const int material);
+   double get_k4r1_odd(const int material);
+   double get_k4r2(const int material);
+   double get_k4r2_odd(const int material);
+   double get_k4r3(const int material);
+   double get_k4r3_odd(const int material);
+   double get_k4r4(const int material);
+   double get_k4r4_odd(const int material);
    double get_ku6(const int material);
+   double get_k6r1(const int material);
+   double get_k6r1_odd(const int material);
+   double get_k6r2(const int material);
+   double get_k6r2_odd(const int material);
+   double get_k6r3(const int material);
+   double get_k6r3_odd(const int material);
+   double get_k6r4(const int material);
+   double get_k6r4_odd(const int material);
+   double get_k6r5_odd(const int material);
+   double get_k6r5(const int material);
+   double get_k6r6(const int material);
+   double get_k6r6_odd(const int material);
    double get_kc4(const int material);
    double get_kc6(const int material);
    std::vector<double> get_ku_vector(const int material);
+   std::vector<double> get_kr_vector(const int material);
+   std::vector<double> get_kl_vector(const int material);
 
    //-----------------------------------------------------------------------------
    // function to identify surface atoms

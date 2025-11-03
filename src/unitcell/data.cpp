@@ -23,6 +23,7 @@ namespace unitcell{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
+   std::string sw_crystal_structure=""; // JRH externally visible variable for crystal structure for spinwaves path
 
    namespace internal{
 

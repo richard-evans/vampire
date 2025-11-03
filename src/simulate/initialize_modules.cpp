@@ -18,6 +18,7 @@
 #include "create.hpp"
 #include "dipole.hpp"
 #include "hamr.hpp"
+#include "spinwaves.hpp" // jrh
 #include "ltmp.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
@@ -139,7 +140,7 @@ void initialize_modules(){
                               cs::non_magnetic_atoms_array);
 
    //----------------------------------------
-   // Initialise hamr module 
+   // Initialise hamr module
    //----------------------------------------
 	hamr::initialize(sim::Hmin,
 				      sim::Hmax,
@@ -153,6 +154,25 @@ void initialize_modules(){
 				      atoms::z_coord_array,
 				      atoms::type_array,
 				      atoms::num_atoms
+					   );
+
+   //----------------------------------------
+   // Initialise spinwaves module
+   // jrh
+   //----------------------------------------
+	spinwaves::initialize(cs::system_dimensions[0],
+                         cs::system_dimensions[1],
+                         cs::system_dimensions[2],
+                         cs::total_num_unit_cells[0],
+                         cs::total_num_unit_cells[1],
+                         cs::total_num_unit_cells[2],
+                         cs::unit_cell.dimensions[0],
+                         cs::unit_cell.dimensions[1],
+                         cs::unit_cell.dimensions[2],
+                         cs::unit_cell.atom,
+                         atoms::x_coord_array,
+                         atoms::y_coord_array,
+                         atoms::z_coord_array
 					   );
 
    return;

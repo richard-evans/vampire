@@ -49,6 +49,13 @@ namespace anisotropy{
       //  direction is shared with the other uniaxial anisotropy coefficients.
       //
       //---------------------------------------------------------------------------------
+
+      // Define useful constants
+      const double two_o_eleven = 2.0 / 11.0;
+      const double thirtythree = 33.0;
+      const double thirty = 30.0;
+      const double five = 5.0;
+
       void uniaxial_sixth_order_fields(std::vector<double>& spin_array_x,
                                        std::vector<double>& spin_array_y,
                                        std::vector<double>& spin_array_z,
@@ -61,12 +68,6 @@ namespace anisotropy{
 
          // if not enabled then do nothing
          if(!internal::enable_uniaxial_sixth_order) return;
-
-         // constant factors
-         const double oneo16 = 1.0/16.0;
-
-         // rescaling prefactor
-         const double scale = oneo16 * 2.0/3.0; // Factor to rescale anisotropies to usual scale
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -82,18 +83,18 @@ namespace anisotropy{
             const double ey = internal::ku_vector[mat].y;
             const double ez = internal::ku_vector[mat].z;
 
+            const double sdote  = sx * ex + sy * ey + sz * ez;
+            const double sdote2 = sdote * sdote;
+            const double sdote4 = sdote2 * sdote2;
+
             // get reduced anisotropy constant ku/mu_s
             const double ku6 = internal::ku6[mat];
 
-            const double sdote  = (sx*ex + sy*ey + sz*ez);
-            const double sdote3 = sdote*sdote*sdote;
-            const double sdote5 = sdote3*sdote*sdote;
+            const double fullz = two_o_eleven * ku6 * sdote * ( thirtythree * sdote4 - thirty * sdote2 + five );
 
-            const double k6 = scale*ku6*(1386.0*sdote5 - 1260.0*sdote3 + 210.0*sdote);
-
-            field_array_x[atom] += ex*k6;
-            field_array_y[atom] += ey*k6;
-            field_array_z[atom] += ez*k6;
+            field_array_x[atom] += ex * fullz;
+            field_array_y[atom] += ey * fullz;
+            field_array_z[atom] += ez * fullz;
 
          }
 
@@ -103,26 +104,31 @@ namespace anisotropy{
 
       //---------------------------------------------------------------------------------
       // Function to add sixth order uniaxial anisotropy
-      // E = 2/3 * - (1/16) * (231sz^6 - 315*sz^4 + 105sz^2 - 5)
+      // E = -ku6(cos^6{theta} - (15/11)cos^4{theta} + (5/11)cos^2{theta})
       //---------------------------------------------------------------------------------
+
+      // Define useful constants
+      const double fiveoeleven = five / 11.0;
+      const double fifteenoeleven = 3.0 * fiveoeleven;
+
       double uniaxial_sixth_order_energy(const int atom,
                                          const int mat,
                                          const double sx,
                                          const double sy,
                                          const double sz){
 
-         // get reduced anisotropy constant ku/mu_s (Tesla)
-         const double ku6 = internal::ku6[mat];
-
          const double ex = internal::ku_vector[mat].x;
          const double ey = internal::ku_vector[mat].y;
          const double ez = internal::ku_vector[mat].z;
 
-         const double sdote  = (sx*ex + sy*ey + sz*ez);
-         const double sdote2 = sdote*sdote;
+         const double sdote  = sx * ex + sy * ey + sz * ez;
+         const double sdote2 = sdote * sdote;
+         const double sdote4 = sdote2 * sdote2;
 
-         // factor = 2/3 * -1/16 = -1/6 = -0.04166666666
-         return -0.04166666666*ku6*(231.0*sdote2*sdote2*sdote2 - 315.0*sdote2*sdote2 + 105.0*sdote2);
+         // get reduced anisotropy constant ku/mu_s (Tesla)
+         const double ku6 = internal::ku6[mat];
+
+         return - ku6 * (sdote2 * sdote4 - fifteenoeleven * sdote4 + fiveoeleven * sdote2);
 
       }
 

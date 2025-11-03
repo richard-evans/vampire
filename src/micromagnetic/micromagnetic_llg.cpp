@@ -196,7 +196,8 @@ namespace micromagnetic{
       // For parallel version set arrays to large negative number every time
       // to allow parallel reduction to work (MPI_MAX always picks in positive order)
       #ifdef MPICF
-         for(int cell=0; cell< x_spin_storage_array.size(); cell++){
+         const int ssa_size = x_spin_storage_array.size();
+         for(int cell=0; cell < ssa_size; cell++){
             x_spin_storage_array[cell] = 0.0;
             y_spin_storage_array[cell] = 0.0;
             z_spin_storage_array[cell] = 0.0;
@@ -256,7 +257,8 @@ namespace micromagnetic{
       // For parallel version set arrays to large negative number every time
       // to allow parallel reduction to work
       #ifdef MPICF
-         for(int cell=0; cell< x_array.size(); cell++){
+         const int ca_size = x_array.size();
+         for(int cell=0; cell< ca_size; cell++){
             x_array[cell] = 0.0;
             y_array[cell] = 0.0;
             z_array[cell] = 0.0;

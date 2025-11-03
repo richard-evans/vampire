@@ -78,7 +78,8 @@ void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<c
          double min_range = 1.e123;
 
          // loop over all ranges and determine minimum and cpu location
-         for(int i=0; i<ranges.size(); i++){
+         const int ranges_size = ranges.size();
+         for(int i = 0; i < ranges_size; i++){
             if(ranges[i] < min_range){
                min_range = ranges[i];
                rank_of_min_range = i;

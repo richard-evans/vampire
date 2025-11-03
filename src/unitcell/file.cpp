@@ -149,8 +149,9 @@ namespace unitcell{
          ofile << "#-----------------------------------------------------------------------------------------" << std::endl;
          ofile << "# Total number of atoms; atom id, cx cy cz, material, lattice category, height category" << std::endl;
          ofile << "#-----------------------------------------------------------------------------------------" << std::endl;
-         ofile << uc.atom.size() << std::endl;
-         for(int a = 0 ; a < uc.atom.size() ; a++ ){
+         const int uc_atom_size = uc.atom.size();
+         ofile << uc_atom_size << std::endl;
+         for(int a = 0 ; a < uc_atom_size ; a++ ){
             ofile << fw(a) << "\t" << fw(uc.atom[a].x) << "\t" << fw(uc.atom[a].y) << "\t" << fw(uc.atom[a].z) << "\t" <<
                      fw5(uc.atom[a].mat) << "\t" << fw5(uc.atom[a].lc) << "\t" << fw5(uc.atom[a].hc) << std::endl;
          }

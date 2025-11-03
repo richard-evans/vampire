@@ -42,13 +42,15 @@ namespace cat{
 		// energy and torque variables
 		double torque;
 		double mean_torque;
-		double spin_temp;
-      double mean_spin_temp;
 		double energy;
 
 		// constraint variables
 		double theta;
 		double phi;
+
+		// spin temperature variables
+		double spin_temp;
+		double mean_spin_temp;
 
 		// member functions
 		category_t(); /// constructor

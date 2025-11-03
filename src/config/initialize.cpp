@@ -111,7 +111,7 @@ namespace config{
 
                // calculate linear integer and 3 vector buffer offsets for my_rank
                uint64_t rank_offset = 0;
-               for(unsigned int p=0; p < vmpi::my_rank; p++){
+               for(int p=0; p < vmpi::my_rank; p++){
                   rank_offset += atoms_per_processor[p];
                }
 

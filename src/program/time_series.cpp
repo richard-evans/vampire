@@ -22,6 +22,7 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
+#include "spinwaves.hpp" // JRH
 
 namespace program{
 

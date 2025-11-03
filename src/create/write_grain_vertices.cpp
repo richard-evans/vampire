@@ -34,8 +34,10 @@ void create::internal::write_grain_vertices(int id, double dx, double dy, std::o
    // write number of vertices
    ofile << vertices.size() << "\t";
 
+   const int num_vertices = vertices.size();
+
    // write vertices
-   for(int i = 0; i < vertices.size(); i++){
+   for(int i = 0; i < num_vertices; i++){
       ofile << vertices[i][0]+dx << "\t" << vertices[i][1]+dy << "\t";
    }
    ofile << std::endl;

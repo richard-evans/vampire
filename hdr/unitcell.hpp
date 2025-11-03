@@ -29,6 +29,8 @@ namespace unitcell{
    //---------------------------------------------------------------------------
    // Unit cell atom class definition
    //---------------------------------------------------------------------------
+   extern std::string sw_crystal_structure; // JRH externally visible crystal structure for spinwaves path
+
    class atom_t {
 	public:
       double x; /// atom x-coordinate

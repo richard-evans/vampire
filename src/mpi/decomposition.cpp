@@ -135,11 +135,12 @@ namespace vmpi{
       //------------------------------------------------------------------------
       if(vmpi::my_rank==0){
 
-         for(int i = 0; i< mdg.size(); i++){
+         const int mdg_size = mdg.size();
+         for(int i = 0; i< mdg_size; i++){
 
             const double value = mdg[i];
 
-            for(int j = 0; j< mdg.size(); j++){
+            for(int j = 0; j< mdg_size; j++){
 
                // calculate absolute numerical diff in value
                const double diff = fabs(mdg[j] - value);

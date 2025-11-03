@@ -506,8 +506,8 @@ namespace spin_transport{
             spin_transport::internal::last_stack = st::internal::num_stacks;
          }
          // check for more processors than stacks, if so allocate one stack per processor
-         if( st::internal::num_stacks < vmpi::num_processors ){
-            if( vmpi::my_rank < st::internal::num_stacks){
+         if( st::internal::num_stacks < static_cast<unsigned int>(vmpi::num_processors) ){
+            if( static_cast<unsigned int>(vmpi::my_rank) < st::internal::num_stacks){
                spin_transport::internal::first_stack = vmpi::my_rank;
                spin_transport::internal::last_stack  = vmpi::my_rank + 1;
             }

@@ -539,6 +539,14 @@ int run(){
 			}
 			program::boltzmann_dist_micromagnetic_llg();
 			break;
+		// JRH call spin_waves program -------------------------------------------
+		case 74:
+			if(vmpi::my_rank==0){
+				std::cout << "Spin-waves..." << std::endl;
+				zlog << "Spin-waves..." << std::endl;
+			}
+			program::spin_waves();
+			break;
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
 			zlog << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
@@ -720,6 +728,30 @@ void integrate_serial(uint64_t n_steps){
 			}
 			break;
 
+		case sim::lsf: // LSF
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sim::internal::lsf_step();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case 7: // LSF Monte Carlo
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				montecarlo::lsf_mc_step();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case sim::lsf_rk4: // LSF-RK4
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sim::internal::lsf_rk4_step();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
          err::vexit();
@@ -827,6 +859,52 @@ int integrate_mpi(uint64_t n_steps){
 				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				terminaltextcolor(WHITE);
 				err::vexit();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case 6: // LSF
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+			// Select CUDA version if supported
+				#ifdef CUDA
+					//sim::LSF_cuda();
+				#else
+					sim::LSF_mpi();
+				#endif
+			#endif
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case 7: // LSF-Montecarlo
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				#ifdef MPICF
+					if(montecarlo::lsf_mc_parallel_initialized == false) {
+						montecarlo::lsf_mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+																	vmpi::min_dimensions, vmpi::max_dimensions);
+					}
+					montecarlo::lsf_mc_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+																atoms::type_array);
+					#endif
+
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case 8: // LSF-RK4
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+			// Select CUDA version if supported
+				#ifdef CUDA
+					//sim::LSF_RK4_cuda();
+				#else
+					sim::LSF_RK4_mpi();
+				#endif
+			#endif
 				// increment time
 				sim::internal::increment_time();
 			}

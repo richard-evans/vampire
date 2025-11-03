@@ -82,8 +82,7 @@ namespace vout{
          mean_magnetisation_length,
          mean_specific_heat,
          mean_susceptibility,
-         mean_torque,
-         mean_spin_temp
+         mean_torque
       };
 
       // internal variables
@@ -185,6 +184,9 @@ namespace vout{
    void current(std::ostream& stream, bool header);
    void domain_wall_position(std::ostream& stream,bool header);
    void MRresistance(std::ostream& stream, bool header);
+   void mean_system_spin_length(std::ostream& stream,bool header);
+   void mean_material_spin_length(std::ostream& stream,bool header);
+   void mean_height_spin_length(std::ostream& stream,bool header);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp

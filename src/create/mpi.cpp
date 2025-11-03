@@ -345,7 +345,8 @@ namespace create{
       }}}*/
 
       for(int cpu=0;cpu<vmpi::num_processors;cpu++){
-         for(int vpidx=0; vpidx<virtual_particle_array[cpu].size(); vpidx++){
+         const int vpa_size = virtual_particle_array[cpu].size();
+         for(int vpidx = 0; vpidx < vpa_size; vpidx++){
             send_mpi_atom_num_array[counter]           = virtual_particle_array[cpu][vpidx].atom;
             send_coord_array[3*counter+0]              = virtual_particle_array[cpu][vpidx].x;
             send_coord_array[3*counter+1]              = virtual_particle_array[cpu][vpidx].y;
@@ -468,7 +469,8 @@ namespace create{
       if(err::check==true){std::cout << "vmpi::set_replicated_data has been called" << std::endl;}
 
       // check for num_atoms > num_CPUS
-      if(catom_array.size()<vmpi::num_processors){
+      const int catom_size = catom_array.size();
+      if( catom_size < vmpi::num_processors ){
          terminaltextcolor(RED);
          std::cerr << "Error! - number of atoms is less than number of CPUs - replicated data parallelisation is not possible!" << std::endl;
          terminaltextcolor(WHITE);

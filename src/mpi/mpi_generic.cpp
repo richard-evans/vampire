@@ -162,10 +162,11 @@ int finalise(){
 			WaitTimesOFS.open("MPI-wait-times");
 
 			// Column Row format
-			for(int idx=0;idx<WaitTimeArray.size();idx++){
+			const int wta_size = WaitTimeArray.size();
+			for(int idx=0;idx<wta_size;idx++){
 				WaitTimesOFS << idx << "\t";
 				for(int p=0;p<vmpi::num_processors;p++){
-					WaitTimesOFS << AllTimes.at(idx+p*WaitTimeArray.size()) << "\t";
+					WaitTimesOFS << AllTimes.at(idx+p*wta_size) << "\t";
 				}
 				WaitTimesOFS << std::endl;
 			}
@@ -178,11 +179,12 @@ int finalise(){
 			std::ofstream ComputeTimesOFS;
 			ComputeTimesOFS.open("MPI-compute-times");
 
+			const int cta_size = ComputeTimeArray.size();
 			// Column Row format
-			for(int idx=0;idx<ComputeTimeArray.size();idx++){
+			for(int idx=0;idx<cta_size;idx++){
 				ComputeTimesOFS << idx << "\t";
 				for(int p=0;p<vmpi::num_processors;p++){
-					ComputeTimesOFS << AllTimes.at(idx+p*ComputeTimeArray.size()) << "\t";
+					ComputeTimesOFS << AllTimes.at(idx+p*cta_size) << "\t";
 				}
 				ComputeTimesOFS << std::endl;
 			}

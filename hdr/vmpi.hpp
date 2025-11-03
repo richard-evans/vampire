@@ -106,7 +106,7 @@ namespace vmpi{
 	extern void initialise(int argc, char *argv[]);
 	extern int hosts();
 	extern int finalise();
-   extern void geometric_decomposition(int, double []);
+	extern void geometric_decomposition(int, double [3]);
 	extern double SwapTimer(double, double&);
 
    // functions for sending/receiving halo data

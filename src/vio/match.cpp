@@ -41,6 +41,8 @@
 #include "spintransport.hpp"
 #include "unitcell.hpp"
 #include "micromagnetic.hpp"
+#include "spinwaves.hpp" // JRH
+
 // vio module headers
 #include "internal.hpp"
 #include "../create/internal.hpp"
@@ -92,6 +94,7 @@ namespace vin{
         else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(hamr::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(spinwaves::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS; // JRH spinwaves input parameters
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -1482,6 +1485,30 @@ namespace vin{
         if(word==test){
            stats::calculate_material_spin_temp = true;
            output_list.push_back(77);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="mean-spin-length";
+        if(word==test){
+           // Set flags for calculation of spin length
+           stats::calculate_system_spin_length=true;
+           output_list.push_back(78);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-spin-length";
+        if(word==test){
+           // Set flags for calculation of spin length
+           stats::calculate_material_spin_length=true;
+           output_list.push_back(79);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="mean-height-spin-length";
+        if(word==test){
+           // Set flags for calculation of spin length
+           stats::calculate_height_spin_length=true;
+           output_list.push_back(80);
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------

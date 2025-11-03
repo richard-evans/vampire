@@ -201,7 +201,8 @@ namespace internal{
          for ( int p = 0; p < vmpi::num_processors; p++){
             //std::cerr << "Rank " << vmpi::my_rank << " cells to send " << cell_ids_to_send[p].size() << "to proc " << p << "\n";
             // loop over all cells to send to processor p
-            for(int id = 0; id < cell_ids_to_send[p].size(); id+=2){
+            const int num_to_send = cell_ids_to_send[p].size();
+            for(int id = 0; id < num_to_send; id+=2){
 
                const int cell = cell_ids_to_send[p][id]; // get cell ID
 
@@ -504,7 +505,8 @@ namespace internal{
 
          // loop over all cells and place into temporary 2D storage
          int count=0;
-         for ( int i = 0; i < recv_cell_data.size()/2 ; i++){
+         const int num_to_recv = recv_cell_data.size()/2;
+         for ( int i = 0; i < num_to_recv ; i++){
             const int cellID = recv_cell_data[2*i+0]; // get global cell ID
             const int cell_index = cellID - my_first_cell; // convert to cell index on local processor
             const int num_atoms = recv_cell_data[2*i+1]; // get number of atoms associated with this cell
@@ -528,11 +530,9 @@ namespace internal{
          //int index=0;
                   std::stringstream textssh;
          for(int cell=0; cell<my_num_cells; cell++){
-
-
-
+            const int ol_count = ordered_cells_atoms_list_2D[cell].size()/4;
             // check total atom counts for each cell agree with global number
-            if( ordered_cells_atoms_list_2D[cell].size()/4 != global_atoms_in_cell_count[my_first_cell + cell]){
+            if( ol_count != global_atoms_in_cell_count[my_first_cell + cell]){
                std::cerr << "Programmer error on rank " << vmpi::my_rank << " in accumulation of atomic posisitions in cells. Expecting ";
                std::cerr << global_atoms_in_cell_count[my_first_cell + cell] << " but only have " << ordered_cells_atoms_list_2D[cell].size() << std::endl;
             }
@@ -592,7 +592,8 @@ namespace internal{
 
          std::stringstream textssk;
          //textssk << "Rank " << vmpi::my_rank << " " << list_of_cells_i_need.size() << " cells i need : ";
-         for( int i = 0; i < list_of_cells_i_need.size() ; i++ ){
+         const int nc_i_need = list_of_cells_i_need.size();
+         for( int i = 0; i < nc_i_need ; i++ ){
 
             // get global cell number
             const int cell = list_of_cells_i_need[i];
@@ -603,7 +604,7 @@ namespace internal{
             const int location = cell_location_list[cell];
 
             // increment cell and atom counters
-            num_cells_to_recv[location] ++;
+            num_cells_to_recv[location]++;
             num_atoms_to_recv[location] += global_atoms_in_cell_count[cell];
 
             // save cell in processor ordered list
@@ -820,7 +821,8 @@ namespace internal{
             // buffer index counter to keep track of which atoms have been extracted (reset for each CPU)
             int buff_index = 0;
 
-            for( int i = 0; i < cells_i_need_from_cpu[cpu].size(); i++ ){
+            const int nc_i_need = cells_i_need_from_cpu[cpu].size();
+            for( int i = 0; i < nc_i_need; i++ ){
 
                // get cell ID in order to find number of atoms to unpack
                const int cell = cells_i_need_from_cpu[cpu][i];
