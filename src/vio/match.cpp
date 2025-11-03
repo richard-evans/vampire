@@ -1546,6 +1546,14 @@ namespace vin{
             output_list.push_back(85);
             return EXIT_SUCCESS;
          }
+
+         //--------------------------------------------------------------------
+        test="mean-coupling-field-vec";
+        if(word==test){
+        output_list.push_back(91);
+         return EXIT_SUCCESS;
+      }
+
          //--------------------------------------------------------------------
          //test="sld-total-spin-energy";
          //if(word==test){

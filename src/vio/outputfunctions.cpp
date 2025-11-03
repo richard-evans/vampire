@@ -23,7 +23,8 @@
 #include "micromagnetic.hpp"
 #include "spintransport.hpp"
 #include "sld.hpp"
-
+#include "atoms.hpp"
+#include "../spinlattice/internal.hpp"
 // vio module headers
 #include "internal.hpp"
 
@@ -40,6 +41,40 @@ namespace vout{
       }
       return result.str();
     }
+
+    // New Output Function for Mean Perpendicular Coupling Field
+
+    void mean_coupling_field_vec(std::ostream& stream, bool header){
+
+      if(header){
+        stream << generic_output_double("Mean_Hc_x(T)", 0.0, header);
+        stream << generic_output_double("Mean_Hc_y(T)", 0.0, header);
+        stream << generic_output_double("Mean_Hc_z(T)", 0.0, header);
+         return;
+      }
+
+      double sum_hx = 0.0, sum_hy = 0.0, sum_hz = 0.0;
+      for (int i = 0; i < atoms::num_atoms; ++i) {
+         sum_hx += sld::internal::coupling_field_x[i];
+         sum_hy += sld::internal::coupling_field_y[i];
+         sum_hz += sld::internal::coupling_field_z[i];
+      }
+
+      double mean_hx = 0.0, mean_hy = 0.0, mean_hz = 0.0;
+      if (atoms::num_atoms > 0) {
+         double n_atoms_double = static_cast<double>(atoms::num_atoms);
+         mean_hx = sum_hx / n_atoms_double;
+         mean_hy = sum_hy / n_atoms_double;
+         mean_hz = sum_hz / n_atoms_double;
+      }
+      
+      stream << generic_output_double("", mean_hx, header);
+      stream << generic_output_double("", mean_hy, header);
+      stream << generic_output_double("", mean_hz, header);
+   }
+
+
+
     //--------------------------------------------------------------------------
     // Function to format a standard double variable including a file header
     //--------------------------------------------------------------------------
