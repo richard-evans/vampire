@@ -137,6 +137,7 @@ include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
+include src/quantum/makefile
 include src/qvoronoi/makefile
 include src/simulate/makefile
 include src/spinlattice/makefile

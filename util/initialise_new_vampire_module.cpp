@@ -60,7 +60,7 @@ int main(int argc, char* argv[]){
    std::string namespace_name="";
    std::string author="";
    std::string email="";
-   std::string year="2018";
+   std::string year="2025";
 
    // determine namespace name, author and email from command line
    process_command_line(argc, argv, namespace_name, author, email, year);
