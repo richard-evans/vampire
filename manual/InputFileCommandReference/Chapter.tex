@@ -394,6 +394,7 @@ The following commands control the simulation, including the program, maximum te
   \item[] constrained-monte-carlo
   \item[] hybrid-constrained-monte-carlo
   \item[] suzuki-trotter
+  \item[] llg-quantum
 \end{itemize}
 
 {\zicf sim:program = exclusive string}\phantomsection\addcontentsline{toc}{subsection}{sim:program} Defines the simulation program to be used.
@@ -650,6 +651,15 @@ Defines the pulse linear fall time in the program \textit{electrical-pulse} with
  {\zicf sim:field-pulse-time = float [default $1.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:field-pulse-time}
  Defines the pulse time in the program \textit{field-pulse} with default
  units of seconds and a default pulse time of 1 ns.
+
+{\zicf sim:noise-type = string [default: classical]}\phantomsection\addcontentsline{toc}{subsection}{sim:noise-type}
+This keyword selects the thermostat that determines the statistical properties of the thermal noise field.
+\begin{itemize}
+    \item \texttt{classical}: Uses the classical thermostat, $\Theta_{cl}(\omega,T) = 2k_B T / (\hbar\omega)$. This option reproduces the behavior of the standard stochastic Landau-Lifshitz-Gilbert equation with white noise.
+    \item \texttt{quantum}: Implements the full quantum thermostat, $\Theta_{qu}(\omega,T) = \coth(\hbar\omega / 2k_B T)$. This thermostat includes quantum zero-point fluctuations, which results in a magnetization that is less than unity even at a temperature of 0~K.
+    \item \texttt{semiquantum}: \textbf{(Recommended)} Uses the "quantum no-zero" thermostat, $\Theta_{qnz}(\omega,T) = \coth(\hbar\omega / 2k_B T) - 1$. This approach correctly captures quantum effects at low temperatures while removing the zero-point fluctuations, ensuring the magnetization is fully saturated at 0~K.
+\end{itemize}
+
 
 \section*{Data output}
 \phantomsection\addcontentsline{toc}{section}{Data output}

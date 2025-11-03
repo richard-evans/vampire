@@ -156,7 +156,7 @@ namespace sim{
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int noise_type = 0; // set noise type for quantum thermostat
+	int noise_type=0;
 
 	bool local_temperature=false; /// flag to enable material specific temperature
 	bool local_applied_field=false; /// flag to enable material specific applied field
@@ -801,6 +801,7 @@ void integrate_serial(uint64_t n_steps){
 ///=====================================================================================
 ///
 int integrate_mpi(uint64_t n_steps){
+	
 
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_mpi has been called" << std::endl;
@@ -874,6 +875,21 @@ int integrate_mpi(uint64_t n_steps){
 				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				terminaltextcolor(WHITE);
 				err::vexit();
+				// increment time
+				sim::internal::increment_time();
+			}
+			break;
+
+		case 5: // LLG Quantum step
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+			// Select CUDA version if supported
+				#ifdef CUDA
+					//sim::LLG_Midpoint_cuda_mpi();
+				#else
+					sim::llg_quantum_mpi_step();
+				#endif
+			#endif
 				// increment time
 				sim::internal::increment_time();
 			}

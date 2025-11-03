@@ -160,7 +160,7 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 
-	extern int noise_type; // noise type parameter for quantum thermostat
+	extern int noise_type;
 
 	extern integrator_t integrator; // variable to specify integrator
 	extern int program;
@@ -204,6 +204,7 @@ namespace sim{
 	extern int LLG_Midpoint_cuda();
 	extern int LSF_mpi();
 	extern int LSF_RK4_mpi();
+	extern int llg_quantum_mpi_step();
 
 	// Integrator initialisers
 	extern int LLGinit();

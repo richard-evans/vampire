@@ -100,6 +100,43 @@ namespace sim{
       extern void lsf_rk4_step();
 
    } // end of internal namespace
+
+   namespace LLGQ_arrays{
+
+   //---------------------------------------------------------------------------
+   // Local arrays and variables
+   //---------------------------------------------------------------------------
+
+   // Auxiallary variables
+   extern std::vector <double> x_w_array;
+   extern std::vector <double> y_w_array;
+   extern std::vector <double> z_w_array;
+   extern std::vector <double> x_v_array;
+   extern std::vector <double> y_v_array;
+   extern std::vector <double> z_v_array;
+
+   // Storage arrays for RK4
+   extern std::vector<std::vector<double>> k1_storage;
+   extern std::vector<std::vector<double>> k2_storage;
+   extern std::vector<std::vector<double>> k3_storage;
+   extern std::vector<std::vector<double>> k4_storage;
+   extern std::vector<std::vector<double>> y_pred_storage;
+   extern std::vector<std::vector<double>> y_in_storage;
+
+   // Arrays for noise generation (now storing coarse-grained noise)
+   extern std::vector<double> coarse_noise_field;
+   extern std::vector<double> sqrt_PSD_buffer; // Restored buffer
+   extern double noise_index;
+   extern int M_decimation;    //< Decimation factor for noise interpolation
+
+   // Indices for random fields
+   extern std::vector<double> atom_idx_x;
+   extern std::vector<double> atom_idx_y;
+   extern std::vector<double> atom_idx_z;
+
+   extern bool LLG_set; ///< Flag to define state of LLG arrays (initialised/uninitialised)
+
+   }
 } // end of sim namespace
 
 #endif //SIM_INTERNAL_H_

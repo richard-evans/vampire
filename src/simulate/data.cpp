@@ -100,6 +100,43 @@ namespace sim{
 
    } // end of internal namespace
 
+   namespace LLGQ_arrays{
+
+   //---------------------------------------------------------------------------
+   // Local arrays and variables
+   //---------------------------------------------------------------------------
+
+   // Auxiallary variables
+   std::vector <double> x_w_array;
+   std::vector <double> y_w_array;
+   std::vector <double> z_w_array;
+   std::vector <double> x_v_array;
+   std::vector <double> y_v_array;
+   std::vector <double> z_v_array;
+
+   // Storage arrays for RK4
+   std::vector<std::vector<double>> k1_storage;
+   std::vector<std::vector<double>> k2_storage;
+   std::vector<std::vector<double>> k3_storage;
+   std::vector<std::vector<double>> k4_storage;
+   std::vector<std::vector<double>> y_pred_storage;
+   std::vector<std::vector<double>> y_in_storage;
+
+   // Arrays for noise generation (now storing coarse-grained noise)
+   std::vector<double> coarse_noise_field;
+   std::vector<double> sqrt_PSD_buffer; // Restored buffer
+   double noise_index;
+   int M_decimation;    //< Decimation factor for noise interpolation
+
+   // Indices for random fields
+   std::vector<double> atom_idx_x;
+   std::vector<double> atom_idx_y;
+   std::vector<double> atom_idx_z;
+
+   bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
+
+   }
+
    //------------------------------------------------------------------------
    // getter functions to give access to internal variables
    //------------------------------------------------------------------------
