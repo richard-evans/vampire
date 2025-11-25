@@ -76,7 +76,7 @@ namespace quantum{
          return true;
       }
       //------------------------------------------------------------------------
-      test = "noise-decimation-factor";
+      test = "noise-interpolation-factor";
       if( word == test ){
          int md = vin::str_to_int(value);
          vin::check_for_valid_int(md, word, line, prefix, 1, 1000000, "input", "> 0");
@@ -105,37 +105,41 @@ namespace quantum{
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
-      std::string test = "quantum-A";
-      if( word == test ){
-         double A = vin::str_to_double(value);
-         vin::check_for_valid_value(A, word, line, prefix, unit, "energy", 0.0, 1.0e9, "material", "> 0");
-         internal::mp[super_index].A.set(A);
-         return true;
-      }
-
-      test = "quantum-Gamma";
+      // commented out for now, needed in the multi-lorentzian case
+      //std::string test = "quantum-noise-amplitude";
+      //if( word == test ){
+      //   double A = vin::str_to_double(value);
+      //   vin::check_for_valid_value(A, word, line, prefix, unit, "energy", 0.0, 1.0e9, "material", "> 0");
+      //   internal::mp[super_index].A.set(A);
+      //   return true;
+      //}
+      //------------------------------------------------------------------------
+      // Lorentzian Gamma value
+      std::string test = "quantum-lorentzian-width";
       if( word == test ){
          double Gamma = vin::str_to_double(value);
          vin::check_for_valid_value(Gamma, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
          internal::mp[super_index].Gamma.set(Gamma);
          return true;
       }
-
-      test = "quantum-omega0";
+      //------------------------------------------------------------------------
+      // Lorentzian omega0 value
+      test = "quantum-lorentzian-central-frequency";
       if( word == test ){
          double omega0 = vin::str_to_double(value);
          vin::check_for_valid_value(omega0, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
          internal::mp[super_index].omega0.set(omega0);
          return true;
       }
-
-      test = "quantum-S0";
-      if( word == test ){
-         double S0 = vin::str_to_double(value);
-         vin::check_for_valid_value(S0, word, line, prefix, unit, "none", 0.0, 100.0, "material", "> 0");
-         internal::mp[super_index].S0.set(S0);
-         return true;
-      }
+      //------------------------------------------------------------------------
+      // Assume S0 == mu_B (until we develop a suitable s-d model description)
+      //test = "quantum-S0";
+      //if( word == test ){
+      //   double S0 = vin::str_to_double(value);
+      //   vin::check_for_valid_value(S0, word, line, prefix, unit, "none", 0.0, 100.0, "material", "> 0");
+      //   internal::mp[super_index].S0.set(S0);
+      //   return true;
+      //}
 
       return false;
 
