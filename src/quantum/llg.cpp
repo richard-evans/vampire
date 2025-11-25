@@ -109,7 +109,7 @@ namespace quantum{
       sim::calculate_spin_fields(0, num_atoms);
       sim::calculate_external_fields(0, num_atoms);
 
-      const double dt = ::dt;
+      const double dt = mp::dt;
       const double half_dt = 0.5 * dt;
       const double dt_over_6 = dt / 6.0;
 

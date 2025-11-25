@@ -27,23 +27,23 @@ namespace quantum{
    //---------------------------------------------------------------------------
    // Material parameter accessors
    //---------------------------------------------------------------------------
-   double get_A(int material_index){
-      if(internal::mp.empty()) return 0.0;
-      if(material_index >= internal::mp.size()) return internal::mp[0].A.get(); // Fallback
-      return internal::mp[material_index].A.get();
-   }
+   // double get_A(int material_index){
+   //    if(internal::mp.empty()) return 0.0;
+   //    if(material_index >= internal::mp.size()) return internal::mp[0].A.get(); // Fallback
+   //    return internal::mp[material_index].A.get();
+   // }
 
-   double get_Gamma(int material_index){
-      if(internal::mp.empty()) return 0.0;
-      if(material_index >= internal::mp.size()) return internal::mp[0].Gamma.get();
-      return internal::mp[material_index].Gamma.get();
-   }
+   // double get_Gamma(int material_index){
+   //    if(internal::mp.empty()) return 0.0;
+   //    if(material_index >= internal::mp.size()) return internal::mp[0].Gamma.get();
+   //    return internal::mp[material_index].Gamma.get();
+   // }
 
-   double get_omega0(int material_index){
-      if(internal::mp.empty()) return 0.0;
-      if(material_index >= internal::mp.size()) return internal::mp[0].omega0.get();
-      return internal::mp[material_index].omega0.get();
-   }
+   // double get_omega0(int material_index){
+   //    if(internal::mp.empty()) return 0.0;
+   //    if(material_index >= internal::mp.size()) return internal::mp[0].omega0.get();
+   //    return internal::mp[material_index].omega0.get();
+   // }
 
    namespace internal{
 
@@ -55,9 +55,10 @@ namespace quantum{
 
       std::vector<internal::mp_t> mp; // array of material properties
 
-      noise_t noise_type = internal::quantum; // Default to Quantum noise
+      noise_t noise_type = internal::quantum_zero; // Default to Quantum noise
       int window_size = 0; // Default window size (initially set to zero, later initialised to simulation length)
       int M_decimation = 1; // No decimation (interpolation in German -> English translation)
+     
 
       std::vector<double> material_A_array; // compact array of Lorentzian amplitude for each material
       std::vector<double> material_gamma_array; // compact array of Lorentzian gamma for each material
@@ -68,6 +69,8 @@ namespace quantum{
       std::vector<std::size_t> atom_idx_x; // indexing for accessing noise for each atom and spatial dimension in coarse array
       std::vector<std::size_t> atom_idx_y;
       std::vector<std::size_t> atom_idx_z;
+
+      int noise_index = 0; // index for accessing noise arrays (at each fine time step)
 
       // Integration arrays for auxiliary variables
       std::vector<double> x_w_array;

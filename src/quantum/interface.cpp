@@ -39,17 +39,17 @@ namespace quantum{
       if( word == test ){
             test = "classical";
             if(value == test){
-               noise_type = classical;
+               internal::noise_type = internal::classical;
                return true;
             }
             test = "quantum";
             if( value == test ){
-               noise_type = quantum_zero;
+               internal::noise_type = internal::quantum_zero;
                return true;
             }
             test = "quantum-no-zero";
             if( value == test ){
-               noise_type = quantum_no_zero;
+               internal::noise_type = internal::quantum_no_zero;
                return true;
             }
             else{
@@ -62,11 +62,11 @@ namespace quantum{
                err::vexit();
             }
          }
-      }
+      
       //------------------------------------------------------------------------
       test = "noise-window-size";
       if( word == test ){
-         int ws = vin::str_to_int(value);
+         int ws = vin::str_to_uint64(value);
          vin::check_for_valid_int(ws, word, line, prefix, 1, 6000000000, "input", "> 0");
          if(ws % 6 != 0){
             std::cerr << "Error: Quantum window size must be divisible by 6, eg 6000, 60000 etc." << std::endl;
@@ -78,7 +78,7 @@ namespace quantum{
       //------------------------------------------------------------------------
       test = "noise-interpolation-factor";
       if( word == test ){
-         int md = vin::str_to_int(value);
+         int md = vin::str_to_uint64(value);
          vin::check_for_valid_int(md, word, line, prefix, 1, 1000000, "input", "> 0");
          internal::M_decimation = md;
          return true;
@@ -114,12 +114,12 @@ namespace quantum{
       //   return true;
       //}
       //------------------------------------------------------------------------
-      // Lorentzian Gamma value
+      // Lorentzian gamma value
       std::string test = "quantum-lorentzian-width";
       if( word == test ){
-         double Gamma = vin::str_to_double(value);
-         vin::check_for_valid_value(Gamma, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
-         internal::mp[super_index].Gamma.set(Gamma);
+         double gamma = vin::str_to_double(value);
+         vin::check_for_valid_value(gamma, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
+         internal::mp[super_index].gamma.set(gamma);
          return true;
       }
       //------------------------------------------------------------------------
