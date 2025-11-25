@@ -55,7 +55,7 @@ namespace quantum{
 
       const int num_atoms = atoms::num_atoms;
       // 3 components per atom (x,y,z)
-      int realizations = num_atoms * 3; 
+      int realizations = num_atoms * 3;
 
       noise_index = 0.0;
 
@@ -63,21 +63,21 @@ namespace quantum{
       // Assuming sim::dt and sim::total_steps are available
       // If not, we might need to include program.hpp or similar
       double dt = ::dt;
-      long int n_fine = sim::total_steps; 
-      
+      long int n_fine = sim::total_steps;
+
       // Fallback if total_steps is not set (e.g. equilibration only)
       if(n_fine <= 0) n_fine = static_cast<long int>(sim::equilibration_time) + static_cast<long int>(sim::loop_time);
       if(n_fine <= 0) n_fine = 10000; // Default fallback
 
       // Temperature
       double T = sim::temperature;
-      
+
       double omega_cutoff = estimate_cutoff_omega_cdf(T, 0.99999);
       M_decimation = static_cast<int>(std::ceil((M_PI / omega_cutoff) / dt));
       if(M_decimation < 1) M_decimation = 1;
 
       int n_coarse = (n_fine > 0) ? ((n_fine - 1) / M_decimation + 1) : 0;
-      
+
       std::cout << "  Quantum Noise Configuration:" << std::endl;
       std::cout << "  Temperature: " << T << " K" << std::endl;
       std::cout << "  Time step: " << dt << " s" << std::endl;
@@ -97,4 +97,3 @@ namespace quantum{
    }
 
 } // end of quantum namespace
-

@@ -71,7 +71,7 @@ namespace quantum{
       //---------------------------------------------------------------------------
       // Estimate cutoff frequency
       //---------------------------------------------------------------------------
-      double estimate_cutoff_omega_cdf(double T, double target_frac) { 
+      double estimate_cutoff_omega_cdf(double T, double target_frac) {
           if(mp.empty()) return 1.0;
           const double omega0 = mp[0].omega0.get();
           if (omega0 <= 0) return 1.0;
@@ -180,7 +180,7 @@ namespace quantum{
              size_t realization_offset = static_cast<size_t>(r) * static_cast<size_t>(n_coarse_total);
 
              while (generated_samples < n_coarse_total) {
-                 
+
                  if (first_run) {
                      // Fill entire buffer with new random numbers
                      for (int i = 0; i < window_size; ++i) {
@@ -188,10 +188,10 @@ namespace quantum{
                      }
                  } else {
                      // Shift buffer: Move last 2 segments (5 and 6) to front (1 and 2)
-                     std::memmove(white_noise_buffer.data(), 
-                                  white_noise_buffer.data() + 4 * segment_size, 
+                     std::memmove(white_noise_buffer.data(),
+                                  white_noise_buffer.data() + 4 * segment_size,
                                   2 * segment_size * sizeof(double));
-                     
+
                      // Fill the rest (segments 3, 4, 5, 6) with new random numbers
                      for (int i = 2 * segment_size; i < window_size; ++i) {
                          white_noise_buffer[i] = dist(gen);
@@ -229,7 +229,7 @@ namespace quantum{
                      // Take segments 2-5
                      int start_idx = 1 * segment_size; // Start of segment 2
                      int end_idx = 5 * segment_size;   // End of segment 5 (exclusive)
-                     
+
                      for (int j = start_idx; j < end_idx; ++j) {
                          if (generated_samples < n_coarse_total) {
                              noise_field[realization_offset + generated_samples] = result[j] * norm_factor * inv_sqrt_S0 * scale;
@@ -262,7 +262,7 @@ namespace quantum{
           // Linear interpolation with safe index calculation
           const size_t index1 = j + atom_idx;
           const size_t index2 = j + atom_idx + 1;
-          
+
           // Boundary check (optional, but good for safety)
           if (index2 >= coarse_noise.size()) return coarse_noise[index1];
 

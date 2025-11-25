@@ -83,7 +83,9 @@ namespace quantum{
       extern bool enabled; // bool to enable module
       extern std::vector<internal::mp_t> mp; // array of material properties
 
-      extern int noise_type;
+      enum noise_t { classical, quantum_zero, quantum_no_zero };
+      extern noise_t noise_type;
+
       extern int window_size;
       extern int M_decimation;
       extern double noise_index;

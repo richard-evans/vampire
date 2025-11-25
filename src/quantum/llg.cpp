@@ -79,7 +79,7 @@ namespace quantum{
           k4_storage.resize(atoms::num_atoms, std::vector<double>(9));
           y_pred_storage.resize(atoms::num_atoms, std::vector<double>(9));
           y_in_storage.resize(atoms::num_atoms, std::vector<double>(9));
-          
+
           LLG_set = true;
       }
 

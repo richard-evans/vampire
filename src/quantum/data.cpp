@@ -55,7 +55,7 @@ namespace quantum{
 
       std::vector<internal::mp_t> mp; // array of material properties
 
-      int noise_type = 1; // Default to Quantum noise
+      noise_t noise_type = internal::quantum; // Default to Quantum noise
       int window_size = 6000; // Default window size
       int M_decimation = 1;
       double noise_index = 0.0;
@@ -85,4 +85,3 @@ namespace quantum{
    } // end of internal namespace
 
 } // end of quantum namespace
-
