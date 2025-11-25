@@ -31,14 +31,8 @@ namespace quantum{
 
       using namespace internal;
 
-      if(!enabled && mp.empty()) return;
-
-      // If mp is empty but enabled is true, create default mp
-      if(mp.empty()){
-          mp.resize(1);
-      }
-
       // Check if we have valid parameters
+      for(int i = 0; i < mp::num_atoms; i++){
       if(!mp[0].A.is_set() || !mp[0].Gamma.is_set() || !mp[0].omega0.is_set()){
           if(enabled){
              std::cout << "Warning: Quantum module enabled but material parameters (A, Gamma, omega0) not fully set." << std::endl;
