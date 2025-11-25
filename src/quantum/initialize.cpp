@@ -31,60 +31,85 @@ namespace quantum{
 
       using namespace internal;
 
-      // Check if we have valid parameters
-      for(int i = 0; i < mp::num_atoms; i++){
-      if(!mp[0].A.is_set() || !mp[0].Gamma.is_set() || !mp[0].omega0.is_set()){
-          if(enabled){
-             std::cout << "Warning: Quantum module enabled but material parameters (A, Gamma, omega0) not fully set." << std::endl;
-          }
-          return;
+      std::cout << "Initializing Quantum Noise Module" << std::endl;
+
+      // Populate Lorentzian parameter arrays
+      for(int i=0; i < atoms::num_atoms; i++){
+
+         // Get material index
+         const int imaterial=atoms::type_array[i];
+
+         // Get material parameters
+         double alpha = mp::material[imaterial].alpha;
+         double gamma = mp::material[imaterial].gamma.get();
+         double omega0 = mp::material[imaterial].omega0.get();
+
+         // Calculate amplitude from damping parameter and Gamma and omega0
+         double A = alpha * pow(omega0, 4) / gamma;
+
+         // Populate parameter arrays
+         material_gamma_array.push_back(gamma);
+         material_omega0_array.push_back(omega0);
+         material_A_array.push_back(A);
+         
       }
 
-      std::cout << "Initializing Quantum Noise Module..." << std::endl;
-
-      // Disable standard thermal field (index 3 usually)
-      // sim::hamiltonian_simulation_flags is a vector<int> or array?
-      // In llg_quantum.cpp: sim::hamiltonian_simulation_flags[3] = 0;
+   
+      // Disable standard thermal field (index 3)
       sim::hamiltonian_simulation_flags[3] = 0;
 
-      const int num_atoms = atoms::num_atoms;
-      // 3 components per atom (x,y,z)
-      int realizations = num_atoms * 3;
-
-      noise_index = 0.0;
-
-      // Time step and duration
-      // Assuming sim::dt and sim::total_steps are available
-      // If not, we might need to include program.hpp or similar
-      double dt = ::dt;
-      long int n_fine = sim::total_steps;
-
-      // Fallback if total_steps is not set (e.g. equilibration only)
-      if(n_fine <= 0) n_fine = static_cast<long int>(sim::equilibration_time) + static_cast<long int>(sim::loop_time);
-      if(n_fine <= 0) n_fine = 10000; // Default fallback
+      // How often calcaulte random fields? 3 components per atom (x,y,z)
+      int realizations = atoms::num_atoms * 3;
 
       // Temperature
       double T = sim::temperature;
 
-      double omega_cutoff = estimate_cutoff_omega_cdf(T, 0.99999);
-      M_decimation = static_cast<int>(std::ceil((M_PI / omega_cutoff) / dt));
-      if(M_decimation < 1) M_decimation = 1;
+      // if window size is zero, set to simulation length
+      if(window_size == 0){
+         window_size = static_cast<int>(sim::total_time) + 1;
+      }
 
-      int n_coarse = (n_fine > 0) ? ((n_fine - 1) / M_decimation + 1) : 0;
+      // Fine time array (used for spin dynamics)
+      double dt_fine = mp::dt;
+      int n_fine = static_cast<int>(sim::total_time) + 1;
 
-      std::cout << "  Quantum Noise Configuration:" << std::endl;
+      // Coarse time array (used for noise generation)
+      int M_decimation = internal::M_decimation;
+      int n_coarse = window_size;
+      
+      
+      std::cout << "Quantum noise module simulation parameters:" << std::endl;
       std::cout << "  Temperature: " << T << " K" << std::endl;
-      std::cout << "  Time step: " << dt << " s" << std::endl;
+      std::cout << "  Time step: " << dt_fine << " s" << std::endl;
       std::cout << "  Total fine steps: " << n_fine << std::endl;
       std::cout << "  Decimation factor M: " << M_decimation << std::endl;
       std::cout << "  Coarse steps: " << n_coarse << std::endl;
       std::cout << "  Window size: " << window_size << std::endl;
+      std::cout << "  Noise type: " << noise_type << std::endl;
+
+      // Check if we have valid parameters (print out parameters for each material)
+      for(int i = 0; i < material_A_array.size(); i++){
+         std::cout << " Material " << i << " parameters: A = " << material_A_array[i]
+                   << ", Gamma = " << material_gamma_array[i]
+                   << ", omega0 = " << material_omega0_array[i] << std::endl;
+
+         if(material_A_array[i] <= 0.0 || material_gamma_array[i] <= 0.0 || material_omega0_array[i] <= 0.0){
+            std::cerr << "Error: Invalid material parameters for material " << i << std::endl;
+            err::vexit();
+         }
+      }
 
       // Assign unique indices for random fields
       assign_unique_indices(n_coarse);
 
       // Generate random fields
-      calculate_random_fields_windowed(realizations, n_fine, dt, M_decimation, T, n_coarse, coarse_noise_field);
+      calculate_noise(realizations, 
+                      n_fine, 
+                      dt_fine, 
+                      M_decimation, 
+                      T, 
+                      n_coarse, 
+                      coarse_noise_field);
 
       return;
 

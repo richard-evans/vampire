@@ -68,62 +68,33 @@ namespace quantum{
          }
       }
 
-      //---------------------------------------------------------------------------
-      // Estimate cutoff frequency
-      //---------------------------------------------------------------------------
-      double estimate_cutoff_omega_cdf(double T, double target_frac) {
-          if(mp.empty()) return 1.0;
-          const double omega0 = mp[0].omega0.get();
-          if (omega0 <= 0) return 1.0;
-          double omega_max = 10.0 * omega0;
-          int steps = 50000;
-          std::vector<double> psd_vals(steps + 1);
-          double domega = omega_max / steps;
-          for (int i = 0; i <= steps; ++i) {
-              double omega = i * domega;
-              psd_vals[i] = PSD(omega, T);
-          }
-          double total_area = 0.0;
-          for (int i = 0; i < steps; ++i) {
-              total_area += 0.5 * (psd_vals[i] + psd_vals[i + 1]) * domega;
-          }
-          if (total_area <= 1e-12) return omega_max;
-          double cum_area = 0.0;
-          for (int i = 0; i <= steps; ++i) {
-              if (i > 0) cum_area += 0.5 * (psd_vals[i - 1] + psd_vals[i]) * domega;
-              if (cum_area >= target_frac * total_area) {
-                  return i * domega;
-              }
-          }
-          return omega_max;
-      }
-
+      
       //---------------------------------------------------------------------------
       // Assign unique indices
       //---------------------------------------------------------------------------
       void assign_unique_indices(int n_coarse) {
-         const int num_atoms = atoms::num_atoms;
+            const int num_atoms = atoms::num_atoms;
 
-         std::cout << "Assigning indices for " << num_atoms << " atoms with " << n_coarse << " coarse steps." << std::endl;
+            std::cout << "Assigning indices for " << num_atoms << " atoms with " << n_coarse << " coarse steps." << std::endl;
 
-         atom_idx_x.resize(num_atoms);
-         atom_idx_y.resize(num_atoms);
-         atom_idx_z.resize(num_atoms);
+            atom_idx_x.resize(num_atoms);
+            atom_idx_y.resize(num_atoms);
+            atom_idx_z.resize(num_atoms);
 
-         for (int atom = 0; atom < num_atoms; atom++) {
-            // Use 64-bit arithmetic to prevent overflow
-            const size_t atom_ll = static_cast<size_t>(atom);
-            const size_t n_coarse_ll = static_cast<size_t>(n_coarse);
-            atom_idx_x[atom] = 3 * atom_ll * n_coarse_ll;
-            atom_idx_y[atom] = 3 * atom_ll * n_coarse_ll + n_coarse_ll;
-            atom_idx_z[atom] = 3 * atom_ll * n_coarse_ll + 2*n_coarse_ll;
-         }
+            for (int atom = 0; atom < num_atoms; atom++) {
+                // Use 64-bit arithmetic to prevent overflow
+                const size_t atom_ll = static_cast<size_t>(atom);
+                const size_t n_coarse_ll = static_cast<size_t>(n_coarse);
+                atom_idx_x[atom] = 3 * atom_ll * n_coarse_ll;
+                atom_idx_y[atom] = 3 * atom_ll * n_coarse_ll + n_coarse_ll;
+                atom_idx_z[atom] = 3 * atom_ll * n_coarse_ll + 2*n_coarse_ll;
+            }
       }
 
       //---------------------------------------------------------------------------
       // Windowed Random Field Calculation
       //---------------------------------------------------------------------------
-      void calculate_random_fields_windowed(int realizations, int n_fine, double dt_fine, int M, double T, int n_coarse_total, std::vector<double>& noise_field) {
+      void calculate_noise(int realizations, int n_fine, double dt_fine, int M, double T, int n_coarse_total, std::vector<double>& noise_field) {
          #ifdef FFT
          if (window_size % 6 != 0) {
              std::cerr << "Error: Window size must be divisible by 6." << std::endl;
