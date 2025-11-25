@@ -6,7 +6,9 @@
 quantum_objects =\
 data.o \
 initialize.o \
-interface.o
+interface.o \
+noise.o \
+llg.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/quantum/,$(quantum_objects))
