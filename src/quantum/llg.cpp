@@ -22,6 +22,7 @@
 #include "sim.hpp"
 #include "quantum.hpp"
 #include "material.hpp"
+#include "vio.hpp"
 
 #include "internal.hpp"
 
@@ -32,10 +33,12 @@ namespace quantum{
       //---------------------------------------------------------------------------
       // Spin Dynamics Function
       //---------------------------------------------------------------------------
-      void spinDynamics(const double* y, const double* H, double* dydt) {
-         const double A = quantum::get_A(0);
-         const double Gamma = quantum::get_Gamma(0);
-         const double omega0 = quantum::get_omega0(0);
+      void spinDynamics(const double* y, const double* H, double* dydt, const int material) {
+
+         // Get lorentzian parameters
+         const double A      = material_A_array[material];
+         const double Gamma  = material_gamma_array[material];
+         const double omega0 = material_omega0_array[material];
 
          // dS/dt = S × (H + v)
          dydt[0] =  (y[1]*(H[2]+y[5]) - y[2]*(H[1]+y[4]));
@@ -63,24 +66,11 @@ namespace quantum{
 
       using namespace internal;
 
-      // Check for initialisation of LLG integration arrays
-      if(LLG_set==false) {
-          // Resize arrays
-          x_w_array.resize(atoms::num_atoms, 0.0);
-          y_w_array.resize(atoms::num_atoms, 0.0);
-          z_w_array.resize(atoms::num_atoms, 0.0);
-          x_v_array.resize(atoms::num_atoms, 0.0);
-          y_v_array.resize(atoms::num_atoms, 0.0);
-          z_v_array.resize(atoms::num_atoms, 0.0);
-
-          k1_storage.resize(atoms::num_atoms, std::vector<double>(9));
-          k2_storage.resize(atoms::num_atoms, std::vector<double>(9));
-          k3_storage.resize(atoms::num_atoms, std::vector<double>(9));
-          k4_storage.resize(atoms::num_atoms, std::vector<double>(9));
-          y_pred_storage.resize(atoms::num_atoms, std::vector<double>(9));
-          y_in_storage.resize(atoms::num_atoms, std::vector<double>(9));
-
-          LLG_set = true;
+      if(!initialised){
+         // error
+         zlog << zTs()  << "Programmer error: quantum noise is not initialised, exiting" << std::endl;
+         std::cerr << "Programmer error: quantum noise is not initialised, exiting" << std::endl;
+         err::vexit();
       }
 
       // Local variables

@@ -33,7 +33,7 @@ namespace quantum{
       // Internal data type definitions
       //-------------------------------------------------------------------------
       // simple initialised class for set variables
-      
+
       class set_double_t{
 
       private:
@@ -73,7 +73,8 @@ namespace quantum{
             set_double_t omega0;     // Lorentzian central frequency parameter
 
             // constructor
-            mp_t (const unsigned int max_materials = 100) {
+            mp_t (const unsigned int max_materials = 100)
+            {
                gamma.set(0.0); // default value
                omega0.set(0.0); // default value
             }; // end of constructor
@@ -90,13 +91,13 @@ namespace quantum{
          quantum_no_zero
       };
 
-      extern bool enabled; // bool to enable module
+      extern bool initialised; // bool to enable module
 
       extern std::vector<internal::mp_t> mp; // array of material properties
 
       extern noise_t noise_type; // Default to Quantum noise
-      extern int window_size; // Default window size (initially set to zero, later initialised to simulation length)
-      extern int M_decimation; // No decimation (interpolation in German -> English translation)
+      extern uint64_t window_size; // Default window size (initially set to zero, later initialised to simulation length)
+      extern uint64_t M_decimation; // No decimation (interpolation in German -> English translation)
 
       extern std::vector<double> material_A_array; // compact array of Lorentzian amplitude for each material
       extern std::vector<double> material_gamma_array; // compact array of Lorentzian gamma for each material
@@ -125,26 +126,26 @@ namespace quantum{
       extern std::vector<std::vector<double>> k4_storage;
       extern std::vector<std::vector<double>> y_pred_storage;
       extern std::vector<std::vector<double>> y_in_storage;
-             
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
 
-      double PSD(const double& omega, 
+      double PSD(const double& omega,
                  const double& T);
 
-      void calculate_noise(int realizations, 
-                           int n_fine, 
-                           double dt_fine, 
-                           int M, 
-                           double T, 
-                           int n_coarse_total, 
+      void calculate_noise(int realizations,
+                           int n_fine,
+                           double dt_fine,
+                           int M,
+                           double T,
+                           int n_coarse_total,
                            std::vector<double>& noise_field);
 
 
-      double get_noise(const std::vector<double>& coarse_noise, 
-                       double fine_step_idx, 
-                       int M, 
+      double get_noise(const std::vector<double>& coarse_noise,
+                       double fine_step_idx,
+                       int M,
                        size_t atom_idx);
 
       void assign_unique_indices(int n_coarse);
@@ -154,5 +155,3 @@ namespace quantum{
 } // end of quantum namespace
 
 #endif //QUANTUM_INTERNAL_H_
-
-

@@ -175,6 +175,11 @@ void initialize_modules(){
                          atoms::z_coord_array
 					   );
 
+   //---------------------------------------------------------------------------
+   // initialise quantum noise and integration
+   //---------------------------------------------------------------------------
+	quantum::initialize()
+
    return;
 
 }
