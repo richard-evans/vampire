@@ -35,6 +35,43 @@ namespace quantum{
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
+      std::string test = "noise-type";
+      if( word == test ){
+          // Set noise type
+          int nt = vin::str_to_int(value);
+          vin::check_for_valid_int(nt, word, line, prefix, 0, 2, "input", "0 - 2");
+          internal::noise_type = nt;
+          return true;
+      }
+
+      test = "window-size";
+      if( word == test ){
+          int ws = vin::str_to_int(value);
+          vin::check_for_valid_int(ws, word, line, prefix, 1, 1000000, "input", "> 0");
+          if(ws % 6 != 0){
+             std::cerr << "Error: Quantum window size must be divisible by 6." << std::endl;
+             return false;
+          }
+          internal::window_size = ws;
+          return true;
+      }
+
+      test = "decimation";
+      if( word == test ){
+          int md = vin::str_to_int(value);
+          vin::check_for_valid_int(md, word, line, prefix, 1, 1000000, "input", "> 0");
+          internal::M_decimation = md;
+          return true;
+      }
+
+      test = "noise-index";
+      if( word == test ){
+          double ni = vin::str_to_double(value);
+          vin::check_for_valid_value(ni, word, line, prefix, unit, "none", -1.0e9, 1.0e9, "input", "any");
+          internal::noise_index = ni;
+          return true;
+      }
+
       return false;
 
    }
@@ -47,12 +84,46 @@ namespace quantum{
       // add prefix string
       std::string prefix="material:";
 
-      // Check for material id > current array size and if so dynamically expand mp array
-      if((unsigned int) super_index + 1 > internal::mp.size() && super_index + 1 < 101) internal::mp.resize(super_index + 1);
+      // Resize mp vector if necessary
+      if(internal::mp.size() <= (unsigned int)super_index){
+         internal::mp.resize(super_index + 1);
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
+      std::string test = "quantum-A";
+      if( word == test ){
+          double A = vin::str_to_double(value);
+          vin::check_for_valid_value(A, word, line, prefix, unit, "energy", 0.0, 1.0e9, "material", "> 0");
+          internal::mp[super_index].A.set(A);
+          return true;
+      }
+
+      test = "quantum-Gamma";
+      if( word == test ){
+          double Gamma = vin::str_to_double(value);
+          vin::check_for_valid_value(Gamma, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
+          internal::mp[super_index].Gamma.set(Gamma);
+          return true;
+      }
+
+      test = "quantum-omega0";
+      if( word == test ){
+          double omega0 = vin::str_to_double(value);
+          vin::check_for_valid_value(omega0, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
+          internal::mp[super_index].omega0.set(omega0);
+          return true;
+      }
+
+      test = "quantum-S0";
+      if( word == test ){
+          double S0 = vin::str_to_double(value);
+          vin::check_for_valid_value(S0, word, line, prefix, unit, "none", 0.0, 100.0, "material", "> 0");
+          internal::mp[super_index].S0.set(S0);
+          return true;
+      }
+
       return false;
 
    }

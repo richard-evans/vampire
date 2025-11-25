@@ -8,9 +8,9 @@
 # Creation attributes:
 #------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
-dimensions:system-size-z = 7.7 !nm
+dimensions:system-size-x = 3.5 !nm
+dimensions:system-size-y = 3.5 !nm
+dimensions:system-size-z = 3.5 !nm
 
 #------------------------------------------
 # Material Files:

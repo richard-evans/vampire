@@ -110,6 +110,7 @@ namespace sim{
 
       const int n_coarse = (n_fine > 0) ? ((n_fine - 1) / M_decimation + 1) : 0;
       double mem_red = 100.0 * (1.0 - static_cast<double>(n_coarse) / n_fine);
+      std::cout << "Initalizing depcrated quantum module..." << std::endl;
       std::cout << "Quantum noise interpolation enabled." << std::endl;
       std::cout << "Decimation factor M=" << M_decimation << ", estimated memory reduction=" << std::fixed << std::setprecision(1) << mem_red << "%" << std::endl;
 
