@@ -305,7 +305,7 @@ namespace exchange{
          double fs = atof(value.c_str());
          vin::check_for_valid_value(fs, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
          internal::mp[super_index].fs[sub_index] = fs;
-         internal::enable_fourspin = true; // Switch on four-spin calc
+         exchange::four_spin = true; // Switch on four-spin calc
          return true;
       }
 

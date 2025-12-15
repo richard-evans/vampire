@@ -90,7 +90,7 @@ void build_rock_salt(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[5].x = 0.5;
    unit_cell.atom[5].y = 0.0;
    unit_cell.atom[5].z = 0.5;
-   unit_cell.atom[5].mat = uc::internal::sublattice_materials ? 2 : 1; // if sublattice material is defined, then identify as metal sublattice 2
+   unit_cell.atom[5].mat = uc::internal::sublattice_materials ? 2 : 0; // if sublattice material is defined, then identify as metal sublattice 2
    unit_cell.atom[5].lc = 0;
    unit_cell.atom[5].hc = 1;
    unit_cell.atom[5].ni = 6;
@@ -98,7 +98,7 @@ void build_rock_salt(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[6].x = 0.0;
    unit_cell.atom[6].y = 0.5;
    unit_cell.atom[6].z = 0.5;
-   unit_cell.atom[6].mat = uc::internal::sublattice_materials ? 3 : 1; // if sublattice material is defined, then identify as metal sublattice 3
+   unit_cell.atom[6].mat = uc::internal::sublattice_materials ? 3 : 0; // if sublattice material is defined, then identify as metal sublattice 3
    unit_cell.atom[6].lc = 0;
    unit_cell.atom[6].hc = 1;
    unit_cell.atom[6].ni = 6;

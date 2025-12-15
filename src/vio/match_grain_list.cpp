@@ -119,6 +119,8 @@ namespace vout{
          grain::output_list.push_back(grain::material_magnetisation);
          return EXIT_SUCCESS;
       }
+     
+
       //--------------------------------------------------------------------
       test="material-height-magnetisation";
       if(word==test){

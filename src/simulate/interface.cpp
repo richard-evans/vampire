@@ -342,7 +342,8 @@ namespace sim{
          int mid = vin::str_to_int(value); // convert string to int
          // Test for valid range
          vin::check_for_valid_int(mid, word, line, prefix, 1, mp::max_materials,"material","1 - 100");
-         sim::internal::mp[super_index].stt_pm = mid;
+         sim::internal::mp[super_index].stt_pm.set(mid-1); // save material ID as m-1
+         zlog << zTs() << "Setting STT polarizer for material " << super_index+1 << " to material " << sim::internal::mp[super_index].stt_pm.get()+1 << std::endl;
          sim::internal::enable_local_stt_polarizers = true;
          return true;
       }
@@ -401,7 +402,8 @@ namespace sim{
          int mid = vin::str_to_int(value); // convert string to int
          // Test for valid range
          vin::check_for_valid_int(mid, word, line, prefix, 1, mp::max_materials,"material","1 - 100");
-         sim::internal::mp[super_index].sot_pm = mid;
+         sim::internal::mp[super_index].sot_pm.set(mid-1); // save material ID as m-1
+         zlog << zTs() << "Setting SOT polarizer for material " << super_index+1 << " to material " << sim::internal::mp[super_index].sot_pm.get()+1 << std::endl;
          sim::internal::enable_local_sot_polarizers = true;
          return true;
       }

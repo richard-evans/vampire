@@ -606,7 +606,10 @@ namespace internal{
 
             }
 
-
+            // Store the coupling field and energy in internal arrays for output
+            sld::internal::coupling_field_x[i] = hc_x;
+            sld::internal::coupling_field_y[i] = hc_y;
+            sld::internal::coupling_field_z[i] = hc_z;
 
             forces_array_x[i] += fc_x;
             forces_array_y[i] += fc_y;
