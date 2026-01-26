@@ -20,18 +20,42 @@
 
 namespace quantum{
 
+   //------------------------------------------------------------------------------
+   // Externally visible variables
+   //------------------------------------------------------------------------------
+   bool enabled = false; // bool to enable module
+   //---------------------------------------------------------------------------
+   // Material parameter accessors
+   //---------------------------------------------------------------------------
+   // double get_A(int material_index){
+   //    if(internal::mp.empty()) return 0.0;
+   //    if(material_index >= internal::mp.size()) return internal::mp[0].A.get(); // Fallback
+   //    return internal::mp[material_index].A.get();
+   // }
+
+   // double get_Gamma(int material_index){
+   //    if(internal::mp.empty()) return 0.0;
+   //    if(material_index >= internal::mp.size()) return internal::mp[0].Gamma.get();
+   //    return internal::mp[material_index].Gamma.get();
+   // }
+
+   // double get_omega0(int material_index){
+   //    if(internal::mp.empty()) return 0.0;
+   //    if(material_index >= internal::mp.size()) return internal::mp[0].omega0.get();
+   //    return internal::mp[material_index].omega0.get();
+   // }
+
    namespace internal{
 
       //------------------------------------------------------------------------
       // Shared variables inside quantum module
       //------------------------------------------------------------------------
 
-      bool enabled = false; // bool to enable the module
+      bool initialised = false; // check for initialisation of the module
 
       std::vector<internal::mp_t> mp; // array of material properties
 
       noise_t noise_type = internal::quantum_zero; // Default to Quantum noise
-      integration_t llg_method = internal::llg_fft; // Default to FFT method
       uint64_t window_size = 0; // Default window size (initially set to zero, later initialised to simulation length)
       uint64_t M_decimation = 1; // No decimation (interpolation in German -> English translation)
 

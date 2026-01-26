@@ -19,8 +19,6 @@
 #include "errors.hpp"
 #include "material.hpp"
 #include "program.hpp"
-#include "quantum.hpp"
-#include "vmpi.hpp"
 
 // quantum module headers
 #include "internal.hpp"
@@ -41,17 +39,18 @@ namespace quantum{
       // Do nothing if module not enabled
       if(!enabled) return;
 
-      // Guard against multiple initialization (can happen in MPI when called from different places)
-      static bool already_initialized = false;
-      if(already_initialized) return;
-      already_initialized = true;
+      std::cout << "Initializing Quantum Noise Module" << std::endl;
 
-      std::cout << "Initializing Quantum Noise Module..." << std::endl;
-
-      //------------------------------------------------------------------------
-      // Common initialization - populate material parameters
-      //------------------------------------------------------------------------
+      // Populate Lorentzian parameter arrays
       for(int m=0; m < mp::num_materials; m++){
+
+         // Get material index
+         //const int imaterial=atoms::type_array[i];
+
+         // Get material parameters
+         double alpha = mp::material[m].alpha; // get damping constant from main materials class
+         double gamma = internal::mp[m].gamma.get();
+         double omega0 = internal::mp[m].omega0.get();
 
          // Get material parameters
          double alpha = mp::material[m].alpha; // get damping constant from main materials class
@@ -66,63 +65,25 @@ namespace quantum{
          material_gamma_array.push_back(gamma);
          material_omega0_array.push_back(omega0);
          material_A_array.push_back(A);
-         material_S0_array.push_back(S0);
-         material_inv_sqrt_S0_array.push_back(inv_sqrt_S0);
 
       }
 
-      //------------------------------------------------------------------------
-      // Disable standard thermal field (index 3) - common to all methods
-      //------------------------------------------------------------------------
+
+      // Disable standard thermal field (index 3)
       sim::hamiltonian_simulation_flags[3] = 0;
 
-      //------------------------------------------------------------------------
-      // Check that this program is explicitly supported - common to all methods
-      //------------------------------------------------------------------------
+
+      // Setting up the window
       uint64_t total_simulation_time = 0;
+
+      // Check that this program is explicitly supported
       if(!supported_program(total_simulation_time)){
-         std::cerr << "Error! Selected program " << program::program << " is not currently supported when using the quantum thermostat" << std::endl;
+         // error
+         std::cerr << "Error! Selected program " << program::program << "is not currently supported when using the quantum thermostat" << std::endl;
          err::vexit();
       }
 
-      //------------------------------------------------------------------------
-      // Print material parameters - common to all methods
-      //------------------------------------------------------------------------
-      for(int m=0; m < mp::num_materials; m++){
-         std::cout << "  Material " << m << " parameters: A = " << material_A_array[m]
-                   << ", Gamma = " << material_gamma_array[m]
-                   << ", omega0 = " << material_omega0_array[m] << 
-                   ", S0 = " << material_S0_array[m] << std::endl;
-      }
-
-      //------------------------------------------------------------------------
-      // Dispatch to method-specific initialization
-      //------------------------------------------------------------------------
-      if(internal::llg_method == internal::llg_ho){
-         initialize_HO();
-      }
-      else if(internal::llg_method == internal::llg_fft){
-         initialize_FFT();
-      }
-
-      return;
-
-   }
-
-   //----------------------------------------------------------------------------
-   // FFT-specific initialization
-   //----------------------------------------------------------------------------
-   void initialize_FFT(){
-
-      using namespace internal;
-
-      std::cout << "  Using FFT-based quantum noise generation" << std::endl;
-
-      // Get total simulation time
-      uint64_t total_simulation_time = 0;
-      supported_program(total_simulation_time); // get total simulation time
-
-      // How often calculate random fields? 3 components per atom (x,y,z)
+      // How often calcaulte random fields? 3 components per atom (x,y,z)
       int realizations = atoms::num_atoms * 3;
 
       // Temperature
@@ -139,47 +100,48 @@ namespace quantum{
 
       // Coarse time array (used for noise generation)
       int M_decimation = internal::M_decimation;
-      // Calculate coarse grid size based on decimation factor
-      int n_coarse = (n_fine > 0) ? ((n_fine - 1) / M_decimation + 1) : 0;
+      int n_coarse = window_size;
 
-      std::cout << "  FFT simulation parameters:" << std::endl;
-      std::cout << "    Temperature: " << T << " K" << std::endl;
-      std::cout << "    Time step: " << dt_fine << " s" << std::endl;
-      std::cout << "    Total fine steps: " << n_fine << std::endl;
-      std::cout << "    Interpolation factor M: " << M_decimation << std::endl;
-      std::cout << "    Coarse steps: " << n_coarse << std::endl;
-      std::cout << "    Window size: " << window_size << std::endl;
-      std::cout << "    Noise type: " << noise_type << std::endl;
+      std::cout << "Quantum noise module simulation parameters:" << std::endl;
+      std::cout << "  Temperature: " << T << " K" << std::endl;
+      std::cout << "  Time step: " << dt_fine << " s" << std::endl;
+      std::cout << "  Total fine steps: " << n_fine << std::endl;
+      std::cout << "  Interpolation factor M: " << M_decimation << std::endl;
+      std::cout << "  Coarse steps: " << n_coarse << std::endl;
+      std::cout << "  Window size: " << window_size << std::endl;
+      std::cout << "  Noise type: " << noise_type << std::endl;
 
-      // Determine number of atoms (including boundary atoms for MPI)
-      #ifdef MPICF
-         const int num_atoms_total = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
-      #else
-         const int num_atoms_total = atoms::num_atoms;
-      #endif
+      // Check if we have valid parameters (print out parameters for each material)
+      for(int m=0; m < mp::num_materials; m++){
+         std::cout << " Material " << m << " parameters: A = " << material_A_array[m]
+                   << ", Gamma = " << material_gamma_array[m]
+                   << ", omega0 = " << material_omega0_array[m] << std::endl;
 
-      // Resize arrays (FFT method uses 9 components like HO: S, q, p)
-      q_x_array.resize(num_atoms_total, 0.0);
-      q_y_array.resize(num_atoms_total, 0.0);
-      q_z_array.resize(num_atoms_total, 0.0);
-      p_x_array.resize(num_atoms_total, 0.0);
-      p_y_array.resize(num_atoms_total, 0.0);
-      p_z_array.resize(num_atoms_total, 0.0);
+         //if(material_A_array[m] <= 0.0 || material_gamma_array[m] <= 0.0 || material_omega0_array[m] <= 0.0){
+         //   std::cerr << "Error: Invalid material parameters for material " << i << std::endl;
+         //   err::vexit();
+         //}
+      }
 
-      k1_storage.resize(num_atoms_total, std::vector<double>(9));
-      k2_storage.resize(num_atoms_total, std::vector<double>(9));
-      k3_storage.resize(num_atoms_total, std::vector<double>(9));
-      k4_storage.resize(num_atoms_total, std::vector<double>(9));
-      y_pred_storage.resize(num_atoms_total, std::vector<double>(9));
-      y_in_storage.resize(num_atoms_total, std::vector<double>(9));
+      // Resize arrays
+      x_w_array.resize(atoms::num_atoms, 0.0);
+      y_w_array.resize(atoms::num_atoms, 0.0);
+      z_w_array.resize(atoms::num_atoms, 0.0);
+      x_v_array.resize(atoms::num_atoms, 0.0);
+      y_v_array.resize(atoms::num_atoms, 0.0);
+      z_v_array.resize(atoms::num_atoms, 0.0);
 
-      // Assign unique indices for random fields (use local atom count for sizing)
-      assign_unique_indices(n_coarse, num_atoms_total);
+      k1_storage.resize(atoms::num_atoms, std::vector<double>(9));
+      k2_storage.resize(atoms::num_atoms, std::vector<double>(9));
+      k3_storage.resize(atoms::num_atoms, std::vector<double>(9));
+      k4_storage.resize(atoms::num_atoms, std::vector<double>(9));
+      y_pred_storage.resize(atoms::num_atoms, std::vector<double>(9));
+      y_in_storage.resize(atoms::num_atoms, std::vector<double>(9));
 
-      // Initialize noise structures (FFT plans, buffers, PSDs)
-      init_noise_structures(n_coarse, realizations, dt_fine, M_decimation, T);
+      // Assign unique indices for random fields
+      assign_unique_indices(n_coarse);
 
-      // Generate initial random fields
+      // Generate random fields
       calculate_noise(realizations,
                       n_fine,
                       dt_fine,
@@ -188,40 +150,8 @@ namespace quantum{
                       n_coarse,
                       coarse_noise_field);
 
-      return;
-
-   }
-
-   //----------------------------------------------------------------------------
-   // Harmonic Oscillator-specific initialization
-   //----------------------------------------------------------------------------
-   void initialize_HO(){
-
-      using namespace internal;
-
-      std::cout << "  Using Harmonic Oscillator (direct noise generation)" << std::endl;
-
-      // Determine number of atoms (including boundary atoms for MPI)
-      #ifdef MPICF
-         const int num_atoms_total = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
-      #else
-         const int num_atoms_total = atoms::num_atoms;
-      #endif
-
-      // Resize arrays
-      q_x_array.resize(num_atoms_total, 0.0);
-      q_y_array.resize(num_atoms_total, 0.0);
-      q_z_array.resize(num_atoms_total, 0.0);
-      p_x_array.resize(num_atoms_total, 0.0);
-      p_y_array.resize(num_atoms_total, 0.0);
-      p_z_array.resize(num_atoms_total, 0.0);
-
-      k1_storage.resize(num_atoms_total, std::vector<double>(9));
-      k2_storage.resize(num_atoms_total, std::vector<double>(9));
-      k3_storage.resize(num_atoms_total, std::vector<double>(9));
-      k4_storage.resize(num_atoms_total, std::vector<double>(9));
-      y_pred_storage.resize(num_atoms_total, std::vector<double>(9));
-      y_in_storage.resize(num_atoms_total, std::vector<double>(9));
+      // Set module as initialised
+      internal::initialised = true;
 
       return;
 
@@ -269,8 +199,7 @@ namespace quantum{
       //simulation_time[5] = et+lt;
 
       // Temperature pulse (not supported, dynamic temperature)
-      programs[6] = true;
-      simulation_time[6] = et+tt;
+      programs[6] = false;
 
       // HAMR (not supported, dynamic temperature)
       programs[7] = false;

@@ -50,40 +50,45 @@ namespace quantum{
          const double Gamma  = material_gamma_array[material];
          const double omega0 = material_omega0_array[material];
 
-         double x = (T > 1e-12) ? omega / (2 * T) : omega;  // Avoid division by zero
+         const double x = (T > 1e-12) ? omega / (2.0 * T) : omega;  // Avoid division by zero
+
          double lorentzian_denom = (omega0 * omega0 - omega * omega) * (omega0 * omega0 - omega * omega) + Gamma * Gamma * omega * omega;
          if (lorentzian_denom < 1e-12) lorentzian_denom = 1e-12; // Avoid division by zero
-         double lorentzian = A * Gamma * omega / lorentzian_denom;
-         double coth = (x < 1e-10) ? 1.0 / x : 1.0 / tanh(x);  // Stabilize coth calculation near zero
 
+         const double lorentzian = A * Gamma * omega / lorentzian_denom;
+         const double coth = (x < 1e-10) ? 1.0 / x : 1.0 / tanh(x);  // Stabilize coth calculation near zero (Joe Barker's idea)
 
          switch (internal::noise_type) {
-            
+
+            // Classical Noise
             case internal::classical:
-               return 2*T* A * Gamma / lorentzian_denom;  
-               break;  
-            
+               return 2.0 * T * A * Gamma / lorentzian_denom;
+               break;
+
+            // Quantum Noise
             case internal::quantum_zero:
-                if (omega>0) return coth * lorentzian;
-                else return 2*T* A * Gamma / (omega0 * omega0  * omega0 * omega0);
-                break;
+               if(omega > 0.0) return coth * lorentzian;
+               else return 2.0 * T * A * Gamma / (omega0 * omega0  * omega0 * omega0);
+               break;
 
+            // Quantum no-zero Noise
             case internal::quantum_no_zero:
-                if (omega>0) return (coth-1) * lorentzian;
-                else return 2*T* A * Gamma / (omega0 * omega0  * omega0 * omega0);
-                break;
+               if(omega > 0.0) return (coth - 1.0) * lorentzian;
+               else return 2.0 * T * A * Gamma / (omega0 * omega0  * omega0 * omega0);
+               break;
 
-            // Error
+            // Classical noise
             default:
                zlog << zTs()  << "Programmer error: quantum noise type is set to unknown value " << internal::noise_type << " which is not known" << std::endl;
                std::cerr << "Programmer error: quantum noise type is set to unknown value " << internal::noise_type << " which is not known" << std::endl;
                err::vexit();
-               return 0.0;
+
+         }
       }
       
    }
 
-      
+
       //---------------------------------------------------------------------------
       // Assign unique indices to map noise for each atom and spatial dimension
       //---------------------------------------------------------------------------

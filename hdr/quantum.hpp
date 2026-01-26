@@ -24,6 +24,8 @@
 //--------------------------------------------------------------------------------
 namespace quantum{
 
+   extern bool enabled; // bool to enable module
+
    //-----------------------------------------------------------------------------
    // Function to initialise quantum module
    //-----------------------------------------------------------------------------
@@ -38,6 +40,11 @@ namespace quantum{
    // Function to process material parameters
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+
+   //---------------------------------------------------------------------------
+   // Function to perform and LLG step with quantum noise
+   //---------------------------------------------------------------------------
+   void llg_step();
 
 } // end of quantum namespace
 

@@ -143,6 +143,8 @@ namespace sim{
          test="llg-quantum";
          if( value == test ){
             sim::integrator = sim::llg_quantum;
+            // turn quantum module on
+            quantum::enabled = true;
             return true;
          }
          test="spin-lattice";

@@ -95,34 +95,13 @@ namespace quantum{
          quantum_no_zero
       };
 
-      enum integration_t {
-         llg_fft,
-         llg_ho
-      };
-
-      extern bool enabled; // bool to enable module
+      extern bool initialised; // bool to enable module
 
       extern std::vector<internal::mp_t> mp; // array of material properties
 
       extern noise_t noise_type; // Default to Quantum noise
-      extern integration_t llg_method; // Default to FFT method
       extern uint64_t window_size; // Default window size (initially set to zero, later initialised to simulation length)
       extern uint64_t M_decimation; // No decimation (interpolation in German -> English translation)
-
-      // FFT Plans and State
-      #ifdef FFT
-      extern fftw_plan fft_forward;
-      extern fftw_plan fft_backward;
-      extern double* fft_in;
-      extern fftw_complex* fft_out;
-      extern double* fft_result;
-      #endif
-
-      extern std::vector<std::vector<double>> noise_gen_buffer; // State for each realization
-      extern std::vector<std::vector<double>> material_psd; // Precomputed PSD for each material
-      extern uint64_t current_noise_start_step; // The coarse step index where the current buffer starts
-      extern uint64_t noise_buffer_len; // Length of the noise buffer (n_coarse)
-
 
       extern std::vector<double> material_A_array; // compact array of Lorentzian amplitude for each material
       extern std::vector<double> material_gamma_array; // compact array of Lorentzian gamma for each material
@@ -167,22 +146,8 @@ namespace quantum{
       void llg_HO();
       void llg_HO_mpi();
 
-      void llg_FFT();
-      void llg_FFT_mpi();
-
-      void spinDynamics(const double* y,
-                        const double* H,
-                        double* dydt,
-                        const int material);
-
-
-
-      void LL_HO_method(const double* y, const double* H, double* dydt, const int material, const double dt);
-      void LL_FFT_method(const double* y, const double* H, double* dydt, const int material);
-
-      double PSD(const double omega,
-                 const double T,
-                 const int material);
+      double PSD(const double& omega,
+                 const double& T);
 
       void calculate_noise(int realizations,
                            int n_fine,

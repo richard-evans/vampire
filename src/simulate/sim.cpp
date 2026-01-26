@@ -59,6 +59,7 @@
 #include "material.hpp"
 #include "montecarlo.hpp"
 #include "program.hpp"
+#include "quantum.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
@@ -731,7 +732,7 @@ void integrate_serial(uint64_t n_steps){
 
 		case sim::llg_quantum: // LLG quantum noise
 			for(uint64_t ti=0;ti<n_steps;ti++){
-				sim::internal::llg_quantum_step();
+				quantum::llg_step();
 				// increment time
 				sim::internal::increment_time();
 			}
@@ -801,7 +802,7 @@ void integrate_serial(uint64_t n_steps){
 ///=====================================================================================
 ///
 int integrate_mpi(uint64_t n_steps){
-	
+
 
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_mpi has been called" << std::endl;
