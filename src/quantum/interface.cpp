@@ -32,9 +32,15 @@ namespace quantum{
       std::string prefix="quantum";
       if(key!=prefix) return false;
 
+      //------------------------------------------------------------------------
+      // If quantum parameter is requested, then enable module
+      //------------------------------------------------------------------------
+      internal::enabled = true;
+
       //--------------------------------------------------------------------
-      // Keyword not found
+      // Find noise type
       //--------------------------------------------------------------------
+
       std::string test = "noise-type";
       if( word == test ){
             test = "classical";
@@ -62,7 +68,35 @@ namespace quantum{
                err::vexit();
             }
          }
-      
+
+      //------------------------------------------------------------------------
+      // Find method to integrate LLG equation
+      //------------------------------------------------------------------------
+
+      test = "llg-method";
+      if( word == test ){
+         test = "llg-ho";;
+         if( value == test ){
+            internal::llg_method = internal::llg_ho;
+            return true;
+         }
+         test = "llg-fft";;
+         if( value == test ){
+            internal::llg_method = internal::llg_fft;
+            return true;
+         }
+
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'quantum:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"llg-ho\"" << std::endl;
+            std::cerr << "\t\"llg-fft\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+
+
       //------------------------------------------------------------------------
       test = "noise-window-size";
       if( word == test ){
@@ -102,21 +136,11 @@ namespace quantum{
          internal::mp.resize(super_index + 1);
       }
 
-      //--------------------------------------------------------------------
-      // Keyword not found
-      //--------------------------------------------------------------------
-      // commented out for now, needed in the multi-lorentzian case
-      //std::string test = "quantum-noise-amplitude";
-      //if( word == test ){
-      //   double A = vin::str_to_double(value);
-      //   vin::check_for_valid_value(A, word, line, prefix, unit, "energy", 0.0, 1.0e9, "material", "> 0");
-      //   internal::mp[super_index].A.set(A);
-      //   return true;
-      //}
       //------------------------------------------------------------------------
       // Lorentzian gamma value
       std::string test = "quantum-lorentzian-width";
       if( word == test ){
+         internal::enabled = true; // enable module if material parameters are set
          double gamma = vin::str_to_double(value);
          vin::check_for_valid_value(gamma, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
          internal::mp[super_index].gamma.set(gamma);
@@ -126,6 +150,7 @@ namespace quantum{
       // Lorentzian omega0 value
       test = "quantum-lorentzian-central-frequency";
       if( word == test ){
+         internal::enabled = true; // enable module if material parameters are set
          double omega0 = vin::str_to_double(value);
          vin::check_for_valid_value(omega0, word, line, prefix, unit, "frequency", 0.0, 1.0e15, "material", "> 0");
          internal::mp[super_index].omega0.set(omega0);

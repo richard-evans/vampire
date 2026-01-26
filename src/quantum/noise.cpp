@@ -31,6 +31,10 @@
 #include "quantum.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "vio.hpp"
+#include "quantum.hpp"
+#include "random.hpp"
+#include "sim.hpp"
 
 #include "internal.hpp"
 
@@ -40,13 +44,11 @@ namespace quantum{
       //---------------------------------------------------------------------------
       // PSD function
       //---------------------------------------------------------------------------
-      double PSD(const double& omega, const double& T) {
-         // TODO: Support multiple materials? For now use material 0
-         if(mp.empty()) return 0.0;
+      double PSD(const double omega, const double T, const int material) {
 
-         const double A = mp[0].A.get();
-         const double Gamma = mp[0].Gamma.get();
-         const double omega0 = mp[0].omega0.get();
+         const double A      = material_A_array[material];
+         const double Gamma  = material_gamma_array[material];
+         const double omega0 = material_omega0_array[material];
 
          double x = (T > 1e-12) ? omega / (2 * T) : omega;  // Avoid division by zero
          double lorentzian_denom = (omega0 * omega0 - omega * omega) * (omega0 * omega0 - omega * omega) + Gamma * Gamma * omega * omega;
@@ -54,34 +56,45 @@ namespace quantum{
          double lorentzian = A * Gamma * omega / lorentzian_denom;
          double coth = (x < 1e-10) ? 1.0 / x : 1.0 / tanh(x);  // Stabilize coth calculation near zero
 
-         switch (noise_type) {
-            case 0: // Classical Noise
-               return 2*T* A * Gamma / lorentzian_denom;
-            case 1: // Quantum Noise
-               if (omega==0) return 2*T* A * Gamma / (omega0 * omega0  * omega0 * omega0);
-               else return coth * lorentzian;
-            case 2: // Semiquantum Noise
-               if (omega==0) return 2*T* A * Gamma / (omega0 * omega0  * omega0 * omega0);
-               else return (coth-1) * lorentzian;
+
+         switch (internal::noise_type) {
+            
+            case internal::classical:
+               return 2*T* A * Gamma / lorentzian_denom;  
+               break;  
+            
+            case internal::quantum_zero:
+                if (omega>0) return coth * lorentzian;
+                else return 2*T* A * Gamma / (omega0 * omega0  * omega0 * omega0);
+                break;
+
+            case internal::quantum_no_zero:
+                if (omega>0) return (coth-1) * lorentzian;
+                else return 2*T* A * Gamma / (omega0 * omega0  * omega0 * omega0);
+                break;
+
+            // Error
             default:
-               return 1.0 / x * lorentzian;
-         }
+               zlog << zTs()  << "Programmer error: quantum noise type is set to unknown value " << internal::noise_type << " which is not known" << std::endl;
+               std::cerr << "Programmer error: quantum noise type is set to unknown value " << internal::noise_type << " which is not known" << std::endl;
+               err::vexit();
+               return 0.0;
       }
+      
+   }
 
       
       //---------------------------------------------------------------------------
-      // Assign unique indices
+      // Assign unique indices to map noise for each atom and spatial dimension
       //---------------------------------------------------------------------------
-      void assign_unique_indices(int n_coarse) {
-            const int num_atoms = atoms::num_atoms;
+      void assign_unique_indices(int n_coarse, int num_atoms_local) {
+            std::cout << "Assigning indices for " << num_atoms_local << " local atoms with " << n_coarse << " coarse steps." << std::endl;
 
-            std::cout << "Assigning indices for " << num_atoms << " atoms with " << n_coarse << " coarse steps." << std::endl;
+            atom_idx_x.resize(num_atoms_local);
+            atom_idx_y.resize(num_atoms_local);
+            atom_idx_z.resize(num_atoms_local);
 
-            atom_idx_x.resize(num_atoms);
-            atom_idx_y.resize(num_atoms);
-            atom_idx_z.resize(num_atoms);
-
-            for (int atom = 0; atom < num_atoms; atom++) {
+            for (int atom = 0; atom < num_atoms_local; atom++) {
                 // Use 64-bit arithmetic to prevent overflow
                 const size_t atom_ll = static_cast<size_t>(atom);
                 const size_t n_coarse_ll = static_cast<size_t>(n_coarse);
@@ -92,132 +105,125 @@ namespace quantum{
       }
 
       //---------------------------------------------------------------------------
-      // Windowed Random Field Calculation
+      // Non-windowed Random Field Calculation (Direct FFT on coarse grid)
       //---------------------------------------------------------------------------
       void calculate_noise(int realizations, int n_fine, double dt_fine, int M, double T, int n_coarse_total, std::vector<double>& noise_field) {
          #ifdef FFT
-         if (window_size % 6 != 0) {
-             std::cerr << "Error: Window size must be divisible by 6." << std::endl;
-             return;
-         }
-         int segment_size = window_size / 6;
-
-         if(mp.empty()) return;
-         const double S0 = mp[0].S0.get();
-         const double inv_sqrt_S0 = (S0 > 0) ? 1.0 / std::sqrt(S0) : 1.0;
+         
+         if (n_fine <= 0) return; // Do not generate noise if there are no steps
+         
          const double dt_coarse = dt_fine * M;
-         const double norm_factor = 1.0 / window_size;
-         const double scale = std::sqrt(dt_fine / dt_coarse);
 
-         // FFTW Setup for the window size
-         double* in = (double*)fftw_malloc(sizeof(double) * window_size);
-         fftw_complex* out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * (window_size / 2 + 1));
-         double* result = (double*)fftw_malloc(sizeof(double) * window_size);
+         // Allocate FFTW arrays for the full coarse grid
+         double* __restrict in = (double*)fftw_malloc(sizeof(double) * n_coarse_total);
+         fftw_complex* __restrict out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * (n_coarse_total/2 + 1));
+         double* __restrict result = (double*)fftw_malloc(sizeof(double) * n_coarse_total);
 
-         fftw_plan forward = fftw_plan_dft_r2c_1d(window_size, in, out, FFTW_MEASURE);
-         fftw_plan backward = fftw_plan_dft_c2r_1d(window_size, out, result, FFTW_MEASURE);
+         // Create FFTW plans
+         fftw_plan forward = fftw_plan_dft_r2c_1d(n_coarse_total, in, out, FFTW_MEASURE);
+         fftw_plan backward = fftw_plan_dft_c2r_1d(n_coarse_total, out, result, FFTW_MEASURE);
 
-         // Random number generator
+         std::cout << "FFTW plans created for coarse grid." << std::endl;
+         std::cout << "Total number fine time steps: " << n_fine << std::endl;
+         std::cout << "Decimation factor M: " << M << std::endl;
+         std::cout << "Number of coarse time steps: " << n_coarse_total << std::endl;
+         std::cout << "FFT speedup factor: " << static_cast<double>(n_fine) / n_coarse_total << "x" << std::endl;
+
+         const double norm_factor = 1.0 / n_coarse_total;
+
+         // White noise statistics use fine time step to preserve variance
+         // Each MPI process generates independent noise for its local atoms
          static thread_local std::random_device rd;
          static thread_local std::mt19937 gen(rd());
          std::normal_distribution<> dist(0.0, 1.0 / std::sqrt(dt_fine));
 
-         // Precompute PSD for the window
-         std::vector<double> sqrt_PSD_window(window_size / 2 + 1);
-         double df_window = 1.0 / (window_size * dt_coarse);
-         for (int i = 0; i <= window_size / 2; ++i) {
-             double omega = 2.0 * M_PI * i * df_window;
-             sqrt_PSD_window[i] = std::sqrt(PSD(omega, T));
-         }
-
-         // Buffer to hold white noise
-         std::vector<double> white_noise_buffer(window_size);
-
-         // Resize output vector
-         // Use 64-bit arithmetic for size calculation
-         size_t total_size = static_cast<size_t>(n_coarse_total) * static_cast<size_t>(realizations);
+         // Resize output vector with 64-bit arithmetic to avoid overflow
          try {
-            noise_field.resize(total_size);
+            const size_t total_elements = static_cast<size_t>(realizations) * static_cast<size_t>(n_coarse_total);
+            noise_field.resize(total_elements);
+            std::cout << "Successfully allocated noise field vector with size: " << total_elements 
+                     << " (" << (total_elements*sizeof(double))/(1024*1024) << " MB)" << std::endl;
+         } catch (const std::length_error& e) {
+            std::cerr << "std::length_error during resize: " << e.what() << std::endl;
+            err::vexit();
          } catch (const std::bad_alloc& e) {
-            std::cerr << "Error: Failed to allocate memory for noise field (" << total_size * sizeof(double) / (1024*1024) << " MB)" << std::endl;
+            std::cerr << "std::bad_alloc during resize: " << e.what() << std::endl;
             err::vexit();
          }
 
-         std::cout << "Generating windowed noise..." << std::endl;
+         // Progress bar setup
+         const int bar_width = 50;
+         int last_printed_percent = -1;
+         std::cout << "Generating PSD-based quantum noise fields on coarse grid..." << std::endl;
 
-         for (int r = 0; r < realizations; ++r) {
-             int generated_samples = 0;
-             bool first_run = true;
-             size_t realization_offset = static_cast<size_t>(r) * static_cast<size_t>(n_coarse_total);
-
-             while (generated_samples < n_coarse_total) {
-
-                 if (first_run) {
-                     // Fill entire buffer with new random numbers
-                     for (int i = 0; i < window_size; ++i) {
-                         white_noise_buffer[i] = dist(gen);
-                     }
-                 } else {
-                     // Shift buffer: Move last 2 segments (5 and 6) to front (1 and 2)
-                     std::memmove(white_noise_buffer.data(),
-                                  white_noise_buffer.data() + 4 * segment_size,
-                                  2 * segment_size * sizeof(double));
-
-                     // Fill the rest (segments 3, 4, 5, 6) with new random numbers
-                     for (int i = 2 * segment_size; i < window_size; ++i) {
-                         white_noise_buffer[i] = dist(gen);
-                     }
-                 }
-
-                 // Copy to FFT input
-                 for(int i=0; i<window_size; ++i) in[i] = white_noise_buffer[i];
-
-                 // FFT
-                 fftw_execute(forward);
-
-                 // Apply PSD
-                 for (int i = 0; i <= window_size / 2; i++) {
-                     const double magnitude = sqrt_PSD_window[i];
-                     out[i][0] *= magnitude;
-                     out[i][1] *= magnitude;
-                 }
-
-                 // Inverse FFT
-                 fftw_execute(backward);
-
-                 // Process Output
-                 if (first_run) {
-                     // Take segments 1-5
-                     int count = 5 * segment_size;
-                     for (int j = 0; j < count; ++j) {
-                         if (generated_samples < n_coarse_total) {
-                              noise_field[realization_offset + generated_samples] = result[j] * norm_factor * inv_sqrt_S0 * scale;
-                              generated_samples++;
-                         }
-                     }
-                     first_run = false;
-                 } else {
-                     // Take segments 2-5
-                     int start_idx = 1 * segment_size; // Start of segment 2
-                     int end_idx = 5 * segment_size;   // End of segment 5 (exclusive)
-
-                     for (int j = start_idx; j < end_idx; ++j) {
-                         if (generated_samples < n_coarse_total) {
-                             noise_field[realization_offset + generated_samples] = result[j] * norm_factor * inv_sqrt_S0 * scale;
-                             generated_samples++;
-                         }
-                     }
-                 }
-             }
+         // Precompute PSD on coarse grid frequency space
+         std::vector<double> sqrt_PSD_coarse(n_coarse_total/2 + 1);
+         double df_coarse = 1.0 / (n_coarse_total * dt_coarse);
+         for (int i = 0; i <= n_coarse_total/2; ++i) {
+            double omega = 2.0 * M_PI * i * df_coarse;
+            sqrt_PSD_coarse[i] = std::sqrt(PSD(omega, T, 0)); // Use material 0 for now
          }
 
+         // Scale factor to preserve fine-time-step variance
+         const double scale = std::sqrt(dt_fine / dt_coarse);
+
+         std::cout << "Starting noise generation for " << realizations << " realizations..." << std::endl;
+         for (int r = 0; r < realizations; ++r) {
+            // Generate white noise on the coarse grid
+            for (int i = 0; i < n_coarse_total; ++i) {
+               in[i] = dist(gen);
+            }
+
+            // Forward FFT
+            fftw_execute(forward);
+
+            // Apply PSD on coarse grid
+            for (int i = 0; i <= n_coarse_total/2; i++) {
+               const double magnitude = sqrt_PSD_coarse[i];
+               out[i][0] *= magnitude;
+               out[i][1] *= magnitude;
+            }
+
+            // Inverse FFT
+            fftw_execute(backward);
+
+            // Store coarse noise with proper scaling
+            for (int j = 0; j < n_coarse_total; ++j) {
+               // Use 64-bit arithmetic to prevent array index overflow
+               const size_t index = static_cast<size_t>(j) + static_cast<size_t>(r) * static_cast<size_t>(n_coarse_total);
+               noise_field[index] = result[j] * norm_factor * scale;
+            }
+
+            // Progress bar update - show progress every 5%
+            int current_percent = static_cast<int>((r + 1) * 100.0 / realizations);
+            if (current_percent >= last_printed_percent + 5 || r == realizations - 1) {
+               float progress = static_cast<float>(r + 1) / realizations;
+               int pos = static_cast<int>(bar_width * progress);
+
+               std::cout << "\r[";
+               for (int i = 0; i < bar_width; ++i) {
+                  if (i < pos) std::cout << "=";
+                  else if (i == pos) std::cout << ">";
+                  else std::cout << " ";
+               }
+               std::cout << "] " << std::setw(3) << current_percent << "% (" << (r + 1) << "/" << realizations << ")";
+               std::cout.flush();
+
+               last_printed_percent = current_percent;
+            }
+         }
+
+         // Cleanup FFTW resources after all realizations are complete
          fftw_destroy_plan(forward);
          fftw_destroy_plan(backward);
          fftw_free(in);
          fftw_free(out);
          fftw_free(result);
+
+         std::cout << std::endl; // New line after progress bar
+
          #else
-         std::cerr << "Error: FFTW library required for quantum noise." << std::endl;
+         std::cerr << "Error - quantum thermostat requires the FFTW library to function. Please recompile with the FFT library linked" << std::endl;
          err::vexit();
          #endif
       }
@@ -261,5 +267,18 @@ namespace quantum{
    void increment_time() {
        internal::noise_index += 1.0;
    }
+
+   namespace internal {
+
+      //---------------------------------------------------------------------------
+      // Initialize noise structures (stub - to be implemented if needed)
+      //---------------------------------------------------------------------------
+      void init_noise_structures(int n_coarse, int realizations, double dt_fine, int M, double T) {
+         // This function should initialize FFT noise structures
+         // For now, just a stub to allow compilation
+         return;
+      }
+
+   } // end of internal namespace
 
 } // end of quantum namespace

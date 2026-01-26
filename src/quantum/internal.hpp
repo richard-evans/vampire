@@ -23,6 +23,10 @@
 // C++ standard library headers
 #include <vector>
 
+#ifdef FFT
+#include <fftw3.h>
+#endif
+
 // Vampire headers
 #include "quantum.hpp"
 
@@ -33,7 +37,7 @@ namespace quantum{
       // Internal data type definitions
       //-------------------------------------------------------------------------
       // simple initialised class for set variables
-      
+
       class set_double_t{
 
       private:
@@ -73,7 +77,8 @@ namespace quantum{
             set_double_t omega0;     // Lorentzian central frequency parameter
 
             // constructor
-            mp_t (const unsigned int max_materials = 100) {
+            mp_t (const unsigned int max_materials = 100)
+            {
                gamma.set(0.0); // default value
                omega0.set(0.0); // default value
             }; // end of constructor
@@ -90,18 +95,40 @@ namespace quantum{
          quantum_no_zero
       };
 
+      enum integration_t {
+         llg_fft,
+         llg_ho
+      };
+
       extern bool enabled; // bool to enable module
 
       extern std::vector<internal::mp_t> mp; // array of material properties
 
       extern noise_t noise_type; // Default to Quantum noise
-      extern int window_size; // Default window size (initially set to zero, later initialised to simulation length)
-      extern int M_decimation; // No decimation (interpolation in German -> English translation)
+      extern integration_t llg_method; // Default to FFT method
+      extern uint64_t window_size; // Default window size (initially set to zero, later initialised to simulation length)
+      extern uint64_t M_decimation; // No decimation (interpolation in German -> English translation)
+
+      // FFT Plans and State
+      #ifdef FFT
+      extern fftw_plan fft_forward;
+      extern fftw_plan fft_backward;
+      extern double* fft_in;
+      extern fftw_complex* fft_out;
+      extern double* fft_result;
+      #endif
+
+      extern std::vector<std::vector<double>> noise_gen_buffer; // State for each realization
+      extern std::vector<std::vector<double>> material_psd; // Precomputed PSD for each material
+      extern uint64_t current_noise_start_step; // The coarse step index where the current buffer starts
+      extern uint64_t noise_buffer_len; // Length of the noise buffer (n_coarse)
+
 
       extern std::vector<double> material_A_array; // compact array of Lorentzian amplitude for each material
       extern std::vector<double> material_gamma_array; // compact array of Lorentzian gamma for each material
       extern std::vector<double> material_omega0_array; // compact array of Lorentzian omega0 for each material
-
+      extern std::vector<double> material_S0_array; // compact array of spin magnitude for each material
+      extern std::vector<double> material_inv_sqrt_S0_array; // compact array of inverse sqrt of spin magnitude for each material
       extern std::vector<double> coarse_noise_field; // final generated noise (1D list of noise for all atoms and dimensions)
 
       extern std::vector<std::size_t> atom_idx_x; // indexing for accessing noise for each atom and spatial dimension in coarse array
@@ -118,6 +145,14 @@ namespace quantum{
       extern std::vector<double> y_v_array;
       extern std::vector<double> z_v_array;
 
+      // Integration arrays for atom position and momenta
+      extern std::vector<double> q_x_array;
+      extern std::vector<double> q_y_array;
+      extern std::vector<double> q_z_array;
+      extern std::vector<double> p_x_array;
+      extern std::vector<double> p_y_array;
+      extern std::vector<double> p_z_array;
+
       // Integration arrays for RK4 integration
       extern std::vector<std::vector<double>> k1_storage;
       extern std::vector<std::vector<double>> k2_storage;
@@ -125,34 +160,63 @@ namespace quantum{
       extern std::vector<std::vector<double>> k4_storage;
       extern std::vector<std::vector<double>> y_pred_storage;
       extern std::vector<std::vector<double>> y_in_storage;
-             
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
+      void llg_HO();
+      void llg_HO_mpi();
 
-      double PSD(const double& omega, 
-                 const double& T);
+      void llg_FFT();
+      void llg_FFT_mpi();
 
-      void calculate_noise(int realizations, 
-                           int n_fine, 
-                           double dt_fine, 
-                           int M, 
-                           double T, 
-                           int n_coarse_total, 
+      void spinDynamics(const double* y,
+                        const double* H,
+                        double* dydt,
+                        const int material);
+
+
+
+      void LL_HO_method(const double* y, const double* H, double* dydt, const int material, const double dt);
+      void LL_FFT_method(const double* y, const double* H, double* dydt, const int material);
+
+      double PSD(const double omega,
+                 const double T,
+                 const int material);
+
+      void calculate_noise(int realizations,
+                           int n_fine,
+                           double dt_fine,
+                           int M,
+                           double T,
+                           int n_coarse_total,
                            std::vector<double>& noise_field);
 
 
-      double get_noise(const std::vector<double>& coarse_noise, 
-                       double fine_step_idx, 
-                       int M, 
+      double get_noise(const std::vector<double>& coarse_noise,
+                       double fine_step_idx,
+                       int M,
                        size_t atom_idx);
 
-      void assign_unique_indices(int n_coarse);
+      void assign_unique_indices(int n_coarse, int num_atoms_local);
+
+      
+      void init_noise_structures(int n_coarse, 
+                                 int realizations, 
+                                 double dt_fine, 
+                                 int M, 
+                                 double T);
+
+      void cleanup_noise_structures();
+
+      void update_noise_if_needed(double current_time_step, 
+                                  int n_fine, 
+                                  double dt_fine, 
+                                  int M,
+                                  double T);
 
    } // end of internal namespace
 
 } // end of quantum namespace
 
 #endif //QUANTUM_INTERNAL_H_
-
-
