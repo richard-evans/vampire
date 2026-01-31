@@ -115,8 +115,12 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			err::vexit();
 			break;
 
+      case 5: // Agglomorate
+         internal::agglomorate(catom_array);
+         break;
+
 		default:{
-			std::cerr << "Unknown system type requested, exiting" << std::endl;
+			std::cerr << "Unknown system type requested in create module, exiting" << std::endl;
 			err::vexit();
 		}
 	}

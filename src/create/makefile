@@ -4,8 +4,7 @@
 
 # List module object filenames
 create_objects=\
-create.o \
-cs_set_atom_vars2.o \
+agglomorate.o \
 alloy.o \
 bubble.o \
 bulk.o \
@@ -13,6 +12,8 @@ centre_particle.o \
 cone.o \
 compare_radius.o \
 composition.o \
+create.o \
+cs_set_atom_vars2.o \
 cube.o \
 cylinder.o \
 data.o \
@@ -32,6 +33,7 @@ particle.o \
 roughness.o \
 sort_atoms_by_grain.o \
 sphere.o \
+sphere_size.o \
 square_array.o \
 system_type.o \
 teardrop.o \

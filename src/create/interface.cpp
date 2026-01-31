@@ -123,13 +123,16 @@ namespace create{
          cs::system_creation_flags[2]=0;
          return true;
       }
-      else
+      test="agglomorate";
+      if(word==test){
+         cs::system_creation_flags[2] = 5;
+         return true;
+      }
       test="particle-array";
       if(word==test){
          cs::system_creation_flags[2]=1;
          return true;
       }
-      else
       test="hexagonal-particle-array";
       if(word==test){
          cs::system_creation_flags[2]=2;
