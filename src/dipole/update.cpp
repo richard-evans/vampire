@@ -126,7 +126,7 @@ namespace dipole{
        //  std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
        }
 
-		dipole:internal::output_dipole_fields();
+		dipole::internal::output_dipole_fields();
 
 	} // end of dipole::internal::update_field() function
 } // end of dipole namespace
