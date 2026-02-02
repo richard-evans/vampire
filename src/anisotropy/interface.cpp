@@ -151,6 +151,7 @@ namespace anisotropy{
          double k2r1 = atof(value.c_str());
          vin::check_for_valid_value(k2r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1 = k2r1;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_1_order = true;
          return true;
 
@@ -164,6 +165,7 @@ namespace anisotropy{
          double k2r1 = - atof( value.c_str() ) * ( 0.25 ) * sqrt( 15.0 / M_PI );
          vin::check_for_valid_value(k2r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1 = k2r1;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_1_order = true;
          return true;
 
@@ -178,6 +180,7 @@ namespace anisotropy{
          double k2r1_odd = atof(value.c_str());
          vin::check_for_valid_value(k2r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1_odd = k2r1_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_1_order_odd = true;
          return true;
 
@@ -191,6 +194,7 @@ namespace anisotropy{
          double k2r1_odd = - atof( value.c_str() ) * ( 0.25 ) * sqrt( 15.0 / M_PI );
          vin::check_for_valid_value(k2r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r1_odd = k2r1_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_1_order_odd = true;
          return true;
 
@@ -206,6 +210,7 @@ namespace anisotropy{
          double k2r2 = atof(value.c_str());
          vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2 = k2r2;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_2_order = true;
          return true;
 
@@ -219,6 +224,7 @@ namespace anisotropy{
          double k2r2 = - atof( value.c_str() ) * 0.25 * sqrt( 15.0 / M_PI );
          vin::check_for_valid_value(k2r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2 = k2r2;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_2_order = true;
          return true;
 
@@ -234,6 +240,7 @@ namespace anisotropy{
          double k2r2_odd = atof(value.c_str());
          vin::check_for_valid_value(k2r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2_odd = k2r2_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_2_order_odd = true;
          return true;
 
@@ -247,6 +254,7 @@ namespace anisotropy{
          double k2r2_odd = - atof( value.c_str() ) * 0.25 * sqrt( 15.0 / M_PI );
          vin::check_for_valid_value(k2r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k2r2_odd = k2r2_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_2_2_order_odd = true;
          return true;
 
@@ -288,6 +296,7 @@ namespace anisotropy{
          double k4r1 = atof(value.c_str());
          vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1 = k4r1;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_1_order = true;
          return true;
 
@@ -301,6 +310,7 @@ namespace anisotropy{
          double k4r1 = - atof( value.c_str() ) * ( 3.0 * 7.0 / 8.0 ) * sqrt( 10.0 / M_PI );
          vin::check_for_valid_value(k4r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1 = k4r1;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_1_order = true;
          return true;
 
@@ -315,6 +325,7 @@ namespace anisotropy{
          double k4r1_odd = atof(value.c_str());
          vin::check_for_valid_value(k4r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1_odd = k4r1_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_1_order_odd = true;
          return true;
 
@@ -328,6 +339,7 @@ namespace anisotropy{
          double k4r1_odd = - atof( value.c_str() ) * ( 3.0 * 7.0 / 8.0 ) * sqrt( 10.0 / M_PI );
          vin::check_for_valid_value(k4r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r1_odd = k4r1_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_1_order_odd = true;
          return true;
 
@@ -342,6 +354,7 @@ namespace anisotropy{
          double k4r2 = atof(value.c_str());
          vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2 = k4r2;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_2_order = true;
          return true;
 
@@ -355,6 +368,7 @@ namespace anisotropy{
          double k4r2 = - atof( value.c_str() ) * ( 3.0 * 7.0 ) * sqrt( 5.0 / M_PI );
          vin::check_for_valid_value(k4r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2 = k4r2;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_2_order = true;
          return true;
 
@@ -369,6 +383,7 @@ namespace anisotropy{
          double k4r2_odd = atof(value.c_str());
          vin::check_for_valid_value(k4r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2_odd = k4r2_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_2_order_odd = true;
          return true;
 
@@ -382,6 +397,7 @@ namespace anisotropy{
          double k4r2_odd = - atof( value.c_str() ) * ( 3.0 * 7.0 ) * sqrt( 5.0 / M_PI );
          vin::check_for_valid_value(k4r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r2_odd = k4r2_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_2_order_odd = true;
          return true;
 
@@ -396,6 +412,7 @@ namespace anisotropy{
          double k4r3 = atof(value.c_str());
          vin::check_for_valid_value(k4r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3 = k4r3;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_3_order = true;
          return true;
 
@@ -409,6 +426,7 @@ namespace anisotropy{
          double k4r3 = - atof( value.c_str() ) * ( 3.0 / 8.0 ) * sqrt( 70.0 / M_PI );
          vin::check_for_valid_value(k4r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3 = k4r3;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_3_order = true;
          return true;
 
@@ -423,6 +441,7 @@ namespace anisotropy{
          double k4r3_odd = atof(value.c_str());
          vin::check_for_valid_value(k4r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3_odd = k4r3_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_3_order_odd = true;
          return true;
 
@@ -436,6 +455,7 @@ namespace anisotropy{
          double k4r3_odd = - atof( value.c_str() ) * ( 3.0 / 8.0 ) * sqrt( 70.0 / M_PI );
          vin::check_for_valid_value(k4r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r3_odd = k4r3_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_3_order_odd = true;
          return true;
 
@@ -451,6 +471,7 @@ namespace anisotropy{
          double k4r4 = atof(value.c_str());
          vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4 = k4r4;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_4_order = true;
          return true;
 
@@ -464,6 +485,7 @@ namespace anisotropy{
          double k4r4 = - atof( value.c_str() ) * ( 3.0 / 16.0 ) * sqrt( 35.0 / M_PI );
          vin::check_for_valid_value(k4r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4 = k4r4;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_4_order = true;
          return true;
 
@@ -479,6 +501,7 @@ namespace anisotropy{
          double k4r4_odd = atof(value.c_str());
          vin::check_for_valid_value(k4r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4_odd = k4r4_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_4_order_odd = true;
          return true;
 
@@ -492,6 +515,7 @@ namespace anisotropy{
          double k4r4_odd = atof( value.c_str() ) * ( 3.0 / 16.0 ) * sqrt( 35.0 / M_PI );
          vin::check_for_valid_value(k4r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k4r4_odd = k4r4_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_4_4_order_odd = true;
          return true;
 
@@ -533,6 +557,7 @@ namespace anisotropy{
          double k6r1 = atof(value.c_str());
          vin::check_for_valid_value(k6r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1 = k6r1;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_1_order = true;
          return true;
 
@@ -546,6 +571,7 @@ namespace anisotropy{
          double k6r1 = - atof( value.c_str() ) * ( 33.0 / 16.0 ) * sqrt( 273.0 / M_PI );
          vin::check_for_valid_value(k6r1, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1 = k6r1;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_1_order = true;
          return true;
 
@@ -560,6 +586,7 @@ namespace anisotropy{
          double k6r1_odd = atof(value.c_str());
          vin::check_for_valid_value(k6r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1_odd = k6r1_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_1_order_odd = true;
          return true;
 
@@ -573,6 +600,7 @@ namespace anisotropy{
          double k6r1_odd = - atof( value.c_str() ) * ( 33.0 / 16.0 ) * sqrt( 273.0 / M_PI );
          vin::check_for_valid_value(k6r1_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r1_odd = k6r1_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_1_order_odd = true;
          return true;
 
@@ -587,6 +615,7 @@ namespace anisotropy{
          double k6r2 = atof( value.c_str() );
          vin::check_for_valid_value(k6r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2 = k6r2;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_2_order = true;
          return true;
 
@@ -600,6 +629,7 @@ namespace anisotropy{
          double k6r2 = - atof( value.c_str() ) * ( 33.0 / 64.0 ) * sqrt( 2730.0 / M_PI );
          vin::check_for_valid_value(k6r2, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2 = k6r2;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_2_order = true;
          return true;
 
@@ -614,6 +644,7 @@ namespace anisotropy{
          double k6r2_odd = atof( value.c_str() );
          vin::check_for_valid_value(k6r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2_odd = k6r2_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_2_order_odd = true;
          return true;
 
@@ -627,6 +658,7 @@ namespace anisotropy{
          double k6r2_odd = - atof( value.c_str() ) * ( 33.0 / 64.0 ) * sqrt( 2730.0 / M_PI );
          vin::check_for_valid_value(k6r2_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r2_odd = k6r2_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_2_order_odd = true;
          return true;
 
@@ -641,6 +673,7 @@ namespace anisotropy{
          double k6r3 = atof( value.c_str() );
          vin::check_for_valid_value(k6r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3 = k6r3;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_3_order = true;
          return true;
 
@@ -654,6 +687,7 @@ namespace anisotropy{
          double k6r3 = - atof( value.c_str() ) * ( 11.0 / 32.0 ) * sqrt( 2730.0 / M_PI );
          vin::check_for_valid_value(k6r3, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3 = k6r3;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_3_order = true;
          return true;
 
@@ -668,6 +702,7 @@ namespace anisotropy{
          double k6r3_odd = atof( value.c_str() );
          vin::check_for_valid_value(k6r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3_odd = k6r3_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_3_order_odd = true;
          return true;
 
@@ -681,6 +716,7 @@ namespace anisotropy{
          double k6r3_odd = - atof( value.c_str() ) * ( 11.0 / 32.0 ) * sqrt( 2730.0 / M_PI );
          vin::check_for_valid_value(k6r3_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r3_odd = k6r3_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_3_order_odd = true;
          return true;
 
@@ -695,6 +731,7 @@ namespace anisotropy{
          double k6r4 = atof(value.c_str());
          vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4 = k6r4;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_4_order = true;
          return true;
 
@@ -708,6 +745,7 @@ namespace anisotropy{
          double k6r4 = - atof( value.c_str() ) * ( 3.0 * 11.0 / 32.0 ) * sqrt( 91.0 / M_PI );
          vin::check_for_valid_value(k6r4, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4 = k6r4;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_4_order = true;
          return true;
 
@@ -722,6 +760,7 @@ namespace anisotropy{
          double k6r4_odd = atof( value.c_str() );
          vin::check_for_valid_value(k6r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4_odd = k6r4_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_4_order_odd = true;
          return true;
 
@@ -735,6 +774,7 @@ namespace anisotropy{
          double k6r4_odd = - atof( value.c_str() ) * ( 3.0 * 11.0 / 32.0 ) * sqrt( 91.0 / M_PI );
          vin::check_for_valid_value(k6r4_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r4_odd = k6r4_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_4_order_odd = true;
          return true;
 
@@ -749,6 +789,7 @@ namespace anisotropy{
          double k6r5 = atof( value.c_str() );
          vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5 = k6r5;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_5_order = true;
          return true;
 
@@ -762,6 +803,7 @@ namespace anisotropy{
          double k6r5 = - atof( value.c_str() ) * ( 3.0 / 32.0 ) * sqrt( 2002.0 / M_PI );
          vin::check_for_valid_value(k6r5, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5 = k6r5;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_5_order = true;
          return true;
 
@@ -776,6 +818,7 @@ namespace anisotropy{
          double k6r5_odd = atof( value.c_str() );
          vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5_odd = k6r5_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_5_order_odd = true;
          return true;
 
@@ -789,6 +832,7 @@ namespace anisotropy{
          double k6r5_odd = - atof( value.c_str() ) * ( 3.0 / 32.0 ) * sqrt( 2002.0 / M_PI );
          vin::check_for_valid_value(k6r5_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r5_odd = k6r5_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_5_order_odd = true;
          return true;
 
@@ -804,6 +848,7 @@ namespace anisotropy{
          double k6r6 = atof( value.c_str() );
          vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6 = k6r6;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_6_order = true;
          return true;
 
@@ -817,6 +862,7 @@ namespace anisotropy{
          double k6r6 = - atof( value.c_str() ) * ( 1.0 / 64.0 ) * sqrt( 6006.0 / M_PI );
          vin::check_for_valid_value(k6r6, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6 = k6r6;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_6_order = true;
          return true;
 
@@ -832,6 +878,7 @@ namespace anisotropy{
          double k6r6_odd = atof( value.c_str() );
          vin::check_for_valid_value(k6r6_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6_odd = k6r6_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_6_order_odd = true;
          return true;
 
@@ -845,6 +892,7 @@ namespace anisotropy{
          double k6r6_odd = - atof( value.c_str() ) * ( 1.0 / 64.0 ) * sqrt( 6006.0 / M_PI );
          vin::check_for_valid_value(k6r6_odd, word, line, prefix, unit, "energy", -1e-17, 1e-17, "material", " < +/-1.0e-17 J/atom");
          internal::mp[super_index].k6r6_odd = k6r6_odd;
+         internal::mp[super_index].need_rotated_basis = true;
          internal::enable_rotational_6_6_order_odd = true;
          return true;
 
@@ -1002,7 +1050,7 @@ namespace anisotropy{
          internal::enable_biaxial_fourth_order_simple = true;
          return true;
       }
-      
+
       //Minimal orthogonality
       test = "fourth-order-cubic-anisotropy-constant"; // new form (preferred)
       test2  = "cubic-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)

@@ -131,7 +131,7 @@ namespace anisotropy{
       std::vector<double> ku4_triaxial_vector_y(100,0); //
       std::vector<double> ku4_triaxial_vector_z(100,0); //
 
-      //basis vectors for second order triaxial - must be orthogonality
+      //basis vectors for second order triaxial - must be orthogonal
       std::vector < double > ku_triaxial_basis1x(100,0.0);
       std::vector < double > ku_triaxial_basis1y(100,0.0);
       std::vector < double > ku_triaxial_basis1z(100,0.0);
@@ -144,7 +144,7 @@ namespace anisotropy{
       std::vector < double > ku_triaxial_basis3y(100,0.0);
       std::vector < double > ku_triaxial_basis3z(100,0.0);
 
-      //basis vectors for fourth order triaxial - must be orthogonality
+      //basis vectors for fourth order triaxial - must be orthogonal
       std::vector < double > ku4_triaxial_basis1x(100,0.0);
       std::vector < double > ku4_triaxial_basis1y(100,0.0);
       std::vector < double > ku4_triaxial_basis1z(100,0.0);
