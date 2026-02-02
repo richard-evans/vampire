@@ -1465,6 +1465,7 @@ namespace vin{
          if(word==test){
             stats::calculate_system_spin_temp = true;
             output_list.push_back(74);
+            return EXIT_SUCCESS;
          }
          //--------------------------------------------------------------------
          test="mean-spin-temperature";

@@ -42,6 +42,7 @@ bool spin_temp_statistic_t::is_initialized(){
 //------------------------------------------------------------------------------------------------------
 void spin_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in_mask, const std::vector<double>& mm){
 
+   
    // Check that mask values never exceed mask_size
    for(unsigned int atom=0; atom<in_mask.size(); ++atom){
       if(in_mask[atom] > in_mask_size-1){
@@ -55,7 +56,7 @@ void spin_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in
 
    // save mask to internal storage
    num_atoms = in_mask.size();
-   mask_size = in_mask_size - 1;
+   mask_size = in_mask_size -1;
    mean_counter = 0.0;
    mask=in_mask; // copy contents of vector
    spin_temp.resize(in_mask_size, 0.0);
@@ -71,16 +72,12 @@ void spin_temp_statistic_t::set_mask(const int in_mask_size, std::vector<int> in
       num_atoms_in_mask[mask_id]++;
    }
 
-   // Reduce on all CPUs
-   #ifdef MPICF
-      MPI_Allreduce(MPI_IN_PLACE, &num_atoms_in_mask[0], mask_size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-   #endif
-
    // Check for no atoms in mask on any CPU
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       // if no atoms exist then add to zero list
       if(num_atoms_in_mask[mask_id]==0){
          zero_list.push_back(mask_id);
+         
       }
    }
 
@@ -114,16 +111,17 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                                           const std::vector<double>& bxe, // external fields (tesla)
                                           const std::vector<double>& bye,
                                           const std::vector<double>& bze,
-                                          const std::vector<double>& mm){
+                                          const std::vector<double>& mm) {
 
    std::fill(spin_temp.begin(),spin_temp.end(),0.0);
 
-   const int64_t num_atoms = sx.size();
-   //double SxH2=0.0;
-   //double SH=0.0;
-
+   if(sim::integrator == sim::monte_carlo || sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc ){
+      const size_t num_atoms = sx.size();
+      sim::calculate_spin_fields(0, num_atoms);
+      sim::calculate_external_fields(0, num_atoms);
+   }  
    // ASD version
-   sim::calculate_spin_fields(0, num_atoms);
+   // sim::calculate_spin_fields(0, num_atoms);
 
    // SLD version
    std::fill(SxH2.begin(),SxH2.end(),0.0);
@@ -132,7 +130,6 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
    /*std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
    std::fill(atoms::y_total_spin_field_array.begin(), atoms::y_total_spin_field_array.end(), 0.0);
    std::fill(atoms::z_total_spin_field_array.begin(), atoms::z_total_spin_field_array.end(), 0.0);
-
    sld::compute_fields(0, // first atom for exchange interactions to be calculated
                      num_atoms, // last +1 atom to be calculated
                      atoms::neighbour_list_start_index,
@@ -152,13 +149,11 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                      atoms::y_total_spin_field_array,
                      atoms::z_total_spin_field_array);*/
 
-
-
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
 
       const int mask_id = mask[atom]; // get mask id
-
+     
       // get atomic moment
 		const double mu = mm[atom];
 
@@ -171,20 +166,26 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
       double SxHz = S[0]*B[1]-S[1]*B[0];
       SxH2[mask_id]  = SxH2[mask_id]+ mu*(SxHx*SxHx + SxHy*SxHy + SxHz*SxHz);
       SH[mask_id]  = SH[mask_id] + S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
-      spin_temp[mask_id]= SxH2[mask_id] / SH[mask_id];
-
 	}
 
+         // Zero empty mask id's
+   for(unsigned int id=0; id<zero_list.size(); ++id) {
+      SxH2[zero_list[id]]=0.0;
+      SH[zero_list[id]] = 1.0;
+   }
    // Reduce on all CPUS
    #ifdef MPICF
-      MPI_Allreduce(MPI_IN_PLACE, &spin_temp[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &SxH2[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &SH[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
-   // Zero empty mask id's
-   for(unsigned int id=0; id<zero_list.size(); ++id) spin_temp[zero_list[id]]=0.0;
+      
+      for(int mask = 0; mask < mask_size; mask++) {
+         
+         spin_temp[mask] = SxH2[mask] / SH[mask]; 
+      }
 
-   const int tsize = spin_temp.size();
-   for(int idx = 0; idx < tsize; ++idx) mean_spin_temp[idx] += spin_temp[idx];
+   for(int idx = 0; idx < mask_size; ++idx) mean_spin_temp[idx] += spin_temp[idx];
    mean_counter+=1.0;
 
    return;
@@ -247,7 +248,7 @@ std::string spin_temp_statistic_t::output_spin_temp(bool header){
          result << name + std::to_string(mask_id) + "_Ts";
       }
       else{
-         result << 0.5*constants::muB/constants::kB * spin_temp[mask_id ] / vmpi::num_processors;
+         result << (0.5*constants::muB/constants::kB) * spin_temp[mask_id ];
       }
    }
 
@@ -270,7 +271,7 @@ std::string spin_temp_statistic_t::output_mean_spin_temp(bool header){
    vout::fixed_width_output result(res,vout::fw_size);
 
    // inverse number of data samples * muB
-   const double ic = constants::muB / mean_counter;
+   const double ic = constants::muB / (2.0*constants::kB*mean_counter);
 
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){

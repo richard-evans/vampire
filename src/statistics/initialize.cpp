@@ -331,9 +331,12 @@ namespace stats{
       if(stats::calculate_material_spin_temp){
          for(int atom=0; atom < stats::num_atoms; ++atom){
             // ignore non-magnetic atoms in stats calculation by assigning them to last mask
-            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] =  num_materials;
+            if(non_magnetic_materials_array[material_type_array[atom]]) {
+               mask[atom] =  num_materials;
+            }
             // other atoms assigned to material level masks
             else mask[atom] = material_type_array[atom];
+
          }
          stats::material_spin_temp.set_mask(num_materials+1,mask,magnetic_moment_array);
       }
