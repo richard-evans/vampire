@@ -27,7 +27,7 @@ void build_mn2au(unitcell::unit_cell_t& unit_cell){
    // Set basic unit cell properties
    unit_cell.dimensions[0] = 1.0;
    unit_cell.dimensions[1] = 1.0;
-   unit_cell.dimensions[2] = 3.0;
+   unit_cell.dimensions[2] = 2.566; 
 
    unit_cell.shape[0][0]=1.0;
    unit_cell.shape[0][1]=0.0;
