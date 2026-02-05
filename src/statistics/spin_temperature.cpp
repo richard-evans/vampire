@@ -21,14 +21,13 @@
 #include "atoms.hpp"
 #include "constants.hpp"
 #include "errors.hpp"
-#include "sim.hpp"
 #include "sld.hpp"
+#include "sim.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
 
 namespace stats{
-
 
 //------------------------------------------------------------------------------------------------------
 // Function to determine if class is properly initialized
@@ -116,20 +115,19 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                                           const std::vector<double>& bze,
                                           const std::vector<double>& mm){
 
-   std::fill(spin_temp.begin(),spin_temp.end(),0.0);
-
-   const int64_t num_atoms = sx.size();
+   //std::fill(spin_temp.begin(),spin_temp.end(),0.0);
+   //const int64_t num_atoms = sx.size();
    //double SxH2=0.0;
    //double SH=0.0;
 
    // ASD version
-   sim::calculate_spin_fields(0, num_atoms);
+   //sim::calculate_spin_fields(0, num_atoms);
 
    // SLD version
    std::fill(SxH2.begin(),SxH2.end(),0.0);
    std::fill(SH.begin(),SH.end(),0.0);
 
-   /*std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
+   std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
    std::fill(atoms::y_total_spin_field_array.begin(), atoms::y_total_spin_field_array.end(), 0.0);
    std::fill(atoms::z_total_spin_field_array.begin(), atoms::z_total_spin_field_array.end(), 0.0);
 
@@ -150,9 +148,7 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
                      atoms::z_total_spin_forces_array,
                      atoms::x_total_spin_field_array,
                      atoms::y_total_spin_field_array,
-                     atoms::z_total_spin_field_array);*/
-
-
+                     atoms::z_total_spin_field_array);
 
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
