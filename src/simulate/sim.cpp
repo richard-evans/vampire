@@ -773,6 +773,8 @@ void integrate_serial(uint64_t n_steps){
 		case sim::suzuki_trotter: // spin-lattice Dynamics
 			for(uint64_t ti=0;ti<n_steps;ti++){
 				sld::suzuki_trotter();
+			   sim::internal::increment_time();
+
 			}
 			break;
 
@@ -960,10 +962,6 @@ int integrate_mpi(uint64_t n_steps){
 
 } // Namespace sim
 
-void spin_lattice_simulation(){
-	sld::suzuki_trotter();
-	sim::internal::increment_time();
-}
 
 void multiscale_simulation_steps(int n_steps){
 
