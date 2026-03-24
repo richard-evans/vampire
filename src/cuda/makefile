@@ -56,7 +56,7 @@ CUDA_MATRIX_TYPE = CSR
 #CUDA 8.0+
 #CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++11 -Wno-deprecated-gpu-targets
 #CUDA 10.0 +
-CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++14 -Wno-deprecated-gpu-targets -diag-suppress 549
+CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++14 -Wno-deprecated-gpu-targets -diag-suppress 549 -Wno-deprecated-declarations
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -dc -o $@ $(CUDA_CFLAGS) $(CUDA_PR) -DCUDA_MATRIX=$(CUDA_MATRIX_TYPE)
@@ -74,11 +74,13 @@ cuda-build: $(OBJECTS) $(CUDA_OBJECTS)
 # CUDA default target - cleans before building
 .PHONY: cuda
 cuda:
-	$(MAKE) clean
 	$(MAKE) cuda-build
+
+# $(MAKE) clean
 
 # CUDA debug target
 cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG
+cuda-debug: clean
 cuda-debug: cuda-build
 
 # CUDA debug target
