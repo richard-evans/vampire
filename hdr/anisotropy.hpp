@@ -31,7 +31,7 @@ namespace anisotropy
    // Function to check orthogonality, set orthonormality and generate last
    // last anisotropy vector
    //-----------------------------------------------------------------------------
-   void set_anisotropy_vectors(  std::vector<double>& v1, 
+   void set_anisotropy_vectors(  std::vector<double>& v1,
                                  std::vector<double>& v2,
                                  std::vector<double>& v3,
                                  int mat);
@@ -114,7 +114,8 @@ namespace anisotropy
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index, const int max_materials);
 
-   std::vector<double>* get_neel_tensor();
+   std::vector<double> get_neel_tensor();
+
    bool is_neel_enabled();
 
    bool is_rotational_enabled();

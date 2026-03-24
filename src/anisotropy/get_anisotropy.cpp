@@ -274,9 +274,10 @@ namespace anisotropy{
    //--------------------------------------------------------------------------------
    // Function to get pointer to neel tensor
    //--------------------------------------------------------------------------------
-   std::vector<double>* get_neel_tensor() {
-      return &internal::neel_tensor;
+   std::vector<double> get_neel_tensor() {
+      return internal::neel_tensor;
    }
+
    //--------------------------------------------------------------------------------
    // Function to determine if Neel anisotropy is enabled
    //--------------------------------------------------------------------------------

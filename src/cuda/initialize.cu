@@ -188,6 +188,12 @@ namespace vcuda{
 
    namespace internal {
 
+      std::vector<cu_real_t> double2cu_real_t(std::vector<double> in){
+         std::vector<cu_real_t> out(in.size());
+         for(int i= 0; i<in.size(); i++) out[i] = cu_real_t(in[i]);
+         return out;
+      }
+
       bool __initialize_atoms ()
       {
          /*
@@ -199,7 +205,7 @@ namespace vcuda{
          cu::atoms::y_spin_array.resize(::atoms::num_atoms);
          cu::atoms::z_spin_array.resize(::atoms::num_atoms);
          */
-        
+
          size_t num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
 
 	 cudaMalloc((void**)&cu::atoms::d_spin, num_bytes * 3);
@@ -365,11 +371,12 @@ namespace vcuda{
          //Skip if neel is not enabled
          if (!anisotropy::is_neel_enabled()) return true;
 
-         std::vector<cu_real_t>* neel_tensor_p = anisotropy::get_neel_tensor();
-         size_t num_bytes = neel_tensor_p->size() * sizeof(cu_real_t);
+         std::vector<cu_real_t> neel_tensor = internal::double2cu_real_t(anisotropy::get_neel_tensor());
+         //std::vector<cu_real_t>* neel_tensor_p = &neel_tensor;
+         size_t num_bytes = neel_tensor.size() * sizeof(cu_real_t);
 
          cudaMalloc((void**)&cu::d_neel_tensor,num_bytes);
-         cudaMemcpy(cu::d_neel_tensor, neel_tensor_p->data(), num_bytes, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::d_neel_tensor, neel_tensor.data(), num_bytes, cudaMemcpyHostToDevice);
 
          return true;
       }
@@ -446,7 +453,7 @@ namespace vcuda{
 
       bool __initialize_dipole(){
 
-         // Initialise and copy dipolar fields for cells. 
+         // Initialise and copy dipolar fields for cells.
          // It's done here because otherwise these objects are not yet initialised on the host when initialise_dipole() is called
          size_t num_bytes = ::cells::num_cells * sizeof(cu_real_t);
          std::vector<cu_real_t> tmp_buffer;
@@ -483,7 +490,7 @@ namespace vcuda{
          cudaMemcpy(cu::cells::d_num_atoms_in_cell, num_atoms_in_cell.data(), num_atoms_in_cell.size() * sizeof(int), cudaMemcpyHostToDevice);
 
          check_cuda_errors(__FILE__,__LINE__);
-         
+
          // Initialise and copy dipolar tensor
 
          // Copy into <cu_real_t> vectors to avoid having to perform later std::copy()
@@ -548,15 +555,15 @@ namespace vcuda{
          std::vector<material_parameters_t> _materials(num_mats);
          for (size_t i = 0; i < num_mats; i++)
          {
-            double mu_s_SI = ::mp::material[i].mu_s_SI;
+            cu_real_t mu_s_SI = ::mp::material[i].mu_s_SI;
 
-            double ku2 = ::anisotropy::get_ku2(i); // second order uniaxial anisotropy constant (Ku1)
-            double ku4 = ::anisotropy::get_ku4(i); // fourth order uniaxial anisotropy constant (Ku2)
-            double ku6 = ::anisotropy::get_ku6(i); // sixth order uniaxial anisotropy constant  (Ku3)
-            double kc4 = ::anisotropy::get_kc4(i); // fourth order cubic anisotropy constant (Kc1)
-            double kc6 = ::anisotropy::get_kc6(i); // sixth order cubic anisotropy constant (Kc2)
+            cu_real_t ku2 = ::anisotropy::get_ku2(i); // second order uniaxial anisotropy constant (Ku1)
+            cu_real_t ku4 = ::anisotropy::get_ku4(i); // fourth order uniaxial anisotropy constant (Ku2)
+            cu_real_t ku6 = ::anisotropy::get_ku6(i); // sixth order uniaxial anisotropy constant  (Ku3)
+            cu_real_t kc4 = ::anisotropy::get_kc4(i); // fourth order cubic anisotropy constant (Kc1)
+            cu_real_t kc6 = ::anisotropy::get_kc6(i); // sixth order cubic anisotropy constant (Kc2)
 
-            std::vector<double> ku_vector = ::anisotropy::get_ku_vector(i); // unit vector defining axis for uniaxial anisotropy
+            std::vector<cu_real_t> ku_vector = internal::double2cu_real_t(::anisotropy::get_ku_vector(i)); // unit vector defining axis for uniaxial anisotropy
 
             _materials[i].alpha     = ::mp::material[i].alpha;
             _materials[i].gamma_rel = ::mp::material[i].gamma_rel;
@@ -564,7 +571,7 @@ namespace vcuda{
             _materials[i].i_mu_s_si = 1.0 / mu_s_SI;
             _materials[i].k_latt = 0.0; //::mp::material[i].Klatt_SI / mu_s_SI;
             // Divide anisotropy energy constants by mus_i to have it in units of field [T]
-            _materials[i].sh2 = ku2 * _materials[i].i_mu_s_si;// J/T 
+            _materials[i].sh2 = ku2 * _materials[i].i_mu_s_si;// J/T
             _materials[i].sh4 = ku4 * _materials[i].i_mu_s_si;
             _materials[i].sh6 = ku6 * _materials[i].i_mu_s_si;
             _materials[i].kc4 = kc4 * _materials[i].i_mu_s_si;
@@ -603,36 +610,36 @@ namespace vcuda{
 
          for (size_t i = 0; i < num_mats; i++)
          {
-            double mu_s_SI = ::mp::material[i].mu_s_SI;
-            double i_mu_s_SI = 1.0 / mu_s_SI;
+            cu_real_t mu_s_SI = ::mp::material[i].mu_s_SI;
+            cu_real_t i_mu_s_SI = 1.0 / mu_s_SI;
 
-            std::vector<double> kr_vector = ::anisotropy::get_kr_vector(i);
-            std::vector<double> kl_vector = ::anisotropy::get_kl_vector(i);
+            std::vector<cu_real_t> kr_vector = internal::double2cu_real_t(::anisotropy::get_kr_vector(i));
+            std::vector<cu_real_t> kl_vector = internal::double2cu_real_t(::anisotropy::get_kl_vector(i));
 
-            double k2r1 = ::anisotropy::get_k2r1(i);
-            double k2r1_odd = ::anisotropy::get_k2r1_odd(i);
-            double k2r2 = ::anisotropy::get_k2r2(i);
-            double k2r2_odd = ::anisotropy::get_k2r2_odd(i);
-            double k4r1 = ::anisotropy::get_k4r1(i);
-            double k4r1_odd = ::anisotropy::get_k4r1_odd(i);
-            double k4r2 = ::anisotropy::get_k4r2(i);
-            double k4r2_odd = ::anisotropy::get_k4r2_odd(i);
-            double k4r3 = ::anisotropy::get_k4r3(i);
-            double k4r3_odd = ::anisotropy::get_k4r3_odd(i);
-            double k4r4 = ::anisotropy::get_k4r4(i);
-            double k4r4_odd = ::anisotropy::get_k4r4_odd(i);
-            double k6r1 = ::anisotropy::get_k6r1(i);
-            double k6r1_odd = ::anisotropy::get_k6r1_odd(i);
-            double k6r2 = ::anisotropy::get_k6r2(i);
-            double k6r2_odd = ::anisotropy::get_k6r2_odd(i);
-            double k6r3 = ::anisotropy::get_k6r3(i);
-            double k6r3_odd = ::anisotropy::get_k6r3_odd(i);
-            double k6r4 = ::anisotropy::get_k6r4(i);
-            double k6r4_odd = ::anisotropy::get_k6r4_odd(i);
-            double k6r5 = ::anisotropy::get_k6r5(i);
-            double k6r5_odd = ::anisotropy::get_k6r5_odd(i);
-            double k6r6 = ::anisotropy::get_k6r6(i);
-            double k6r6_odd = ::anisotropy::get_k6r6_odd(i);
+            cu_real_t k2r1 = ::anisotropy::get_k2r1(i);
+            cu_real_t k2r1_odd = ::anisotropy::get_k2r1_odd(i);
+            cu_real_t k2r2 = ::anisotropy::get_k2r2(i);
+            cu_real_t k2r2_odd = ::anisotropy::get_k2r2_odd(i);
+            cu_real_t k4r1 = ::anisotropy::get_k4r1(i);
+            cu_real_t k4r1_odd = ::anisotropy::get_k4r1_odd(i);
+            cu_real_t k4r2 = ::anisotropy::get_k4r2(i);
+            cu_real_t k4r2_odd = ::anisotropy::get_k4r2_odd(i);
+            cu_real_t k4r3 = ::anisotropy::get_k4r3(i);
+            cu_real_t k4r3_odd = ::anisotropy::get_k4r3_odd(i);
+            cu_real_t k4r4 = ::anisotropy::get_k4r4(i);
+            cu_real_t k4r4_odd = ::anisotropy::get_k4r4_odd(i);
+            cu_real_t k6r1 = ::anisotropy::get_k6r1(i);
+            cu_real_t k6r1_odd = ::anisotropy::get_k6r1_odd(i);
+            cu_real_t k6r2 = ::anisotropy::get_k6r2(i);
+            cu_real_t k6r2_odd = ::anisotropy::get_k6r2_odd(i);
+            cu_real_t k6r3 = ::anisotropy::get_k6r3(i);
+            cu_real_t k6r3_odd = ::anisotropy::get_k6r3_odd(i);
+            cu_real_t k6r4 = ::anisotropy::get_k6r4(i);
+            cu_real_t k6r4_odd = ::anisotropy::get_k6r4_odd(i);
+            cu_real_t k6r5 = ::anisotropy::get_k6r5(i);
+            cu_real_t k6r5_odd = ::anisotropy::get_k6r5_odd(i);
+            cu_real_t k6r6 = ::anisotropy::get_k6r6(i);
+            cu_real_t k6r6_odd = ::anisotropy::get_k6r6_odd(i);
 
             _materials_r[i].rotational_anisotropy_unit_x = kr_vector[0];
             _materials_r[i].rotational_anisotropy_unit_y = kr_vector[1];

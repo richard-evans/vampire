@@ -28,7 +28,7 @@ CUDA_OBJECTS= \
 	obj/cuda/spin_fields.o \
 	obj/cuda/statistics.o \
 	obj/cuda/thermal_fields.o \
-	obj/cuda/transfer.o 
+	obj/cuda/transfer.o
 
 CUDA_ARCH=\
 -gencode arch=compute_50,code=sm_50 \
