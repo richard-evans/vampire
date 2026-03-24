@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <vector>
 
 // Vampire headers
 #include "sim.hpp"
@@ -78,19 +79,26 @@ namespace sim{
       // Shared variables used within sim module
       //----------------------------------------------------------------------------
       bool enable_spin_torque_fields = false; // flag to enable spin torque fields
+      bool enable_local_stt_polarizers = false; // flag to enable localised stt polarization vectors
+      bool enable_local_sot_polarizers = false; // flag to enable localised sot polarization vectors
+
       bool enable_vcma_fields        = false; // flag to enable voltage-controlled anisotropy fields
 
       std::vector<sim::internal::mp_t> mp; // array of material properties
 
       std::vector<double> stt_asm; // array of spin transfer torque asymmetry
-      std::vector<double> stt_rj; // array of adiabatic spin torques
-      std::vector<double> stt_pj; // array of non-adiabatic spin torques
-      std::vector<double> stt_polarization_unit_vector(3,0.0); // stt spin polarization direction
+      std::vector<double> stt_rj;  // array of adiabatic spin torques
+      std::vector<double> stt_pj;  // array of non-adiabatic spin torques
+      std::vector<int> stt_pm;     // array of spin orbit torque polarizer materials
+      vtype::vec_t stt_polarization_unit_vector; // stt spin polarization direction
+      std::vector<vtype::vec_t> stt_material_polarization_unit_vector; // stt spin polarization direction for each material
 
       std::vector<double> sot_asm; // array of spin orbit torque asymmetry
       std::vector<double> sot_rj;  // array of adiabatic spin torques
       std::vector<double> sot_pj;  // array of non-adiabatic spin torques
-      std::vector<double> sot_polarization_unit_vector(3,0.0); // sot spin polarization direction
+      std::vector<int> sot_pm;     // array of spin orbit torque polarizer materials
+      vtype::vec_t sot_polarization_unit_vector; // sot spin polarization direction
+      std::vector<vtype::vec_t>  sot_material_polarization_unit_vector; // sot spin polarization direction for each material
 
       std::vector<double> vcmak;   // voltage controlled anisotropy coefficient
 
@@ -104,7 +112,11 @@ namespace sim{
    // getter functions to give access to internal variables
    //------------------------------------------------------------------------
    std::vector<double> get_stt_polarization_unit_vector(){
-      return sim::internal::stt_polarization_unit_vector;
+      std::vector<double> sttpv(3);
+      sttpv[0] = sim::internal::stt_polarization_unit_vector.x;
+      sttpv[1] = sim::internal::stt_polarization_unit_vector.y;
+      sttpv[2] = sim::internal::stt_polarization_unit_vector.z;
+      return sttpv;
    }
 
    std::vector<double> get_stt_rj(){

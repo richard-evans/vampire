@@ -24,7 +24,7 @@ namespace exchange{
    // Externally visible variables
    //------------------------------------------------------------------------------
    bool biquadratic = false; // flag to enable biquadratic exchange calculation
-   bool four_spin = true; // flag to enable biquadratic exchange calculation
+   bool four_spin = false; // flag to enable biquadratic exchange calculation
 
    namespace internal{
 

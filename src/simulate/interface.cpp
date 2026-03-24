@@ -1,11 +1,14 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This source file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+//   (c) Richard F L Evans 2025. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//   Email: richard.evans@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 
 // C++ standard library headers
 #include <sstream>
@@ -44,7 +47,9 @@ namespace sim{
          // Test for valid range
          vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
          // save sanitized unit vector
-         sim::internal::stt_polarization_unit_vector = u;
+         sim::internal::stt_polarization_unit_vector.x = u[0];
+         sim::internal::stt_polarization_unit_vector.y = u[1];
+         sim::internal::stt_polarization_unit_vector.z = u[2];
          return true;
       }
       //-------------------------------------------------------------------
@@ -55,7 +60,9 @@ namespace sim{
          // Test for valid range
          vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
          // save sanitized unit vector
-         sim::internal::sot_polarization_unit_vector = u;
+         sim::internal::sot_polarization_unit_vector.x = u[0];
+         sim::internal::sot_polarization_unit_vector.y = u[1];
+         sim::internal::sot_polarization_unit_vector.z = u[2];
          return true;
       }
       //-------------------------------------------------------------------
@@ -316,6 +323,31 @@ namespace sim{
          return true;
       }
       //------------------------------------------------------------
+      test="spin-transfer-torque-polarization-unit-vector";
+      if(word==test){
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         // Test for valid range
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+         // save sanitized unit vector
+         sim::internal::mp[super_index].stt_pv.x = u[0];
+         sim::internal::mp[super_index].stt_pv.y = u[1];
+         sim::internal::mp[super_index].stt_pv.z = u[2];
+         sim::internal::enable_local_stt_polarizers = true;
+         return true;
+      }
+      //------------------------------------------------------------
+      test="spin-transfer-torque-polarization-material";
+      if(word==test){
+         int mid = vin::str_to_int(value); // convert string to int
+         // Test for valid range
+         vin::check_for_valid_int(mid, word, line, prefix, 1, mp::max_materials,"material","1 - 100");
+         sim::internal::mp[super_index].stt_pm.set(mid-1); // save material ID as m-1
+         zlog << zTs() << "Setting STT polarizer for material " << super_index+1 << " to material " << sim::internal::mp[super_index].stt_pm.get()+1 << std::endl;
+         sim::internal::enable_local_stt_polarizers = true;
+         return true;
+      }
+      //------------------------------------------------------------
       // field-like parameter for material in spin orbit torque calculation
       test = "spin-orbit-relaxation-torque";
       test2 = "spin-orbit-anti-damping-torque";
@@ -348,6 +380,31 @@ namespace sim{
          // Test for valid range
          vin::check_for_valid_value(sotasm, word, line, prefix, unit, "", 0.0, 1.0e2,"input","0 - 100");
          sim::internal::mp[super_index].sot_asm.set(sotasm);
+         return true;
+      }
+      //------------------------------------------------------------
+      test="spin-orbit-torque-polarization-unit-vector";
+      if(word==test){
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         // Test for valid range
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+         // save sanitized unit vector
+         sim::internal::mp[super_index].sot_pv.x = u[0];
+         sim::internal::mp[super_index].sot_pv.y = u[1];
+         sim::internal::mp[super_index].sot_pv.z = u[2];
+         sim::internal::enable_local_sot_polarizers = true;
+         return true;
+      }
+      //------------------------------------------------------------
+      test="spin-orbit-torque-polarization-material";
+      if(word==test){
+         int mid = vin::str_to_int(value); // convert string to int
+         // Test for valid range
+         vin::check_for_valid_int(mid, word, line, prefix, 1, mp::max_materials,"material","1 - 100");
+         sim::internal::mp[super_index].sot_pm.set(mid-1); // save material ID as m-1
+         zlog << zTs() << "Setting SOT polarizer for material " << super_index+1 << " to material " << sim::internal::mp[super_index].sot_pm.get()+1 << std::endl;
+         sim::internal::enable_local_sot_polarizers = true;
          return true;
       }
       //------------------------------------------------------------

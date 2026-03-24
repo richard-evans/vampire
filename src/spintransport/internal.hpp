@@ -103,6 +103,8 @@ namespace spin_transport{
       extern double cell_size_y; // cell size along y-direction
       extern double cell_size_z; // cell size along z-direction
 
+      extern int cell_increment; // cell increment depending on positive or negative current direction
+
       extern unsigned int num_stacks; // number of stacks perpendicular to current direction
       extern unsigned int total_num_cells; // number of cells
 

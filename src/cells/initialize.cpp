@@ -116,7 +116,7 @@ namespace cells{
                supercell_array[i][j][k]=cell;
                // increment cell number
 
-               
+
                cell++;
             }
          }
@@ -269,6 +269,11 @@ namespace cells{
       // Atomic volume is corrected by a factor which makes it a magnetic atomic volume
       const double factor_for_volume = double(total_atoms_non_filler)/double(num_atoms_magnetic);
       const double atomic_volume =  factor_for_volume * unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/double(cells::num_atoms_in_unit_cell);
+
+      // Calculate local moment vloume for moment density in self term
+      cells::atomic_volume = atomic_volume;
+      zlog << zTs() << "Calculated (magnetic) atomic volume: " << cells::atomic_volume << " cubic Angstroms" << std::endl;
+
       // std::cout << "\n\tnum_total_atoms_for_dipole\t" << total_atoms_non_filler << std::endl;
       // std::cout << "\n\tnum_atoms_magnetic\t" << num_atoms_magnetic << std::endl;
       // std::cout << "\n\tfactor_for_volume\t" << factor_for_volume << std::endl;
@@ -285,7 +290,7 @@ namespace cells{
             cells::pos_array[3*local_cell+0] = cells::pos_array[3*local_cell+0]/cells::num_atoms_in_cell[local_cell];
             cells::pos_array[3*local_cell+1] = cells::pos_array[3*local_cell+1]/cells::num_atoms_in_cell[local_cell];
             cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/cells::num_atoms_in_cell[local_cell];
-         
+
          }
 
       }

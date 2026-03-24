@@ -39,6 +39,20 @@ namespace sld{
       // Shared variables inside sld module
       //------------------------------------------------------------------------
 
+      //Spin-lattice coupling variables
+      bool linear_pump_enabled;
+      double phonon_frequency;
+      double phonon_force_amplitude[3];
+      double phonon_wavevector[3];
+      double phonon_pulse_start_time;
+      double phonon_pulse_end_time;
+      double phonon_wave_lambda[3];   
+      double phonon_wave_direction[3]; 
+      std::vector<double> coupling_field_x; 
+      std::vector<double> coupling_field_y; 
+      std::vector<double> coupling_field_z;
+
+
       bool enabled; // bool to enable module
 
       std::vector<internal::mp_t> mp; // array of material properties

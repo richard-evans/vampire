@@ -31,6 +31,7 @@ namespace cells{
    extern double macro_cell_size_x; /// lateral size of local macro-cells (A)
    extern double macro_cell_size_y; /// lateral size of local macro-cells (A)
    extern double macro_cell_size_z; /// lateral size of local macro-cells (A)
+   extern double atomic_volume; // volume of each magnetic moment for atomistic dipole self term
 
    extern std::vector <int> local_cell_array;
    extern std::vector <int> num_atoms_in_cell; /// number of atoms in each cell

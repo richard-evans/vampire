@@ -110,7 +110,27 @@ namespace sld{
 
              }; // end of constructor
 
+             
+
        }; // end of internal::mp class
+
+
+       // NEW: Parameters for the linear phonon pump
+      extern bool linear_pump_enabled;
+      extern double phonon_frequency;
+      extern double phonon_force_amplitude[3]; // For fx, fy, fz
+      extern double phonon_wavevector[3];      // For kx, ky, kz
+      extern double phonon_pulse_start_time;
+      extern double phonon_pulse_end_time;
+      extern std::vector<double> coupling_field_x; 
+      extern std::vector<double> coupling_field_y; 
+      extern std::vector<double> coupling_field_z;
+
+      // NEW: Intermediate storage for wave parameters from the input file
+      extern double phonon_wave_lambda[3];   // For λ_x, λ_y, λ_z
+      extern double phonon_wave_direction[3]; // For direction_x, direction_y, direction_z
+ 
+
 
       //-------------------------------------------------------------------------
       // Internal shared variables
@@ -241,6 +261,18 @@ namespace sld{
             std::vector<double>& forces_array_y,
             std::vector<double>& forces_array_z,
             std::vector<double>& potential_eng);
+
+
+      void compute_thz(const int start_index,
+            const int end_index, 
+            const std::vector<double>& x_coord_array, // current coord vectors for atoms
+            const std::vector<double>& y_coord_array,
+            const std::vector<double>& z_coord_array,
+            std::vector<double>& forces_array_x, //  vectors for forces
+            std::vector<double>& forces_array_y,
+            std::vector<double>& forces_array_z);
+
+
 //
       void compute_sld_coupling(const int start_index,
             const int end_index, // last +1 atom to be calculated

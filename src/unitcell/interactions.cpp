@@ -198,7 +198,6 @@ void calculate_interactions(unit_cell_t& unit_cell){
    unit_cell.interaction_range = interaction_range;
 
    // Normalise exchange interactions
-
    unit_cell.bilinear.normalise_exchange(nn_cutoff_range);
    unit_cell.biquadratic.normalise_exchange(nn_cutoff_range);
 
