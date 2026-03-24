@@ -35,6 +35,9 @@ namespace anisotropy{
                                  std::vector<double>& v3,
                                  int mat){
 
+      // if we don't need a rotational basis then do nothing as the other vectors do not need to be checked
+      if(anisotropy::internal::mp[mat].need_rotated_basis == false) return;
+
       // Set primary axis
       double e1[3] = {v1[0], v1[1], v1[2]};
       // Set secondary axis

@@ -165,9 +165,11 @@ namespace create{
       extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void geometry(std::vector<cs::catom_t>& catom_array);
       extern void sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void sphere_size(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain, const double agg_particle_scale);
       extern void teardrop(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
 
+      extern void agglomorate(std::vector<cs::catom_t> & catom_array);
       extern void particle(std::vector<cs::catom_t> &);
       extern void particle_array(std::vector<cs::catom_t> &);
       extern void hex_particle_array(std::vector<cs::catom_t> &);

@@ -88,6 +88,7 @@ namespace anisotropy{
          public:
 
             // variables
+            bool need_rotated_basis; // flag to determine if material needs rotational basis
             double ku2;       // second order uniaxial anisotropy constant ( - Ku1 )
             double k2r1;      // second order theta first order phi anisotropy constant
             double k2r1_odd;  // second order theta first order phi odd anisotropy constant
@@ -144,6 +145,7 @@ namespace anisotropy{
 
             // constructor
             mp_t ( const unsigned int max_materials = 100 ):
+               need_rotated_basis(false), // in genetral we do not need a rotated basis
             	ku2( 0.0 ),       // set initial value of ku2 to zero
                k2r1( 0.0 ),      // set initial value of k2r1 to zero
                k2r1_odd( 0.0 ),  // set initial value of k2r1_odd to zero

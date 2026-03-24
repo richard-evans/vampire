@@ -47,7 +47,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
 
    // update hierarchical magnetization in cells
    hierarchical::internal::calculate_hierarchical_magnetisation(x_spin_array, y_spin_array, z_spin_array, m_spin_array, magnetic);
-
+   cells::mag();
    // instantiate timer
    vutil::vtimer_t timer;
 

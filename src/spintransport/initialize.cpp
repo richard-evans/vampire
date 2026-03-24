@@ -398,7 +398,7 @@ namespace spin_transport{
       const double l = cell_size[stack_z];
 
       // constant prefactor for STT components
-      const double one_o_gamma_e = 1.0 / (1.76e11 * 1.602e-19);  // muB / (gamma * e) but cell saturation already specified in muB's
+      //const double one_o_gamma_e = 1.0 / (1.76e11 * 1.602e-19);  // muB / (gamma * e) but cell saturation already specified in muB's
 
       // loop over all xy-cells (stacks)
       for(unsigned int i = 0; i < cells3D.size(); i++){
@@ -432,8 +432,10 @@ namespace spin_transport{
                      // calculate mean spin torque prefactor parameters for magnetic cells
                      const double count = total_num_magnetic_atoms[cell]; // number of magnetic atoms in cell
                      const double total_moment = st::internal::cell_isaturation[cell]; // total magnetic moment
-                     st::internal::cell_relaxation_torque_rj[cell] = st::internal::cell_relaxation_torque_rj[cell] * one_o_gamma_e / (count * total_moment);
-                     st::internal::cell_precession_torque_pj[cell] = st::internal::cell_precession_torque_pj[cell] * one_o_gamma_e / (count * total_moment);
+                     //st::internal::cell_relaxation_torque_rj[cell] = st::internal::cell_relaxation_torque_rj[cell] * one_o_gamma_e / (count * total_moment);
+                     st::internal::cell_relaxation_torque_rj[cell] = st::internal::cell_relaxation_torque_rj[cell] / count ;
+                     //st::internal::cell_precession_torque_pj[cell] = st::internal::cell_precession_torque_pj[cell] * one_o_gamma_e / (count * total_moment);
+                     st::internal::cell_precession_torque_pj[cell] = st::internal::cell_precession_torque_pj[cell] / count;
                      st::internal::cell_alpha[cell] = st::internal::cell_alpha[cell] / count;
                   }
 
