@@ -70,6 +70,7 @@ namespace spin_transport{
             //----------------
             // variables
             //----------------
+            int stsl;                      // spin transport sublattice (grouping of atoms for which spin transport is calculated)
             set_double_t resistivity;      // spin-independent resistivity (Ohm m)
             set_double_t spin_resistivity; // spin-dependent resistivity (Ohm m)
             set_double_t stt_rj;           // spin transport relaxation torque
@@ -77,10 +78,11 @@ namespace spin_transport{
 
             // constructor
             mp_t (const unsigned int max_materials = 100) {
-               resistivity.set(1.68e-8); // default value is for copper (Cu)
-               spin_resistivity.set(0.0); // default value is for copper (Cu)
-               stt_rj.set(0.0); // default value is for copper (Cu)
-               stt_pj.set(0.0); // default value is for copper (Cu)
+               stsl = 0;                  // default is to calculate spin transport for all atoms (sublattice 0)
+               resistivity.set(1.68e-8);  // default value is for copper (Cu)
+               spin_resistivity.set(0.0); // default value is 0
+               stt_rj.set(0.0);           // default value is 0
+               stt_pj.set(0.0);           // default value is 0
             }; // end of constructor
 
       }; // end of exchange::internal::mp class
@@ -89,11 +91,13 @@ namespace spin_transport{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool enabled; // bool to enable spin transport calculation
+      extern bool sublattice; // bool to enable sublattice level spin transport calculation
 
       extern unsigned int update_rate;  // number of timesteps between updates
       extern unsigned int time_counter; // number of timesteps since last update
 
       extern std::vector<internal::mp_t> mp; // array of material properties
+      extern std::vector <int> atom_sublattice; // array to store which sublattice each atom is in for spin transport calculation
 
       // enumerated list of different current directions
       enum current_direction_t {px,py,pz,mx,my,mz}; // +x,+y,+z,-x,-y,-z
@@ -105,6 +109,7 @@ namespace spin_transport{
 
       extern int cell_increment; // cell increment depending on positive or negative current direction
 
+      extern unsigned int num_sublattices; // number of sublattices
       extern unsigned int num_stacks; // number of stacks perpendicular to current direction
       extern unsigned int total_num_cells; // number of cells
 
@@ -126,6 +131,8 @@ namespace spin_transport{
       // arrays to store average resistance and spin resistance in each cell
       extern std::vector <double> cell_resistance;
       extern std::vector <double> cell_spin_resistance;
+      extern std::vector < std::vector<double> > cell_sl_resistance;
+      extern std::vector < std::vector<double> > cell_sl_spin_resistance;
 
       // arrays to store cell properties
       extern std::vector <bool> magnetic;                    // boolean array to determine if cell is magnetic or not
@@ -136,6 +143,14 @@ namespace spin_transport{
       extern std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
       extern std::vector <double> cell_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
       extern std::vector <double> cell_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
+
+      // material specific arrays to store cell properties
+      extern std::vector < std::vector <double> > cell_sl_magnetization;        // 3M normalised magnetization of each material in each cell
+      extern std::vector < std::vector <double> > cell_sl_alpha;                // cell magnetization (average of constituent atoms)
+      extern std::vector < std::vector <double> > cell_sl_isaturation;          // inverse magnetic saturation at T=0 in each cell
+      extern std::vector < std::vector <double> > cell_sl_spin_torque_fields;   // 3N array of cell spin torque fields
+      extern std::vector < std::vector <double> > cell_sl_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
+      extern std::vector < std::vector <double> > cell_sl_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
 
       // array to store which cell each atom is in
       extern std::vector <unsigned int> atom_in_cell;
@@ -150,13 +165,27 @@ namespace spin_transport{
                                         const std::vector<double>& atoms_m_spin_array  // moment of atoms
       );
 
-      void calculate_magnetoresistance();
+      void calculate_cell_material_magnetization(const unsigned int num_local_atoms,          // number of local atoms
+                                               const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
+                                               const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
+                                               const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
+                                               const std::vector<double>& atoms_m_spin_array  // moment of atoms
+      );
 
-      void calculate_field(const unsigned int num_local_atoms,            // number of local atoms
+      void calculate_magnetoresistance();
+      void calculate_material_magnetoresistance();
+
+      /*void calculate_field(const unsigned int num_local_atoms,            // number of local atoms
                            std::vector<double>& atoms_x_field_array,      // x-field of atoms
                            std::vector<double>& atoms_y_field_array,      // y-field of atoms
                            std::vector<double>& atoms_z_field_array       // z-field of atoms
       );
+
+      void calculate_material_field(const unsigned int num_local_atoms,            // number of local atoms
+                                  std::vector<double>& atoms_x_field_array,      // x-field of atoms
+                                  std::vector<double>& atoms_y_field_array,      // y-field of atoms
+                                  std::vector<double>& atoms_z_field_array       // z-field of atoms
+      );*/
 
    } // end of internal namespace
 

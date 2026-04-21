@@ -58,9 +58,9 @@ namespace spin_transport{
    //-----------------------------------------------------------------------------
    // Function to update resistance, current and spin transfer torque fields
    //-----------------------------------------------------------------------------
-   void update(const unsigned int num_local_atoms,            // number of local atoms
-               const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
-               const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
+   void update(const unsigned int num_local_atoms,             // number of local atoms
+               const std::vector<double>& atoms_x_spin_array,  // x-spin vector of atoms
+               const std::vector<double>& atoms_y_spin_array,  // y-spin vector of atoms
                const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
                const std::vector<double>& atoms_m_spin_array);
 
@@ -68,7 +68,8 @@ namespace spin_transport{
                         const unsigned int end_index,              // last atom
                         std::vector<double>& atoms_x_field_array,  // x-field of atoms
                         std::vector<double>& atoms_y_field_array,  // y-field of atoms
-                        std::vector<double>& atoms_z_field_array); // z-field of atoms
+                        std::vector<double>& atoms_z_field_array,  // z-field of atoms
+                        const std::vector<int>& atoms_type_array); // material ID of atom);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for spintransport module

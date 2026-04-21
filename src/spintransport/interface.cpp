@@ -174,6 +174,14 @@ namespace spin_transport{
           st::internal::time_counter = ur;
           return true;
       }
+      //------------------------------------------------------------------------
+      test = "sublattice-resolved";
+      if( word == test ){
+         bool tf = vin::check_for_valid_bool(value, word, line, prefix, "input");
+          // set control flag for sublattice resolved (material specific) calculations
+          st::internal::sublattice = tf;
+          return true;
+      }
       // channel length
       //--------------------------------------------------------------------
       // Keyword not found
@@ -246,6 +254,16 @@ namespace spin_transport{
          // Test for valid range
          vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e-2, 1.0e2,"input","-100 - 100T");
          st::internal::mp[super_index].stt_pj.set(bj);
+         return true;
+      }
+      //------------------------------------------------------------
+      test = "spin-transport-sublattice";
+      // arbitrary number indicating group (sublattice) of atoms for which spin transport is calculated
+      if( word == test ){
+         int stsl = atoi(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_int(stsl, word, line, prefix,1,100,"input","1 - 100");
+         st::internal::mp[super_index].stsl = stsl;
          return true;
       }
       //--------------------------------------------------------------------
