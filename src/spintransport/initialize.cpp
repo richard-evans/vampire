@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2019. All rights reserved.
+//   (c) Richard F L Evans 2019,2026. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -23,12 +23,25 @@
 
 namespace spin_transport{
 
-   // simple struct to store 3D cell info
-   struct cell3D_t{
-      uint64_t id; // id of cell
-      std::vector<uint64_t> atom; // list of atoms in each cell
-      std::vector<uint64_t> nm_atom; // list of non-magnetic atoms in each cell
-   };
+   namespace internal{
+      // function forward declaration
+      internal::v3cell3D_t
+      initialize_stack(const double system_size_x, // maximum dimensions of system along x-direction (angstroms)
+                       const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
+                       const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
+                       const uint64_t num_atoms,   // number of local atoms
+                       //const std::vector<int>& atoms_type_array, // material types of atoms
+                       const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
+                       const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
+                       const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
+                       //const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
+                       //const std::vector<double>& material_damping_array, // array of material level damping constants
+                       //const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
+                       const std::vector<cs::nm_atom_t> non_magnetic_atoms_array, // list of non-magnetic atoms
+                       int stack_x, int stack_y, int stack_z // direction of stacks relative to current direction
+      );
+
+   }
 
    //----------------------------------------------------------------------------
    // Function to initialize spin transport module
@@ -48,30 +61,7 @@ namespace spin_transport{
                    const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
    ){
 
-      //-------------------------------------------------------------------------
-      // create 3D array of cells
-      //
-      //                 |       |       |       |       |
-      //                 |       |       |       |       |
-      //                 |       |       |       |       |
-      //                 |       |       |       |       |
-      //                 |       |       |       |       |
-      //      stacks_z   |       |       |       |       |
-      //                 |       |       |       |       |
-      //    (current-    |       |   ^   |       |       |
-      //     direction)  |       |   |   |       |       |
-      //                 |       |   |   |       |       |
-      //                 |       |   |   |       |       |
-      //
-      //                              stacks_x
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //-------------------------------------------------------------------------
+
 
       //-------------------------------------------------------------------------
       // check that module is needed - if not do nothing
@@ -86,17 +76,9 @@ namespace spin_transport{
          spin_transport::internal::mp.resize(num_materials);
       }
 
-      // copy cell sizes to local variable to enable arbitrary current direction
-      const double cell_size[3] = { st::internal::cell_size_x,
-                                    st::internal::cell_size_y,
-                                    st::internal::cell_size_z };
-
-      // calculate number of cells in each direction x,y,z (rounding up)
-      const int num_cells[3] = { static_cast<int>( ceil(system_size_x/cell_size[0]) ),
-                                 static_cast<int>( ceil(system_size_y/cell_size[1]) ),
-                                 static_cast<int>( ceil(system_size_z/cell_size[2]) ) };
-
-
+      //-------------------------------------------------------------------------
+      // determine stack direction
+      //-------------------------------------------------------------------------
       int stack_x = 0; // spatial direction of stack arrays  x,y,z
       int stack_y = 1; // (each mapping into a physical direction)
       int stack_z = 2;
@@ -115,139 +97,17 @@ namespace spin_transport{
          stack_z = 1; // y-direction
       }
 
-      //---------------------------------------------------------------------------------
-      // Calculate cell IDs in 3D to calculate atom-cell associations
-      //---------------------------------------------------------------------------------
-      std::vector< std::vector < std::vector <cell3D_t> > > cells3D; // 3D list of cell IDs
-
-      int cell_id =0;
-
-      // resize cell array to hold stack x_cells
-      cells3D.resize(num_cells[stack_x]);
-
-      // loop over all x-cells in stack
-      for(unsigned int i = 0; i < cells3D.size(); i++){
-
-         // resize cell array[i] to hold stack y_cells
-         cells3D[i].resize(num_cells[stack_y]);
-
-         // loop over all y-cells in stack
-         for(unsigned int j = 0; j < cells3D[i].size(); j++){
-
-            // resize cell array[i][j] to hold stack z_cells (each stack linear in memory along z (current) direction)
-            cells3D[i][j].resize(num_cells[stack_z]); //
-
-            // loop over all z-cells to set linear cell ID for cell arrays
-            for(unsigned int k = 0; k < cells3D[i][j].size(); k++){
-               cells3D[i][j][k].id = cell_id;
-               cell_id++; // increment cell number
-            }
-
-         }
-
-      }
-
-      //---------------------------------------------------------------------------------
-      // Calculate atom-cell associations and cell positions
-      //---------------------------------------------------------------------------------
-
-      // resize array to store which cell each atom is in
-      st::internal::atom_in_cell.resize(num_atoms);
-
-      for(uint64_t atom = 0; atom < num_atoms; atom++){
-
-         // get atomic coordinates
-         const double cx = atoms_x_coord_array[atom];
-         const double cy = atoms_y_coord_array[atom];
-         const double cz = atoms_z_coord_array[atom];
-
-         // calculate 3D cell ID in atoms coordinate system
-         unsigned int cellID[3] = { static_cast<unsigned int>( cx / cell_size[0] ),
-                                    static_cast<unsigned int>( cy / cell_size[1] ),
-                                    static_cast<unsigned int>( cz / cell_size[2] ) };
-
-         // now calculate in stack coordinate system
-         const uint64_t i = cellID[stack_x];
-         const uint64_t j = cellID[stack_y];
-         const uint64_t k = cellID[stack_z];
-
-         // associate atom with stack cell ID
-         st::internal::atom_in_cell[atom] = cells3D[i][j][k].id;
-
-         // add atom to atoms in cell list
-         cells3D[i][j][k].atom.push_back(atom);
-
-      }
-
-      // include non-magnetic atoms
-      const uint64_t num_nm_atoms = non_magnetic_atoms_array.size();
-      for(uint64_t atom = 0; atom < num_nm_atoms; atom++){
-
-         // get atomic coordinates
-         const double cx = non_magnetic_atoms_array[atom].x;
-         const double cy = non_magnetic_atoms_array[atom].y;
-         const double cz = non_magnetic_atoms_array[atom].z;
-
-         // calculate 3D cell ID in atoms coordinate system
-         unsigned int cellID[3] = { static_cast<unsigned int>( cx / cell_size[0] ),
-                                    static_cast<unsigned int>( cy / cell_size[1] ),
-                                    static_cast<unsigned int>( cz / cell_size[2] ) };
-
-         // now calculate in stack coordinate system
-         const uint64_t i = cellID[stack_x];
-         const uint64_t j = cellID[stack_y];
-         const uint64_t k = cellID[stack_z];
-
-         // add atom to atoms in non-magnetic cell list
-         cells3D[i][j][k].nm_atom.push_back(atom);
-
-      }
-
-      //---------------------------------------------------------------------------------
-      // Calculate stack data
-      //---------------------------------------------------------------------------------
-
-      // calculate number of stacks (x*y)
-      st::internal::num_stacks = num_cells[stack_x]*num_cells[stack_y];
-      const uint64_t num_cells_in_stack = num_cells[stack_z]; // save number of cells in stack along current direction
-
-      // resize limits for each stack
-      st::internal::stack_start_index.resize(st::internal::num_stacks);
-      st::internal::stack_final_index.resize(st::internal::num_stacks);
-      st::internal::stack_resistance.resize(st::internal::num_stacks, 0.0); // total resistance in each stack
-      st::internal::stack_current.resize(st::internal::num_stacks, 0.0);    // total current in each stack
-
-      // determine initial start and end cell of each stack
-      for(uint64_t s = 0; s < st::internal::num_stacks; s++){
-         st::internal::stack_start_index[s] = s*num_cells_in_stack;
-         st::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack - 1; // loop to less than or equal to this number
-      }
-
-      //---------------------------------------------------------------------------------
-      // set up current direction for increment
-      //---------------------------------------------------------------------------------
-      if(st::internal::current_direction == st::internal::px ||
-         st::internal::current_direction == st::internal::py ||
-         st::internal::current_direction == st::internal::pz){
-         // positive loop for the current
-         st::internal::cell_increment = +1;
-      }
-      else{
-         // negative loop for the current
-         st::internal::cell_increment = -1;
-         // loop over stacks and swap start and end cell IDs
-         for(uint64_t s = 0; s < st::internal::num_stacks; s++){
-            int ssi = st::internal::stack_start_index[s];
-            int sfi = st::internal::stack_final_index[s];
-            st::internal::stack_start_index[s] = sfi;
-            st::internal::stack_final_index[s] = ssi;
-         }
-
-      }
-
-      // calculate total number of cells
-      st::internal::total_num_cells = num_cells[0]*num_cells[1]*num_cells[2];
-
+      // copy cell sizes to local variable to enable arbitrary current direction
+      const double cell_size[3] = { st::internal::cell_size_x,
+                                    st::internal::cell_size_y,
+                                    st::internal::cell_size_z };
+                                    
+      //-------------------------------------------------------------------------
+      // Initialise stack properties
+      //-------------------------------------------------------------------------
+      internal::v3cell3D_t cells3D = internal::initialize_stack(system_size_x, system_size_y, system_size_z,
+                                                                num_atoms, atoms_x_coord_array, atoms_y_coord_array,
+                                                                atoms_z_coord_array, non_magnetic_atoms_array, stack_x, stack_y, stack_z);
 
       //---------------------------------------------------------------------------------
       // Accumulate derived cell data
@@ -573,6 +433,199 @@ namespace spin_transport{
       }
 
       return;
+
+   }
+
+   namespace internal{
+
+      // function to initialise stack properties including list of atoms in each
+      // cell, current direction and returns cell structure for initialization
+      internal::v3cell3D_t
+      initialize_stack(const double system_size_x, // maximum dimensions of system along x-direction (angstroms)
+                       const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
+                       const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
+                       const uint64_t num_atoms,   // number of local atoms
+                       //const std::vector<int>& atoms_type_array, // material types of atoms
+                       const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
+                       const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
+                       const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
+                       //const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
+                       //const std::vector<double>& material_damping_array, // array of material level damping constants
+                       //const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
+                       const std::vector<cs::nm_atom_t> non_magnetic_atoms_array, // list of non-magnetic atoms
+                       int stack_x, int stack_y, int stack_z // direction of stacks relative to current direction
+      ){
+         //-------------------------------------------------------------------------
+         // create 3D array of cells
+         //
+         //                 |       |       |       |       |
+         //                 |       |       |       |       |
+         //                 |       |       |       |       |
+         //                 |       |       |       |       |
+         //                 |       |       |       |       |
+         //      stacks_z   |       |       |       |       |
+         //                 |       |       |       |       |
+         //    (current-    |       |   ^   |       |       |
+         //     direction)  |       |   |   |       |       |
+         //                 |       |   |   |       |       |
+         //                 |       |   |   |       |       |
+         //
+         //                              stacks_x
+         //
+         //
+         //
+         //
+         //
+         //
+         //
+         //-------------------------------------------------------------------------
+
+         // copy cell sizes to local variable to enable arbitrary current direction
+         const double cell_size[3] = { st::internal::cell_size_x,
+                                       st::internal::cell_size_y,
+                                       st::internal::cell_size_z };
+
+         // calculate number of cells in each direction x,y,z (rounding up)
+         const int num_cells[3] = { static_cast<int>( ceil(system_size_x/cell_size[0]) ),
+                                    static_cast<int>( ceil(system_size_y/cell_size[1]) ),
+                                    static_cast<int>( ceil(system_size_z/cell_size[2]) ) };
+
+         //---------------------------------------------------------------------------------
+         // Calculate cell IDs in 3D to calculate atom-cell associations
+         //---------------------------------------------------------------------------------
+         std::vector< std::vector < std::vector <internal::cell3D_t> > > cells3D; // 3D list of cell IDs
+
+         int cell_id =0;
+
+         // resize cell array to hold stack x_cells
+         cells3D.resize(num_cells[stack_x]);
+
+         // loop over all x-cells in stack
+         for(unsigned int i = 0; i < cells3D.size(); i++){
+
+            // resize cell array[i] to hold stack y_cells
+            cells3D[i].resize(num_cells[stack_y]);
+
+            // loop over all y-cells in stack
+            for(unsigned int j = 0; j < cells3D[i].size(); j++){
+
+               // resize cell array[i][j] to hold stack z_cells (each stack linear in memory along z (current) direction)
+               cells3D[i][j].resize(num_cells[stack_z]); //
+
+               // loop over all z-cells to set linear cell ID for cell arrays
+               for(unsigned int k = 0; k < cells3D[i][j].size(); k++){
+                  cells3D[i][j][k].id = cell_id;
+                  cell_id++; // increment cell number
+               }
+
+            }
+
+         }
+
+         //---------------------------------------------------------------------------------
+         // Calculate atom-cell associations and cell positions
+         //---------------------------------------------------------------------------------
+
+         // resize array to store which cell each atom is in
+         st::internal::atom_in_cell.resize(num_atoms);
+
+         for(uint64_t atom = 0; atom < num_atoms; atom++){
+
+            // get atomic coordinates
+            const double cx = atoms_x_coord_array[atom];
+            const double cy = atoms_y_coord_array[atom];
+            const double cz = atoms_z_coord_array[atom];
+
+            // calculate 3D cell ID in atoms coordinate system
+            unsigned int cellID[3] = { static_cast<unsigned int>( cx / cell_size[0] ),
+                                       static_cast<unsigned int>( cy / cell_size[1] ),
+                                       static_cast<unsigned int>( cz / cell_size[2] ) };
+
+            // now calculate in stack coordinate system
+            const uint64_t i = cellID[stack_x];
+            const uint64_t j = cellID[stack_y];
+            const uint64_t k = cellID[stack_z];
+
+            // associate atom with stack cell ID
+            st::internal::atom_in_cell[atom] = cells3D[i][j][k].id;
+
+            // add atom to atoms in cell list
+            cells3D[i][j][k].atom.push_back(atom);
+
+         }
+
+         // include non-magnetic atoms
+         const uint64_t num_nm_atoms = non_magnetic_atoms_array.size();
+         for(uint64_t atom = 0; atom < num_nm_atoms; atom++){
+
+            // get atomic coordinates
+            const double cx = non_magnetic_atoms_array[atom].x;
+            const double cy = non_magnetic_atoms_array[atom].y;
+            const double cz = non_magnetic_atoms_array[atom].z;
+
+            // calculate 3D cell ID in atoms coordinate system
+            unsigned int cellID[3] = { static_cast<unsigned int>( cx / cell_size[0] ),
+                                       static_cast<unsigned int>( cy / cell_size[1] ),
+                                       static_cast<unsigned int>( cz / cell_size[2] ) };
+
+            // now calculate in stack coordinate system
+            const uint64_t i = cellID[stack_x];
+            const uint64_t j = cellID[stack_y];
+            const uint64_t k = cellID[stack_z];
+
+            // add atom to atoms in non-magnetic cell list
+            cells3D[i][j][k].nm_atom.push_back(atom);
+
+         }
+
+         //---------------------------------------------------------------------------------
+         // Calculate stack data
+         //---------------------------------------------------------------------------------
+
+         // calculate number of stacks (x*y)
+         st::internal::num_stacks = num_cells[stack_x]*num_cells[stack_y];
+         const uint64_t num_cells_in_stack = num_cells[stack_z]; // save number of cells in stack along current direction
+
+         // resize limits for each stack
+         st::internal::stack_start_index.resize(st::internal::num_stacks);
+         st::internal::stack_final_index.resize(st::internal::num_stacks);
+         st::internal::stack_resistance.resize(st::internal::num_stacks, 0.0); // total resistance in each stack
+         st::internal::stack_current.resize(st::internal::num_stacks, 0.0);    // total current in each stack
+
+         // determine initial start and end cell of each stack
+         for(uint64_t s = 0; s < st::internal::num_stacks; s++){
+            st::internal::stack_start_index[s] = s*num_cells_in_stack;
+            st::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack - 1; // loop to less than or equal to this number
+         }
+
+         //---------------------------------------------------------------------------------
+         // set up current direction for increment
+         //---------------------------------------------------------------------------------
+         if(st::internal::current_direction == st::internal::px ||
+            st::internal::current_direction == st::internal::py ||
+            st::internal::current_direction == st::internal::pz){
+            // positive loop for the current
+            st::internal::cell_increment = +1;
+         }
+         else{
+            // negative loop for the current
+            st::internal::cell_increment = -1;
+            // loop over stacks and swap start and end cell IDs
+            for(uint64_t s = 0; s < st::internal::num_stacks; s++){
+               int ssi = st::internal::stack_start_index[s];
+               int sfi = st::internal::stack_final_index[s];
+               st::internal::stack_start_index[s] = sfi;
+               st::internal::stack_final_index[s] = ssi;
+            }
+
+         }
+
+         // calculate total number of cells
+         st::internal::total_num_cells = num_cells[0]*num_cells[1]*num_cells[2];
+
+         return cells3D;
+
+      }
 
    }
 

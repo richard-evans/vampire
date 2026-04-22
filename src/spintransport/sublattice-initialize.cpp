@@ -33,7 +33,7 @@ namespace spin_transport{
    //----------------------------------------------------------------------------
    // Function to initialize spin transport module
    //----------------------------------------------------------------------------
-   void initialize(const double system_size_x, // maximum dimensions of system along x-direction (angstroms)
+   void initialize_sublattice(const double system_size_x, // maximum dimensions of system along x-direction (angstroms)
                    const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
                    const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
                    const int num_materials,    // number of materials

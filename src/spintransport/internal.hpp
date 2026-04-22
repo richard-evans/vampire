@@ -87,6 +87,16 @@ namespace spin_transport{
 
       }; // end of exchange::internal::mp class
 
+      // simple struct to store 3D cell info
+      struct cell3D_t{
+         uint64_t id; // id of cell
+         std::vector<uint64_t> atom; // list of atoms in each cell
+         std::vector<uint64_t> nm_atom; // list of non-magnetic atoms in each cell
+      };
+
+      // compact data type for code readability
+      typedef std::vector< std::vector < std::vector <cell3D_t> > > v3cell3D_t;
+
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
