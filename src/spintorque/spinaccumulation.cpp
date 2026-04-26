@@ -117,9 +117,10 @@ namespace st{
 
          const double i_muB = 1.0/9.274e-24; // J/T
          const double i_e = 1.0/1.60217662e-19; // electronic charge (Coulombs)
-         const double microcell_volume = (st::internal::micro_cell_size *
-                                          st::internal::micro_cell_size *
-                                          st::internal::micro_cell_thickness)*1.e-30; // m^3
+         const double microcell_volume = 6.783e-29;//(st::internal::micro_cell_size *
+                                          // st::internal::micro_cell_size *
+                                          // st::internal::micro_cell_thickness)*1.e-30; // m^3  20 A x 20 A x 2.69 A = 1.076e-27 m^3
+                                          //Mn muffin tin: 4/3 pi  (2.53 A)^3 = 67.83 A^3 = 6.783e-29 m^3
 
          // loop over all 1D stacks (in parallel)
          for(int stack=0; stack <num_stacks; ++stack){
@@ -317,9 +318,9 @@ namespace st{
                   st::internal::j[cellz] = st::internal::j[pcellz];
 
                   // Calculate spin torque energy for cell (Joules)
-                  st::internal::spin_torque[cellx] = st::internal::spin_torque[pcellx];
-                  st::internal::spin_torque[celly] = st::internal::spin_torque[pcelly];
-                  st::internal::spin_torque[cellz] = st::internal::spin_torque[pcellz];
+                  st::internal::spin_torque[cellx] = 0.0;//st::internal::spin_torque[pcellx];
+                  st::internal::spin_torque[celly] = 0.0;//st::internal::spin_torque[pcelly];
+                  st::internal::spin_torque[cellz] = 0.0;//st::internal::spin_torque[pcellz];
                }
 
                //--------------------------------------------
@@ -391,8 +392,8 @@ namespace st{
 
          // Reduce all microcell spin torques on all nodes
          #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::spin_torque[0],st::internal::spin_torque.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::total_ST[0],st::internal::total_ST.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            // MPI_Allreduce(MPI_IN_PLACE, &st::internal::spin_torque[0],st::internal::spin_torque.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            // MPI_Allreduce(MPI_IN_PLACE, &st::internal::total_ST[0],st::internal::total_ST.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
          st::internal::output_microcell_data();
 
