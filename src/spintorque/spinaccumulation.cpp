@@ -117,6 +117,9 @@ namespace st{
 
          const double i_muB = 1.0/9.274e-24; // J/T
          const double i_e = 1.0/1.60217662e-19; // electronic charge (Coulombs)
+
+         //volume unit normalisation needs to be material dependent; hard coding here to make independent of microcell size
+         // (26-04-2026 JLR)
          const double microcell_volume = 6.783e-29;//(st::internal::micro_cell_size *
                                           // st::internal::micro_cell_size *
                                           // st::internal::micro_cell_thickness)*1.e-30; // m^3  20 A x 20 A x 2.69 A = 1.076e-27 m^3
@@ -317,7 +320,8 @@ namespace st{
                   st::internal::j[celly] = st::internal::j[pcelly];
                   st::internal::j[cellz] = st::internal::j[pcellz];
 
-                  // Calculate spin torque energy for cell (Joules)
+                  // spin torque should be zero for cells with no atoms
+                  // (26-04-2026 JLR)
                   st::internal::spin_torque[cellx] = 0.0;//st::internal::spin_torque[pcellx];
                   st::internal::spin_torque[celly] = 0.0;//st::internal::spin_torque[pcelly];
                   st::internal::spin_torque[cellz] = 0.0;//st::internal::spin_torque[pcellz];
@@ -390,7 +394,9 @@ namespace st{
             } // end of cell loop
          } // end of stack loop
 
-         // Reduce all microcell spin torques on all nodes
+         // Currently, all ranks process all spin current stacks so no reduction is needed
+         // This needs to be decomposed for future parallelisation
+         // (26-04-2026 JLR)
          #ifdef MPICF
             // MPI_Allreduce(MPI_IN_PLACE, &st::internal::spin_torque[0],st::internal::spin_torque.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             // MPI_Allreduce(MPI_IN_PLACE, &st::internal::total_ST[0],st::internal::total_ST.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
