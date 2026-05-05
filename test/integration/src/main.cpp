@@ -38,12 +38,12 @@ int main(){
    unsigned int fail = 0;
 
    // Exchange energy tests
-   if( !exchange_test("crystals/sc" , -3.0e-17, exe ) ) fail += 1;
-   if( !exchange_test("crystals/fcc", -2.4e-16, exe ) ) fail += 1;
-   if( !exchange_test("crystals/bcc", -8.0e-18, exe ) ) fail += 1;
+   if( !energy_test("crystals/sc" , -3.0e-17, exe, "exchange" ) ) fail += 1;
+   if( !energy_test("crystals/fcc", -2.4e-16, exe, "exchange" ) ) fail += 1;
+   if( !energy_test("crystals/bcc", -8.0e-18, exe, "exchange" ) ) fail += 1;
 
    // Anisotropy energy tests
-   if( !exchange_test("anisotropy/uniaxial", -1.0e-20, exe ) ) fail += 1;
+   if( !energy_test("anisotropy/uniaxial", -1.0e-20, exe, "anisotropy" ) ) fail += 1;
 
    // Integrator tests
    if( !integrator_test("dynamics/heun",   -0.106813, -0.337996, 0.935067, exe ) ) fail += 1;

@@ -18,14 +18,14 @@
 //------------------------------------------------------------------------------
 // Test to verify the correct exchange energy for different configurations
 //------------------------------------------------------------------------------
-bool exchange_test(std::string dir, double result, std::string executable){
+bool energy_test(std::string dir, double result, std::string executable, std::string energy_type){
 
    // get root directory
    std::string path = std::filesystem::current_path();
 
    // fixed-width output for prettiness
    std::stringstream test_name;
-   test_name << "Testing exchange energy for " << dir;
+   test_name << "Testing " << energy_type << " energy for " << dir;
    std::cout << std::setw(60) << std::left << test_name.str() << " : " << std::flush;
 
    // change directory
