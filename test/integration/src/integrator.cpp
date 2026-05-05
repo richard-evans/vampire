@@ -47,7 +47,7 @@ bool integrator_test(const std::string dir, double rx, double ry, double rz, con
    ifile.open("output");
 
    // read value after header
-   for(int i=0; i<982; i++) getline(ifile, line);
+   for(int i=0; i<983; i++) getline(ifile, line);
    std::stringstream liness(line);
    double v1 = 0.0;
    double vx = 0.0;
