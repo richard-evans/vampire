@@ -40,12 +40,21 @@ int main(){
    // Exchange energy tests
    if( !exchange_test("crystals/sc" , -3.0e-17, exe ) ) fail += 1;
    if( !exchange_test("crystals/fcc", -2.4e-16, exe ) ) fail += 1;
+   if( !exchange_test("crystals/bcc", -8.0e-18, exe ) ) fail += 1;
+
+   // Anisotropy energy tests
+   if( !exchange_test("anisotropy/uniaxial", -1.0e-20, exe ) ) fail += 1;
 
    // Integrator tests
-   if( !integrator_test("dynamics/heun",-0.106813,-0.337996,0.935067, exe ) ) fail += 1;
+   if( !integrator_test("dynamics/heun",   -0.106813, -0.337996, 0.935067, exe ) ) fail += 1;
+   if( !integrator_test("dynamics/midpoint",-0.0878796,-0.33953,  0.936481, exe ) ) fail += 1;
 
    // Structure tests
    if( !material_atoms_test("structure/core-shell", 3474, 485, 0, 0, exe ) ) fail += 1;
+   if( !material_atoms_test("structure/multilayer", 1000, 1000, 0, 0, exe ) ) fail += 1;
+
+   // Monte Carlo equilibration test
+   if( !final_value_test("montecarlo/equilibrium", 1.0, 1.0e-4, exe ) ) fail += 1;
 
    // Summary
    std::cout << "---------------------------------------------------------------------" << std::endl;

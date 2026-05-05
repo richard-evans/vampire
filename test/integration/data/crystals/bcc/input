@@ -1,0 +1,59 @@
+#------------------------------------------
+# Integration test: BCC exchange energy
+#
+# Tests that the total exchange energy for a
+# ferromagnetic BCC crystal is computed correctly.
+#
+# Analytic result:
+#   E = -J * N_atoms * N_nn / 2
+#     = -1e-21 * 2000 * 8 / 2
+#     = -8e-18 J
+#
+# BCC has 8 nearest neighbours per atom.
+# System: 10x10x10 unit cells * 2 atoms/cell = 2000 atoms.
+# All spins initialised along z (default), so all
+# neighbour pairs are parallel: E_pair = -J.
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:crystal-structure=bcc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.87 !nm
+dimensions:system-size-y = 2.87 !nm
+dimensions:system-size-z = 2.87 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Fe.mat
+
+#------------------------------------------
+# Simulation attributes:
+# Single step at T=0 - no dynamics needed,
+# just compute the ground-state energy.
+#------------------------------------------
+sim:temperature=0.0
+sim:time-steps-increment = 1
+sim:total-time-steps = 1
+sim:time-step=1.0E-15
+
+#------------------------------------------
+# Program and integrator details:
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-heun
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:total-energy
+screen:total-energy

@@ -1,0 +1,18 @@
+#===================================================
+# Material file for BCC exchange energy test
+#
+# Single Fe-like material with isotropic exchange.
+# Anisotropy is set to zero so that the total energy
+# is purely exchange, making the analytic result exact.
+#===================================================
+
+material:num-materials=1
+
+material[1]:material-name=Fe
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=1.0e-21
+material[1]:atomic-spin-moment=2.22 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Fe
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0

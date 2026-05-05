@@ -1,0 +1,36 @@
+#===================================================
+# Material file for two-material multilayer test
+#
+# Two materials occupying equal halves of the film
+# along the z-direction (height 0.0-1.0 is normalised).
+# The minimum-height and maximum-height keywords
+# assign atoms to each layer based on their fractional
+# z-position within the system.
+#
+#   Layer 1 (Co): z in [0.0, 0.5) -> lower half
+#   Layer 2 (Fe): z in [0.5, 1.0] -> upper half
+#
+# With a 10x10x20 SC system this gives 1000 atoms per layer.
+#===================================================
+
+material:num-materials=2
+
+material[1]:material-name=Co
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=1.0e-21
+material[1]:exchange-matrix[2]=1.0e-21
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Co
+material[1]:minimum-height=0.0
+material[1]:maximum-height=0.5
+
+material[2]:material-name=Fe
+material[2]:damping-constant=1.0
+material[2]:exchange-matrix[1]=1.0e-21
+material[2]:exchange-matrix[2]=1.0e-21
+material[2]:atomic-spin-moment=2.22 !muB
+material[2]:uniaxial-anisotropy-constant=0.0
+material[2]:material-element=Fe
+material[2]:minimum-height=0.5
+material[2]:maximum-height=1.0

@@ -18,6 +18,7 @@ OBJECTS= \
 obj/main.o \
 obj/exchange.o \
 obj/integrator.o \
+obj/montecarlo.o \
 obj/structure.o \
 obj/utilities.o
 
