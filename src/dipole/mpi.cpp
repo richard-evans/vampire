@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -349,7 +350,7 @@ namespace dipole{
                      int N                                  = counter[cpu_recv];
                      int atom_id                            = cells_index_atoms_array[cell_send][j];
                      int type                               = atom_type_array[atom_id];
-                     const double mus                       = mp::material[type].mu_s_SI/9.27400915e-24;
+                     const double mus                       = mp::material[type].mu_s_SI/constants::muB;
                      mpi_2d_send_atoms_cell[cpu_recv][N]    = cell_send;
                      mpi_2d_send_atoms_id[cpu_recv][N]      = atom_id;
                      mpi_2d_send_atoms_pos_x[cpu_recv][N]   = atom_pos_x[atom_id];

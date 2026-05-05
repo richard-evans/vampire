@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 
 // Headers
+#include "constants.hpp"
 #include "errors.hpp"
 #include "units.hpp"
 #include "vio.hpp"
@@ -60,9 +61,9 @@ int init(){
    add("feet",   3.12E9, "length");  // Imperial feet
 
    // --- Energies (internal unit: Joules) ---
-   add("J",      1.0,             "energy");  // Joules (internal unit)
-   add("eV",     1.602176487e-19, "energy");  // Electron volts
-   add("meV",    1.602176487e-22, "energy");  // Millielectron volts
+   add("J",      1.0,                    "energy");  // Joules (internal unit)
+   add("eV",     constants::eV,          "energy");  // Electron volts
+   add("meV",    constants::eV * 1.0e-3, "energy");  // Millielectron volts
    add("erg",    1.0E-7,          "energy");  // Ergs
    add("Ryd",    2.17987208E-18,  "energy");  // Rydbergs
    add("mRyd",   2.17987208E-21,  "energy");  // Millirydbergs
@@ -74,8 +75,8 @@ int init(){
    add("Amm",    1.0,             "moment");  // Amp metres squared
    add("erg/G",  1.0E-3,          "moment");  // Erg/Gauss
    add("abAcmcm",1.0E-3,          "moment");  // Abampere centimetre squared
-   add("muB",    9.27400915e-24,  "moment");  // Bohr magnetons
-   add("eV/T",   1.602176487e-19, "moment");  // Electron volts/Tesla
+   add("muB",    constants::muB,   "moment");  // Bohr magnetons
+   add("eV/T",   constants::eV,   "moment");  // Electron volts/Tesla
    add("erg/Oe", 1.0E-3,          "moment");  // Erg/Oersted
 
    // --- Magnetisation (internal unit: J/T/Angstrom^3) ---

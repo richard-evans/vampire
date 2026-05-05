@@ -10,6 +10,7 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -115,7 +116,7 @@ namespace st{
 
          //---------------------------------------------------------------------------------------------------
 
-         const double i_muB = 1.0/9.274e-24; // J/T
+         const double i_muB = constants::i_muB; // J/T
          const double i_e = 1.0/1.60217662e-19; // electronic charge (Coulombs)
 
          //volume unit normalisation needs to be material dependent; hard coding here to make independent of microcell size

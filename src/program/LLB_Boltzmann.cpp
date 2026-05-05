@@ -22,6 +22,7 @@
 //
 // ----------------------------------------------------------------------------
 //
+#include "constants.hpp"
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -148,7 +149,7 @@ int LLB_Boltzmann(){
 		const double chi_para = chi_parallel(sim::temperature, Tc);
 		const double chi_perp = chi_perpendicular(sim::temperature, Tc);
 		const double n_spins = 10000.0;
-		const double kB = 1.3806503e-23;
+		const double kB = constants::kB;
 		const double mu_s = 1.5E-24;
 		for(int para=0;para<101;para++){
 			for(int perp=0;perp<101;perp++){
@@ -166,8 +167,7 @@ int LLB_Boltzmann(){
 		//const double Tc = 661.1;
 		//const double chi_para = chi_parallel(sim::temperature, Tc);
 		//const double n_spins = 10000.0;
-		//const double kB = 1.3806503e-23;
-		//const double mu_s = 1.5E-24;
+		//const double kB = constants::kB;
 		std::cout << "m_e: " << pow((Tc-sim::temperature)/(Tc),0.365) << std::endl;
 		for(int para=0;para<1001;para++){
 			double m=double(para)/1000.0;

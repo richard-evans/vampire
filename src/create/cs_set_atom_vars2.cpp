@@ -11,6 +11,7 @@
 //
 
 // VAMPIRE headers
+#include "constants.hpp"
 #include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
@@ -138,7 +139,7 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 		atoms::x_spin_array[atom]=sx*modS;
 		atoms::y_spin_array[atom]=sy*modS;
 		atoms::z_spin_array[atom]=sz*modS;
-      atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
+      atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/constants::muB;
 
       // generate list of magnetic atoms
       if( mp::material[mat].non_magnetic == 0 ) atoms::magnetic[atom] = true;

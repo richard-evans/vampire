@@ -11,6 +11,7 @@
 //
 
 // Vampire headers
+#include "constants.hpp"
 #include "environment.hpp"
 
 // micromagnetic module headers
@@ -156,7 +157,7 @@ namespace environment{
                }
 
 
-               //const double kB = 1.3806503e-23;
+               //const double kB = constants::kB;
                std::vector<double> m(3,0.0);
                std::vector<double> spin_field(3,0.0);
 
@@ -199,9 +200,7 @@ namespace environment{
 
                //}
 
-               const double kB = 1.3806503e-23;
-
-//std::cout << "HERE3" <<std::endl;
+               const double kB = constants::kB;
                for (int i = my_env_start_index; i < my_env_end_index; i++){
                   int cell = env::none_atomistic_cells[i];
                   m[0] = x_array[cell];

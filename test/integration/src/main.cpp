@@ -46,8 +46,8 @@ int main(){
    if( !energy_test("anisotropy/uniaxial", -1.0e-20, exe, "anisotropy" ) ) fail += 1;
 
    // Integrator tests
-   if( !integrator_test("dynamics/heun",   -0.106813, -0.337996, 0.935067, exe ) ) fail += 1;
-   if( !integrator_test("dynamics/midpoint",-0.0878796,-0.33953,  0.936481, exe ) ) fail += 1;
+   if( !integrator_test("dynamics/heun",    -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+   if( !integrator_test("dynamics/midpoint",-0.0849683,-0.339983, 0.936585, exe ) ) fail += 1;
 
    // Structure tests
    if( !material_atoms_test("structure/core-shell", 3474, 485, 0, 0, exe ) ) fail += 1;

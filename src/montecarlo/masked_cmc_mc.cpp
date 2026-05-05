@@ -299,7 +299,7 @@ void cmc_mc_step_mask(){
 			const double Enew = sim::calculate_spin_energy(atom1);
 
 			// Calculate difference in Joules/mu_B
-			const double delta_energy1 = (Enew-Eold)*mp::material[mat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
+			const double delta_energy1 = (Enew-Eold)*mp::material[mat1].mu_s_SI*constants::i_muB; //1/constants::muB
 
 			// Check for lower energy state and accept unconditionally
 			if(delta_energy1 < 0.0) cmc::mc_success += 1.0;
@@ -352,7 +352,7 @@ void cmc_mc_step_mask(){
 			const double Enew = sim::calculate_spin_energy(atom1);
 
 			// Calculate difference in Joules/mu_B
-			const double delta_energy1 = (Enew-Eold)*mp::material[mat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
+			const double delta_energy1 = (Enew-Eold)*mp::material[mat1].mu_s_SI*constants::i_muB; //1/constants::muB
 
 			// Compute second move
 
@@ -396,7 +396,7 @@ void cmc_mc_step_mask(){
 				const double Enew = sim::calculate_spin_energy(atom2);
 
 	         // Calculate difference in Joules/mu_B
-				const double delta_energy2 = (Enew-Eold)*mp::material[mat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24
+				const double delta_energy2 = (Enew-Eold)*mp::material[mat2].mu_s_SI*constants::i_muB; //1/constants::muB
 
 				// Calculate Delta E for both spins
 				const double delta_energy21 = delta_energy1*rescaled_material_kBTBohr[mat1] + delta_energy2*rescaled_material_kBTBohr[mat2];

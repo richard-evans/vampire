@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -45,7 +46,7 @@ namespace spinwaves {
                     std::ofstream freq_file;
                     freq_file.open("frequencies.dat");
                     for (int i=0; i < internal::nt; i++){
-                        freq_file << i/(sim::partial_time*mp::dt/1.76e11)/internal::nt << "\n";
+                        freq_file << i/(sim::partial_time*mp::dt/constants::gamma_SI)/internal::nt << "\n";
                     }
                     freq_file.close();
                 }
@@ -53,7 +54,7 @@ namespace spinwaves {
                 std::ofstream freq_file;
                 freq_file.open("frequencies.dat");
                 for (int i=0; i < internal::nt; i++){
-                    freq_file << i/(sim::partial_time*mp::dt/1.76e11)/internal::nt << "\n";
+                    freq_file << i/(sim::partial_time*mp::dt/constants::gamma_SI)/internal::nt << "\n";
                 }
                 freq_file.close();
             #endif

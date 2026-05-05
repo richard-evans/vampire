@@ -22,6 +22,7 @@
 //
 // ----------------------------------------------------------------------------
 //
+#include "constants.hpp"
 #include "material.hpp"
 
 namespace mp{
@@ -31,7 +32,7 @@ materials_t::materials_t ():
 	element("H"),
 	alpha(1.0),
    alpha_eq(1.0),
-	mu_s_SI(1.72*9.27400915e-24),
+	mu_s_SI(1.72*constants::muB),
 	magnetisation(0.0),
 	gamma_rel(1.0),
 	random_spins(false),

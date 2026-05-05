@@ -159,9 +159,7 @@ namespace sim{
          const int num_atoms = atoms::num_atoms;
          double xyz[3];   // Local delta spin components
          double S_new[3]; // New local spin moment
-         const double kB = 1.3806503e-23;
-
-         // Calculate fields
+         const double kB = constants::kB;
          calculate_spin_fields(0, num_atoms);
          calculate_lsf_magnetic_field(0, num_atoms);
          calculate_external_fields(0, num_atoms);

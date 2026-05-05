@@ -10,6 +10,7 @@
 //
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <cmath>
 #include <algorithm>
 #include <cstdlib>
@@ -348,7 +349,7 @@ void update_field_fft(){
 
   }
 
-   const double imuB = 1.0/9.27400915e-24;
+   const double imuB = constants::i_muB;
 
    for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
       for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++){
@@ -421,9 +422,9 @@ void update_field_fft(){
      dipole::cells_field_array_y[cell] = Hy_out[id][0]/dp::eight_num_cells;
      dipole::cells_field_array_z[cell] = Hz_out[id][0]/dp::eight_num_cells;
 
-     dipole::cells_field_array_x[cell] *= 9.27400915e-01;
-     dipole::cells_field_array_y[cell] *= 9.27400915e-01;
-     dipole::cells_field_array_z[cell] *= 9.27400915e-01;
+     dipole::cells_field_array_x[cell] *= constants::dipole_prefactor;
+     dipole::cells_field_array_y[cell] *= constants::dipole_prefactor;
+     dipole::cells_field_array_z[cell] *= constants::dipole_prefactor;
 
     //dp_fields <<sim::time<< '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell]  << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] << std::endl;
     cell++;
