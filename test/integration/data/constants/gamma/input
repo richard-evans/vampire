@@ -1,0 +1,55 @@
+#------------------------------------------
+# Integration test: gyromagnetic ratio (gamma_SI)
+#
+# Tests that the LLG precession frequency is correct.
+# A single spin in an applied field precesses at angular
+# frequency omega = gamma_SI * H. After time t the spin
+# angle from its starting position in the xy-plane is:
+#
+#   phi = gamma_SI * H * t / (1 + alpha^2)
+#
+# With near-zero damping (alpha = 0.001) the spin remains
+# almost entirely in the xy-plane, so Sx and Sy at a
+# known time are direct measures of gamma_SI. A 0.05%
+# change in gamma_SI shifts the accumulated phase by
+# ~8.6 mrad at t = 9.74e-11 s, moving Sy by ~5e-3 --
+# well above the test tolerance of 1e-5.
+#
+# This test is deliberately more sensitive to gamma_SI
+# than the dynamics/heun test, which uses alpha=0.1
+# and where relaxation partially obscures phase errors.
+#------------------------------------------
+
+#------------------------------------------
+# Creation: single spin (overrides dimensions)
+#------------------------------------------
+create:single-spin
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+# T=0 for deterministic (no thermal noise).
+# 1T field along z drives precession of the
+# initial spin which points along x.
+#------------------------------------------
+sim:temperature=0.0
+sim:applied-field-strength = 1.0 !T
+sim:time-step = 1.0E-15
+sim:time-steps-increment = 100
+sim:total-time-steps = 100000
+
+#------------------------------------------
+# Program and integrator:
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-heun
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:real-time
+output:magnetisation

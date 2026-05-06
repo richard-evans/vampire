@@ -1,0 +1,23 @@
+#===================================================
+# Material file for muB Zeeman energy test
+#
+# Moment set to exactly 1.0 muB so the applied-field
+# energy is E = -N * muB * H with no other prefactors.
+# Exchange and anisotropy are both zero so the only
+# contribution to the energy is Zeeman, making the
+# analytic result exact.
+# Spins are initialised along z (the field direction)
+# to ensure cos(theta) = 1 for every atom.
+#===================================================
+
+material:num-materials=1
+
+material[1]:material-name=Co
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=0.0
+material[1]:atomic-spin-moment=1.0 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Co
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
+material[1]:initial-spin-direction=0,0,1

@@ -56,6 +56,14 @@ int main(){
    // Monte Carlo equilibration test
    if( !final_value_test("montecarlo/equilibrium", 1.0, 1.0e-4, exe ) ) fail += 1;
 
+   // Constants tests
+   // gamma_SI: single spin precession — spin trajectory at t=9.74e-11 s with alpha=0.001
+   if( !integrator_test("constants/gamma", -0.127636, -0.991673, 0.0171491, exe ) ) fail += 1;
+   // muB: Zeeman energy for 125 spins of 1 muB in 1T field = -125*muB = -1.15925125979e-21 J
+   if( !energy_test("constants/muB", -1.15925125979e-21, exe, "muB" ) ) fail += 1;
+   // kB: single spin MC with fixed seed; final spin direction is deterministic and depends on kB
+   if( !integrator_test("constants/kB", 0.411154, -0.829297, 0.378442, exe ) ) fail += 1;
+
    // Summary
    std::cout << "---------------------------------------------------------------------" << std::endl;
    if(fail >0){

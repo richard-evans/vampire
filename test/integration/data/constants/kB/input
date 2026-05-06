@@ -1,0 +1,61 @@
+#------------------------------------------
+# Integration test: Boltzmann constant (kB)
+#
+# Tests kB through the Metropolis acceptance criterion.
+# In the Monte Carlo integrator, a trial move with
+# energy change dE > 0 is accepted with probability:
+#
+#   p = exp( -dE * muB / (kB * T) )
+#
+# With sim:integrator-random-seed set, the sequence of
+# trial moves and acceptance random numbers is fully
+# deterministic. The final spin direction after N steps
+# depends on which moves were accepted -- which depends
+# on kB through the Boltzmann factor above.
+#
+# Temperature is chosen so that kB*T ~ muB*H (the
+# Zeeman energy scale), placing the system in the
+# maximally sensitive regime where acceptance
+# probabilities are ~37%. A significant change in kB
+# shifts these probabilities, causing different moves to
+# be accepted and producing a different final spin state.
+#
+# The fixed seed makes the test deterministic:
+# run once with correct kB to record the reference
+# spin direction; future runs must reproduce it.
+#------------------------------------------
+
+#------------------------------------------
+# Creation: single spin
+#------------------------------------------
+create:single-spin
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+# T = 0.6717 K chosen so kB*T ~ muB*H (H=1T),
+# the maximally sensitive regime for kB.
+# The fixed seed makes the MC trajectory reproducible.
+#------------------------------------------
+sim:temperature = 0.6717
+sim:applied-field-strength = 1.0 !T
+sim:time-step = 1.0E-15
+sim:time-steps-increment = 100
+sim:total-time-steps = 100000
+sim:integrator-random-seed = 123456
+
+#------------------------------------------
+# Program and integrator:
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=monte-carlo
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:real-time
+output:magnetisation
