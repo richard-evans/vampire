@@ -338,7 +338,7 @@ namespace spin_transport{
                   const uint64_t cell = cells3D[i][j][k].id;
 
                   // determine total number of atoms on all processors
-                  const uint64_t num_atoms_in_cell = total_num_atoms_in_cell[0];
+                  const uint64_t num_atoms_in_cell = total_num_atoms_in_cell[cell];
 
                   // loop over all sublattices
                   for( int sl = 0; sl < num_sublattices; sl++ ){
