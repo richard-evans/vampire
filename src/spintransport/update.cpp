@@ -51,13 +51,20 @@ void update(const unsigned int num_local_atoms,            // number of local at
    //---------------------------------------------------------------------------------------------------------
    // update cell magnetizations
    //---------------------------------------------------------------------------------------------------------
-   st::internal::calculate_cell_magnetization(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
-                                                               atoms_z_spin_array, atoms_m_spin_array);
+   if(st::internal::sublattice){
+      st::internal::calculate_cell_sublattice_magnetization(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
+                                                                             atoms_z_spin_array, atoms_m_spin_array);
+   }
+   else{
+      st::internal::calculate_cell_magnetization(num_local_atoms, atoms_x_spin_array, atoms_y_spin_array,
+                                                                  atoms_z_spin_array, atoms_m_spin_array);
+   }
 
    //---------------------------------------------------------------------------------------------------------
    // calculate magnetoresistance
    //---------------------------------------------------------------------------------------------------------
-   st::internal::calculate_magnetoresistance();
+   if(st::internal::sublattice) st::internal::calculate_sublattice_resistance();
+   else st::internal::calculate_magnetoresistance();
 
    //---------------------------------------------------------------------------------------------------------
    // test output of cell-level spin transport data

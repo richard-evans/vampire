@@ -24,10 +24,10 @@
 namespace spin_transport{
 namespace internal{
 
-   double calculate_start_cell_resistance_and_magnetization(const int cell),
+   double calculate_start_cell_resistance_and_magnetization(const int cell,
                                                             std::vector<double>& sl_mix, // sublattice moments of previous cell
                                                             std::vector<double>& sl_miy,
-                                                            std::vector<double>& sl_miz)
+                                                            std::vector<double>& sl_miz);
 
    // function to calculate cell resistance and torques
    double calculate_cell_resistance_and_torques(const int cell,
@@ -42,7 +42,7 @@ void calculate_sublattice_resistance(){
 
    // define local constants for number of cells sublattices to avoid repeated access to global variables
    const int num_sublattices = st::internal::num_sublattices;
-   const int num_cells = st::internal::total_num_cells;
+   //const int num_cells = st::internal::total_num_cells;
 
    // variable to compute sum of inverse resistances over all stacks
    double sum_inv_resistance = 0.0;
@@ -71,7 +71,7 @@ void calculate_sublattice_resistance(){
       const unsigned int end   = stack_final_index[stack];
 
       // initialise resistance with the first cell
-      double total_stack_resistance = calculate_start_cell_resistance_and_magnetization(start, sl_mix, sl_miy, sl_miz)
+      double total_stack_resistance = calculate_start_cell_resistance_and_magnetization(start, sl_mix, sl_miy, sl_miz);
 
       //------------------------------------------------------------------------------------------------------
       // loop over all other cells in stack starting at cell start+1
@@ -169,7 +169,7 @@ void calculate_sublattice_resistance(){
          const double Rsp = st::internal::cell_sl_spin_resistance[cell][sl];
 
          // if the sublattice is magnetic then add to sum of inverse resistances
-         if(st::internal::sl_magnetic[sl]){
+         if(st::internal::sl_magnetic[cell][sl]){
 
             // calculate next cell reduced magnetization
             const double jsat = st::internal::cell_sl_isaturation[cell][sl];
@@ -216,7 +216,7 @@ void calculate_sublattice_resistance(){
       } // end of sublattice loop
 
       // calculate total resistance for the cell
-      const double total_inverse_resistance = sum_inv_resistances + sum_inv_spin_resistances;
+      const double total_inverse_resistance = sum_inv_resistances;
       const double R = 1.0 / total_inverse_resistance;
 
       return R;
@@ -227,7 +227,7 @@ void calculate_sublattice_resistance(){
    // Function to calculate the resistance of the first cell in the stack
    // Each sublattice forms a set of parallel resistors
    //-----------------------------------------------------------------------------------
-   double calculate_start_cell_resistance_and_magnetization(const int cell),
+   double calculate_start_cell_resistance_and_magnetization(const int cell,
                                                             std::vector<double>& sl_mix, // sublattice moments of previous cell
                                                             std::vector<double>& sl_miy,
                                                             std::vector<double>& sl_miz){
@@ -242,7 +242,7 @@ void calculate_sublattice_resistance(){
       for( int sl = 0; sl < num_sublattices; sl++ ){
 
          // if the sublattice is magnetic then add to sum of inverse resistances
-         if(st::internal::sl_magnetic[sl]){
+         if(st::internal::sl_magnetic[cell][sl]){
 
             // calculate next cell reduced magnetization
             const double isat = st::internal::cell_sl_isaturation[cell][sl];

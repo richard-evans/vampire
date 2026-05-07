@@ -52,6 +52,18 @@ namespace spin_transport{
 
       );
 
+      void initialise_sublattice_cell_data(
+         const uint64_t num_atoms,   // number of local atoms
+         const int num_materials, // number of materials
+         const std::vector<int>& atoms_type_array, // material types of atoms
+         const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
+         const std::vector<double>& material_damping_array, // array of material level damping constants
+         const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
+         const std::vector<cs::nm_atom_t>& non_magnetic_atoms_array, // list of non-magnetic atoms
+         internal::v3cell3D_t& cells3D, // Cell data
+         const int stack_x, const int stack_y, const int stack_z // direction of stacks relative to current direction
+      );
+
       void determine_stack_order();
 
    }
@@ -121,9 +133,12 @@ namespace spin_transport{
       // Calculate cell-specific data
       //---------------------------------------------------------------------------------
 
-      internal::initialise_cell_data(atoms_type_array, atoms_m_spin_array, material_damping_array, is_magnetic_material, non_magnetic_atoms_array, cells3D, stack_x, stack_y, stack_z);
+      if(st::internal::sublattice) internal::initialise_sublattice_cell_data(num_atoms, num_materials, atoms_type_array, atoms_m_spin_array,
+                                                                             material_damping_array, is_magnetic_material, non_magnetic_atoms_array,
+                                                                             cells3D, stack_x, stack_y, stack_z);
+      else internal::initialise_cell_data(atoms_type_array, atoms_m_spin_array, material_damping_array, is_magnetic_material, non_magnetic_atoms_array,
+                                          cells3D, stack_x, stack_y, stack_z);
 
-      //initialise_sublattice_cell_data();
 
       //---------------------------------------------------------------------------------
       // Determine the direction of the stack integration and parallelisation
@@ -131,9 +146,9 @@ namespace spin_transport{
       internal::determine_stack_order();
 
       //---------------------------------------------------------------------------------
-      // Output cell data to file
+      // Output cell data to file on rank0 and only if not sublattice calculation
       //---------------------------------------------------------------------------------
-      if( vmpi::my_rank == 0 ){
+      if( vmpi::my_rank == 0 && !st::internal::sublattice){
          std::ofstream ofile("spin_transport_cell_data.txt");
          for(uint64_t i =0; i< st::internal::total_num_cells; i++){
             ofile << st::internal::cell_position[3*i+0] << "\t" <<

@@ -468,6 +468,8 @@ namespace spin_transport{
          //------------------------------------------------------------------------
          // resize cell vector data arrays and set to zero
          //------------------------------------------------------------------------
+         st::internal::cell_resistance.resize(num_cells,0.0); // also stores accumulated resistance before averaging
+
          st::internal::cell_sl_magnetization_x.resize(num_cells);
          st::internal::cell_sl_magnetization_y.resize(num_cells);
          st::internal::cell_sl_magnetization_z.resize(num_cells);

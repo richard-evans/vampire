@@ -180,15 +180,15 @@ namespace spin_transport{
                                         const std::vector<double>& atoms_m_spin_array  // moment of atoms
       );
 
-      void calculate_cell_material_magnetization(const unsigned int num_local_atoms,          // number of local atoms
-                                               const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
-                                               const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
-                                               const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
-                                               const std::vector<double>& atoms_m_spin_array  // moment of atoms
+      void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,             // number of local atoms
+                                                   const std::vector<double>& atoms_x_spin_array,  // x-spin vector of atoms
+                                                   const std::vector<double>& atoms_y_spin_array,  // y-spin vector of atoms
+                                                   const std::vector<double>& atoms_z_spin_array,  // z-spin-vector of atoms
+                                                   const std::vector<double>& atoms_m_spin_array   // moment of atoms
       );
 
       void calculate_magnetoresistance();
-      void calculate_material_magnetoresistance();
+      void calculate_sublattice_resistance();
 
       /*void calculate_field(const unsigned int num_local_atoms,            // number of local atoms
                            std::vector<double>& atoms_x_field_array,      // x-field of atoms
