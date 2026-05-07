@@ -33,11 +33,19 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
                                              const std::vector<double>& atoms_m_spin_array   // moment of atoms
 ){
 
+   // define local constants for number of cells sublattices to avoid repeated access to global variables
+   const int num_sublattices = st::internal::num_sublattices;
+   const int num_cells = st::internal::total_num_cells;
+
    //---------------------------------------------------------------------------
    // reset magnetization vector to zero
    //---------------------------------------------------------------------------
-   for( int sl = 0; sl < num_sublattices; sl++ ){
-      std::fill(st::internal::cell_sl_magnetization[sl].begin(), st::internal::cell_sl_magnetization[sl].end(), 0.0);
+   for( int cell = 0; cell < num_cells; cell++ ){
+      for( int sl = 0; sl < num_sublattices; sl++ ){
+         st::internal::cell_sl_magnetization_x[cell][sl] = 0.0;
+         st::internal::cell_sl_magnetization_y[cell][sl] = 0.0;
+         st::internal::cell_sl_magnetization_z[cell][sl] = 0.0;
+      }
    }
 
    //---------------------------------------------------------------------------
@@ -55,18 +63,18 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
       const int sl = st::internal::atom_sublattice[atom];
 
       // add magnetization to cell
-      st::internal::cell_sl_magnetization[sl][3*cell+0] += mm*atoms_x_spin_array[atom];
-      st::internal::cell_sl_magnetization[sl][3*cell+1] += mm*atoms_y_spin_array[atom];
-      st::internal::cell_sl_magnetization[sl][3*cell+2] += mm*atoms_z_spin_array[atom];
+      st::internal::cell_sl_magnetization_x[cell][sl] += mm*atoms_x_spin_array[atom];
+      st::internal::cell_sl_magnetization_y[cell][sl] += mm*atoms_y_spin_array[atom];
+      st::internal::cell_sl_magnetization_z[cell][sl] += mm*atoms_z_spin_array[atom];
 
    }
 
-   // for(int cell = 0; cell < st::internal::cell_sl_magnetization[0].size()/3; cell++){
+   // for(int cell = 0; cell < num_cells; cell++){
    //    for( int sl = 0; sl < num_sublattices; sl++ ){
    //       std::cout << "cell: " << cell << "\t" <<
-   //                 st::internal::cell_sl_magnetization[sl][3*cell+0] << "\t" <<
-   //                 st::internal::cell_sl_magnetization[sl][3*cell+1] << "\t" <<
-   //                 st::internal::cell_sl_magnetization[sl][3*cell+2] << std::endl;
+   //                 st::internal::cell_sl_magnetization_x[cell][sl] << "\t" <<
+   //                 st::internal::cell_sl_magnetization_y[cell][sl] << "\t" <<
+   //                 st::internal::cell_sl_magnetization_z[cell][sl] << std::endl;
    //    }
    // }
 
@@ -75,9 +83,11 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
    //---------------------------------------------------------------------------
    #ifdef MPICF
       // cast to int for MPI
-      int bufsize = 3*st::internal::total_num_cells;
-      for( int sl = 0; sl < num_sublattices; sl++ ){
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization[sl][0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      int bufsize = num_sublattices;
+      for( int cell = 0; cell < num_cells; cell++ ){
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_x[cell][0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_y[cell][0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_z[cell][0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       }
    #endif
 

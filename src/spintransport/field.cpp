@@ -60,9 +60,9 @@ namespace spin_transport{
                // get sublattice of atom
                const int sl = st::internal::atom_sublattice[atom];
 
-               atoms_x_field_array[atom] += st::internal::cell_sl_spin_torque_fields[sl][3*cell+0];
-               atoms_y_field_array[atom] += st::internal::cell_sl_spin_torque_fields[sl][3*cell+1];
-               atoms_z_field_array[atom] += st::internal::cell_sl_spin_torque_fields[sl][3*cell+2];
+               atoms_x_field_array[atom] += st::internal::cell_sl_spin_torque_fields_x[cell][sl];
+               atoms_y_field_array[atom] += st::internal::cell_sl_spin_torque_fields_y[cell][sl];
+               atoms_z_field_array[atom] += st::internal::cell_sl_spin_torque_fields_z[cell][sl];
 
             }
          }
