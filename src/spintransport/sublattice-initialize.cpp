@@ -367,8 +367,11 @@ namespace spin_transport{
                         // check for empty cells or cells with only non-magnetic atoms (keep) and if so treat as non-magnetic
                         //------------------------------------------------------------
                         if(num_sl_magnetic_atoms_in_cell < 0.1){
-                            st::internal::sl_magnetic[cell][sl] = false; // no magnetic atoms -> non-magnetic cell
-                            st::internal::cell_sl_isaturation[cell][sl] = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
+                           // normalise resistance to number of atoms in sublattice
+                           st::internal::cell_sl_resistance[cell][sl] = st::internal::cell_sl_resistance[cell][sl] / double(num_sl_atoms_in_cell);
+                           st::internal::cell_sl_spin_resistance[cell][sl] = st::internal::cell_sl_spin_resistance[cell][sl] / double(num_sl_atoms_in_cell);
+                           st::internal::sl_magnetic[cell][sl] = false; // no magnetic atoms -> non-magnetic cell
+                           st::internal::cell_sl_isaturation[cell][sl] = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
                         }
                         //-------------------------------------------------------------------------
                         // finally consider magnetic atoms in each sublattice in each cell
@@ -376,6 +379,8 @@ namespace spin_transport{
                         else{
                            // calculate mean spin torque prefactor parameters for magnetic cells
                            const double count = num_sl_atoms_in_cell; // number of magnetic atoms in sublattice in cell
+                           st::internal::cell_sl_resistance[cell][sl] = st::internal::cell_sl_resistance[cell][sl] / count;
+                           st::internal::cell_sl_spin_resistance[cell][sl] = st::internal::cell_sl_spin_resistance[cell][sl] / count;
                            st::internal::cell_sl_relaxation_torque_rj[cell][sl] = st::internal::cell_sl_relaxation_torque_rj[cell][sl] / count;
                            st::internal::cell_sl_precession_torque_pj[cell][sl] = st::internal::cell_sl_precession_torque_pj[cell][sl] / count;
                            st::internal::cell_sl_alpha[cell][sl]                = st::internal::cell_sl_alpha[cell][sl] / count;
@@ -394,7 +399,7 @@ namespace spin_transport{
                         //------------------------------------------------------------
 
                         // work out fractional area for each sublattice
-                        const double fractional_area = num_sl_atoms_in_cell / num_atoms_in_cell;
+                        const double fractional_area = double(num_sl_atoms_in_cell) / double(num_atoms_in_cell);
 
                         // get average resistivity for each sublattice in this cell
                         const double sublattice_cell_resistivity = st::internal::cell_sl_resistance[cell][sl];
