@@ -181,7 +181,19 @@ Determines the macro cell size for calculation of the demagnetizing field and
 output of the magnetic configuration. Finer discretisation leads to more
 accurate results at the cost of significantly longer run times. The cell size
 should always be less than the system size, as highly asymmetric cells will lead
-to significant errors in the demagnetisation field calculation.
+to significant errors in the demagnetisation field calculation. Note: the preferred form for this parameter is \textit{cells:macro-cell-size} described below.
+
+\section*{Macro-cell size}
+\phantomsection\addcontentsline{toc}{section}{Macro-cell size}
+The following commands control the size of the macro-cells used for demagnetisation field calculations and configuration output. Smaller cells give higher spatial resolution at the cost of increased computation time. All cell sizes accept length units (e.g.\ \texttt{!nm}, \texttt{!A}).
+
+{\zicf cells:macro-cell-size = float [0.0--1.0$\times$10$^7$ \AA; default system dependent]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size} Sets the macro-cell size to the same value in all three directions. The cell size should always be smaller than the system dimensions; highly asymmetric cells can lead to significant errors in the demagnetisation field calculation.
+
+{\zicf cells:macro-cell-size-x = float [0.0--1.0$\times$10$^7$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size-x} Sets the macro-cell size along the $x$-direction independently. When set, this overrides the $x$ component of \textit{cells:macro-cell-size}.
+
+{\zicf cells:macro-cell-size-y = float [0.0--1.0$\times$10$^7$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size-y} Sets the macro-cell size along the $y$-direction independently.
+
+{\zicf cells:macro-cell-size-z = float [0.0--1.0$\times$10$^7$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size-z} Sets the macro-cell size along the $z$-direction independently.
 
 \section*{Exchange calculation}\phantomsection\addcontentsline{toc}{section}{Exchange calculation}
 The following commands control the calculation of built-in exchange interactions
@@ -365,7 +377,7 @@ Specifies the bit sequence to be simulated in the program \textit{hamr-simulatio
 Acceptable values are -1 (opposite to field direction), 0 (zero field) and 1 (along field direction) and by default the vector is empty.
 
 \section*{Spin-Lattice calculations}
-This includes phonons (lattice dynamics) and uses a Suzuki-Trotter decomposition for the integration. Hence it needs the following:
+This section covers parameters for the spin-lattice dynamics module, which couples spin and lattice degrees of freedom. The integration uses a Suzuki-Trotter decomposition, selected by setting \textit{sim:integrator = spin-lattice}. The following parameters control the behaviour of the module:
 sim:integrator=suzuki-trotter.
 
 {\zicf spin-lattice:potential-cutoff-range=float}\phantomsection\addcontentsline{toc}{subsubsection}{spin-lattice:potential-cutoff-range=float}
@@ -418,7 +430,7 @@ The wavelength ($\lambda_z$) of the force wave in the z-direction. Units are in 
 
 {\zicf phonon:wave-direction-y = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-direction-y = float} The y-component of the unit vector that defines the direction of propagation.
 
-{\zicf phonon:wave-direction-z = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-direction-z = float} The z-component of the unit vector that defines the direction of propagation. 
+{\zicf phonon:wave-direction-z = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-direction-z = float} The z-component of the unit vector that defines the direction of propagation.
 
 
 
@@ -432,12 +444,16 @@ The following commands control the simulation, including the program, maximum te
 
 {\zicf sim:integrator = exclusive string [default llg-heun]}\phantomsection\addcontentsline{toc}{subsection}{sim:integrator} Declares the integrator to be used for the simulation. Available options are:
 \begin{itemize}
-  \item[] llg-heun
-  \item[] monte-carlo
-  \item[] llg-midpoint
-  \item[] constrained-monte-carlo
-  \item[] hybrid-constrained-monte-carlo
-  \item[] suzuki-trotter
+  \item[] \texttt{llg-heun} (default): second-order Heun integration of the stochastic Landau-Lifshitz-Gilbert equation. Recommended for most dynamic simulations.
+  \item[] \texttt{llg-midpoint}: implicit midpoint integration of the LLG equation. More accurate than Heun, especially for low Gilbert damping, but computationally more expensive per step.
+  \item[] \texttt{llg-quantum}: LLG-Heun integration with quantum-corrected thermal fields based on Bose-Einstein statistics with time-correlated noise.
+  \item[] \texttt{monte-carlo}: Metropolis Monte Carlo algorithm. Efficient for computing equilibrium thermodynamic properties such as the Curie temperature and magnetisation curves.
+  \item[] \texttt{constrained-monte-carlo}: Monte Carlo integration with a global constraint on the magnetisation direction. Used for computing anisotropy energy surfaces and constrained equilibrium states.
+  \item[] \texttt{hybrid-constrained-monte-carlo}: combines constrained Monte Carlo moves for the constrained material(s) with standard Monte Carlo for all other materials.
+  \item[] \texttt{spin-lattice}: Suzuki-Trotter decomposition integrator for coupled spin-lattice dynamics. Requires the spin-lattice module parameters to be defined.
+  \item[] \texttt{lsf}: Heun integration of the longitudinal spin fluctuation (LSF) equations of motion, allowing the spin length to vary according to the Landau free-energy.
+  \item[] \texttt{lsf-mc}: Monte Carlo sampling for longitudinal spin fluctuations. Used for computing equilibrium properties with varying spin length.
+  \item[] \texttt{lsf-rk4}: fourth-order Runge-Kutta integration of the LSF equations of motion. More accurate than Heun.
 \end{itemize}
 
 {\zicf sim:program = exclusive string}\phantomsection\addcontentsline{toc}{subsection}{sim:program} Defines the simulation program to be used.
