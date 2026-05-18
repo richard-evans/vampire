@@ -71,6 +71,7 @@ namespace program
    extern void mm_A_calculation();
    extern void exchange_stiffness();
 	extern void electrical_pulse();
+	extern void laser_electrical_pulse();
 	extern void spin_waves(); // JRH
 	extern void field_pulse();
 

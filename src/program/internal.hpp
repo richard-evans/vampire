@@ -71,6 +71,7 @@ namespace program{
       extern double electrical_pulse_rise_time; // linear rise time for electrical pulse (0.0 default)
       extern double electrical_pulse_fall_time; // linear fall time for electrical pulse (0.0 default)
       extern int num_electrical_pulses;
+      extern double electrical_pulse_delay;     // delay from laser pulse centre to electrical pulse centre (laser-electrical-pulse program)
 
       //------------------------------------------------------------------------
       // Field pulse program

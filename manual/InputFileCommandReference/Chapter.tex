@@ -473,9 +473,27 @@ scaled in direct proportion with the applied voltage. The pulse duration is
 controlled by the parameter \textit{sim:electrical-pulse-time}
 with a rise time of \textit{sim:electrical-pulse-rise-time} and fall time of
 \textit{sim:electrical-pulse-fall-time}. The default pulse time is 1 ns, and
-default fall and rise times are 0, reproducing a square pulse. The time
+default fall and rise times are 0, reproducing a square pulse. An optional delay
+before the pulse begins can be set with \textit{sim:electrical-pulse-delay}. The time
 dependence of the fractional voltage can be printed in the output file with the
 parameter \textit{output:fractional-electric-field-strength}.
+
+{\zicf sim:program = laser-electrical-pulse}\phantomsection\addcontentsline{toc}{subsubsection}{laser-electrical-pulse}
+Simulates the combined effect of an ultrafast laser pulse and an independent electrical pulse.
+The laser pulse heats the electronic and phonon subsystems using the two-temperature model (TTM),
+driven by the same parameters as \textit{sim:program = temperature-pulse}
+(\textit{sim:laser-pulse-temporal-profile}, \textit{sim:laser-pulse-time}, \textit{sim:laser-pulse-power},
+\textit{sim:two-temperature-electron-heat-capacity}, \textit{sim:two-temperature-phonon-heat-capacity},
+\textit{sim:two-temperature-electron-phonon-coupling}, \textit{sim:equilibration-temperature}).
+The electrical pulse modulates the spin-transfer or spin-orbit torque strength via a Gaussian envelope,
+scaled by the STT/SOT field strengths set in the material file.
+The electrical Gaussian is centred at $t_\mathrm{delay} + 3\tau_\mathrm{elec}$ from the start of the simulation,
+where $t_\mathrm{delay}$ is set by \textit{sim:electrical-pulse-delay} and $\tau_\mathrm{elec}$ by
+\textit{sim:electrical-pulse-time}.
+The laser Gaussian peaks at $3\tau_\mathrm{laser}$, so setting delay $= 0$ with equal pulse times produces
+perfectly overlapping pulses; a positive delay shifts the electrical pulse to arrive after the laser.
+The fractional electrical field strength can be written to the output file with
+\textit{output:fractional-electric-field-strength}.
 
 {\zicf sim:program = field-pulse}\phantomsection\addcontentsline{toc}{subsubsection}{field-pulse}
 Simulates the effect of a field pulse from an external applied field. The
@@ -690,6 +708,14 @@ Defines the pulse linear rise time in the program \textit{electrical-pulse} with
 Defines the pulse linear fall time in the program \textit{electrical-pulse} with
  default units of seconds and a default pulse time of 0, i.e. an instantaneous
  turning off of the current.
+
+{\zicf sim:electrical-pulse-delay = float [default $0.0$ s]}\phantomsection\addcontentsline{toc}{subsection}{sim:electrical-pulse-delay}
+Defines a time delay before the electrical pulse begins, with default units of seconds and a default of 0.
+In \textit{sim:program = electrical-pulse} the trapezoidal pulse is shifted forward in time by this amount,
+so the rise phase does not begin until $t = t_\mathrm{delay}$.
+In \textit{sim:program = laser-electrical-pulse} it sets the offset from the laser pulse centre to the
+electrical pulse centre; note that in this program \textit{sim:electrical-pulse-time} specifies the
+Gaussian width $\tau_\mathrm{elec}$ rather than a trapezoidal constant-phase duration.
 
  {\zicf sim:field-pulse-time = float [default $1.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:field-pulse-time}
  Defines the pulse time in the program \textit{field-pulse} with default

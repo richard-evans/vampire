@@ -40,6 +40,7 @@ namespace program{
       double electrical_pulse_rise_time = 0.0;    // linear rise time for electrical pulse (0.0 default)
       double electrical_pulse_fall_time = 0.0;    // linear fall time for electrical pulse (0.0 default)
       int num_electrical_pulses         = 1;
+      double electrical_pulse_delay     = 0.0;    // delay from laser pulse centre to electrical pulse centre (0.0 default)
 
       //------------------------------------------------------------------------
       // Field pulse program

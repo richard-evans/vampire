@@ -37,20 +37,27 @@ namespace pgi = program::internal;
 //------------------------------------------------------------------------------
 void update_electric_field_strength(const double time_from_start){
 
+   // shift time origin by user-specified delay (zero by default)
+   const double t = time_from_start - pgi::electrical_pulse_delay;
+
+   // before pulse delay: current = 0
+   if( t < 0.0 ){
+      pg::fractional_electric_field_strength = 0.0;
+   }
    // implement rise time
-   if( time_from_start < pgi::electrical_pulse_rise_time ){
-      pg::fractional_electric_field_strength = time_from_start / pgi::electrical_pulse_rise_time;
+   else if( t < pgi::electrical_pulse_rise_time ){
+      pg::fractional_electric_field_strength = t / pgi::electrical_pulse_rise_time;
    }
    // implement continuous current
-   else if( time_from_start < pgi::electrical_pulse_rise_time + pgi::electrical_pulse_time ){
+   else if( t < pgi::electrical_pulse_rise_time + pgi::electrical_pulse_time ){
       pg::fractional_electric_field_strength = 1.0;
    }
    // implement fall time
-   else if( time_from_start < pgi::electrical_pulse_rise_time + pgi::electrical_pulse_time + pgi::electrical_pulse_fall_time) {
-      const double fractional_fall_time = time_from_start - (pgi::electrical_pulse_rise_time + pgi::electrical_pulse_time);
+   else if( t < pgi::electrical_pulse_rise_time + pgi::electrical_pulse_time + pgi::electrical_pulse_fall_time) {
+      const double fractional_fall_time = t - (pgi::electrical_pulse_rise_time + pgi::electrical_pulse_time);
       pg::fractional_electric_field_strength = 1.0 - fractional_fall_time / pgi::electrical_pulse_fall_time;
    }
-   // after pulse current = 0
+   // after pulse: current = 0
    else{
       pg::fractional_electric_field_strength = 0.0;
    }

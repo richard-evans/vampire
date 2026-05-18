@@ -484,6 +484,13 @@ int run(){
 	  		}
 	  		program::field_pulse();
 	  		break;
+		case 19:
+	  		if(vmpi::my_rank==0){
+	    		std::cout << "laser-electrical-pulse..." << std::endl;
+	    		zlog << "laser-electrical-pulse..." << std::endl;
+	  		}
+	  		program::laser_electrical_pulse();
+	  		break;
 
 		case 50:
 			if(vmpi::my_rank==0){

@@ -130,6 +130,11 @@ namespace program{
             program::program = 18;
             return true;
          }
+         test="laser-electrical-pulse";
+         if(value==test){
+            program::program = 19;
+            return true;
+         }
          test="diagnostic-boltzmann";
          if(value==test){
             program::program=50;
@@ -195,6 +200,7 @@ namespace program{
             std::cerr << "\t\"exchange-stiffness\"" << std::endl;
             std::cerr << "\t\"field-cool\"" << std::endl;
             std::cerr << "\t\"field-pulse\"" << std::endl;
+            std::cerr << "\t\"laser-electrical-pulse\"" << std::endl;
             std::cerr << "\t\"laser-pulse\"" << std::endl;
             std::cerr << "\t\"localised-field-cool\"" << std::endl;
             std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
@@ -236,6 +242,14 @@ namespace program{
          vin::check_for_valid_positive_value(ft, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
          // save sanitized value
          program::internal::electrical_pulse_fall_time = ft;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test = "electrical-pulse-delay";
+      if(word == test){
+         double pd = atof(value.c_str());
+         vin::check_for_valid_positive_value(pd, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
+         program::internal::electrical_pulse_delay = pd;
          return true;
       }
       //--------------------------------------------------------------------

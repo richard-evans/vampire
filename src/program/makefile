@@ -13,6 +13,7 @@ disk_tracks.o \
 domain_wall.o \
 effective_damping.o \
 electrical_pulse.o \
+laser_electrical_pulse.o \
 exchange_stiffness.o \
 field_cool.o \
 field_pulse.o \
