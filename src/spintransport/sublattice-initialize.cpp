@@ -58,10 +58,6 @@ namespace spin_transport{
             }
          }
 
-         //for(int i=0; i< sublattice_list.size(); i++){
-         //   std::cout << "Sublattice " << sublattice_list[i] << " mapped to index " << i << std::endl;
-         //}
-
          // relabel list in linear order for memory efficiency
          for(int mat = 0; mat < num_materials; mat++){
             for(int stsl = 0; stsl < sublattice_list.size(); stsl++){
@@ -70,10 +66,6 @@ namespace spin_transport{
                }
             }
          }
-
-         //for(int mat = 0; mat < num_materials; mat++){
-         //   std::cout << "Material " << mat << ": stsl = " << st::internal::mp[mat].stsl << std::endl;
-         //}
 
          // now associate each atom with the correct sublattice for spin transport calculation
          st::internal::atom_sublattice.resize(num_atoms);
@@ -125,26 +117,15 @@ namespace spin_transport{
 
          // Temporary arrays to accumulate intermediate values
          std::vector<uint64_t> total_num_atoms_in_cell( num_cells, 0 ); // array to store total number of magnetic and non-magnetic atoms in cell
-         //std::vector<double>   total_num_magnetic_atoms(   st::internal::total_num_cells, 0  ); // array to store total number of actually magnetic atoms (ignoring nm = keep atoms) [double format for easy normalisation]
-         //std::vector<double>   total_resistivity_sq(       st::internal::total_num_cells, 0.0); // array to store total resistivity^2 calculated from constituent atoms
-         //std::vector<double>   total_spin_resistivity_sq(  st::internal::total_num_cells, 0.0); // array to store total spin resistivity^2 calculated from constituent atoms
 
          // Temporary arrays to accumulate intermediate values for material-resolved calculation
          std::vector < std::vector<uint64_t> > cell_sl_num_atoms_in_cell(  num_cells);   // array to store total number of magnetic and non-magnetic atoms in cell
          std::vector < std::vector< double > > cell_sl_num_magnetic_atoms( num_cells);  // array to store total number of actually magnetic atoms (ignoring nm = keep atoms) [double format for easy normalisation]
-         //std::vector < std::vector< double > > cell_sl_resistivity(        num_cells);         // array to store total resistivity calculated from constituent atoms
-         //std::vector < std::vector< double > > cell_sl_resistivity_sq(     num_cells);      // array to store total resistivity^2 calculated from constituent atoms
-         //std::vector < std::vector< double > > cell_sl_spin_resistivity(   num_cells);    // array to store total spin resistivity calculated from constituent atoms
-         //std::vector < std::vector< double > > cell_sl_spin_resistivity_sq(num_cells); // array to store total spin resistivity^2 calculated from constituent atoms*/
 
          // allocate memory for sublattice properties for each cell
          for( int cell = 0; cell < num_cells; cell++ ){
             cell_sl_num_atoms_in_cell[cell].resize(  num_sublattices,  0  );
             cell_sl_num_magnetic_atoms[cell].resize( num_sublattices, 0.0 );
-            //cell_sl_resistivity[cell].resize(        num_sublattices, 0.0 );
-            //cell_sl_resistivity_sq[cell].resize(     num_sublattices, 0.0 );
-            //cell_sl_spin_resistivity[cell].resize(   num_sublattices, 0.0 );
-            //cell_sl_spin_resistivity_sq[cell].resize(num_sublattices, 0.0 );
          }
 
          std::vector<uint64_t> sl_num_atoms_in_cell(num_sublattices);   // array to store total number of magnetic and non-magnetic atoms in cell
@@ -252,6 +233,7 @@ namespace spin_transport{
 
                   // save accumulated values
                   for( int sl = 0; sl < num_sublattices; sl++ ){
+
                      st::internal::cell_sl_resistance          [cell][sl] = sl_resistivity     [sl]; // temporarily store rho_eff for each sublattice here
                      st::internal::cell_sl_spin_resistance     [cell][sl] = sl_spin_resistivity[sl]; // temporarily store spin-dependent rho_eff for each sublattice here
                      st::internal::cell_sl_relaxation_torque_rj[cell][sl] = sl_total_rj        [sl];
@@ -262,10 +244,7 @@ namespace spin_transport{
                      // temporary values
                      cell_sl_num_atoms_in_cell[cell][sl]   = sl_num_atoms_in_cell[sl];   // store total number of magnetic and non-magnetic atoms in cell
                      cell_sl_num_magnetic_atoms[cell][sl]  = sl_num_magnetic_atoms[sl];  // store total number of magnetic atoms in cell in double format for normalisation
-                     //cell_sl_resistivity[sl][cell]         = sl_resistivity[sl];
-                     //cell_sl_resistivity_sq[cell][sl]      = sl_resistivity_sq[sl];      // store total resistivity^2 calculated from constituent atoms
-                     //cell_sl_spin_resistivity[sl][cell]    = sl_spin_resistivity[sl];
-                     //cell_sl_spin_resistivity_sq[cell][sl] = sl_spin_resistivity_sq[sl]; // store total spin resistivity^2 calculated from constituent atoms
+
                   }
 
                } // end of cell loop
@@ -292,8 +271,7 @@ namespace spin_transport{
                MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_alpha               [cell][0], bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
                MPI_Allreduce(MPI_IN_PLACE, &cell_sl_num_atoms_in_cell                 [cell][0], bufsize, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
                MPI_Allreduce(MPI_IN_PLACE, &cell_sl_num_magnetic_atoms                [cell][0], bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-               //MPI_Allreduce(MPI_IN_PLACE, &cell_sl_resistivity_sq                    [cell][0], bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-               //MPI_Allreduce(MPI_IN_PLACE, &cell_sl_spin_resistivity_sq               [cell][0], bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+
             }
          #endif
 
@@ -441,6 +419,7 @@ namespace spin_transport{
             if(stack[i] == 2) istack[2] = i;
          }
 
+         // Output stack directions
          //std::cout << " stack: " << stack[0] << "\t" << stack[1] << "\t" << stack[2] << std::endl;
          //std::cout << "istack: " << istack[0] << "\t" << istack[1] << "\t" << istack[2] << std::endl;
 
@@ -469,6 +448,10 @@ namespace spin_transport{
                }
             }
          }
+
+         //------------------------------------------------------------------------
+         // TODO: Pre-processing step to accumulate resistances for GMR and TMR
+         //------------------------------------------------------------------------
 
          //------------------------------------------------------------------------
          // resize cell vector data arrays and set to zero

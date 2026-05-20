@@ -41,15 +41,17 @@ void calculate_magnetoresistance(){
       //std::fill(st::internal::stack_current.begin(),    st::internal::stack_current.end(),    0.0);
    #endif
 
-   // TODO need to parallelise stack loop
    //---------------------------------------------------------------------------------------------------------
-   // loop over all stacks to calculate stack resistance (can OpenMP this loop)
+   // loop over all stacks to calculate stack resistance (parallelised for MPI)
    //---------------------------------------------------------------------------------------------------------
    for(uint64_t stack = st::internal::first_stack; stack < st::internal::last_stack; stack++){
 
       const unsigned int start = stack_start_index[stack];
       const unsigned int end   = stack_final_index[stack];
       const double isat = st::internal::cell_isaturation[start]; // saturation magnetization for cell i
+
+      // hbar / ( 2 e mu_B) = 1.054571817e-34 /(2.0 * 1.602176634e-19 * 9.2740100657e-24) = 35486911.9121
+      const double hbar_o_2emuB = 35486911.9121;
 
       double total_stack_resistance = 0.0;
 
@@ -92,9 +94,9 @@ void calculate_magnetoresistance(){
             const double hz = (strj-alpha*stpj)*(mjx*miy - mjy*mix) + (stpj+alpha*strj)*miz;
 
             // save field (without current factor)
-            st::internal::cell_spin_torque_fields[3*cell+0] = hx;
-            st::internal::cell_spin_torque_fields[3*cell+1] = hy;
-            st::internal::cell_spin_torque_fields[3*cell+2] = hz;
+            st::internal::cell_spin_torque_fields[3*cell+0] = hx * jsat * hbar_o_2emuB; // multiply by inverse moment
+            st::internal::cell_spin_torque_fields[3*cell+1] = hy * jsat * hbar_o_2emuB;
+            st::internal::cell_spin_torque_fields[3*cell+2] = hz * jsat * hbar_o_2emuB;
 
             // update cell resistances and magnetization
             mix = mjx;
@@ -126,7 +128,7 @@ void calculate_magnetoresistance(){
       //-----------------------------------------------------
       // Compute stack current
       //-----------------------------------------------------
-      const double je = st::internal::voltage * program::fractional_electric_field_strength / total_stack_resistance;
+      const double I = st::internal::voltage * program::fractional_electric_field_strength / total_stack_resistance;
 
       //---------------------------------------------------------
       // Compute cell spin torque fields based on stack currents
@@ -137,25 +139,24 @@ void calculate_magnetoresistance(){
       // loop over all other cells in stack
       // slightly unsafe loop structure, but designed for allowing forward and backward loops starting one after the first cell
       for(unsigned int cell = start + cell_inc ; cell != end + cell_inc ; cell += cell_inc){
-         st::internal::cell_spin_torque_fields[3*cell+0] *= je;
-         st::internal::cell_spin_torque_fields[3*cell+1] *= je;
-         st::internal::cell_spin_torque_fields[3*cell+2] *= je;
+         st::internal::cell_spin_torque_fields[3*cell+0] *= I;
+         st::internal::cell_spin_torque_fields[3*cell+1] *= I;
+         st::internal::cell_spin_torque_fields[3*cell+2] *= I;
       }
 
       //-----------------------------------------------------
       // save stack resistance and current to arrays
       //-----------------------------------------------------
       st::internal::stack_resistance[stack] = total_stack_resistance;
-      st::internal::stack_current[stack]    = je;
+      st::internal::stack_current[stack]    = I;
 
    } // end of stack loop
 
    //------------------------------------------------------------------------------------------
-   // Reduce cell spin trorque fields and stack currents and resistances on all processors
+   // Reduce cell spin torque fields and stack currents and resistances on all processors
    //------------------------------------------------------------------------------------------
    #ifdef MPICF
       MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_torque_fields[0], 3*st::internal::total_num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      //MPI_Allreduce(MPI_IN_PLACE, &st::internal::stack_resistance[0],        st::internal::num_stacks,        MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &sum_inv_resistance,                       1,                               MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 

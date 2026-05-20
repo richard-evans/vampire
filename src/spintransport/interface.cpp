@@ -237,23 +237,27 @@ namespace spin_transport{
          return true;
       }*/
       //------------------------------------------------------------
-      test  = "spin-transport-relaxation-torque";
-      // aj parameter for material in slonczewski torque calculation
-      if( word==test ){
-         double aj=atof(value.c_str());
+      test  = "spin-transport-relaxation-torque-efficiency";
+      std::string test2  = "spin-transport-spin-torque-efficiency";
+      std::string test3 = "spin-transport-eta";
+      // eta parameter for material in slonczewski torque calculation
+      if( word == test || word == test2 || word == test3 ){
+         double eta = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", -1.0e-2, 1.0e2,"input","-100 - 100T");
-         st::internal::mp[super_index].stt_rj.set(aj);
+         vin::check_for_valid_value(eta, word, line, prefix, unit, "", -1.0, 1.0,"input","-1.0 - 1.0");
+         st::internal::mp[super_index].stt_rj.set(eta);
          return true;
       }
       //------------------------------------------------------------
-      test = "spin-transport-precession-torque";
-      // bj parameter for material in slonczewski torque calculation
-      if( word==test ){
-         double bj=atof(value.c_str());
+      test  = "spin-transport-precession-torque-efficiency";
+      test2 = "spin-transport-spin-torque-beta";
+      test3 = "spin-transport-beta";
+      // beta parameter for material in slonczewski torque calculation
+      if( word == test || word == test2 || word == test3 ){
+         double beta = atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e-2, 1.0e2,"input","-100 - 100T");
-         st::internal::mp[super_index].stt_pj.set(bj);
+         vin::check_for_valid_value(beta, word, line, prefix, unit, "", -1.0, 1.0,"input","-1.0 - 1.0");
+         st::internal::mp[super_index].stt_pj.set(beta);
          return true;
       }
       //------------------------------------------------------------
