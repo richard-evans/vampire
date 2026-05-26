@@ -16,6 +16,7 @@
 
 // Vampire headers
 #include "spintransport.hpp"
+#include "vmpi.hpp"
 
 // spintransport module headers
 #include "internal.hpp"
@@ -70,22 +71,55 @@ void update(const unsigned int num_local_atoms,            // number of local at
    // test output of cell-level spin transport data
    //---------------------------------------------------------------------------------------------------------
 
-   // std::ofstream ofile("stdata.txt");
-   // for(int i =0; i< st::internal::total_num_cells; i++){
-   //    const double isat = st::internal::cell_isaturation[i];
-   //    ofile << st::internal::cell_position[3*i+0] << "\t" <<
-   //             st::internal::cell_position[3*i+1] << "\t" <<
-   //             st::internal::cell_position[3*i+2] << "\t" <<
-   //             st::internal::cell_magnetization[3*i+0] * isat << "\t" <<
-   //             st::internal::cell_magnetization[3*i+1] * isat << "\t" <<
-   //             st::internal::cell_magnetization[3*i+2] * isat << "\t" <<
-   //             st::internal::cell_spin_torque_fields[3*i+0] << "\t" <<
-   //             st::internal::cell_spin_torque_fields[3*i+1] << "\t" <<
-   //             st::internal::cell_spin_torque_fields[3*i+2] << "\t" <<
-   //             st::internal::cell_resistance[i] << "\t" <<
-   //             st::internal::cell_spin_resistance[i] << std::endl;
-   // }
-   // ofile.close();
+   /*if( vmpi::my_rank == 0 && !st::internal::sublattice){
+      std::ofstream ofile("stdata.txt");
+      for(int i =0; i< st::internal::total_num_cells; i++){
+         const double isat = st::internal::cell_isaturation[i];
+         ofile << st::internal::cell_position[3*i+0] << "\t" <<
+                  st::internal::cell_position[3*i+1] << "\t" <<
+                  st::internal::cell_position[3*i+2] << "\t" <<
+                  st::internal::cell_magnetization[3*i+0] * isat << "\t" <<
+                  st::internal::cell_magnetization[3*i+1] * isat << "\t" <<
+                  st::internal::cell_magnetization[3*i+2] * isat << "\t" <<
+                  st::internal::cell_spin_torque_fields[3*i+0] << "\t" <<
+                  st::internal::cell_spin_torque_fields[3*i+1] << "\t" <<
+                  st::internal::cell_spin_torque_fields[3*i+2] << "\t" <<
+                  st::internal::cell_resistance[i] << "\t" <<
+                  st::internal::cell_spin_resistance[i] << std::endl;
+      }
+      ofile.close();
+      std::cin.get();
+   }
+
+   if( vmpi::my_rank == 0 && st::internal::sublattice){
+      const int num_sublattices = st::internal::num_sublattices;
+      std::ofstream ofile("stdata.txt");
+      std::cout << "CRS: " << st::internal::cell_resistance.size() << "\t" << st::internal::cell_spin_resistance.size() << std::endl;
+      for(uint64_t i =0; i< st::internal::total_num_cells; i++){
+         ofile << st::internal::cell_position[3*i+0] << "\t" <<
+                  st::internal::cell_position[3*i+1] << "\t" <<
+                  st::internal::cell_position[3*i+2] << "\t"; // <<
+                  //st::internal::cell_resistance[i] << "\t"; // <<
+                  //st::internal::cell_spin_resistance[i] << "\t";
+
+                  for( int sl = 0; sl < num_sublattices; sl++ ){
+
+                     const double isat = st::internal::cell_sl_isaturation[i][sl];
+                     double mix = st::internal::cell_sl_magnetization_x[i][sl] * isat;
+                     double miy = st::internal::cell_sl_magnetization_y[i][sl] * isat;
+                     double miz = st::internal::cell_sl_magnetization_z[i][sl] * isat;
+                     ofile << mix << "\t" << miy << "\t" << miz << "\t" << st::internal::cell_sl_spin_torque_fields_x[i][sl] << "\t" <<
+                                                                           st::internal::cell_sl_spin_torque_fields_y[i][sl] << "\t" <<
+                                                                           st::internal::cell_sl_spin_torque_fields_z[i][sl] << "\t" <<
+                                                                           st::internal::cell_sl_resistance[i][sl] << "\t" <<
+                                                                           st::internal::cell_sl_spin_resistance[i][sl] << "\t";
+                                                                           ;
+                  }
+                  ofile << std::endl;
+      }
+      ofile.close();
+      std::cin.get();
+   }*/
 
    return;
 

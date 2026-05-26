@@ -64,6 +64,7 @@ void calculate_sublattice_resistance(){
             st::internal::cell_sl_spin_torque_fields_y[cell][sl] = 0.0;
             st::internal::cell_sl_spin_torque_fields_z[cell][sl] = 0.0;
          }
+         //std::fill(st::internal::cell_resistance.begin(), st::internal::cell_resistance.end(), 0.0);
       }
       //std::fill(st::internal::stack_resistance.begin(), st::internal::stack_resistance.end(), 0.0); // needed for data output only
       //std::fill(st::internal::stack_current.begin(),    st::internal::stack_current.end(),    0.0);
@@ -94,6 +95,9 @@ void calculate_sublattice_resistance(){
          // add cell resistance to total resistance
          total_stack_resistance += cell_resistance;
 
+         // save cell resistance to calculate local voltage drop over the cell, and thereby calculate sublattice currents
+         st::internal::cell_resistance[cell] = cell_resistance;
+
       }
 
       //-----------------------------------------------------
@@ -115,11 +119,16 @@ void calculate_sublattice_resistance(){
       // loop over all other cells in stack
       // slightly unsafe loop structure, but designed for allowing forward and backward loops starting one after the first cell
       for(unsigned int cell = start + cell_inc ; cell != end + cell_inc ; cell += cell_inc){
-         // loop over all sublattices
+
+         // Calculate vocal voltage drop (based on cell resistance)
+         const double V_cell = I * st::internal::cell_resistance[cell];
+
+         // loop over all sublattices, multiply by V_cell due to I_sl = V_cell / R_sl,
+         // as torque already pre-divided by R_sl
          for( int sl = 0; sl < num_sublattices; sl++ ){
-            st::internal::cell_sl_spin_torque_fields_x[cell][sl] *= I;
-            st::internal::cell_sl_spin_torque_fields_y[cell][sl] *= I;
-            st::internal::cell_sl_spin_torque_fields_z[cell][sl] *= I;
+            st::internal::cell_sl_spin_torque_fields_x[cell][sl] *= V_cell;
+            st::internal::cell_sl_spin_torque_fields_y[cell][sl] *= V_cell;
+            st::internal::cell_sl_spin_torque_fields_z[cell][sl] *= V_cell;
          }
       }
 
@@ -194,21 +203,22 @@ void calculate_sublattice_resistance(){
             const double mi_dot_mj = ( mix*mjx + miy*mjy + miz*mjz );
 
             // calculate resistance and sum as 1/R since Rep and Rsp are serial resistances
-            sum_inv_resistances += 1.0 / ( Rep + 0.5*Rsp*(1.0 - mi_dot_mj) );
+            const double R_sl = Rep + 0.5*Rsp*(1.0 - mi_dot_mj);
+            sum_inv_resistances += 1.0 / R_sl;
 
             // calculate relative contributions of adiabatic and non-adiabatic spin torque
             const double strj = st::internal::cell_sl_relaxation_torque_rj[cell][sl]; // eta parameter
-            const double stpj = st::internal::cell_sl_precession_torque_pj[cell][sl]; // eta * beta parameter
+            const double stpj = st::internal::cell_sl_precession_torque_pj[cell][sl]; // beta parameter (should be multiplied by eta?)
 
             // calculate field without current based on relative magnetization orientations
             const double hx = (strj-alpha*stpj)*(mjy*miz - mjz*miy) + (stpj+alpha*strj)*mix;
             const double hy = (strj-alpha*stpj)*(mjz*mix - mjx*miz) + (stpj+alpha*strj)*miy;
             const double hz = (strj-alpha*stpj)*(mjx*miy - mjy*mix) + (stpj+alpha*strj)*miz;
 
-            // save field (without current factor)
-            st::internal::cell_sl_spin_torque_fields_x[cell][sl] = hx * jsat * hbar_o_2emuB; // multiply by inverse moment
-            st::internal::cell_sl_spin_torque_fields_y[cell][sl] = hy * jsat * hbar_o_2emuB;
-            st::internal::cell_sl_spin_torque_fields_z[cell][sl] = hz * jsat * hbar_o_2emuB;
+            // save field (without current factor, but scaled with R_sl, with I = V/R, so multiply by V_cell to get local current)
+            st::internal::cell_sl_spin_torque_fields_x[cell][sl] = hx * jsat * hbar_o_2emuB / R_sl; // multiply by inverse moment
+            st::internal::cell_sl_spin_torque_fields_y[cell][sl] = hy * jsat * hbar_o_2emuB / R_sl;
+            st::internal::cell_sl_spin_torque_fields_z[cell][sl] = hz * jsat * hbar_o_2emuB / R_sl;
 
             // update magnetization for next iteration
             sl_mix[sl] = mjx;
@@ -222,7 +232,7 @@ void calculate_sublattice_resistance(){
 
             // here we would also add the spin resistance here for accumulation in the
             // next step to include the effects of TMR, but for the sublattice
-            // calcultaion this is information is lost and its not clear how this impacts
+            // calculation this is information is lost and its not clear how this impacts
             // the cell level resistances that must be done with the inverse sum
             // sum_inv_spin_resistances += 1.0 / Rsp;
 
