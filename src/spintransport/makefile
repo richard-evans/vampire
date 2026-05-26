@@ -10,6 +10,9 @@ initialize.o \
 interface.o \
 magnetization.o \
 resistance.o \
+sublattice-initialize.o \
+sublattice-magnetization.o \
+sublattice-resistance.o \
 update.o \
 voltage.o
 

@@ -52,15 +52,15 @@ namespace spin_transport{
                    const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
                    const std::vector<double>& material_damping_array, // array of material level damping constants
                    const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
-                   const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
+                   const std::vector<cs::nm_atom_t>& non_magnetic_atoms_array // list of non-magnetic atoms
    );
 
    //-----------------------------------------------------------------------------
    // Function to update resistance, current and spin transfer torque fields
    //-----------------------------------------------------------------------------
-   void update(const unsigned int num_local_atoms,            // number of local atoms
-               const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
-               const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
+   void update(const unsigned int num_local_atoms,             // number of local atoms
+               const std::vector<double>& atoms_x_spin_array,  // x-spin vector of atoms
+               const std::vector<double>& atoms_y_spin_array,  // y-spin vector of atoms
                const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
                const std::vector<double>& atoms_m_spin_array);
 
@@ -68,7 +68,8 @@ namespace spin_transport{
                         const unsigned int end_index,              // last atom
                         std::vector<double>& atoms_x_field_array,  // x-field of atoms
                         std::vector<double>& atoms_y_field_array,  // y-field of atoms
-                        std::vector<double>& atoms_z_field_array); // z-field of atoms
+                        std::vector<double>& atoms_z_field_array,  // z-field of atoms
+                        const std::vector<int>& atoms_type_array); // material ID of atom);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for spintransport module

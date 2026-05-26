@@ -32,11 +32,13 @@ namespace spin_transport{
       // Shared variables inside spintransport module
       //------------------------------------------------------------------------
       bool enabled = false; // bool to enable spin transport calculation
+      bool sublattice = false; // bool to enable sublattice level spin transport calculation
 
       unsigned int update_rate  = 100;  // number of timesteps between updates
       unsigned int time_counter = 100;  // number of timesteps since last update (initially set to same as update rate to ensure calculation at start)
 
       std::vector<internal::mp_t> mp; // array of material properties
+      std::vector <int> atom_sublattice; // array to store which sublattice each atom is in for spin transport calculation
 
       // enumerated list of different current directions
       current_direction_t current_direction = st::internal::pz; // current direction (default along +z direction)
@@ -47,6 +49,7 @@ namespace spin_transport{
 
       int cell_increment = 1; // cell increment depending on positive or negative current direction
 
+      unsigned int num_sublattices = 1; // number of sublattices
       unsigned int num_stacks = 0; // number of stacks perpendicular to current direction
       unsigned int total_num_cells  = 0; // number of cells
 
@@ -65,6 +68,8 @@ namespace spin_transport{
       // arrays to store average resistance and spin resistance in each cell
       std::vector <double> cell_resistance;
       std::vector <double> cell_spin_resistance;
+      std::vector < std::vector <double> > cell_sl_resistance;
+      std::vector < std::vector <double> > cell_sl_spin_resistance;
 
       // arrays to store cell properties
       std::vector <bool> magnetic;                    // boolean array to determine if cell is magnetic or not
@@ -75,6 +80,19 @@ namespace spin_transport{
       std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
       std::vector <double> cell_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
       std::vector <double> cell_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
+
+      // material specific arrays to store cell properties
+      std::vector < std::vector < bool > > sl_magnetic;                  // boolean array to determine if cell is magnetic or not, by material type
+      std::vector < std::vector <double> > cell_sl_alpha;                // cell magnetization (average of constituent atoms)
+      std::vector < std::vector <double> > cell_sl_isaturation;          // inverse magnetic saturation at T=0 in each cell
+      std::vector < std::vector <double> > cell_sl_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
+      std::vector < std::vector <double> > cell_sl_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
+      std::vector < std::vector <double> > cell_sl_magnetization_x;        // normalised magnetization of each material in each cell
+      std::vector < std::vector <double> > cell_sl_magnetization_y;        // normalised magnetization of each material in each cell
+      std::vector < std::vector <double> > cell_sl_magnetization_z;        // normalised magnetization of each material in each cell
+      std::vector < std::vector <double> > cell_sl_spin_torque_fields_x;   // array of cell spin torque fields x
+      std::vector < std::vector <double> > cell_sl_spin_torque_fields_y;   // array of cell spin torque fields y
+      std::vector < std::vector <double> > cell_sl_spin_torque_fields_z;   // array of cell spin torque fields z
 
       // array to store which cell each atom is in
       std::vector <unsigned int> atom_in_cell;
