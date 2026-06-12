@@ -177,8 +177,9 @@ namespace spin_transport{
                      const int atomID = cells3D[i][j][k].atom[atom];
                      // get atom material of atom
                      const int mat = atoms_type_array[atomID]; // get material type
-                     // get sublattice of atom
-                     const int sl = st::internal::atom_sublattice[atom];
+                     // get sublattice of atom (indexed by global atom ID, not local loop index)
+                     //const int sl = st::internal::atom_sublattice[atom];
+                     const int sl = st::internal::atom_sublattice[atomID]; //jeff
 
                      // get resistivities
                      const double r  = st::internal::mp[mat].resistivity.get();
@@ -214,8 +215,14 @@ namespace spin_transport{
                   // non-magnetic (remove) atoms
                   for(unsigned int atom = 0; atom < cells3D[i][j][k].nm_atom.size(); atom++ ){
 
-                     const int mat = non_magnetic_atoms_array[atom].mat; // get material type
-                     const int sl = st::internal::atom_sublattice[atom]; // get sublattice of atom
+                     // get atom number in total list
+                     const int atomID = cells3D[i][j][k].atom[atom]; //jeff
+                     const int mat = non_magnetic_atoms_array[atomID].mat; // get material type jeff
+                     //const int mat = non_magnetic_atoms_array[atomID].mat; // get material type
+
+                     // get sublattice of atom (indexed by global atom ID, not local loop index)
+                     //const int sl = st::internal::atom_sublattice[atomID];
+                     const int sl = st::internal::mp[mat].stsl; // get sublattice from material (nm atoms not in atom_sublattice) jeff
 
                      // add number of total atoms (magnetic and non-magnetic) for each sublattice for each cell
                      sl_num_atoms_in_cell[sl] += 1;

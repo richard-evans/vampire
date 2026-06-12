@@ -227,8 +227,8 @@ void calculate_sublattice_resistance(){
 
          }
          else{
-            // otherwise just add the standard inverse resistances
-            sum_inv_resistances += 1.0 / Rep;
+            // otherwise just add the standard inverse resistances (skip empty sublattices with R=0)
+            if(Rep > 0.0) sum_inv_resistances += 1.0 / Rep;
 
             // here we would also add the spin resistance here for accumulation in the
             // next step to include the effects of TMR, but for the sublattice
@@ -276,8 +276,9 @@ void calculate_sublattice_resistance(){
 
          }
 
-         // otherwise just add the standard inverse resistances
-         sum_inv_resistances += 1.0 / st::internal::cell_sl_resistance[cell][sl];
+         // skip empty sublattices (R=0) to avoid short-circuiting the parallel network
+         if(st::internal::cell_sl_resistance[cell][sl] > 0.0)
+            sum_inv_resistances += 1.0 / st::internal::cell_sl_resistance[cell][sl];
 
       } // end of sublattice loop
 
