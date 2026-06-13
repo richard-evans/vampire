@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include <algorithm>
 #include <iostream>
 
 // Vampire headers
@@ -36,17 +37,14 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
    // define local constants for number of cells sublattices to avoid repeated access to global variables
    const int num_sublattices = st::internal::num_sublattices;
    const int num_cells = st::internal::total_num_cells;
+   const int num_cells_x_sl = num_cells * num_sublattices;
 
    //---------------------------------------------------------------------------
    // reset magnetization vector to zero
    //---------------------------------------------------------------------------
-   for( int cell = 0; cell < num_cells; cell++ ){
-      for( int sl = 0; sl < num_sublattices; sl++ ){
-         st::internal::cell_sl_magnetization_x[cell][sl] = 0.0;
-         st::internal::cell_sl_magnetization_y[cell][sl] = 0.0;
-         st::internal::cell_sl_magnetization_z[cell][sl] = 0.0;
-      }
-   }
+   std::fill(st::internal::cell_sl_magnetization_x.begin(), st::internal::cell_sl_magnetization_x.end(), 0.0);
+   std::fill(st::internal::cell_sl_magnetization_y.begin(), st::internal::cell_sl_magnetization_y.end(), 0.0);
+   std::fill(st::internal::cell_sl_magnetization_z.begin(), st::internal::cell_sl_magnetization_z.end(), 0.0);
 
    //---------------------------------------------------------------------------
    // loop over all atoms and determine cell magnetizations (can OpenMP)
@@ -62,10 +60,13 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
       // get sublattice of atom
       const int sl = st::internal::atom_sublattice[atom];
 
+      // flat index: sl is the fastest-varying index
+      const int idx = (int)cell * num_sublattices + sl;
+
       // add magnetization to cell
-      st::internal::cell_sl_magnetization_x[cell][sl] += mm*atoms_x_spin_array[atom];
-      st::internal::cell_sl_magnetization_y[cell][sl] += mm*atoms_y_spin_array[atom];
-      st::internal::cell_sl_magnetization_z[cell][sl] += mm*atoms_z_spin_array[atom];
+      st::internal::cell_sl_magnetization_x[idx] += mm*atoms_x_spin_array[atom];
+      st::internal::cell_sl_magnetization_y[idx] += mm*atoms_y_spin_array[atom];
+      st::internal::cell_sl_magnetization_z[idx] += mm*atoms_z_spin_array[atom];
 
    }
 
@@ -82,13 +83,10 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
    // Reduce cell material magnetizations on all processors
    //---------------------------------------------------------------------------
    #ifdef MPICF
-      // cast to int for MPI
-      int bufsize = num_sublattices;
-      for( int cell = 0; cell < num_cells; cell++ ){
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_x[cell][0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_y[cell][0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_z[cell][0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      }
+      // single reduction per component over the entire flat array
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_x[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_y[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_z[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
    return;

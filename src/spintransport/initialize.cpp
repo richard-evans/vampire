@@ -178,14 +178,16 @@ namespace spin_transport{
 
                      for( int sl = 0; sl < num_sublattices; sl++ ){
 
+                        // flat index: sl is the fastest-varying index
+                        const int idx = int(i * num_sublattices + sl);
 
-                        const double isat = st::internal::cell_sl_isaturation[i][sl];
-                        double mix = st::internal::cell_sl_magnetization_x[i][sl] * isat;
-                        double miy = st::internal::cell_sl_magnetization_y[i][sl] * isat;
-                        double miz = st::internal::cell_sl_magnetization_z[i][sl] * isat;
-                        ofile << mix << "\t" << miy << "\t" << miz << "\t" << st::internal::cell_sl_alpha[i][sl] << "\t" <<
-                                                                              st::internal::cell_sl_resistance[i][sl] << "\t" <<
-                                                                              st::internal::cell_sl_spin_resistance[i][sl] << "\t";
+                        const double isat = st::internal::cell_sl_isaturation[idx];
+                        double mix = st::internal::cell_sl_magnetization_x[idx] * isat;
+                        double miy = st::internal::cell_sl_magnetization_y[idx] * isat;
+                        double miz = st::internal::cell_sl_magnetization_z[idx] * isat;
+                        ofile << mix << "\t" << miy << "\t" << miz << "\t" << st::internal::cell_sl_alpha[idx] << "\t" <<
+                                                                              st::internal::cell_sl_resistance[idx] << "\t" <<
+                                                                              st::internal::cell_sl_spin_resistance[idx] << "\t";
                      }
                      ofile << std::endl;
          }

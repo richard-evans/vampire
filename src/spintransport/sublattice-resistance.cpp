@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include <algorithm>
 #include <iostream>
 
 // Vampire headers
@@ -42,7 +43,7 @@ void calculate_sublattice_resistance(){
 
    // define local constants for number of cells sublattices to avoid repeated access to global variables
    const int num_sublattices = st::internal::num_sublattices;
-   //const int num_cells = st::internal::total_num_cells;
+   const int num_cells_x_sl  = int(st::internal::total_num_cells) * num_sublattices;
 
    // variable to compute sum of inverse resistances over all stacks
    double sum_inv_resistance = 0.0;
@@ -56,16 +57,10 @@ void calculate_sublattice_resistance(){
    // Zero spin torque arrray for parallel version to allow reduction
    //---------------------------------------------------------------------------------------------------------
    #ifdef MPICF
-      // loop over all cells
-      for(unsigned int cell = 0; cell < st::internal::total_num_cells ; cell++){
-         // loop over all sublattices
-         for( int sl = 0; sl < num_sublattices; sl++ ){
-            st::internal::cell_sl_spin_torque_fields_x[cell][sl] = 0.0;
-            st::internal::cell_sl_spin_torque_fields_y[cell][sl] = 0.0;
-            st::internal::cell_sl_spin_torque_fields_z[cell][sl] = 0.0;
-         }
-         //std::fill(st::internal::cell_resistance.begin(), st::internal::cell_resistance.end(), 0.0);
-      }
+      std::fill(st::internal::cell_sl_spin_torque_fields_x.begin(), st::internal::cell_sl_spin_torque_fields_x.end(), 0.0);
+      std::fill(st::internal::cell_sl_spin_torque_fields_y.begin(), st::internal::cell_sl_spin_torque_fields_y.end(), 0.0);
+      std::fill(st::internal::cell_sl_spin_torque_fields_z.begin(), st::internal::cell_sl_spin_torque_fields_z.end(), 0.0);
+      //std::fill(st::internal::cell_resistance.begin(), st::internal::cell_resistance.end(), 0.0);
       //std::fill(st::internal::stack_resistance.begin(), st::internal::stack_resistance.end(), 0.0); // needed for data output only
       //std::fill(st::internal::stack_current.begin(),    st::internal::stack_current.end(),    0.0);
    #endif
@@ -125,10 +120,11 @@ void calculate_sublattice_resistance(){
 
          // loop over all sublattices, multiply by V_cell due to I_sl = V_cell / R_sl,
          // as torque already pre-divided by R_sl
+         const int base = int(cell) * num_sublattices;
          for( int sl = 0; sl < num_sublattices; sl++ ){
-            st::internal::cell_sl_spin_torque_fields_x[cell][sl] *= V_cell;
-            st::internal::cell_sl_spin_torque_fields_y[cell][sl] *= V_cell;
-            st::internal::cell_sl_spin_torque_fields_z[cell][sl] *= V_cell;
+            st::internal::cell_sl_spin_torque_fields_x[base + sl] *= V_cell;
+            st::internal::cell_sl_spin_torque_fields_y[base + sl] *= V_cell;
+            st::internal::cell_sl_spin_torque_fields_z[base + sl] *= V_cell;
          }
       }
 
@@ -142,15 +138,12 @@ void calculate_sublattice_resistance(){
 
    //------------------------------------------------------------------------------------------
    // Reduce cell spin torque fields and stack currents and resistances on all processors
-   // TODO: not efficient - probably better making a 1D N = cell x sl x 3 array for a single reduction
+   // Single reduction per component over the entire flat array
    //------------------------------------------------------------------------------------------
    #ifdef MPICF
-      // loop over all cells
-      for(unsigned int cell = 0; cell < st::internal::total_num_cells ; cell++){
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_x[cell][0], num_sublattices, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_y[cell][0], num_sublattices, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_z[cell][0], num_sublattices, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      }
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_x[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_y[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_z[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &sum_inv_resistance, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
@@ -180,26 +173,31 @@ void calculate_sublattice_resistance(){
       // variable to hold the sum of inverse resistances for all sublattices
       double sum_inv_resistances = 0.0;
 
+      // flat base index for this cell: sl is the fastest-varying index
+      const int base = cell * num_sublattices;
+
       // loop over all sublattices
       for( int sl = 0; sl < num_sublattices; sl++ ){
+
+         const int idx = base + sl;
 
          const double mix = sl_mix[sl];
          const double miy = sl_miy[sl];
          const double miz = sl_miz[sl];
 
          // get standard and spin-dependent resistances
-         const double Rep = st::internal::cell_sl_resistance[cell][sl];
-         const double Rsp = st::internal::cell_sl_spin_resistance[cell][sl];
+         const double Rep = st::internal::cell_sl_resistance[idx];
+         const double Rsp = st::internal::cell_sl_spin_resistance[idx];
 
          // if the sublattice is magnetic then add to sum of inverse resistances
-         if(st::internal::sl_magnetic[cell][sl]){
+         if(st::internal::sl_magnetic[idx]){
 
             // calculate next cell reduced magnetization
-            const double jsat      = st::internal::cell_sl_isaturation[cell][sl];
-            const double mjx       = st::internal::cell_sl_magnetization_x[cell][sl] * jsat;
-            const double mjy       = st::internal::cell_sl_magnetization_y[cell][sl] * jsat;
-            const double mjz       = st::internal::cell_sl_magnetization_z[cell][sl] * jsat;
-            const double alpha     = st::internal::cell_sl_alpha[cell][sl];
+            const double jsat      = st::internal::cell_sl_isaturation[idx];
+            const double mjx       = st::internal::cell_sl_magnetization_x[idx] * jsat;
+            const double mjy       = st::internal::cell_sl_magnetization_y[idx] * jsat;
+            const double mjz       = st::internal::cell_sl_magnetization_z[idx] * jsat;
+            const double alpha     = st::internal::cell_sl_alpha[idx];
             const double mi_dot_mj = ( mix*mjx + miy*mjy + miz*mjz );
 
             // calculate resistance and sum as 1/R since Rep and Rsp are serial resistances
@@ -207,8 +205,8 @@ void calculate_sublattice_resistance(){
             sum_inv_resistances += 1.0 / R_sl;
 
             // calculate relative contributions of adiabatic and non-adiabatic spin torque
-            const double strj = st::internal::cell_sl_relaxation_torque_rj[cell][sl]; // eta parameter
-            const double stpj = st::internal::cell_sl_precession_torque_pj[cell][sl]; // beta parameter (should be multiplied by eta?)
+            const double strj = st::internal::cell_sl_relaxation_torque_rj[idx]; // eta parameter
+            const double stpj = st::internal::cell_sl_precession_torque_pj[idx]; // beta parameter (should be multiplied by eta?)
 
             // calculate field without current based on relative magnetization orientations
             const double hx = (strj-alpha*stpj)*(mjy*miz - mjz*miy) + (stpj+alpha*strj)*mix;
@@ -216,9 +214,9 @@ void calculate_sublattice_resistance(){
             const double hz = (strj-alpha*stpj)*(mjx*miy - mjy*mix) + (stpj+alpha*strj)*miz;
 
             // save field (without current factor, but scaled with R_sl, with I = V/R, so multiply by V_cell to get local current)
-            st::internal::cell_sl_spin_torque_fields_x[cell][sl] = hx * jsat * hbar_o_2emuB / R_sl; // multiply by inverse moment
-            st::internal::cell_sl_spin_torque_fields_y[cell][sl] = hy * jsat * hbar_o_2emuB / R_sl;
-            st::internal::cell_sl_spin_torque_fields_z[cell][sl] = hz * jsat * hbar_o_2emuB / R_sl;
+            st::internal::cell_sl_spin_torque_fields_x[idx] = hx * jsat * hbar_o_2emuB / R_sl; // multiply by inverse moment
+            st::internal::cell_sl_spin_torque_fields_y[idx] = hy * jsat * hbar_o_2emuB / R_sl;
+            st::internal::cell_sl_spin_torque_fields_z[idx] = hz * jsat * hbar_o_2emuB / R_sl;
 
             // update magnetization for next iteration
             sl_mix[sl] = mjx;
@@ -262,23 +260,28 @@ void calculate_sublattice_resistance(){
       // variable to hold the sum of inverse resistances for all sublattices
       double sum_inv_resistances = 0.0;
 
+      // flat base index for this cell: sl is the fastest-varying index
+      const int base = cell * num_sublattices;
+
       // loop over all sublattices
       for( int sl = 0; sl < num_sublattices; sl++ ){
 
+         const int idx = base + sl;
+
          // if the sublattice is magnetic then add to sum of inverse resistances
-         if(st::internal::sl_magnetic[cell][sl]){
+         if(st::internal::sl_magnetic[idx]){
 
             // calculate next cell reduced magnetization
-            const double isat = st::internal::cell_sl_isaturation[cell][sl];
-            sl_mix[sl] = st::internal::cell_sl_magnetization_x[cell][sl] * isat;
-            sl_miy[sl] = st::internal::cell_sl_magnetization_y[cell][sl] * isat;
-            sl_miz[sl] = st::internal::cell_sl_magnetization_z[cell][sl] * isat;
+            const double isat = st::internal::cell_sl_isaturation[idx];
+            sl_mix[sl] = st::internal::cell_sl_magnetization_x[idx] * isat;
+            sl_miy[sl] = st::internal::cell_sl_magnetization_y[idx] * isat;
+            sl_miz[sl] = st::internal::cell_sl_magnetization_z[idx] * isat;
 
          }
 
          // skip empty sublattices (R=0) to avoid short-circuiting the parallel network
-         if(st::internal::cell_sl_resistance[cell][sl] > 0.0)
-            sum_inv_resistances += 1.0 / st::internal::cell_sl_resistance[cell][sl];
+         if(st::internal::cell_sl_resistance[idx] > 0.0)
+            sum_inv_resistances += 1.0 / st::internal::cell_sl_resistance[idx];
 
       } // end of sublattice loop
 

@@ -52,6 +52,7 @@ namespace spin_transport{
             }
          }
          else{
+            const int num_sublattices = st::internal::num_sublattices;
             for(unsigned int atom = start_index; atom < end_index; atom++){
 
                // get cell id
@@ -60,9 +61,12 @@ namespace spin_transport{
                // get sublattice of atom
                const int sl = st::internal::atom_sublattice[atom];
 
-               atoms_x_field_array[atom] += st::internal::cell_sl_spin_torque_fields_x[cell][sl];
-               atoms_y_field_array[atom] += st::internal::cell_sl_spin_torque_fields_y[cell][sl];
-               atoms_z_field_array[atom] += st::internal::cell_sl_spin_torque_fields_z[cell][sl];
+               // flat index: sl is the fastest-varying index
+               const int idx = (int)cell * num_sublattices + sl;
+
+               atoms_x_field_array[atom] += st::internal::cell_sl_spin_torque_fields_x[idx];
+               atoms_y_field_array[atom] += st::internal::cell_sl_spin_torque_fields_y[idx];
+               atoms_z_field_array[atom] += st::internal::cell_sl_spin_torque_fields_z[idx];
 
             }
          }

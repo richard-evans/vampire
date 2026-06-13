@@ -141,8 +141,8 @@ namespace spin_transport{
       // arrays to store average resistance and spin resistance in each cell
       extern std::vector <double> cell_resistance;
       extern std::vector <double> cell_spin_resistance;
-      extern std::vector < std::vector<double> > cell_sl_resistance;
-      extern std::vector < std::vector<double> > cell_sl_spin_resistance;
+      extern std::vector <double> cell_sl_resistance;
+      extern std::vector <double> cell_sl_spin_resistance;
 
       // arrays to store cell properties
       extern std::vector <bool> magnetic;                    // boolean array to determine if cell is magnetic or not
@@ -154,18 +154,18 @@ namespace spin_transport{
       extern std::vector <double> cell_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
       extern std::vector <double> cell_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
 
-      // material specific arrays to store cell properties
-      extern std::vector < std::vector <bool> > sl_magnetic;                    // boolean array to determine if cell is magnetic or not
-      extern std::vector < std::vector <double> > cell_sl_alpha;                // cell magnetization (average of constituent atoms)
-      extern std::vector < std::vector <double> > cell_sl_isaturation;          // inverse magnetic saturation at T=0 in each cell
-      extern std::vector < std::vector <double> > cell_sl_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
-      extern std::vector < std::vector <double> > cell_sl_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
-      extern std::vector < std::vector <double> > cell_sl_magnetization_x;        // normalised magnetization of each material in each cell
-      extern std::vector < std::vector <double> > cell_sl_magnetization_y;        // normalised magnetization of each material in each cell
-      extern std::vector < std::vector <double> > cell_sl_magnetization_z;        // normalised magnetization of each material in each cell
-      extern std::vector < std::vector <double> > cell_sl_spin_torque_fields_x;   // array of cell spin torque fields x
-      extern std::vector < std::vector <double> > cell_sl_spin_torque_fields_y;   // array of cell spin torque fields y
-      extern std::vector < std::vector <double> > cell_sl_spin_torque_fields_z;   // array of cell spin torque fields z
+      // material specific arrays to store cell properties, flat 1D layout: index = cell * num_sublattices + sl
+      extern std::vector <bool>   sl_magnetic;                    // boolean array to determine if cell is magnetic or not
+      extern std::vector <double> cell_sl_alpha;                // cell magnetization (average of constituent atoms)
+      extern std::vector <double> cell_sl_isaturation;          // inverse magnetic saturation at T=0 in each cell
+      extern std::vector <double> cell_sl_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
+      extern std::vector <double> cell_sl_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
+      extern std::vector <double> cell_sl_magnetization_x;        // normalised magnetization of each material in each cell
+      extern std::vector <double> cell_sl_magnetization_y;        // normalised magnetization of each material in each cell
+      extern std::vector <double> cell_sl_magnetization_z;        // normalised magnetization of each material in each cell
+      extern std::vector <double> cell_sl_spin_torque_fields_x;   // array of cell spin torque fields x
+      extern std::vector <double> cell_sl_spin_torque_fields_y;   // array of cell spin torque fields y
+      extern std::vector <double> cell_sl_spin_torque_fields_z;   // array of cell spin torque fields z
 
       // array to store which cell each atom is in
       extern std::vector <unsigned int> atom_in_cell;
