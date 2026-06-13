@@ -38,11 +38,15 @@ namespace spininitialize{
          std::stringstream ss(value);
          std::string token;
 
+         // std::getline with a ',' delimiter splits "value" into substrings
+         // between commas; each substring may still have leading/trailing
+         // spaces (e.g. "skyrmion, 0.5, 0.5" -> "skyrmion", " 0.5", " 0.5")
          while(std::getline(ss, token, ',')){
             // trim leading and trailing whitespace
             const std::string whitespace = " \t\r\n";
             size_t start = token.find_first_not_of(whitespace);
             if(start == std::string::npos){
+               // token was empty or all whitespace
                tokens.push_back("");
                continue;
             }
@@ -60,8 +64,11 @@ namespace spininitialize{
       //-----------------------------------------------------------------------------
       bool normalise(double& sx, double& sy, double& sz){
 
+         // |s| = sqrt(sx^2 + sy^2 + sz^2)
          const double mod_s = std::sqrt(sx*sx + sy*sy + sz*sz);
 
+         // guard against dividing by zero for a degenerate (zero-length)
+         // vector; the caller decides what to do in this case
          if(mod_s < 1.0e-12) return false;
 
          sx /= mod_s;
@@ -80,7 +87,9 @@ namespace spininitialize{
       //-----------------------------------------------------------------------------
       int get_vector_field_id(const std::string& filename, const int line){
 
-         // check cache for an already-loaded file
+         // check cache for an already-loaded file: if another material
+         // already requested this filename, reuse its data rather than
+         // reading and storing the file twice
          for(size_t i = 0; i < vector_field_filenames.size(); i++){
             if(vector_field_filenames[i] == filename) return int(i);
          }
@@ -97,10 +106,12 @@ namespace spininitialize{
 
          std::vector<field_point_t> points;
 
+         // read the file one line at a time, expecting each non-comment,
+         // non-blank line to contain "x,y,z,mx,my,mz"
          std::string line_str;
          while(std::getline(ifile, line_str)){
 
-            // skip empty lines and comments
+            // skip empty lines and comments (lines starting with '#')
             std::vector<std::string> tokens = split_csv(line_str);
             if(tokens.size() == 1 && tokens[0].empty()) continue;
             if(tokens[0].empty()) continue;
@@ -113,6 +124,9 @@ namespace spininitialize{
                err::vexit();
             }
 
+            // x,y,z are fractional coordinates (0-1) of the point within
+            // the system; mx,my,mz is the spin direction at that point,
+            // which need not be normalised by the user
             field_point_t point;
             point.x  = atof(tokens[0].c_str());
             point.y  = atof(tokens[1].c_str());
@@ -121,7 +135,7 @@ namespace spininitialize{
             point.my = atof(tokens[4].c_str());
             point.mz = atof(tokens[5].c_str());
 
-            // normalise the supplied direction vector
+            // normalise the supplied direction vector to a unit vector
             if(!normalise(point.mx, point.my, point.mz)){
                terminaltextcolor(RED);
                std::cerr << "Error - vector field file \'" << filename << "\' contains a point with a zero-length direction vector: \'" << line_str << "\'" << std::endl;
@@ -140,7 +154,9 @@ namespace spininitialize{
             err::vexit();
          }
 
-         // add to cache and return new id
+         // add to cache and return the new id, which is stored in
+         // mat.vector_field_id and used by vector_field_spin() to look up
+         // vector_field_data[id]
          vector_field_filenames.push_back(filename);
          vector_field_data.push_back(points);
 

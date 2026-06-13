@@ -39,7 +39,14 @@ namespace spininitialize{
       //-------------------------------------------------------------------------
 
       //-----------------------------------------------------------------------------
-      // Enumeration of the different supported initial spin textures
+      // Enumeration of the different supported initial spin textures.
+      //
+      // Each material has exactly one texture, selected via
+      // material[#]:initial-spin-direction in the material file (see
+      // interface.cpp). The texture value determines which of the
+      // "individual texture functions" declared below (and implemented in
+      // textures.cpp / vector_field.cpp) is used to compute the initial
+      // spin direction of each atom of that material.
       //-----------------------------------------------------------------------------
       enum spin_texture_t{
          uniform_vector = 0, // single user-defined unit vector (default (0,0,1))

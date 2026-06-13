@@ -200,6 +200,8 @@ values in the range $0.1-10 \times 10^{-21}$ J / volt.
 
 {\zicf material:initial-spin-direction = texture-name, parameters... [default (001)]}\phantomsection\addcontentsline{toc}{subsection}{material:initial-spin-direction} Determines the initial spin configuration of the material at the start of the simulation. The simplest option is a unit vector defining a uniform direction in space, given either as a normalised value or in crystallographic notation (e.g. [110]). Alternatively, one of several predefined spin textures can be selected by giving its name followed by a comma-separated list of numerical parameters. The following textures are supported:
 
+Each texture is evaluated independently for every atom of the material, based on the fractional position $(f_x, f_y, f_z)$ of that atom within the overall system bounding box, where each coordinate runs from 0 to 1 across the full size of the system in that direction (regardless of the atom's material). All positional parameters below (centres, widths, radii, wavelengths) are therefore also given as fractions in the range 0-1, making the texture definition independent of the absolute size of the system. Textures are purely geometric: they set the initial direction of each spin before the simulation starts, and have no further effect once the simulation begins. Different materials in the same system may be given different textures (or none, in which case a material defaults to a uniform spin direction along $+z$).
+
 \begin{itemize}
 
 \item \verb|random| \\
