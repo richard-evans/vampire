@@ -34,7 +34,6 @@ materials_t::materials_t ():
 	mu_s_SI(1.72*9.27400915e-24),
 	magnetisation(0.0),
 	gamma_rel(1.0),
-	random_spins(false),
 	core_shell_size(1.0),
 	interface_roughness(0.0),
 	density(1.0),
@@ -78,10 +77,6 @@ materials_t::materials_t ():
 		intermixing[i]=0.0;
 		alloy[i]=0.0;
 	}
-	initial_spin[0]=0.0;
-	initial_spin[1]=0.0;
-	initial_spin[2]=1.0;
-
 	// Applied field direction default initialisation
 	applied_field_unit_vector.at(0)=0.0;
 	applied_field_unit_vector.at(1)=0.0;

@@ -139,6 +139,7 @@ include src/neighbours/makefile
 include src/program/makefile
 include src/qvoronoi/makefile
 include src/simulate/makefile
+include src/spininitialize/makefile
 include src/spinlattice/makefile
 include src/spintextures/makefile
 include src/spintransport/makefile

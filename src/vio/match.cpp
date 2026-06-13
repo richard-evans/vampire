@@ -42,6 +42,7 @@
 #include "unitcell.hpp"
 #include "micromagnetic.hpp"
 #include "sld.hpp"
+#include "spininitialize.hpp"
 #include "spinwaves.hpp" // JRH
 
 // vio module headers
@@ -96,6 +97,7 @@ namespace vin{
         else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(hamr::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sld::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(spininitialize::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(spinwaves::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS; // JRH spinwaves input parameters
         //===================================================================
         // Test for create variables
@@ -1903,36 +1905,6 @@ namespace vin{
             }
             //------------------------------------------------------------
             else
-            test="initial-spin-direction";
-            if(word==test){
-                // first test for random spins
-                test="random";
-                if(value==test){
-                    read_material[super_index].random_spins=true;
-                }
-                else{
-                    // temporary storage container
-                    std::vector<double> u(3);
-
-                    // read values from string
-                    u=doubles_from_string(value);
-
-                    // check for sane input and normalise if necessary
-                    check_for_valid_unit_vector(u, word, line, prefix, "material");
-
-                    // Copy sanitised unit vector to material
-                    read_material[super_index].initial_spin[0]=u.at(0);
-                    read_material[super_index].initial_spin[1]=u.at(1);
-                    read_material[super_index].initial_spin[2]=u.at(2);
-
-                    // ensure random spins is unset
-                    read_material[super_index].random_spins=false;
-                }
-                // return
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
             test="material-element";
             if(word==test){
                 // Test for 3 characters
@@ -2438,6 +2410,7 @@ namespace vin{
             else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sld::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(spininitialize::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found

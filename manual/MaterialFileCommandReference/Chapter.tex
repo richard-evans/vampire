@@ -198,7 +198,47 @@ values in the range $0.1-10 \times 10^{-21}$ J / volt.
 
 {\zicf material:relative-gamma float [default 1]}\phantomsection\addcontentsline{toc}{subsection}{material:relative-gamma} Defines the gyromagnetic ratio of the material relative to that of the electron $\gamma_{\mathrm{e}} = 1.76$ T$^{-1}$s$^{-1}$. Valid values are in the range 0.01 - 100.0. For most materials $\gamma_{\mathrm{r}} = 1$.
 
-{\zicf material:initial-spin-direction float vector /bool [default (001) / false]}\phantomsection\addcontentsline{toc}{subsection}{material:initial-spin-direction} Determines the initial direction of the spins in the material. Value can wither be a unit vector defining a direction in space, or a boolean which initialises each spin to a different random direction (equivalent to infinite temperature). As with other unit vectors, a  normalised value or crystallographic notation (e.g. [110]) may be used.
+{\zicf material:initial-spin-direction = texture-name, parameters... [default (001)]}\phantomsection\addcontentsline{toc}{subsection}{material:initial-spin-direction} Determines the initial spin configuration of the material at the start of the simulation. The simplest option is a unit vector defining a uniform direction in space, given either as a normalised value or in crystallographic notation (e.g. [110]). Alternatively, one of several predefined spin textures can be selected by giving its name followed by a comma-separated list of numerical parameters. The following textures are supported:
+
+\begin{itemize}
+
+\item \verb|random| \\
+Initialises each spin in the material to an independent random direction, equivalent to an infinite temperature configuration. Example:
+\begin{quote}
+\verb|material[1]:initial-spin-direction = random|
+\end{quote}
+
+\item \verb|domain-wall-x|, \verb|domain-wall-y|, \verb|domain-wall-z|, \emph{centre}, \emph{width} \\
+Initialises a 180$^\circ$ domain wall with a $\tanh$ profile, varying along the chosen axis. \emph{centre} and \emph{width} are given as a fraction of the system size along that axis. Example, for a domain wall centred at the middle of the system along $x$ with a width of half the system size:
+\begin{quote}
+\verb|material[1]:initial-spin-direction = domain-wall-x, 0.5, 0.5|
+\end{quote}
+
+\item \verb|skyrmion|, \emph{cx}, \emph{cy}, \emph{radius} [, \emph{chirality}, \emph{polarity}] \\
+Initialises a skyrmion in the $x$-$y$ plane, with its core centred at fractional coordinates (\emph{cx}, \emph{cy}) and the given \emph{radius}, both as a fraction of the system size. The optional \emph{chirality} and \emph{polarity} parameters take values of $+1$ or $-1$ (the sign of the value given is used) and respectively control the sense of in-plane rotation and the out-of-plane direction of the core, and both default to $+1$. Example:
+\begin{quote}
+\verb|material[1]:initial-spin-direction = skyrmion, 0.5, 0.5, 0.25|
+\end{quote}
+
+\item \verb|spin-spiral-x|, \verb|spin-spiral-y|, \verb|spin-spiral-z|, \emph{wavelength} \\
+Initialises a helical spin spiral (spin wave) propagating along the chosen axis, with the given \emph{wavelength} as a fraction of the system size along that axis. Example:
+\begin{quote}
+\verb|material[1]:initial-spin-direction = spin-spiral-x, 0.5|
+\end{quote}
+
+\item \verb|vortex|, \emph{cx}, \emph{cy}, \emph{core-radius} [, \emph{chirality}, \emph{polarity}] \\
+Initialises an in-plane curling vortex in the $x$-$y$ plane, centred at fractional coordinates (\emph{cx}, \emph{cy}) with the given \emph{core-radius} (as a fraction of the system size) over which the spins rotate out of plane to form the vortex core. The optional \emph{chirality} and \emph{polarity} parameters behave as for \verb|skyrmion| above. Example:
+\begin{quote}
+\verb|material[1]:initial-spin-direction = vortex, 0.5, 0.5, 0.1|
+\end{quote}
+
+\item \verb|vector-field|, \emph{filename} \\
+Initialises the spin direction of each atom by interpolating a user-supplied vector field, using inverse-distance weighting of the nearest defined points. The file named \emph{filename} contains one point per line in the format \verb|x,y,z,mx,my,mz|, where \verb|x,y,z| are the fractional coordinates (in the range 0-1) of the point within the system, and \verb|mx,my,mz| is the (not necessarily normalised) spin direction at that point. Blank lines and lines beginning with \verb|#| are ignored. Example:
+\begin{quote}
+\verb|material[1]:initial-spin-direction = vector-field, vector_field.dat|
+\end{quote}
+
+\end{itemize}
 
 {\zicf material:material-element string [default "Fe"]}\phantomsection\addcontentsline{toc}{subsection}{material:material-element} Defines a purely descriptive chemical element for the material, which gives visual contrast in a range of interactive atomic structure viewers such as jmol, rasmol etc. In rasmol, Fe is a gold colour, H is white, Li is a deep red, O is red, B is green and Ag is a medium grey. This parameter has no relevance to the simulation at all, and only appears when outputting atomic coordinates, which can be post-processed to be viewable in rasmol. The contrast is particularly useful in inspecting the generated structures, particularly ones with a high degree of complexity.
 

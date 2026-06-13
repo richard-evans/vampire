@@ -1,0 +1,52 @@
+#----------------------------------------------------------
+# Sample vampire input file demonstrating the
+# material:initial-spin-direction = skyrmion texture
+#
+# A thin film is initialised with a skyrmion centred in the
+# middle of the system (x = 0.5, y = 0.5) with a radius of
+# 0.3 of the system size, with default chirality and polarity.
+#----------------------------------------------------------
+
+#----------------------------------------------------------
+# Creation attributes
+#----------------------------------------------------------
+create:crystal-structure = fcc
+
+#----------------------------------------------------------
+# System Dimensions
+#----------------------------------------------------------
+dimensions:unit-cell-size = 3.524 !A
+dimensions:system-size-x  = 20 !nm
+dimensions:system-size-y  = 20 !nm
+dimensions:system-size-z  = 1 !nm
+
+#----------------------------------------------------------
+# Material File
+#----------------------------------------------------------
+material:file = Co.mat
+
+#----------------------------------------------------------
+# Simulation attributes
+#----------------------------------------------------------
+sim:temperature              = 0.0
+sim:equilibration-time-steps = 0
+sim:total-time-steps          = 1
+sim:time-steps-increment      = 1
+sim:time-step                 = 1.0e-15
+
+#----------------------------------------------------------
+# Program and integrator
+#----------------------------------------------------------
+sim:program    = benchmark
+sim:integrator = llg-heun
+
+#----------------------------------------------------------
+# Data output
+#----------------------------------------------------------
+output:real-time
+output:magnetisation
+
+screen:time-steps
+screen:magnetisation
+
+config:atoms

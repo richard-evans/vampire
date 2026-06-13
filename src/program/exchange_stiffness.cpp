@@ -20,6 +20,7 @@
 #include "montecarlo.hpp"
 #include "program.hpp"
 #include "sim.hpp"
+#include "spininitialize.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
@@ -241,7 +242,8 @@ void exchange_stiffness(){
 			}
 			// otherwise assume initial spin direction for sublattice before rotation (should work OK for most ferro, ferri and antiferromagnets)
 			else{
-				const double S[3] = {mp::material[mat].initial_spin[0],mp::material[mat].initial_spin[1],mp::material[mat].initial_spin[2]};
+				double S[3] = {0.0,0.0,1.0};
+				spininitialize::get_uniform_vector(mat, S[0], S[1], S[2]);
 				atoms::x_spin_array[atom] = S[0];
 				atoms::y_spin_array[atom] = costr*S[1] + sintr*S[2];
 				atoms::z_spin_array[atom] = -sintr*S[1] + costr*S[2];

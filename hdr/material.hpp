@@ -96,8 +96,6 @@ namespace mp
 		double magnetisation;
 
 		double gamma_rel;
-		double initial_spin[3];
-		bool random_spins;
 
 		double core_shell_size;
 		double interface_roughness;

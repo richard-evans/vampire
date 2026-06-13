@@ -19,6 +19,7 @@
 #include "exchange.hpp"
 #include "neighbours.hpp"
 #include "random.hpp"
+#include "spininitialize.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 #include "sld.hpp"
@@ -119,25 +120,21 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 		//std::cout << atom << " grain: " << catom_array[atom].grain << std::endl;
 		atoms::grain_array[atom] = catom_array[atom].grain;
 
-		// initialise atomic spin positions
-      // Use a normalised gaussian for uniform distribution on a unit sphere
+		// initialise atomic spin positions according to the material's initial
+      // spin texture (uniform vector, random, domain wall, skyrmion, etc.)
 		int mat=atoms::type_array[atom];
 		double sx,sy,sz; // spins
-		if(mp::material[mat].random_spins==true){
-         sx=mtrandom::gaussianc(random_spin_rng);
-         sy=mtrandom::gaussianc(random_spin_rng);
-         sz=mtrandom::gaussianc(random_spin_rng);
-		}
-		else{
-			sx=mp::material[mat].initial_spin[0];
-			sy=mp::material[mat].initial_spin[1];
-			sz=mp::material[mat].initial_spin[2];
-		}
-		// now normalise spins
-		double modS=1.0/sqrt(sx*sx + sy*sy + sz*sz);
-		atoms::x_spin_array[atom]=sx*modS;
-		atoms::y_spin_array[atom]=sy*modS;
-		atoms::z_spin_array[atom]=sz*modS;
+
+      // fractional coordinates of the atom within the system bounding box
+      const double fx = (cs::system_dimensions[0] > 0.0) ? catom_array[atom].x / cs::system_dimensions[0] : 0.0;
+      const double fy = (cs::system_dimensions[1] > 0.0) ? catom_array[atom].y / cs::system_dimensions[1] : 0.0;
+      const double fz = (cs::system_dimensions[2] > 0.0) ? catom_array[atom].z / cs::system_dimensions[2] : 0.0;
+
+      spininitialize::initialize_spin(mat, fx, fy, fz, sx, sy, sz, random_spin_rng);
+
+		atoms::x_spin_array[atom]=sx;
+		atoms::y_spin_array[atom]=sy;
+		atoms::z_spin_array[atom]=sz;
       atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
 
       // generate list of magnetic atoms

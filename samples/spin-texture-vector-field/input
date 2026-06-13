@@ -1,0 +1,51 @@
+#----------------------------------------------------------
+# Sample vampire input file demonstrating the
+# material:initial-spin-direction = vector-field texture
+#
+# A thin film is initialised by interpolating the user-supplied
+# vector field defined in field.dat (inverse-distance weighting).
+#----------------------------------------------------------
+
+#----------------------------------------------------------
+# Creation attributes
+#----------------------------------------------------------
+create:crystal-structure = fcc
+
+#----------------------------------------------------------
+# System Dimensions
+#----------------------------------------------------------
+dimensions:unit-cell-size = 3.524 !A
+dimensions:system-size-x  = 20 !nm
+dimensions:system-size-y  = 20 !nm
+dimensions:system-size-z  = 1 !nm
+
+#----------------------------------------------------------
+# Material File
+#----------------------------------------------------------
+material:file = Co.mat
+
+#----------------------------------------------------------
+# Simulation attributes
+#----------------------------------------------------------
+sim:temperature              = 0.0
+sim:equilibration-time-steps = 0
+sim:total-time-steps          = 1
+sim:time-steps-increment      = 1
+sim:time-step                 = 1.0e-15
+
+#----------------------------------------------------------
+# Program and integrator
+#----------------------------------------------------------
+sim:program    = benchmark
+sim:integrator = llg-heun
+
+#----------------------------------------------------------
+# Data output
+#----------------------------------------------------------
+output:real-time
+output:magnetisation
+
+screen:time-steps
+screen:magnetisation
+
+config:atoms

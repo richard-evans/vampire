@@ -1,0 +1,17 @@
+# Sample vector field file for material:initial-spin-direction = vector-field
+#
+# Each line gives a point "x,y,z,mx,my,mz" where x,y,z are fractional
+# coordinates of the system size [0:1] and mx,my,mz is the (not
+# necessarily normalised) spin direction at that point. Initial spins
+# for each atom are obtained by inverse-distance-weighted interpolation
+# of these points.
+#
+# This example rotates the in-plane spin direction around the four
+# corners of the film, with the out-of-plane direction at the centre.
+#
+# x,   y,   z,   mx, my, mz
+0.0, 0.0, 0.5,  1,  0,  0
+1.0, 0.0, 0.5,  0,  1,  0
+0.0, 1.0, 0.5,  0, -1,  0
+1.0, 1.0, 0.5, -1,  0,  0
+0.5, 0.5, 0.5,  0,  0,  1
