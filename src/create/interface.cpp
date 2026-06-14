@@ -12,6 +12,7 @@
 // Vampire headers
 #include "errors.hpp"
 #include "create.hpp"
+#include "spininitialize.hpp"
 #include "vio.hpp"
 #include "voronoi.hpp"
 #include "random.hpp"
@@ -323,6 +324,36 @@ namespace create{
          }
          else{
             cs::interfacial_roughness_type=0;
+            return true;
+         }
+      }
+      //--------------------------------------------------------------------
+      // create:grain-magnetisation-direction = material | alternating
+      //
+      // Controls how the initial spin direction (as set by
+      // material[#]:initial-spin-direction, see the spininitialize module)
+      // is applied across grains:
+      //   - "material" (default): every atom is initialised exactly as
+      //     specified by its material's texture, with no further
+      //     modification.
+      //   - "alternating": the spin direction is reversed (negated) for
+      //     every atom belonging to an odd-numbered grain (grains are
+      //     numbered from 0), giving neighbouring grains opposite
+      //     magnetisation directions. This is useful e.g. for setting up
+      //     antiferromagnetically-coupled grain structures or testing
+      //     domain-wall pinning at grain boundaries.
+      //--------------------------------------------------------------------
+      test="grain-magnetisation-direction";
+      if(word==test){
+         std::string loctest="alternating";
+         if(value==loctest){
+            spininitialize::set_grain_magnetisation_mode(1); // grain_mode_alternating
+            return true;
+         }
+         else{
+            // default: "material" (or any unrecognised value falls back to
+            // the default of no grain-level post-processing)
+            spininitialize::set_grain_magnetisation_mode(0); // grain_mode_material
             return true;
          }
       }

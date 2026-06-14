@@ -32,6 +32,10 @@ namespace spininitialize{
 
       bool enabled; // bool to enable module
 
+      // grain-level magnetisation mode, set via create:grain-magnetisation-direction
+      // (see spininitialize::grain_magnetisation_mode_t in spininitialize.hpp)
+      int grain_magnetisation_mode = spininitialize::grain_mode_material;
+
       std::vector<internal::mp_t> mp; // array of material spin initialisation properties
 
       std::vector<std::string> vector_field_filenames; // cache of loaded vector field file names

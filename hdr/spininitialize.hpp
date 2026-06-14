@@ -25,6 +25,15 @@
 namespace spininitialize{
 
    //-----------------------------------------------------------------------------
+   // Grain-level magnetisation modes, set via set_grain_magnetisation_mode()
+   // below in response to the create:grain-magnetisation-direction keyword.
+   //-----------------------------------------------------------------------------
+   enum grain_magnetisation_mode_t{
+      grain_mode_material    = 0, // no grain-level post-processing (default)
+      grain_mode_alternating = 1  // flip spins for odd-numbered grains
+   };
+
+   //-----------------------------------------------------------------------------
    // Function to initialise spininitialize module
    //-----------------------------------------------------------------------------
    void initialize();
@@ -47,6 +56,28 @@ namespace spininitialize{
    //---------------------------------------------------------------------------
    void initialize_spin(const int material, const double fx, const double fy, const double fz,
                          double& sx, double& sy, double& sz, MTRand& prng);
+
+   //---------------------------------------------------------------------------
+   // Function to set the grain-level magnetisation mode, called by the create
+   // module when it parses the create:grain-magnetisation-direction keyword.
+   // mode = 0 ("material"): no grain-level post-processing (default).
+   // mode = 1 ("alternating"): the spin direction computed from the material's
+   // texture is reversed (sx,sy,sz -> -sx,-sy,-sz) for every atom belonging to
+   // an odd-numbered grain (grains are numbered from 0), giving alternating
+   // (e.g. antiferromagnetic-like) grains.
+   //---------------------------------------------------------------------------
+   void set_grain_magnetisation_mode(const int mode);
+
+   //---------------------------------------------------------------------------
+   // Function to apply the grain-level magnetisation mode (see
+   // set_grain_magnetisation_mode above) to the already-initialised spins of
+   // every atom. This is a one-off post-processing pass over atoms::*_spin_array,
+   // called once after all atoms have had their initial spin direction set by
+   // initialize_spin(). Keeping this logic out of initialize_spin() avoids an
+   // extra per-atom branch in the (much hotter) main initialisation loop for
+   // the common case where no grain-level alternation is requested.
+   //---------------------------------------------------------------------------
+   void apply_grain_magnetisation_mode();
 
    //---------------------------------------------------------------------------
    // Function to get the reference (uniform) spin direction for a material, for

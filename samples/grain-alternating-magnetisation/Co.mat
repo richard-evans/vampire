@@ -1,0 +1,30 @@
+#===================================================
+# Sample vampire material file
+# Cobalt thin film with a uniform initial spin
+# direction along +z. See the input file for the
+# create:grain-magnetisation-direction = alternating
+# setting, which reverses this direction for every
+# odd-numbered grain.
+#===================================================
+
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=1
+
+#---------------------------------------------------
+# Material 1 - Cobalt
+#---------------------------------------------------
+material[1]:material-name=Co
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=11.2e-21
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:uniaxial-anisotropy-constant=1.0e-24
+material[1]:material-element=Co
+
+# Uniform spin direction along +z, before any grain-level
+# alternation is applied by create:grain-magnetisation-direction
+material[1]:initial-spin-direction = 0, 0, 1
+
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0

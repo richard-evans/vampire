@@ -143,6 +143,13 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 
 	}
 
+   // apply any requested grain-level alternation of the initial spin
+   // directions (create:grain-magnetisation-direction). This is a single
+   // post-processing pass over all atoms, separate from the main loop above,
+   // since it is a relatively uncommon feature and would otherwise add an
+   // unnecessary per-atom branch to the much hotter initialisation loop.
+   spininitialize::apply_grain_magnetisation_mode();
+
    //---------------------------------------------------------------------------
    // Identify surface atoms and initialise anisotropy data
    //---------------------------------------------------------------------------

@@ -1,0 +1,65 @@
+#----------------------------------------------------------
+# Sample vampire input file demonstrating
+# create:grain-magnetisation-direction = alternating
+#
+# A thin film is divided into voronoi grains. Material 1 is
+# initialised with a uniform spin direction along +z
+# (material[1]:initial-spin-direction = 0,0,1). With
+# create:grain-magnetisation-direction = alternating, every
+# odd-numbered grain (1, 3, 5, ...) has this direction
+# reversed to -z, while even-numbered grains (0, 2, 4, ...)
+# keep +z, giving a "chessboard" pattern of alternating
+# grain magnetisation.
+#----------------------------------------------------------
+
+#----------------------------------------------------------
+# Creation attributes
+#----------------------------------------------------------
+create:crystal-structure = fcc
+create:voronoi-film
+
+# Grain (particle) size and spacing for the voronoi structure
+dimensions:particle-size    = 5 !nm
+dimensions:particle-spacing = 1 !nm
+
+# Flip the initial spin direction for odd-numbered grains
+create:grain-magnetisation-direction = alternating
+
+#----------------------------------------------------------
+# System Dimensions
+#----------------------------------------------------------
+dimensions:unit-cell-size = 3.524 !A
+dimensions:system-size-x  = 30 !nm
+dimensions:system-size-y  = 30 !nm
+dimensions:system-size-z  = 2 !nm
+
+#----------------------------------------------------------
+# Material File
+#----------------------------------------------------------
+material:file = Co.mat
+
+#----------------------------------------------------------
+# Simulation attributes
+#----------------------------------------------------------
+sim:temperature              = 0.0
+sim:equilibration-time-steps = 0
+sim:total-time-steps          = 1
+sim:time-steps-increment      = 1
+sim:time-step                 = 1.0e-15
+
+#----------------------------------------------------------
+# Program and integrator
+#----------------------------------------------------------
+sim:program    = benchmark
+sim:integrator = llg-heun
+
+#----------------------------------------------------------
+# Data output
+#----------------------------------------------------------
+output:real-time
+output:magnetisation
+
+screen:time-steps
+screen:magnetisation
+
+config:atoms

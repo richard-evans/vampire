@@ -135,6 +135,10 @@ namespace spininitialize{
 
       extern bool enabled; // bool to enable module
 
+      // grain-level magnetisation mode (one of the grain_magnetisation_mode_t
+      // values above), set via spininitialize::set_grain_magnetisation_mode()
+      extern int grain_magnetisation_mode;
+
       extern std::vector<internal::mp_t> mp; // array of material spin initialisation properties
 
       // cache of loaded vector field files, indexed by internal::mp[mat].vector_field_id
