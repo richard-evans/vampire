@@ -1,0 +1,77 @@
+#----------------------------------------------------------
+# Sample vampire input file for the laser-electrical-pulse
+# program.
+#
+# Simulates an ultrafast laser pulse (two-temperature model)
+# followed by a Gaussian spin-transfer torque (STT) pulse on
+# a single-spin Nickel system at 300 K.
+#
+# Timing:
+#   Laser pulse peaks at  t = 3 x laser-pulse-time = 300 fs
+#   STT pulse peaks at    t = delay + 3 x electrical-pulse-time
+#                           = 200 + 600 = 800 fs
+#   => STT pulse arrives 500 fs after the laser peak
+#----------------------------------------------------------
+
+#----------------------------------------------------------
+# Creation attributes
+#----------------------------------------------------------
+create:single-spin
+
+#----------------------------------------------------------
+# Material file
+#----------------------------------------------------------
+material:file = Ni-stt.mat
+
+#----------------------------------------------------------
+# Simulation attributes
+#----------------------------------------------------------
+sim:equilibration-temperature = 300.0
+sim:time-step                 = 1 !fs
+sim:time-steps-increment      = 100
+sim:equilibration-time-steps  = 10000
+sim:total-time-steps          = 20000
+
+#----------------------------------------------------------
+# Laser pulse - two-temperature model (Nickel parameters)
+#   electron heat capacity coefficient gamma (J/m^3/K^2)
+#   phonon heat capacity Cl (J/m^3/K)
+#   electron-phonon coupling G (J/m^3/K/s)
+#   heat-sink coupling (s^-1) - models thermal diffusion
+#----------------------------------------------------------
+sim:laser-pulse-temporal-profile          = two-temperature
+sim:laser-pulse-time                      = 100 !fs
+sim:laser-pulse-power                     = 20.0
+sim:two-temperature-electron-heat-capacity = 222.0
+sim:two-temperature-phonon-heat-capacity   = 2.3e6
+sim:two-temperature-electron-phonon-coupling = 6.6e17
+sim:two-temperature-heat-sink-coupling    = 1.0e11
+
+#----------------------------------------------------------
+# Electrical (STT) pulse
+#   electrical-pulse-time sets the Gaussian width sigma
+#   electrical-pulse-delay sets the time offset from t = 0
+#   Polarization anti-parallel to easy axis drives switching
+#----------------------------------------------------------
+sim:electrical-pulse-time  = 200 !fs
+sim:electrical-pulse-delay = 200 !fs
+sim:spin-transfer-torque-polarization-unit-vector = 0,0,-1
+
+#----------------------------------------------------------
+# Program and integrator
+#----------------------------------------------------------
+sim:program   = laser-electrical-pulse
+sim:integrator = llg-heun
+
+#----------------------------------------------------------
+# Data output
+#----------------------------------------------------------
+output:real-time
+output:electron-temperature
+output:phonon-temperature
+output:fractional-electric-field-strength
+output:material-magnetisation
+
+screen:real-time
+screen:electron-temperature
+screen:material-magnetisation

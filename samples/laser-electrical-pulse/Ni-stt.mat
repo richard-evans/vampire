@@ -1,0 +1,26 @@
+#===================================================
+# Sample vampire material file
+# Nickel with spin-transfer torque parameters
+#===================================================
+
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=1
+
+#---------------------------------------------------
+# Material 1 - Nickel
+#   Exchange, moment and anisotropy from ab-initio
+#   Damping and STT parameters representative of Ni
+#   Initial spin along easy axis +z
+#---------------------------------------------------
+material[1]:material-name=Ni
+material[1]:damping-constant=0.05
+material[1]:exchange-matrix[1]=2.757e-21
+material[1]:atomic-spin-moment=0.606 !muB
+material[1]:second-order-uniaxial-anisotropy-constant=5.47e-26
+material[1]:initial-spin-direction=0,0,1
+material[1]:material-element=Ni
+material[1]:spin-transfer-relaxation-torque=0.1
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
