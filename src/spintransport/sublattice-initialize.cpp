@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include <algorithm>
 
 // Vampire headers
 #include "create.hpp"
