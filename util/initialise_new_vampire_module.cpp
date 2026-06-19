@@ -47,6 +47,7 @@ void create_initialise(const std::string& file_header, const std::string& namesp
 void create_internal(const std::string& file_header, const std::string& nn);
 void create_module(const std::string& file_header, const std::string& nn);
 void create_makefile(const std::string& file_header, const std::string& nn);
+void create_gitignore(const std::string& nn);
 
 // global constants
 const std::string blank = "";
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]){
    std::string namespace_name="";
    std::string author="";
    std::string email="";
-   std::string year="2018";
+   std::string year="2026";
 
    // determine namespace name, author and email from command line
    process_command_line(argc, argv, namespace_name, author, email, year);
@@ -85,6 +86,9 @@ int main(int argc, char* argv[]){
 
    // Generate makefile
    create_makefile(file_header, namespace_name);
+
+   // Generate .gitgnore file to preserve folder structure
+   create_gitignore(namespace_name);
 
    return EXIT_SUCCESS;
 
@@ -574,5 +578,30 @@ void create_makefile(const std::string& file_header, const std::string& nn){
    ofile.close();
 
       return;
+
+}
+
+void create_gitignore(const std::string& nn){
+
+   // Check to see if file exists
+   if(file_exists(".gitignore")){
+      std::cout << ".gitignore already exists - skipping initialisation." << std::endl;
+      return;
+   }
+
+   std::cout << "Generating .gitgnore file" << std::endl;
+
+   // Open file
+   std::ofstream ofile;
+   ofile.open(".gitignore");
+
+   // Write header
+   ofile << "#--------------------------------------------------------------" << std::endl;
+   ofile << "#     git ignore file for " << nn << " module" << std::endl;
+   ofile << "#--------------------------------------------------------------\n" << std::endl;
+
+   ofile.close();
+
+   return;
 
 }
