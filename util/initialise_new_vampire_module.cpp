@@ -17,6 +17,7 @@
 //          internal.hpp      // Header file listing module shared variables
 //          <module>.hpp      // Header file for extenrally visible functions
 //          makefile          // Module makefile
+//          obj/module/       // Folder for objective files
 //
 //    This program is invoked using:
 //
@@ -34,8 +35,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "stdlib.h"
 #include <algorithm>
+#include <filesystem>
 
 // Forward declaration of functions
 void process_command_line(int argc, char* argv[], std::string& namespace_name, std::string& author, std::string& email, std::string& year);
@@ -583,17 +584,29 @@ void create_makefile(const std::string& file_header, const std::string& nn){
 
 void create_gitignore(const std::string& nn){
 
+   // specify object file folder
+   std::stringstream objfolder_ss;
+   objfolder_ss << "../../obj/" << nn;
+   std::string objfolder = objfolder_ss.str();
+
+   // create obj/module folder
+   std::cout << "Generating obj/" << nn << "/ folder" << std::endl;
+   std::filesystem::create_directory(objfolder);
+
    // Check to see if file exists
-   if(file_exists(".gitignore")){
+   std::stringstream gifile_ss;
+   gifile_ss << "../../obj/" << nn << "/.gitignore";
+   std::string gifile = gifile_ss.str();
+   if(file_exists(gifile)){
       std::cout << ".gitignore already exists - skipping initialisation." << std::endl;
       return;
    }
 
-   std::cout << "Generating .gitgnore file" << std::endl;
+   std::cout << "Generating obj/" << nn << "/.gitgnore file" << std::endl;
 
    // Open file
    std::ofstream ofile;
-   ofile.open(".gitignore");
+   ofile.open(gifile);
 
    // Write header
    ofile << "#--------------------------------------------------------------" << std::endl;
