@@ -19,7 +19,9 @@ obj/unit_tests.o \
 obj/utility/units_test.o \
 obj/utility/utility_test.o\
 obj/utility/spin_temperature_test.o \
-obj/utility/vmath_test.o
+obj/utility/vmath_test.o \
+obj/create/create_tests.o \
+obj/create/voronoi_bimodal_seeds_test.o
 
 
 VAMPIRE_OBJECTS= \
@@ -34,7 +36,10 @@ VAMPIRE_OBJECTS= \
 ../../obj/vio/timestamp.o\
 ../../obj/constants/constants.o\
 ../../obj/spinlattice/temperatures.o\
-../../obj/spinlattice/data.o
+../../obj/spinlattice/data.o\
+../../obj/random/mtrand.o\
+../../obj/random/random.o\
+../../obj/create/voronoi_bimodal_seeds.o
 
 
 EXECUTABLE=unit_tests

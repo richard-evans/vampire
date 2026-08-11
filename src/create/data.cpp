@@ -49,7 +49,6 @@ namespace create{
          double voronoi_grain_substructure_spacing = 10.0; // spacing between substructure grains
          double voronoi_grain_substructure_crystallization_radius = 1.2;
          double voronoi_grain_substructure_overlap_factor = 1.0;
-         bool grain_poission = false;
 
          double voronoi_elliptical_rounding = 0.0;        // 0.0 = vertical grain walls (default), 1.0 = ellipsoidal grains
          double voronoi_elliptical_rounding_height = 0.5; // centre height of system

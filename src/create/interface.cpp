@@ -211,6 +211,36 @@ namespace create{
          return true;
       }
       //-------------------------------------------------------------------
+      test="voronoi-bimodal-grains";
+      if(word==test){
+         create_voronoi::bimodal_grains=true;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="voronoi-small-grain-diameter";
+      if(word==test){
+         double sgd=atof(value.c_str());
+         vin::check_for_valid_value(sgd, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         create_voronoi::small_grain_diameter=sgd;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="voronoi-small-grain-fraction";
+      if(word==test){
+         double sgf=atof(value.c_str());
+         vin::check_for_valid_value(sgf, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         create_voronoi::small_grain_fraction=sgf;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="voronoi-small-grain-size-variance";
+      if(word==test){
+         double sgv=atof(value.c_str());
+         vin::check_for_valid_value(sgv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         create_voronoi::small_grain_size_variance=sgv;
+         return true;
+      }
+      //-------------------------------------------------------------------
       test="particle-centre-offset"; //parity
       if(word==test){
          cs::particle_creation_parity=1;
@@ -426,12 +456,6 @@ namespace create{
          vin::check_for_valid_int(nmul, word, line, prefix, 1, 100,"input","1 - 100, specifying the number of multilayers to be generated");
          cs::multilayers = true;
          cs::num_multilayers = nmul;
-         return true;
-      }
-      //--------------------------------------------------------------------
-      test="grains-poission"; //parity
-      if(word==test){
-         create::internal::grain_poission=true;
          return true;
       }
       //--------------------------------------------------------------------

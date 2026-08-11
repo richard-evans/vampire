@@ -40,6 +40,11 @@ namespace create_voronoi{
 	double area_cutoff=0.8;
 	double voronoi_sd=0.15;			/// Standard Deviation of voronoi grains
 	bool include_boundary_grains_real = false;
+
+	bool bimodal_grains = false;
+	double small_grain_diameter = 20.0;          // 2.0 nm in Angstroms
+	double small_grain_size_variance = -1.0;     // sentinel: fall back to voronoi_sd
+	double small_grain_fraction = 0.3;
 }
 
 namespace cs{
@@ -88,178 +93,42 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	int vp=int(create_voronoi::parity);
    int grain = 0;
+
+	// parallel flag array recording which population each seed belongs to
+	// (only populated/used when create_voronoi::bimodal_grains is set)
+	std::vector<bool> is_small_grain;
+
 	// --------------------------------------------------------------------------
-	// poisson distribution
+	// seed point generation
 	// --------------------------------------------------------------------------
 
-	if (create::internal::grain_poission){
+	if (create_voronoi::bimodal_grains){
 
-		std::ofstream file;
-	   file.open("dist");
-
-		int sdx = cs::system_dimensions[0];
-		int sdy = cs::system_dimensions[1];
-
-		//std::random_device rd;
-      std::mt19937 gen(12345);
-		//variance = exp ( 2.0 * mu + sigma * sigma ) * ( exp ( sigma * sigma ) - 1.0 );
-		//mean = exp ( mu + 0.5 * sigma * sigma );
-		std::lognormal_distribution<> d(log(grain_cell_size_x), grain_sd );
-		std::cout << grain_cell_size_x << "\t" << grain_sd<< std::endl;
-		double initial_grain_pos_x = sdx/2.0;
-		double initial_grain_pos_y = sdy/2.0;
-		double initial_grain_r = d(gen)/2.0;
-		while (initial_grain_r > 2*grain_cell_size_x){
-			initial_grain_r = d(gen)/2.0;
-		}
-		int maxattempts1 = 10;
-		int maxattempts2 = 1000;
-
-		std::vector <double> grains_x;
-		std::vector <double> grains_y;
-		std::vector <double> grains_r;
-		std::vector <bool> active;
-		grain=0;
-		grains_x.push_back(initial_grain_pos_x);
-		grains_y.push_back(initial_grain_pos_y);
-		grains_r.push_back(initial_grain_r);
-		active.push_back(true);
-		grain_coord_array.push_back(std::vector <double>());
-		grain_vertices_array.push_back(std::vector <std::vector <double> >());
-		grain_coord_array[grain].push_back(initial_grain_pos_x);
-		grain_coord_array[grain].push_back(initial_grain_pos_y);
-		//int num_active_grains = 1;
-		grain++;
-		double PI = 3.14159265;
-		file << initial_grain_pos_x << '\t' << initial_grain_pos_y << '\t' << initial_grain_r << std::endl;
-		for (int attempt = 0; attempt < maxattempts1; attempt ++){
-			for (size_t g =0; g < grains_x.size() ; g++){
-				double r = d(gen)/2.0;
-			//	std::cout << r << "\t" << grain_cell_size_x+ grain_sd*grain_cell_size_x << "\t" << grain_cell_size_x << std::endl;
-				while (r > grain_cell_size_x + grain_sd*grain_cell_size_x || r < grain_cell_size_x - grain_sd*grain_cell_size_x){
-					r = d(gen)/2.0;
-			//		std::cout << "A" <<std::endl;
- 				}
-			//	std::cout << r << std::endl;
-				bool added =false;
-				int attempt2 = 0;
-				while (added == false && attempt2 < maxattempts2){
-					attempt2 ++;
-					int i = int(mtrandom::grnd()*grains_x.size());
-
-				   double r1 = mtrandom::grnd();
-			      double r2 = mtrandom::grnd();
-			      double theta = r1*PI;
-			      double phi = r2*PI*2;
-					//file << number << std::endl;
-					double min_distance = grains_r[i] + r;
-					double max_distance = min_distance;
-					double max_minus_min = max_distance - min_distance;
-			      double rn = mtrandom::grnd();
-			      double d = rn*max_minus_min;
-			      double dx = sin(theta)*cos(phi);
-			      double dy = sin(theta)*sin(phi);
-			      double ddxdy = sqrt(dx*dx + dy*dy);
-			      dx = dx/ddxdy;
-			      dy = dy/ddxdy;
-			      double x = grains_x[i] + d*dx + min_distance*dx;
-			      double y = grains_y[i] + d*dy + min_distance*dy;
-					if (x <= 2*sdx && y <= 2*sdy & x >= 0  - 2*grain_cell_size_x && y >= 0 - 2*grain_cell_size_y){
-						int within =0;
-				       for (size_t grain = 0; grain < grains_x.size(); grain ++ ){
-				   		double dx2 = grains_x[grain] - x;
-				   		double dy2 = grains_y[grain] - y;
-				   		double dist = sqrt(dx2*dx2 + dy2*dy2);
-				         if (dist < grains_r[grain] + r){
-				   			within = 1;
-				   			break;
-				      	}
-				   	}
-						if (within ==0){
-							bool xmove = true;
-							bool ymove = true;
-							double tempx = x;
-							double tempy = y;
-							while (xmove || ymove){
-								if (x > sdx/2.0)	tempx = tempx - 1;
-								else tempx = tempx + 1;
-								for (size_t grain2 = 0; grain2 < grains_x.size(); grain2 ++ ){
-								  double dx2 = grains_x[grain2] - tempx;
-								  double dy2 = grains_y[grain2] - tempy;
-								  double dist = sqrt(dx2*dx2 + dy2*dy2);
-								  if (dist < grains_r[grain2] + r){
-									  xmove = false;
-									  break;
-								  }
-							  }
-								if (y > sdy/2.0)	tempy = tempy - 1;
-  								else tempy = tempy + 1;
-  								for (size_t grain2 = 0; grain2 < grains_x.size(); grain2 ++ ){
-  								  double dx2 = grains_x[grain2] - tempx;
-  								  double dy2 = grains_y[grain2] - tempy;
-  								  double dist = sqrt(dx2*dx2 + dy2*dy2);
-  								  if (dist < grains_r[grain2] + r){
-  									  ymove = false;
-  									  break;
-  								  }
-							  }
-							  if (xmove) x = tempx;
-							  if (ymove) y = tempy;
-
-							}
-
-							//file << grain << '\t' << x/10 << '\t' << y/10 << '\t' << r/10 << std::endl;
-					      grains_x.push_back(x);
-							file << x << '\t' << y << '\t' << r << std::endl;
-							grain_coord_array.push_back(std::vector <double>());
-							grain_vertices_array.push_back(std::vector <std::vector <double> >());
-							grain_coord_array[grain].push_back(x);
-							grain_coord_array[grain].push_back(y);
-					      grains_y.push_back(y);
-					      grains_r.push_back(r);
-					      active.push_back(true);
-							//num_active_grains++;
-							grain++;
-							added = true;
-						}
-					}
-				}
-			}
-		}
-		double sumV = 0;
-		double sumR = 0;
-		for (size_t i = 0; i < grains_x.size(); i ++){
-			double r = grains_r[i];
-			double V = 3.14*r*r;
-			sumV = sumV +V;
-			sumR = sumR +r;
-		}
-		//------------------------------------------------------------------------
-		// output voroni statistics to screen
-		//------------------------------------------------------------------------
-		double avR = sumR/grains_x.size();
-		std::sort(grains_r.begin(),grains_r.end());
-		int index = grains_r.size()/2;
-		double Mr = (grains_r[index-1] + grains_r[index])/2;
-		std::cout<< "Median grain radius: " << Mr << std::endl;
-		std::cout<< "Mean grain radius: " << avR << std::endl;
-		//------------------------------------------------------------------------
-		double totalV = (2*sdx + 2*grain_cell_size_x)*(2*sdy + 2*grain_cell_size_y);
-	 	double frac = sumV/totalV;
-		std::cout<< " frac: " << frac << std::endl;
-		std::cout << grain_cell_size_x/2.0 - avR << "\t" <<  2.0*(grain_cell_size_x/2.0 - avR)/grain_cell_size_x << std::endl;
-		frac = frac + (grain_cell_size_x/2.0 - avR)/grain_cell_size_x;
-	 	//	std::cout << sumV << '\t' << totalV << '\t' << frac  << "\t" << grains_x.size() << '\t'<<  grain_coord_array.size() << std::endl;
-
-		for (size_t i = 0; i < grain_coord_array.size(); i ++){
-		//	double r = grains_r[i];
-		grain_coord_array[i][0] = grain_coord_array[i][0]* frac;
-		grain_coord_array[i][1] = grain_coord_array[i][1]* frac;
-		//	sd = sd + sqrt(r*r - Mr*Mr);
-		//	file << grain << '\t' << grain_coord_array[i][0]/10 << '\t' << grain_coord_array[i][1]/10 << '\t' << grains_r[i]/10 << std::endl;
+		// validate ordering of the two populations
+		if(create_voronoi::small_grain_diameter >= cs::particle_scale){
+			terminaltextcolor(RED);
+			std::cerr << "Error! create:voronoi-small-grain-diameter must be smaller than "
+			          << "dimensions:particle-size for bimodal voronoi grains." << std::endl;
+			terminaltextcolor(WHITE);
+			zlog << zTs() << "Error! create:voronoi-small-grain-diameter must be smaller than "
+			     << "dimensions:particle-size for bimodal voronoi grains." << std::endl;
+			err::vexit();
 		}
 
-	} // end of Poisson version
+		const double small_variance = (create_voronoi::small_grain_size_variance < 0.0) ?
+			create_voronoi::voronoi_sd : create_voronoi::small_grain_size_variance;
+
+		grain = create::internal::generate_bimodal_voronoi_seeds(
+		           grain_coord_array, is_small_grain,
+		           cs::system_dimensions[0], cs::system_dimensions[1],
+		           cs::particle_scale, create_voronoi::voronoi_sd,
+		           create_voronoi::small_grain_diameter, small_variance,
+		           create_voronoi::small_grain_fraction);
+
+		// pre-size the (still-empty) per-grain vertex array to match
+		grain_vertices_array.resize(grain_coord_array.size());
+
+	}
 
 	else{
 		//Calculate pointers
@@ -308,10 +177,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	}
 
-
-
-	// ----------------------- end of old version -------------------------------------
-
 	//-----------------------
 	// Check for grains >=1
 	//-----------------------
@@ -353,6 +218,63 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
    // round grains if necessary
 	if(create_voronoi::rounded) create::internal::voronoi_grain_rounding(grain_coord_array, grain_vertices_array);
+
+	// report realised grain-size statistics for bimodal grains, since the RSA
+	// packer only approximately hits the requested diameters/fraction
+	if(create_voronoi::bimodal_grains){
+
+		int placed_small = 0;
+		int placed_std = 0;
+		double sum_diameter_small = 0.0;
+		double sum_diameter_std = 0.0;
+
+		for(unsigned int grain=0; grain<grain_coord_array.size(); grain++){
+
+			const int nv = grain_vertices_array[grain].size();
+			if(nv==0) continue;
+
+			// polygon area via the shoelace formula
+			double area = 0.0;
+			for(int vertex=0; vertex<nv; vertex++){
+				const int next = (vertex+1)%nv;
+				area += grain_vertices_array[grain][vertex][0]*grain_vertices_array[grain][next][1] -
+				        grain_vertices_array[grain][next][0]*grain_vertices_array[grain][vertex][1];
+			}
+			area = std::fabs(area) * 0.5;
+
+			const double diameter = 2.0*std::sqrt(area/M_PI);
+
+			if(is_small_grain[grain]){
+				placed_small++;
+				sum_diameter_small += diameter;
+			}
+			else{
+				placed_std++;
+				sum_diameter_std += diameter;
+			}
+		}
+
+		const int placed = placed_small + placed_std;
+		const double realised_fraction = placed>0 ? double(placed_small)/double(placed) : 0.0;
+		const double mean_diameter_small = placed_small>0 ? sum_diameter_small/placed_small : 0.0;
+		const double mean_diameter_std = placed_std>0 ? sum_diameter_std/placed_std : 0.0;
+
+		std::cout << "Bimodal voronoi grains: requested (std, small) = (" <<
+			cs::particle_scale/10.0 << ", " << create_voronoi::small_grain_diameter/10.0 <<
+			") nm, fraction small = " << create_voronoi::small_grain_fraction << std::endl;
+		std::cout << "  Placed " << placed << " grains (" << placed_std << " standard, " <<
+			placed_small << " small, realised fraction " << realised_fraction << ")" << std::endl;
+		std::cout << "  Measured mean equivalent diameter: standard = " << mean_diameter_std/10.0 <<
+			" nm, small = " << mean_diameter_small/10.0 << " nm" << std::endl;
+
+		zlog << zTs() << "Bimodal voronoi grains: requested (std, small) = (" <<
+			cs::particle_scale/10.0 << ", " << create_voronoi::small_grain_diameter/10.0 <<
+			") nm, fraction small = " << create_voronoi::small_grain_fraction << std::endl;
+		zlog << zTs() << "  Placed " << placed << " grains (" << placed_std << " standard, " <<
+			placed_small << " small, realised fraction " << realised_fraction << ")" << std::endl;
+		zlog << zTs() << "  Measured mean equivalent diameter: standard = " << mean_diameter_std/10.0 <<
+			" nm, small = " << mean_diameter_small/10.0 << " nm" << std::endl;
+	}
 
 	std::vector <double > R_med;
 

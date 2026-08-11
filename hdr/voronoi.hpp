@@ -33,6 +33,11 @@ namespace create_voronoi{
 	extern double voronoi_sd;			/// Standard Deviation of voronoi grains
 	extern double area_cutoff;
 	extern bool include_boundary_grains_real;
+
+	extern bool bimodal_grains;                // enable bimodal seed generation
+	extern double small_grain_diameter;        // mean diameter of small population (Angstroms)
+	extern double small_grain_size_variance;   // <0 sentinel = "use voronoi_sd"
+	extern double small_grain_fraction;        // target number fraction, 0..1
 }
 
 #endif //CREATE_VORONOI_H_

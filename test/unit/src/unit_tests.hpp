@@ -20,9 +20,11 @@ namespace ut{
    // simple struct specifying modules to test
    struct module_t {
       bool utility = false;
+      bool create = false;
    };
 
    // module level functions
    int utility_tests(const bool verbose);
+   int create_tests(const bool verbose);
 
 }

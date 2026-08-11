@@ -141,8 +141,6 @@ namespace create{
       extern double voronoi_elliptical_rounding;        // degree of elliptical grain rounding (0-1)
       extern double voronoi_elliptical_rounding_height; // height of widest grain cross-section as a fraction of system size z
 
-      extern bool grain_poission;
-
       extern bool select_material_by_geometry;	// Toggle override of input material type by geometry
       extern bool select_material_by_z_height;
       extern bool output_gv_file; // toggle output of grain positions to file
@@ -190,6 +188,13 @@ namespace create{
                                   std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,
                                   bool include_boundary_grains,
                                   const double grain_size);
+
+      int generate_bimodal_voronoi_seeds(std::vector <std::vector <double> >& grain_coord_array,
+                                          std::vector<bool>& is_small_grain,
+                                          const double domain_x, const double domain_y,
+                                          const double std_diameter,   const double std_variance,
+                                          const double small_diameter, const double small_variance,
+                                          const double small_fraction);
 
       extern void write_grain_vertices(int id, double dx, double dy, std::ofstream& ofile, std::vector< std::vector <double> >& vertices);
 
