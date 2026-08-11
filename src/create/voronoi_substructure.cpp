@@ -66,7 +66,7 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 	double grain_sd=create_voronoi::voronoi_sd;
 
 	// Set number of particles in x and y directions
-	double size = create::internal::voronoi_grain_size + create::internal::voronoi_grain_spacing;
+	double size = create::internal::voronoi_grain_substructure_size + create::internal::voronoi_grain_substructure_spacing;
 	double grain_cell_size_x = size;
 	double grain_cell_size_y = sqrt(3.0)*size;
 
@@ -137,10 +137,10 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 	}
 
 	// Calculate Voronoi construction using qhull not including boundary grains (false) - to be fixed!
-	create::internal::populate_vertex_points(grain_coord_array, grain_vertices_array, false);
+	create::internal::populate_vertex_points(grain_coord_array, grain_vertices_array, false, create::internal::voronoi_grain_substructure_size);
 
 	// Shrink Voronoi vertices in reduced coordinates to get spacing
-	double shrink_factor = create::internal::voronoi_grain_size/(create::internal::voronoi_grain_size+create::internal::voronoi_grain_spacing);
+	double shrink_factor = create::internal::voronoi_grain_substructure_size/(create::internal::voronoi_grain_substructure_size+create::internal::voronoi_grain_substructure_spacing);
 
 	// Reduce vertices to relative coordinates
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
@@ -213,7 +213,7 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
    //------------------------------------------------------------------------------
    // Set 3D structure for grains
    //------------------------------------------------------------------------------
-   const double sphere_radius = create::internal::voronoi_grain_substructure_crystallization_radius; //*create::internal::voronoi_grain_size*radius_factor;
+   const double sphere_radius = create::internal::voronoi_grain_substructure_crystallization_radius; //*create::internal::voronoi_grain_substructure_size*radius_factor;
 
 	// loop over all grains with vertices
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){

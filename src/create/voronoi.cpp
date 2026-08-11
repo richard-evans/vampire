@@ -60,7 +60,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	double grain_sd=create_voronoi::voronoi_sd;
 
 	// Set number of particles in x and y directions
-	double size = create::internal::voronoi_grain_size + create::internal::voronoi_grain_spacing;
+	double size = cs::particle_scale + cs::particle_spacing;
 	double grain_cell_size_x = size;
 	double grain_cell_size_y = sqrt(3.0)*size;
 
@@ -324,11 +324,11 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	}
 
    // Calculate Voronoi construction using qhull removing boundary grains (false)
-	create::internal::populate_vertex_points(grain_coord_array, grain_vertices_array, true);
+	create::internal::populate_vertex_points(grain_coord_array, grain_vertices_array, true, cs::particle_scale);
 
 
 	// Shrink Voronoi vertices in reduced coordinates to get spacing
-	double shrink_factor = create::internal::voronoi_grain_size/(create::internal::voronoi_grain_size+create::internal::voronoi_grain_spacing);
+	double shrink_factor = cs::particle_scale/(cs::particle_scale+cs::particle_spacing);
 
 	// Reduce vertices to relative coordinates
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){

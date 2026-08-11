@@ -129,13 +129,12 @@ namespace create{
       extern double faceted_particle_111_radius; // 111 facet radius
       extern double cone_angle; // angle of cone to truncate cylinder
 
-      extern double voronoi_grain_size;
-      extern double voronoi_grain_spacing;
-
       extern double bubble_radius;
       extern double bubble_nucleation_height;
 
       extern bool generate_voronoi_substructure;
+      extern double voronoi_grain_substructure_size;    // mean grain size of the substructure within a particle
+      extern double voronoi_grain_substructure_spacing; // spacing between substructure grains
       extern double voronoi_grain_substructure_crystallization_radius;
       extern double voronoi_grain_substructure_overlap_factor;
 
@@ -184,7 +183,8 @@ namespace create{
 
       void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_array,
                                   std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,
-                                  bool include_boundary_grains);
+                                  bool include_boundary_grains,
+                                  const double grain_size);
 
       extern void write_grain_vertices(int id, double dx, double dy, std::ofstream& ofile, std::vector< std::vector <double> >& vertices);
 

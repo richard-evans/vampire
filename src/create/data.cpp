@@ -41,13 +41,12 @@ namespace create{
          double faceted_particle_111_radius = 1.0; // 111 facet particle radius
          double cone_angle = 10.0; // factor to truncate cone
 
-         double voronoi_grain_size = 50.0;
-         double voronoi_grain_spacing = 10.0;
-
          double bubble_radius = 0.3333;
          double bubble_nucleation_height = 0.0;
 
          bool generate_voronoi_substructure = false;
+         double voronoi_grain_substructure_size = 50.0;    // mean grain size of the substructure within a particle
+         double voronoi_grain_substructure_spacing = 10.0; // spacing between substructure grains
          double voronoi_grain_substructure_crystallization_radius = 1.2;
          double voronoi_grain_substructure_overlap_factor = 1.0;
          bool grain_poission = false;

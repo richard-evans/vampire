@@ -461,20 +461,20 @@ namespace create{
          return true;
       }
       //--------------------------------------------------------------------
-      test="voronoi-grain-size";
+      test="voronoi-grain-substructure-size";
       if(word==test){
          double psize=atof(value.c_str());
          vin::check_for_valid_value(psize, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-         create::internal::voronoi_grain_size=psize;
+         create::internal::voronoi_grain_substructure_size=psize;
          return true;
       }
       else
       //--------------------------------------------------------------------
-      test="voronoi-grain-spacing";
+      test="voronoi-grain-substructure-spacing";
       if(word==test){
          double pspacing=atof(value.c_str());
          vin::check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
-         create::internal::voronoi_grain_spacing=pspacing;
+         create::internal::voronoi_grain_substructure_spacing=pspacing;
          return true;
       }
       //--------------------------------------------------------------------

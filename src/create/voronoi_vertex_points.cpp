@@ -30,7 +30,8 @@ namespace internal{
 
 void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_array,
                                 std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,
-                                bool include_boundary_grains){ // controls is boundary grains are removed
+                                bool include_boundary_grains, // controls is boundary grains are removed
+                                const double grain_size){ // mean grain size used to set the boundary grain tolerance
 	//========================================================================================================
 	//		 				Function to populate voronoi vertices for grains using qhull
 	//
@@ -203,7 +204,7 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
             }
 
             // but only include grains with a centre of mass inside the system dimensions
-            const double tol = create::internal::voronoi_grain_size * 0.25; // allow grains with half the mean grain size
+            const double tol = grain_size * 0.25; // allow grains with half the mean grain size
             bool inx = grain_coord_array[i][0] >= -tol && grain_coord_array[i][0] < cs::system_dimensions[0] + tol;
             bool iny = grain_coord_array[i][1] >= -tol && grain_coord_array[i][1] < cs::system_dimensions[1] + tol;
             if( !(inx && iny) ) inf = true;
