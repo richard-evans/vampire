@@ -27,6 +27,7 @@ int utility_tests(const bool verbose){
    int error_count = 0;
 
    error_count += ut::utility::test_units(verbose);
+   error_count += ut::utility::test_vmath(verbose);
 
    if(verbose) std::cout <<          "================================" << std::endl;
    if(error_count == 0) std::cout << " utility             : PASS " << std::endl;

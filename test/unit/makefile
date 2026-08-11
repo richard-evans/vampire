@@ -18,7 +18,8 @@ TEST_OBJECTS= \
 obj/unit_tests.o \
 obj/utility/units_test.o \
 obj/utility/utility_test.o\
-obj/utility/spin_temperature_test.o
+obj/utility/spin_temperature_test.o \
+obj/utility/vmath_test.o
 
 
 VAMPIRE_OBJECTS= \
@@ -27,6 +28,7 @@ VAMPIRE_OBJECTS= \
 ../../obj/main/material.o \
 ../../obj/utility/errors.o \
 ../../obj/utility/units.o \
+../../obj/utility/vmath.o \
 ../../obj/vio/data.o \
 ../../obj/vio/globalio.o \
 ../../obj/vio/timestamp.o\

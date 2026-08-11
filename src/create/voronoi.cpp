@@ -394,8 +394,16 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
    // sort by increasing radius
    material_order.sort(create::internal::compare_radius);
 
+	// determine whether elliptical grain rounding is active
+	const bool elliptical_rounding = create::internal::voronoi_elliptical_rounding > 0.0;
+
 	std::cout <<"Generating Voronoi Grains" << std::flush;
 	zlog << zTs() << "Generating Voronoi Grains" << std::flush;
+	if(elliptical_rounding){
+		zlog << zTs() << "Applying elliptical grain rounding with rounding factor " <<
+			create::internal::voronoi_elliptical_rounding << " about height fraction " <<
+			create::internal::voronoi_elliptical_rounding_height << std::endl;
+	}
 
    // arrays to store list of grain vertices
    double tmp_grain_pointx_array[max_vertices];
@@ -460,6 +468,12 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 						double x = catom_array[atom].x;
 						double y = catom_array[atom].y;
 
+						// compute in-plane scale factor for elliptical grain rounding
+						const double erf = create::internal::elliptical_rounding_factor(catom_array[atom].z);
+
+						// skip atoms where the grain cross-section has closed completely
+						if(erf <= 0.0) continue;
+
 						if(mp::material[catom_array[atom].material].core_shell_size>0.0){
 							// Iterate over materials
 							for(std::list<create::internal::core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
@@ -471,7 +485,13 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
                         const int atom_uc_cat = catom_array[atom].uc_category;
                         const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
 								// check for within core shell range
-								if(vmath::point_in_polygon_factor(x-x0,y-y0,factor, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
+								// note: point_in_polygon_factor() scales the polygon by factor^2; this
+								// legacy behaviour is retained when elliptical rounding is inactive so
+								// that existing core-shell structures are unchanged
+								const bool in_grain = elliptical_rounding ?
+									vmath::point_in_polygon_scaled(x-x0, y-y0, factor*erf, tmp_grain_pointx_array, tmp_grain_pointy_array, num_vertices) :
+									vmath::point_in_polygon_factor(x-x0, y-y0, factor,     tmp_grain_pointx_array, tmp_grain_pointy_array, num_vertices);
+								if(in_grain){
 									if((cz>=minz) && (cz<maxz) && (atom_uc_cat == mat_uc_cat) ){
 										catom_array[atom].include=true;
 										catom_array[atom].material=mat;
@@ -484,8 +504,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 								}
 							}
 						}
-						// Check to see if site is within polygon
-						else if(vmath::point_in_polygon_factor(x-x0,y-y0,1.0,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
+						// Check to see if site is within the (optionally elliptically rounded) grain
+						else if(vmath::point_in_polygon_scaled(x-x0,y-y0,erf,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
 							catom_array[atom].include=true;
 							catom_array[atom].grain=grain;
 						}

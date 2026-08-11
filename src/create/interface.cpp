@@ -195,6 +195,22 @@ namespace create{
          return true;
       }
       //-------------------------------------------------------------------
+      test="voronoi-elliptical-rounding";
+      if(word==test || word == "elliptical-rounding"){
+         double er=atof(value.c_str());
+         vin::check_for_valid_value(er, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         create::internal::voronoi_elliptical_rounding=er;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="voronoi-elliptical-rounding-height";
+      if(word==test || word == "elliptical-rounding-height"){
+         double erh=atof(value.c_str());
+         vin::check_for_valid_value(erh, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+         create::internal::voronoi_elliptical_rounding_height=erh;
+         return true;
+      }
+      //-------------------------------------------------------------------
       test="particle-centre-offset"; //parity
       if(word==test){
          cs::particle_creation_parity=1;

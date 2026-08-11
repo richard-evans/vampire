@@ -39,6 +39,7 @@ system_type.o \
 teardrop.o \
 truncated_octahedron.o \
 voronoi.o \
+voronoi_elliptical_rounding.o \
 voronoi_grain_rounding.o \
 voronoi_substructure.o \
 voronoi_vertex_points.o \

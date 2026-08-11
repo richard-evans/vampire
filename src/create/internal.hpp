@@ -138,6 +138,9 @@ namespace create{
       extern double voronoi_grain_substructure_crystallization_radius;
       extern double voronoi_grain_substructure_overlap_factor;
 
+      extern double voronoi_elliptical_rounding;        // degree of elliptical grain rounding (0-1)
+      extern double voronoi_elliptical_rounding_height; // height of widest grain cross-section as a fraction of system size z
+
       extern bool grain_poission;
 
       extern bool select_material_by_geometry;	// Toggle override of input material type by geometry
@@ -180,6 +183,8 @@ namespace create{
 
       void voronoi_grain_rounding(std::vector <std::vector <double> > & grain_coord_array,
                                   std::vector <std::vector <std::vector <double> > > &  grain_vertices_array);
+
+      double elliptical_rounding_factor(const double z);
 
       void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_array,
                                   std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,

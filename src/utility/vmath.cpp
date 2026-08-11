@@ -105,6 +105,41 @@ bool point_in_polygon_factor(double x, double y, double factor, double *polyX, d
 
 }
 
+//---------------------------------------------------------------------------------------------
+//
+//   Function to determine if a point lies within a polygon uniformly scaled about the origin
+//
+//   Scaling the polygon by a factor f is equivalent to scaling the test point by 1/f, which
+//   is both simpler and numerically better behaved than scaling every vertex.
+//
+//   Note: this supersedes point_in_polygon_factor(), which incorrectly scales the polygon by
+//   f^2. That function is retained unchanged for backwards compatibility of existing
+//   core-shell and grain-substructure geometries.
+//
+//---------------------------------------------------------------------------------------------
+bool point_in_polygon_scaled(double x, double y, double factor, double *polyX, double *polyY, int polySides){
+
+   // a degenerate or inverted polygon contains nothing
+   if(factor <= 0.0) return false;
+
+   const double inv_factor = 1.0/factor;
+   const double sx = x*inv_factor;
+   const double sy = y*inv_factor;
+
+   int j = polySides-1;
+   bool oddNodes = false;
+
+   for(int i=0; i<polySides; i++){
+      if( (polyY[i] < sy && polyY[j] >= sy) || (polyY[j] < sy && polyY[i] >= sy) ){
+         if(polyX[i] + (sy-polyY[i])/(polyY[j]-polyY[i])*(polyX[j]-polyX[i]) < sx) oddNodes = !oddNodes;
+      }
+      j = i;
+   }
+
+   return oddNodes;
+
+}
+
 bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vector<double>& polyY, const int polySides) {
 	///========================================================================================================
 	///		 						Function to decide if point is within polygon
