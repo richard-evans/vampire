@@ -425,6 +425,11 @@ namespace vin{
                 sim::pump_function=double_pump_square;
                 return EXIT_SUCCESS;
             }
+             test="multilayer-two-temperature";
+            if(value==test){
+                sim::pump_function=multilayer_two_temperature;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -517,6 +522,65 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
+        //--------------------------------------------------------------------
+        //Modified by M Strungaru 2024
+        test="two-temperature-damping";
+        if(word==test){
+            double hscc=atof(value.c_str());
+            check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+            sim::TTdamp=hscc;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="two-temperature-cutoff-time";
+        if(word==test){
+            double hscc=atof(value.c_str());
+            check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+            sim::TTcutofftime=hscc;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="two-temperature-e-ph-ratio";
+        if(word==test){
+            double hscc=atof(value.c_str());
+            check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+            sim::TTephrat=hscc;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="two-temperature-after-pulse-power";
+        if(word==test){
+            double hscc=atof(value.c_str());
+            check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+            sim::TT_afterpp=hscc;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+       test="two-temperature-substrate-electron-heat-capacity";
+       if(word==test){
+           double hscc=atof(value.c_str());
+           check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+           sim::TTCe_sub=hscc;
+           return EXIT_SUCCESS;
+       }
+       //--------------------------------------------------------------------
+       test="two-temperature-substrate-phonon-heat-capacity";
+       if(word==test){
+           double hscc=atof(value.c_str());
+           check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+           sim::TTCl_sub=hscc;
+           return EXIT_SUCCESS;
+       }
+       //--------------------------------------------------------------------
+       test="two-temperature-substrate-electron-phonon-coupling";
+       if(word==test){
+           double hscc=atof(value.c_str());
+           check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+           sim::TTG_sub=hscc;
+           return EXIT_SUCCESS;
+       }
+              //--------------------------------------------------------------------
+
         test="cooling-function";
         if(word==test){
             test="exponential";

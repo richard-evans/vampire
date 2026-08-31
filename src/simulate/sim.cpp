@@ -154,6 +154,16 @@ namespace sim{
 	double TTTe = 0.0; /// electron temperature
 	double TTTp = 0.0; /// phonon temperature
 
+//created by M Strungaru
+	double TTcutofftime=500E-15; //cutoff time for the laser pulse (in s)
+	double TTdamp=0.001; //damping after the TTcutofftime
+	double TTephrat=100; //ratio between the new electron-phonon coupling and old one
+   double TT_afterpp=0.0;
+	double TTCe_sub = 222.0; ///electron specific heat (gamma)
+	double TTCl_sub = 2.3E06; ///phonon specific heat
+	double TTG_sub = 6.6E17 ;///electron coupling constant
+
+
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 
