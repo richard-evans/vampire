@@ -105,9 +105,9 @@ namespace anisotropy{
                                           const double sz){
 
          // Get basis vectors
-         const double eA[3] = {internal::ku4_triaxial_basis1x[mat],internal::ku4_triaxial_basis1y[mat],internal::ku4_triaxial_basis1z[mat]};
-         const double eB[3] = {internal::ku4_triaxial_basis2x[mat],internal::ku4_triaxial_basis2y[mat],internal::ku4_triaxial_basis2z[mat]};
-         const double eC[3] = {internal::ku4_triaxial_basis3x[mat],internal::ku4_triaxial_basis3y[mat],internal::ku4_triaxial_basis3z[mat]};
+         const double eA[3] = {internal::ku_triaxial_basis1x[mat],internal::ku_triaxial_basis1y[mat],internal::ku_triaxial_basis1z[mat]};
+         const double eB[3] = {internal::ku_triaxial_basis2x[mat],internal::ku_triaxial_basis2y[mat],internal::ku_triaxial_basis2z[mat]};
+         const double eC[3] = {internal::ku_triaxial_basis3x[mat],internal::ku_triaxial_basis3y[mat],internal::ku_triaxial_basis3z[mat]};
 
          // compute dot products with each basis vector
          const double sdoteA = eA[0]*sx + eA[1]*sy + eA[2]*sz;
@@ -115,9 +115,9 @@ namespace anisotropy{
          const double sdoteC = eC[0]*sx + eC[1]*sy + eC[2]*sz;
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
-         const double kA = internal::ku4_triaxial_vector_x[mat];
-         const double kB = internal::ku4_triaxial_vector_y[mat];
-         const double kC = internal::ku4_triaxial_vector_z[mat];
+         const double kA = internal::ku_triaxial_vector_x[mat];
+         const double kB = internal::ku_triaxial_vector_y[mat];
+         const double kC = internal::ku_triaxial_vector_z[mat];
 
          // compute send and fourth order components
          const double sdoteA2 = sdoteA*sdoteA;
