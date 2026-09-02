@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <cmath>
 #include <fstream>
 
 // Vampire headers
@@ -98,6 +99,74 @@ namespace internal{
 
 
    //------------------------------------------------------------------------------
+   // Kernel function to add the global and material-specific FMR fields
+   //------------------------------------------------------------------------------
+   __global__ void update_fmr_fields_kernel(
+         cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
+         const cu_real_t Hx_fmr, const cu_real_t Hy_fmr, const cu_real_t Hz_fmr,
+         const double real_time, const bool local_fmr_field,
+         int * material, material_parameters_t * material_params,
+         const int n_atoms)
+   {
+      for (int atom = blockIdx.x * blockDim.x + threadIdx.x;
+           atom < n_atoms;
+           atom += blockDim.x * gridDim.x)
+      {
+         cu_real_t field_x = Hx_fmr;
+         cu_real_t field_y = Hy_fmr;
+         cu_real_t field_z = Hz_fmr;
+
+         if (local_fmr_field)
+         {
+            const int mid = material[atom];
+            const material_parameters_t mat = material_params[mid];
+            const cu_real_t phase = cu_real_t(2.0 * M_PI) * mat.fmr_field_frequency * real_time;
+
+            #ifdef CUDA_DP
+               const cu_real_t Hsinwt = mat.fmr_field_strength * sin(phase);
+            #else
+               const cu_real_t Hsinwt = mat.fmr_field_strength * sinf(phase);
+            #endif
+
+            field_x += Hsinwt * mat.fmr_field_unit_x;
+            field_y += Hsinwt * mat.fmr_field_unit_y;
+            field_z += Hsinwt * mat.fmr_field_unit_z;
+         }
+
+         x_field_array[atom] += field_x;
+         y_field_array[atom] += field_y;
+         z_field_array[atom] += field_z;
+      }
+   }
+
+
+   // Host function to calculate and add the FMR field
+   void update_fmr_fields()
+   {
+      const double real_time = sim::time * ::mp::dt_SI;
+      const double phase = (2.0 * M_PI) *
+                              sim::fmr_field_frequency * real_time;
+      const double Hsinwt = sim::fmr_field_strength * sin(phase);
+
+      // Update CPU up to date for output.
+      sim::fmr_field = Hsinwt;
+
+      const cu_real_t Hx_fmr = sim::fmr_field_unit_vector[0] * Hsinwt;
+      const cu_real_t Hy_fmr = sim::fmr_field_unit_vector[1] * Hsinwt;
+      const cu_real_t Hz_fmr = sim::fmr_field_unit_vector[2] * Hsinwt;
+
+      update_fmr_fields_kernel <<< cu::grid_size, cu::block_size >>> (
+            cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+            Hx_fmr, Hy_fmr, Hz_fmr,
+            real_time, sim::local_fmr_field,
+            cu::atoms::d_materials, cu::mp::d_material_params,
+            ::atoms::num_atoms);
+
+      check_cuda_errors (__FILE__, __LINE__);
+   }
+
+
+   //------------------------------------------------------------------------------
    // Kernel function to calculate external fields
    //------------------------------------------------------------------------------
    __global__ void update_external_fields_kernel (
@@ -142,6 +211,9 @@ namespace internal{
          cu::update_global_thermal_field();
          cu::update_applied_fields();
       }
+
+      // Add the oscillating field only after it has been enabled by the FMR program.
+      if(sim::enable_fmr) cu::update_fmr_fields();
 
    //   // update dipole field
    //    update_dipolar_fields();  //-- disabled  as causes NaN and deferred to CPU code for now

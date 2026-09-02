@@ -74,6 +74,11 @@ namespace internal{
       cu_real_t applied_field_unit_x;
       cu_real_t applied_field_unit_y;
       cu_real_t applied_field_unit_z;
+      cu_real_t fmr_field_strength;
+      cu_real_t fmr_field_frequency;
+      cu_real_t fmr_field_unit_x;
+      cu_real_t fmr_field_unit_y;
+      cu_real_t fmr_field_unit_z;
       cu_real_t kc4;
       cu_real_t kc6;
       cu_real_t temperature;
