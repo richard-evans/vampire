@@ -583,6 +583,11 @@ namespace vcuda{
             _materials[i].applied_field_unit_x   = ::mp::material[i].applied_field_unit_vector[0];
             _materials[i].applied_field_unit_y   = ::mp::material[i].applied_field_unit_vector[1];
             _materials[i].applied_field_unit_z   = ::mp::material[i].applied_field_unit_vector[2];
+            _materials[i].fmr_field_strength = ::mp::material[i].fmr_field_strength;
+            _materials[i].fmr_field_frequency = ::mp::material[i].fmr_field_frequency;
+            _materials[i].fmr_field_unit_x = ::mp::material[i].fmr_field_unit_vector[0];
+            _materials[i].fmr_field_unit_y = ::mp::material[i].fmr_field_unit_vector[1];
+            _materials[i].fmr_field_unit_z = ::mp::material[i].fmr_field_unit_vector[2];
             _materials[i].temperature = ::mp::material[i].temperature;
             _materials[i].temperature_rescaling_alpha = ::mp::material[i].temperature_rescaling_alpha;
             _materials[i].temperature_rescaling_Tc    = ::mp::material[i].temperature_rescaling_Tc;
