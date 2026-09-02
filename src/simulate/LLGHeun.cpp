@@ -77,6 +77,10 @@ namespace LLG_arrays{
 	std::vector <double> y_initial_spin_array;
 	std::vector <double> z_initial_spin_array;
 
+	// Per-atom flattened copies of material-specific LLG prefactors.
+	std::vector <double> atom_one_oneplusalpha_sq;
+	std::vector <double> atom_alpha_oneplusalpha_sq;
+
 	bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
 }
@@ -126,6 +130,16 @@ int LLGinit(){
 	y_heun_array.resize(atoms::num_atoms,0.0);
 	z_heun_array.resize(atoms::num_atoms,0.0);
 
+	// Flatten per-material LLG prefactors onto a per-atom array so the
+	// integration loops can be vectorized.
+	atom_one_oneplusalpha_sq.resize(atoms::num_atoms,0.0);
+	atom_alpha_oneplusalpha_sq.resize(atoms::num_atoms,0.0);
+	for(int atom=0; atom<atoms::num_atoms; ++atom){
+		const int imaterial = atoms::type_array[atom];
+		atom_one_oneplusalpha_sq[atom]   = mp::material[imaterial].one_oneplusalpha_sq;
+		atom_alpha_oneplusalpha_sq[atom] = mp::material[imaterial].alpha_oneplusalpha_sq;
+	}
+
 	LLG_set=true;
 
   	return EXIT_SUCCESS;
@@ -170,29 +184,30 @@ int LLG_Heun(){
 	double S_new[3];	// New Local Spin Moment
 	double mod_S;		// magnitude of spin moment
 
-	// Store initial spin positions
-	for(int atom=0;atom<num_atoms;atom++){
-		x_initial_spin_array[atom] = atoms::x_spin_array[atom];
-		y_initial_spin_array[atom] = atoms::y_spin_array[atom];
-		z_initial_spin_array[atom] = atoms::z_spin_array[atom];
-	}
-
 	// Calculate fields
 	calculate_spin_fields(0,num_atoms);
 	calculate_external_fields(0,num_atoms);
 
 	// Calculate Euler Step
+	// Each compiler only understands its own pragma and ignores the
+	// other (with a harmless "unknown pragma" warning).
+	#pragma GCC ivdep
+	#pragma clang loop vectorize(assume_safety) interleave(enable)
 	for(int atom=0;atom<num_atoms;atom++){
 
-		const int imaterial=atoms::type_array[atom];
-		const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq; // material specific alpha and gamma
-		const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
+		const double one_oneplusalpha_sq = atom_one_oneplusalpha_sq[atom]; // material specific alpha and gamma, flattened per-atom (see LLG_arrays)
+		const double alpha_oneplusalpha_sq = atom_alpha_oneplusalpha_sq[atom];
 
 		// Store local spin in Sand local field in H
-		const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
+		const double S[3] = { atoms::x_spin_array[atom], atoms::y_spin_array[atom], atoms::z_spin_array[atom]};
 		const double H[3] = { atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + atoms::x_thermal_field_array[atom],
-							  atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + atoms::y_thermal_field_array[atom],
-							  atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + atoms::z_thermal_field_array[atom] };
+									 atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + atoms::y_thermal_field_array[atom],
+									 atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + atoms::z_thermal_field_array[atom] };
+
+		// Store initial spin position for Heun corrector
+		x_initial_spin_array[atom] = S[0];
+		y_initial_spin_array[atom] = S[1];
+		z_initial_spin_array[atom] = S[2];
 
 		// Calculate Delta S
 		xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
@@ -216,51 +231,40 @@ int LLG_Heun(){
 		S_new[1]=S_new[1]*mod_S;
 		S_new[2]=S_new[2]*mod_S;
 
-		//Writing of Spin Values to Storage Array
-		x_spin_storage_array[atom]=S_new[0];
-		y_spin_storage_array[atom]=S_new[1];
-		z_spin_storage_array[atom]=S_new[2];
+		// Commit predicted (Euler) spin directly to the spin array
+		atoms::x_spin_array[atom]=S_new[0];
+		atoms::y_spin_array[atom]=S_new[1];
+		atoms::z_spin_array[atom]=S_new[2];
  	}
-
-	// Copy new spins to spin array
-	for(int atom=0;atom<num_atoms;atom++){
-		atoms::x_spin_array[atom]=x_spin_storage_array[atom];
-		atoms::y_spin_array[atom]=y_spin_storage_array[atom];
-		atoms::z_spin_array[atom]=z_spin_storage_array[atom];
-	}
 
 	// Recalculate spin dependent fields
 	calculate_spin_fields(0,num_atoms);
 
-	// Calculate Heun Gradients
+	// Calculate Heun Gradients and corrected step
+	// Clang vectorizes this loop unassisted; GCC needs the same ivdep hint
+	// as above (its runtime alias-check budget is smaller than the number
+	// of distinct arrays this loop touches).
+	#pragma GCC ivdep
 	for(int atom=0;atom<num_atoms;atom++){
 
-		const int imaterial=atoms::type_array[atom];;
-		const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
-		const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
+		const double one_oneplusalpha_sq = atom_one_oneplusalpha_sq[atom];
+		const double alpha_oneplusalpha_sq = atom_alpha_oneplusalpha_sq[atom];
 
 		// Store local spin in Sand local field in H
-		const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
+		const double S[3] = { atoms::x_spin_array[atom], atoms::y_spin_array[atom], atoms::z_spin_array[atom]};
 		const double H[3] = { atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + atoms::x_thermal_field_array[atom],
-							  atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + atoms::y_thermal_field_array[atom],
-							  atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom]  + atoms::z_thermal_field_array[atom] };
+									 atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + atoms::y_thermal_field_array[atom],
+									 atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom]  + atoms::z_thermal_field_array[atom] };
 
-		// Calculate Delta S
+		// Calculate Delta S (Heun gradient)
 		xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
 		xyz[1]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
 		xyz[2]=(one_oneplusalpha_sq)*(S[0]*H[1]-S[1]*H[0]) + (alpha_oneplusalpha_sq)*(S[0]*(S[2]*H[0]-S[0]*H[2])-S[1]*(S[1]*H[2]-S[2]*H[1]));
 
-		// Store dS in heun array
-		x_heun_array[atom]=xyz[0];
-		y_heun_array[atom]=xyz[1];
-		z_heun_array[atom]=xyz[2];
-	}
-
-	// Calculate Heun Step
-	for(int atom=0;atom<num_atoms;atom++){
-		S_new[0]=x_initial_spin_array[atom]+mp::half_dt*(x_euler_array[atom]+x_heun_array[atom]);
-		S_new[1]=y_initial_spin_array[atom]+mp::half_dt*(y_euler_array[atom]+y_heun_array[atom]);
-		S_new[2]=z_initial_spin_array[atom]+mp::half_dt*(z_euler_array[atom]+z_heun_array[atom]);
+		// Calculate Heun Step
+		S_new[0]=x_initial_spin_array[atom]+mp::half_dt*(x_euler_array[atom]+xyz[0]);
+		S_new[1]=y_initial_spin_array[atom]+mp::half_dt*(y_euler_array[atom]+xyz[1]);
+		S_new[2]=z_initial_spin_array[atom]+mp::half_dt*(z_euler_array[atom]+xyz[2]);
 
 		// Normalise Spin Length
 		mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
