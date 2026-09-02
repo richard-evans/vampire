@@ -26,10 +26,11 @@ namespace dp = dipole::internal;
 
 namespace dipole{
 
-namespace internal{
-
 //------------------------------------------------------------------------------
 // Function to output calculated dipole cell coords and fields on root process
+// (externally visible: called from both the tensor/macrocell and hierarchical
+// dipole solvers, so it lives in the public dipole:: namespace rather than
+// dipole::internal::)
 //------------------------------------------------------------------------------
 void output_dipole_fields(){
 
@@ -44,7 +45,7 @@ void output_dipole_fields(){
 
       dp_fields.open("dipole-field.txt");
 
-      for (int i = 0 ; i < dipole::internal::cells_num_cells; i ++){
+      for (int i = 0 ; i < dipole::cells_num_cells; i ++){
          dp_fields << i << "\t" <<  // cell ID
          cells::num_atoms_in_cell[i] << "\t" << // num atoms in cell
          cells::pos_and_mom_array[4*i+0] << "\t" << // x
@@ -62,5 +63,4 @@ void output_dipole_fields(){
 
 }
 
-} // end of namespace internal
 } // end of namespace dipole

@@ -81,11 +81,13 @@ namespace dipole{
       extern std::vector < int > atom_type_array;
       extern std::vector < int > atom_cell_id_array;
 
-      extern int cells_num_cells;
-      extern int cells_num_local_cells;
+      // aliased functions so existing dipole::internal:: uses keep working
+      using dipole::cells_num_cells;
+      using dipole::cells_num_local_cells;
+      using dipole::cells_volume_array;
+
       extern std::vector <int>  cells_local_cell_array;
       extern std::vector <int>  cells_num_atoms_in_cell;
-      extern std::vector < double > cells_volume_array;
 
       extern std::vector<double> cells_pos_and_mom_array;
       extern std::vector < int > proc_cell_index_array1D;
@@ -338,7 +340,6 @@ namespace dipole{
        // Functions to output dipole fields
        //-----------------------------------------------------------------
        void output_atomistic_dipole_fields();
-       void output_dipole_fields();
 
        //-----------------------------------------------------------------
        // Function to output solver memory information

@@ -26,7 +26,6 @@
 #include "vutil.hpp"
 // dipole module headers
 #include "internal.hpp"
-#include "../dipole/internal.hpp"
 
 // alias internal hierarchical namespace for brevity
 namespace ha = hierarchical::internal;
@@ -62,7 +61,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    }
 
    // Compute dipole fields for all cells with atoms (local cells)
-	for(int lc = 0; lc < dipole::internal::cells_num_local_cells; lc++){
+	for(int lc = 0; lc < dipole::cells_num_local_cells; lc++){
 
       // get global cell ID from local cell list
       int cell_i = cells::cell_id_array[lc];
@@ -72,7 +71,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       const int end = ha::interaction_list_end_index[lc];
 
       // Self demagnetisation factor multiplying m(i)
-      const double V = dipole::internal::cells_volume_array[cell_i];
+      const double V = dipole::cells_volume_array[cell_i];
       const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
       const double self_demag = eightPI_three_cell_volume;
       //std::cout << self_demag << std::endl;
@@ -137,13 +136,13 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
 
    #ifdef MPICF
       // Reduce fields on all processors so all have correct field values
-      MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], dipole::internal::cells_num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-      MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0], dipole::internal::cells_num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-      MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0], dipole::internal::cells_num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], dipole::cells_num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0], dipole::cells_num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0], dipole::cells_num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
    #endif
 
    // Check for cells with unrealistic fields from initialisation and zero
-   for (int i = 0 ; i < dipole::internal::cells_num_cells; i ++){
+   for (int i = 0 ; i < dipole::cells_num_cells; i ++){
       if (dipole::cells_field_array_x[i] < -1000) dipole::cells_field_array_x[i] = 0.0;
       if (dipole::cells_field_array_y[i] < -1000) dipole::cells_field_array_y[i] = 0.0;
       if (dipole::cells_field_array_z[i] < -1000) dipole::cells_field_array_z[i] = 0.0;
@@ -156,6 +155,8 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    //std::cout << "\tdone! [ " << timer.elapsed_time() << " s ]" << std::endl;
    //zlog << zTs() <<  "\tDIPOLE UPDATE. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
    //std::cout << "dipole update time " << timer.elapsed_time() << " s" << std::endl;
+
+   dipole::output_dipole_fields();
 
    return;
 

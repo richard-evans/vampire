@@ -60,6 +60,10 @@ namespace dipole{
    extern double atomistic_cutoff;
    extern bool atomsitic_tensor_enabled;
 
+   extern int cells_num_cells; // number of macrocells
+   extern int cells_num_local_cells; // number of local macrocells
+   extern std::vector < double > cells_volume_array; // volume of each macrocell
+
    //-----------------------------------------------------------------------------
    // Function to unroll cells dipolar field into atomic field
    //-----------------------------------------------------------------------------
@@ -74,6 +78,11 @@ namespace dipole{
    // Function to calculate energy of spin in dipole (magnetostatic) field
    //------------------------------------------------------------------------------
    double spin_magnetostatic_energy(const int atom, const double sx, const double sy, const double sz);
+
+   //--------------------------------------------------------
+   // Function to output calculated dipole cell fields to file
+   //--------------------------------------------------------
+   void output_dipole_fields();
 
    //--------------------------------------------------------
    // Function to send cells field to be output in cfg file
