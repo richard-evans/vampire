@@ -9,10 +9,10 @@ Sergiu Ruta, Sheffield Hallam University, UK
 
 Contributors
 -----------------------------------------------
-Daniel Meilak, Andrew Naden, Oscar Arbelaez,
-Sam Morris, Rory Pond, Weijia Fan,
-Milton Persson, Junlin Wang, Wu Hong-Ye,
-Razvan Ababei, Sam Westmoreland, Jackson Ross,
-Phanwadee Chureemart, Pawel Sobieszczyk,
-Joseph Barker, Thomas Ostler, Andreas Biternas,
-Roy W Chantrell
+Daniel Meilak, Andrew Naden, Jack Collings,
+Oscar Arbelaez, Sam Morris, Rory Pond,
+Weijia Fan, Milton Persson, Junlin Wang,
+Wu Hong-Ye, Razvan Ababei, Sam Westmoreland,
+Jackson Ross, Phanwadee Chureemart,
+Pawel Sobieszczyk, Joseph Barker, Thomas Ostler,
+Andreas Biternas, Roy W Chantrell
