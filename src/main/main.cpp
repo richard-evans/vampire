@@ -62,18 +62,15 @@ int main(int argc, char* argv[]){
       std::cout << std::endl;
       std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
       std::cout << std::endl;
-      std::cout << "  Developers:   Richard F L Evans, Sarah Jenkins, Andrea Meo, " << std::endl;
-      std::cout << "                Daniel Meilak, Andrew Naden, Matthew Ellis," << std::endl;
-      std::cout << "                Oscar Arbelaez, Sam Morris, Rory Pond, Weijia Fan," << std::endl;
-      std::cout << "                Phanwadee Chureemart, Pawel Sobieszczyk, Joe Barker, " << std::endl;
-      std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
-      std::cout << "                Wu Hong-Ye, Razvan Ababei, Sam Westmoreland," << std::endl;
-      std::cout << "                Milton Persson" << std::endl;
+      std::cout << "      Main Developers: Richard F L Evans, Sarah Jenkins, Andrea Meo, " << std::endl;
+      std::cout << "                       Matthew Ellis, Mara Strungaru, Sergiu Ruta" << std::endl;
+      std::cout << " " << std::endl;
+      std::cout << "                       See developers.txt for details" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
-      std::cout << "                Compiled with:  " << COMP << std::endl;
+      std::cout << "                       Compiled with:  " << COMP << std::endl;
       #endif
-      std::cout << "                Compiler Flags: ";
+      std::cout << "                       Compiler Flags: ";
       #ifdef CUDA
       std::cout << "CUDA ";
       #endif

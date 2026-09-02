@@ -261,7 +261,7 @@ parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPIICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)-intel
 
 $(MPI_ICC_OBJECTS): obj/%_i_par.o: src/%.cpp
-	$(MPIICC) -c -o $@ $(ICC_CFLAGS) $<
+	$(MPIICC) -c -o $@ $(ICC_CFLAGS) $(OPTIONS) $<
 
 parallel-cray: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(PEXECUTABLE)
@@ -273,7 +273,7 @@ parallel-archer: $(MPI_ARCHER_OBJECTS)
 	CC -DMPICF $(GCC_LDFLAGS) $(LIBS) $(MPI_ARCHER_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_ARCHER_OBJECTS): obj/%_archer_par.o: src/%.cpp
-	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $<
+	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
 # parallel - use for macOS systems
 parallel-llvm: $(MPI_LLVM_OBJECTS)

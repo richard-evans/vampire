@@ -1,0 +1,18 @@
+Main Developers
+-----------------------------------------------
+Lead: Richard F L Evans, University of York
+Sarah Jenkins, Canva UK
+Andrea Meo, University of Bari, Italy
+Matthew Ellis, University of Sheffield, UK
+Mara Strungaru, University of Manchester, UK
+Sergiu Ruta, Sheffield Hallam University, UK
+
+Contributors
+-----------------------------------------------
+Daniel Meilak, Andrew Naden, Oscar Arbelaez,
+Sam Morris, Rory Pond, Weijia Fan,
+Milton Persson, Junlin Wang, Wu Hong-Ye,
+Razvan Ababei, Sam Westmoreland, Jackson Ross,
+Phanwadee Chureemart, Pawel Sobieszczyk,
+Joseph Barker, Thomas Ostler, Andreas Biternas,
+Roy W Chantrell
