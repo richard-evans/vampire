@@ -69,6 +69,19 @@ double reduce_sum(double local){
 
 }
 
+double reduce_max(double local){
+
+   double global = local;
+
+   #ifdef MPICF
+      // Perform MPI reduce for MPI code
+      MPI_Reduce(&local, &global, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+   #endif
+
+   return global;
+
+}
+
 //------------------------------------------------------------------------------
 // Wrapper function(s) for MPI all reduce operation
 //------------------------------------------------------------------------------

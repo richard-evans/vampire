@@ -18,6 +18,7 @@
 #include "dipole.hpp"
 #include "gpu.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 #include "vutil.hpp"
 #include "hierarchical.hpp"
 
@@ -85,6 +86,17 @@ namespace dipole{
       //----------------------------------------------------------
       // initialise dipole solver
       //----------------------------------------------------------
+
+      // Time the build phase (tensor construction / hierarchical tree
+      // build) and its memory footprint, separately from the first field
+      // evaluation timed below, for the ARCHER2 weak/strong scaling study
+      // (papers/dipole). Barrier before sampling so all ranks start the
+      // clock together and slow ranks aren't hidden by fast ones.
+      vmpi::barrier();
+      const double dipole_scaling_mem_before_kb = vutil::peak_memory_usage_kb();
+      vutil::vtimer_t dipole_scaling_build_timer;
+      dipole_scaling_build_timer.start();
+
       switch (dipole::internal::solver){
 
          case dipole::internal::macrocell:
@@ -135,6 +147,39 @@ namespace dipole{
 
 
       }
+
+      // Report build time and memory footprint of the solver just
+      // initialised (papers/dipole ARCHER2 scaling study).
+      vmpi::barrier();
+      dipole_scaling_build_timer.stop();
+      const double dipole_scaling_build_time = dipole_scaling_build_timer.elapsed_time();
+      const double dipole_scaling_mem_local_kb = vutil::peak_memory_usage_kb() - dipole_scaling_mem_before_kb;
+      const double dipole_scaling_mem_total_kb = vmpi::reduce_sum(dipole_scaling_mem_local_kb);
+      const double dipole_scaling_mem_max_kb = vmpi::reduce_max(dipole_scaling_mem_local_kb);
+      // dipole::internal::num_atoms is this rank's local (core + boundary
+      // halo) atom count under MPI domain decomposition, so summing it
+      // slightly over-counts shared boundary atoms rather than giving the
+      // exact system total -- good enough as a cross-check, but the
+      // scaling analysis script uses the known system size for each run
+      // directory as the authoritative atom count, not this field.
+      const uint64_t dipole_scaling_total_atoms = vmpi::reduce_sum(static_cast<uint64_t>(dipole::internal::num_atoms));
+      if(vmpi::master){
+         std::cout << "DIPOLE_SCALING BUILD solver=" << dipole::internal::dipole_solver_name()
+                    << " nprocs=" << vmpi::num_processors
+                    << " cells=" << dipole::internal::cells_num_cells
+                    << " atoms=" << dipole_scaling_total_atoms
+                    << " build_time_s=" << dipole_scaling_build_time
+                    << " mem_total_kb=" << dipole_scaling_mem_total_kb
+                    << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb << std::endl;
+         zlog << zTs() << "DIPOLE_SCALING BUILD solver=" << dipole::internal::dipole_solver_name()
+              << " nprocs=" << vmpi::num_processors
+              << " cells=" << dipole::internal::cells_num_cells
+              << " atoms=" << dipole::internal::num_atoms
+              << " build_time_s=" << dipole_scaling_build_time
+              << " mem_total_kb=" << dipole_scaling_mem_total_kb
+              << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb << std::endl;
+      }
+
       // Set initialised flag
       dipole::internal::initialised=true;
 

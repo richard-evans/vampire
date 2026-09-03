@@ -36,6 +36,19 @@ namespace dipole{
 
    namespace internal{
       void calculate_macrocell_dipole_field();
+
+      // Human-readable name for the active solver, for scaling-study log output
+      const char* dipole_solver_name(){
+         switch (dipole::internal::solver){
+            case dipole::internal::macrocell:   return "macrocell";
+            case dipole::internal::tensor:      return "tensor";
+            case dipole::internal::atomistic:   return "atomistic";
+            case dipole::internal::hierarchical:return "hierarchical";
+            case dipole::internal::fft:         return "fft";
+            case dipole::internal::atomisticfft:return "atomisticfft";
+            default:                            return "unknown";
+         }
+      }
    }
 
    //-----------------------------------------------------------------------------
@@ -62,6 +75,14 @@ namespace dipole{
 
             // // for gpu acceleration, transfer spin positions now (does nothing for serial)
             // gpu::transfer_spin_positions_from_gpu_to_cpu();
+
+            // Time each individual dipole field recalculation, for the
+            // ARCHER2 weak/strong scaling study (papers/dipole). Barrier
+            // first so slow ranks don't make fast ranks look slow, then
+            // report the slowest rank's time (the one that sets wall clock).
+            vmpi::barrier();
+            vutil::vtimer_t dipole_scaling_timer;
+            dipole_scaling_timer.start();
 
             switch (dipole::internal::solver){
 
@@ -100,6 +121,20 @@ namespace dipole{
             // gpu::transfer_dipole_fields_from_cpu_to_gpu();
             // // for gpu acceleration, transfer calculated cells dipolar fields now (does nothing for serial)
             // gpu::transfer_dipole_cells_fields_from_gpu_to_cpu();
+
+            dipole_scaling_timer.stop();
+            const double dipole_scaling_local_time = dipole_scaling_timer.elapsed_time();
+            const double dipole_scaling_max_time = vmpi::reduce_max(dipole_scaling_local_time);
+            if(vmpi::master){
+               std::cout << "DIPOLE_SCALING UPDATE solver=" << dipole::internal::dipole_solver_name()
+                          << " nprocs=" << vmpi::num_processors
+                          << " sim_time=" << sim_time
+                          << " update_time_s=" << dipole_scaling_max_time << std::endl;
+               zlog << zTs() << "DIPOLE_SCALING UPDATE solver=" << dipole::internal::dipole_solver_name()
+                    << " nprocs=" << vmpi::num_processors
+                    << " sim_time=" << sim_time
+                    << " update_time_s=" << dipole_scaling_max_time << std::endl;
+            }
 
 		   } // End of check for update rate
 		} // end of check for update time
