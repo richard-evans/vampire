@@ -43,6 +43,7 @@ int main(int argc, char* argv[]){
 
    if( module.utility || all ) error_count += ut::utility_tests(verbose);
    if( module.create  || all ) error_count += ut::create_tests(verbose);
+   if( module.grains  || all ) error_count += ut::grains_tests(verbose);
 
 
    // Summary
@@ -55,6 +56,6 @@ int main(int argc, char* argv[]){
    }
    std::cout << "--------------------------------------------------" << std::endl;
 
-   return 0;
+   return error_count;
 
 }

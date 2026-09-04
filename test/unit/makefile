@@ -21,7 +21,12 @@ obj/utility/utility_test.o\
 obj/utility/spin_temperature_test.o \
 obj/utility/vmath_test.o \
 obj/create/create_tests.o \
-obj/create/voronoi_bimodal_seeds_test.o
+obj/grains/grains_tests.o \
+obj/grains/grain_geometry_test.o \
+obj/grains/grain_tessellation_test.o \
+obj/grains/grain_packing_test.o \
+obj/grains/grain_seeds_test.o \
+obj/grains/grain_shape_test.o
 
 
 VAMPIRE_OBJECTS= \
@@ -39,7 +44,11 @@ VAMPIRE_OBJECTS= \
 ../../obj/spinlattice/data.o\
 ../../obj/random/mtrand.o\
 ../../obj/random/random.o\
-../../obj/create/voronoi_bimodal_seeds.o
+../../obj/grains/grain_geometry.o\
+../../obj/grains/grain_packing.o\
+../../obj/grains/grain_seeds.o\
+../../obj/grains/grain_shape.o\
+../../obj/grains/grain_tessellation.o
 
 
 EXECUTABLE=unit_tests

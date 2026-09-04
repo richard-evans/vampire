@@ -14,21 +14,32 @@
 #include <iostream>
 
 // include header for test functions
-#include "create_tests.hpp"
+#include "grains_tests.hpp"
+#include "grain_geometry_test.hpp"
+#include "grain_packing_test.hpp"
+#include "grain_seeds_test.hpp"
+#include "grain_shape_test.hpp"
+#include "grain_tessellation_test.hpp"
 
 namespace ut{
 //------------------------------------------------------------------------------
-// Function to test create module functions
+// Function to test grains module functions
 //------------------------------------------------------------------------------
-int create_tests(const bool verbose){
+int grains_tests(const bool verbose){
 
-   if(verbose) std::cout << "Testing create module" << std::endl;
+   if(verbose) std::cout << "Testing grains module" << std::endl;
 
    int error_count = 0;
 
+   error_count += ut::grains::test_grain_geometry(verbose);
+   error_count += ut::grains::test_grain_tessellation(verbose);
+   error_count += ut::grains::test_grain_packing(verbose);
+   error_count += ut::grains::test_grain_seeds(verbose);
+   error_count += ut::grains::test_grain_shape(verbose);
+
    if(verbose) std::cout <<          "================================" << std::endl;
-   if(error_count == 0) std::cout << " create               : PASS " << std::endl;
-   else std::cout <<                 " create               : FAIL " << error_count << std::endl;
+   if(error_count == 0) std::cout << " grains               : PASS " << std::endl;
+   else std::cout <<                 " grains               : FAIL " << error_count << std::endl;
    if(verbose) std::cout <<          "================================" << std::endl;
 
    return error_count;

@@ -32,7 +32,6 @@
 #include "config.hpp"
 #include "demag.hpp"
 #include "cells.hpp"
-#include "voronoi.hpp"
 #include "ltmp.hpp"
 #include "montecarlo.hpp"
 #include "program.hpp"
@@ -83,6 +82,7 @@ namespace vin{
         else if(anisotropy::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(grains::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -2401,6 +2401,7 @@ namespace vin{
 
             else if(anisotropy::match_material_parameter(word, value, unit, line, super_index, sub_index, mp::max_materials)) return EXIT_SUCCESS;
             else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(grains::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;

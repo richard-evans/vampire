@@ -47,6 +47,7 @@
 ///	Revision:	  ---
 ///=====================================================================================
 ///
+#include <list>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -199,7 +200,25 @@ namespace create{
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 	double get_material_height_min(const int material);
 	double get_material_height_max(const int material);
+	bool get_material_sub_fill(const int material);
+	int get_material_unit_cell_category(const int material);
+	double get_material_substructure_nucleation_height(const int material);
 
+	// A material's core-shell radius (mp::material[mat].core_shell_size) and
+	// the materials list ordered by that radius, largest first, so that
+	// iterating in order and overwriting on each match paints the smallest,
+	// innermost core last, on top of the larger shells enclosing it. Used by
+	// any driver (particle shapes, granular films) that supports core-shell
+	// materials.
+	struct core_radius_t{ int mat; double radius; };
+	bool compare_radius(core_radius_t first, core_radius_t second);
+	std::list<core_radius_t> sorted_core_shell_materials();
+
+	// Sorts catom_array in place by grain number, for improved cache
+	// locality of later per-grain processing. Used by every system-creation
+	// path that assigns atoms to grains (particle arrays, the nanoparticle
+	// agglomerate, granular films).
+	void sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array);
 
 } // end of namespace create
 

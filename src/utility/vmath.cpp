@@ -83,38 +83,10 @@ bool point_in_polygon(double x, double y,double *polyX, double *polyY,int polySi
 
 //---------------------------------------------------------------------------------------------
 //
-//	   						Function to determine if point is in scaled polygon
-//
-//												(c) R F L Evans 2015
-//
-//---------------------------------------------------------------------------------------------
-bool point_in_polygon_factor(double x, double y, double factor, double *polyX, double *polyY,int polySides) {
-	int   i, j=polySides-1 ;
-	bool  oddNodes=0;
-
-	for (i=0; i<polySides; i++) {
-		if ((polyY[i]*factor<y && polyY[j]*factor>=y) || (polyY[j]*factor<y && polyY[i]*factor>=y)) {
-			if (polyX[i]*factor+(y-polyY[i]*factor)/(polyY[j]-polyY[i])*(polyX[j]-polyX[i])*factor<x) {
-				oddNodes=!oddNodes;
-			}
-		}
-		j=i;
-	}
-
-  return oddNodes;
-
-}
-
-//---------------------------------------------------------------------------------------------
-//
 //   Function to determine if a point lies within a polygon uniformly scaled about the origin
 //
 //   Scaling the polygon by a factor f is equivalent to scaling the test point by 1/f, which
 //   is both simpler and numerically better behaved than scaling every vertex.
-//
-//   Note: this supersedes point_in_polygon_factor(), which incorrectly scales the polygon by
-//   f^2. That function is retained unchanged for backwards compatibility of existing
-//   core-shell and grain-substructure geometries.
 //
 //---------------------------------------------------------------------------------------------
 bool point_in_polygon_scaled(double x, double y, double factor, double *polyX, double *polyY, int polySides){

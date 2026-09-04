@@ -37,14 +37,7 @@ sphere_size.o \
 square_array.o \
 system_type.o \
 teardrop.o \
-truncated_octahedron.o \
-voronoi.o \
-voronoi_bimodal_seeds.o \
-voronoi_elliptical_rounding.o \
-voronoi_grain_rounding.o \
-voronoi_substructure.o \
-voronoi_vertex_points.o \
-write_grain_vertices.o
+truncated_octahedron.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/create/,$(create_objects))

@@ -43,44 +43,44 @@ export LANG=C
 export LC_ALL=C
 
 # Debug Flags
-ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
-ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
+ICC_DBCFLAGS= -O0 -C -I./hdr
+ICC_DBLFLAGS= -C -I./hdr
 
-GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
-GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr $(FFTW) -Wsign-compare
+GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr $(FFTW) -Wsign-compare
 
-PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
-PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
+PCC_DBCFLAGS= -O0 -I./hdr
+PCC_DBLFLAGS= -O0 -I./hdr
 
-IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
-IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
+IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
+IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
 
-LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
-LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr $(FFTW) -Wsign-compare
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr $(FFTW) -Wsign-compare
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
-ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
+ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr
+ICC_LDFLAGS= -I./hdr -axCORE-AVX2
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW)
-LLVM_LDFLAGS= -I./hdr -I./src/qvoronoi $(FFTW)
+LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr $(FFTW)
+LLVM_LDFLAGS= -I./hdr $(FFTW)
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW) -std=c++11 -Wsign-compare
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr $(FFTW) -std=c++11 -Wsign-compare
+GCC_LDFLAGS= -lstdc++ -I./hdr $(FFTW) -Wsign-compare
 
-PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
-PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
+PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr
+PCC_LDFLAGS= -I./hdr -O2 -march=barcelona -ipa
 
-IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
-IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
+IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr
+IBM_LDFLAGS= -lstdc++ -I./hdr -O5 -qarch=450 -qtune=450
 
-CRAY_CFLAGS= -O3 -hfp3 -I./hdr -I./src/qvoronoi
-CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi
+CRAY_CFLAGS= -O3 -hfp3 -I./hdr
+CRAY_LDFLAGS= -I./hdr
 
-CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
-CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
+CCC_CFLAGS=-I./hdr -O0
+CCC_LDFLAGS=-I./hdr -O0
 
 
 # Save git commit in simple function
@@ -93,7 +93,6 @@ OPTIONS=
 OBJECTS= \
 obj/data/atoms.o \
 obj/data/category.o \
-obj/data/grains.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -128,6 +127,7 @@ include src/dipole/makefile
 include src/environment/makefile
 include src/exchange/makefile
 include src/gpu/makefile
+include src/grains/makefile
 include src/hamr/makefile
 include src/hierarchical/makefile
 include src/ltmp/makefile
@@ -137,7 +137,6 @@ include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
-include src/qvoronoi/makefile
 include src/simulate/makefile
 include src/spininitialize/makefile
 include src/spinlattice/makefile

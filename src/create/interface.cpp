@@ -14,7 +14,6 @@
 #include "create.hpp"
 #include "spininitialize.hpp"
 #include "vio.hpp"
-#include "voronoi.hpp"
 #include "random.hpp"
 // Internal sim header
 #include "internal.hpp"
@@ -143,101 +142,6 @@ namespace create{
       test="voronoi-film";
       if(word==test || word == "grains" || word == "granular-film"){
          cs::system_creation_flags[2]=3;
-         return true;
-      }
-      test="voronoi-grain-substructure";
-      if(word==test){
-         create::internal::generate_voronoi_substructure = true;
-         return true;
-      }
-      ///-------------------------------------------------------------------
-      /// system_creation_flags[1] - Set system particle shape
-      ///-------------------------------------------------------------------
-
-      //--------------------------------------------------------------------
-      test="voronoi-size-variance";
-      if(word==test || word == "grain-size-variance"){
-         double vsd=atof(value.c_str());
-         vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-         create_voronoi::voronoi_sd=vsd;
-         return true;
-      }
-      //--------------------------------------------------------------------
-      test="voronoi-row-offset";
-      if(word==test){
-         create_voronoi::parity=1;
-         return true;
-      }
-      //--------------------------------------------------------------------
-      test="voronoi-random-seed";
-      if(word==test){
-         int vs=atoi(value.c_str());
-         vin::check_for_valid_int(vs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-         mtrandom::voronoi_seed=vs;
-         return true;
-      }
-      test="voronoi-rounded-grains";
-      if(word==test || word == "rounded-grains"){
-         create_voronoi::rounded=true;
-         return true;
-      }
-      test="voronoi-include-boundary-grains";
-      if(word==test || word == "include-boundary-grains"){
-         create_voronoi::include_boundary_grains_real=true;
-         return true;
-      }
-      //-------------------------------------------------------------------
-      test="voronoi-rounded-grains-area";
-      if(word==test || word == "rounded-grains-area"){
-         double vsd=atof(value.c_str());
-         vin::check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-         create_voronoi::area_cutoff=vsd;
-         return true;
-      }
-      //-------------------------------------------------------------------
-      test="voronoi-elliptical-rounding";
-      if(word==test || word == "elliptical-rounding"){
-         double er=atof(value.c_str());
-         vin::check_for_valid_value(er, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-         create::internal::voronoi_elliptical_rounding=er;
-         return true;
-      }
-      //-------------------------------------------------------------------
-      test="voronoi-elliptical-rounding-height";
-      if(word==test || word == "elliptical-rounding-height"){
-         double erh=atof(value.c_str());
-         vin::check_for_valid_value(erh, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-         create::internal::voronoi_elliptical_rounding_height=erh;
-         return true;
-      }
-      //-------------------------------------------------------------------
-      test="voronoi-bimodal-grains";
-      if(word==test){
-         create_voronoi::bimodal_grains=true;
-         return true;
-      }
-      //-------------------------------------------------------------------
-      test="voronoi-small-grain-diameter";
-      if(word==test){
-         double sgd=atof(value.c_str());
-         vin::check_for_valid_value(sgd, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-         create_voronoi::small_grain_diameter=sgd;
-         return true;
-      }
-      //-------------------------------------------------------------------
-      test="voronoi-small-grain-fraction";
-      if(word==test){
-         double sgf=atof(value.c_str());
-         vin::check_for_valid_value(sgf, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-         create_voronoi::small_grain_fraction=sgf;
-         return true;
-      }
-      //-------------------------------------------------------------------
-      test="voronoi-small-grain-size-variance";
-      if(word==test){
-         double sgv=atof(value.c_str());
-         vin::check_for_valid_value(sgv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-         create_voronoi::small_grain_size_variance=sgv;
          return true;
       }
       //-------------------------------------------------------------------
@@ -374,36 +278,6 @@ namespace create{
          }
       }
       //--------------------------------------------------------------------
-      // create:grain-magnetisation-direction = material | alternating
-      //
-      // Controls how the initial spin direction (as set by
-      // material[#]:initial-spin-direction, see the spininitialize module)
-      // is applied across grains:
-      //   - "material" (default): every atom is initialised exactly as
-      //     specified by its material's texture, with no further
-      //     modification.
-      //   - "alternating": the spin direction is reversed (negated) for
-      //     every atom belonging to an odd-numbered grain (grains are
-      //     numbered from 0), giving neighbouring grains opposite
-      //     magnetisation directions. This is useful e.g. for setting up
-      //     antiferromagnetically-coupled grain structures or testing
-      //     domain-wall pinning at grain boundaries.
-      //--------------------------------------------------------------------
-      test="grain-magnetisation-direction";
-      if(word==test){
-         std::string loctest="alternating";
-         if(value==loctest){
-            spininitialize::set_grain_magnetisation_mode(1); // grain_mode_alternating
-            return true;
-         }
-         else{
-            // default: "material" (or any unrecognised value falls back to
-            // the default of no grain-level post-processing)
-            spininitialize::set_grain_magnetisation_mode(0); // grain_mode_material
-            return true;
-         }
-      }
-      //--------------------------------------------------------------------
       test="interfacial-roughness-seed-radius";
       if(word==test){
          double irsr=atof(value.c_str());
@@ -485,39 +359,6 @@ namespace create{
          }
       }
       //--------------------------------------------------------------------
-      test="voronoi-grain-substructure-crystallization-radius";
-      if(word==test){
-         double rsize=atof(value.c_str());
-         vin::check_for_valid_value(rsize, word, line, prefix, unit, "none", 0.01, 2.0,"input","0.01 - 2");
-         create::internal::voronoi_grain_substructure_crystallization_radius=rsize;
-         return true;
-      }
-      //--------------------------------------------------------------------
-      test="voronoi-grain-substructure-overlap-factor";
-      if(word==test){
-         double ol=atof(value.c_str());
-         vin::check_for_valid_value(ol, word, line, prefix, unit, "none", 0.1, 3.0,"input","0.1 - 3");
-         create::internal::voronoi_grain_substructure_overlap_factor = ol;
-         return true;
-      }
-      //--------------------------------------------------------------------
-      test="voronoi-grain-substructure-size";
-      if(word==test){
-         double psize=atof(value.c_str());
-         vin::check_for_valid_value(psize, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-         create::internal::voronoi_grain_substructure_size=psize;
-         return true;
-      }
-      else
-      //--------------------------------------------------------------------
-      test="voronoi-grain-substructure-spacing";
-      if(word==test){
-         double pspacing=atof(value.c_str());
-         vin::check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
-         create::internal::voronoi_grain_substructure_spacing=pspacing;
-         return true;
-      }
-      //--------------------------------------------------------------------
       test="cone";
       if(word==test){
          cs::system_creation_flags[1]=8;
@@ -579,6 +420,9 @@ namespace create{
          return true;
       }
       //--------------------------------------------------------------------
+      // Seeds granular ALLOYING (per-atom material choice within a grain,
+      // see alloy.cpp) - not the grain tessellation itself, which is seeded
+      // separately by create:grain-structure-random-seed.
       test="grain-random-seed";
       if(word==test){
          int grs=atoi(value.c_str());

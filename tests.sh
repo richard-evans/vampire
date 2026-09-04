@@ -26,5 +26,15 @@ if [ "$integration" = true ]; then
     cd ../../
 fi
 if [ "$unit" = true ]; then
-    echo "Running unit tests"
+    echo "====================================================================="
+    echo "      Running unit tests"
+    echo "====================================================================="
+    cd test/unit/
+    make
+    ./unit_tests
+    unit_status=$?
+    cd ../../
+    if [ "$unit_status" -ne 0 ]; then
+        exit $unit_status
+    fi
 fi
