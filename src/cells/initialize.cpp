@@ -135,16 +135,28 @@ namespace cells{
          int num_local_atoms = num_atoms;
       #endif
 
+      // Count non-magnetic atoms kept in the simulation (e.g. fill-space
+      // material used to pad empty MPI domains). These atoms are included
+      // in num_local_atoms/atoms::num_atoms below but must not inflate the
+      // atomic-volume estimate, since they do not correspond to real
+      // lattice sites diluted out of the magnetic material.
+      int num_local_non_magnetic_kept_atoms = 0;
+      for(int atom=0; atom<num_local_atoms; atom++){
+         if(mp::material[atom_type_array[atom]].non_magnetic==2) num_local_non_magnetic_kept_atoms++;
+      }
+
       // Determine number of total atoms
       #ifdef MPICF
          int num_total_atoms=0;
          int total_non_mag_removed_atoms=0;
+         int total_non_mag_kept_atoms=0;
          MPI_Reduce(&num_local_atoms,&num_total_atoms, 1,MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
          MPI_Reduce(&create::num_total_atoms_non_filler,&total_non_mag_removed_atoms, 1, MPI_INT, MPI_SUM, 0,MPI_COMM_WORLD);
-         int total_atoms_non_filler = num_total_atoms + total_non_mag_removed_atoms;
+         MPI_Reduce(&num_local_non_magnetic_kept_atoms,&total_non_mag_kept_atoms, 1, MPI_INT, MPI_SUM, 0,MPI_COMM_WORLD);
+         int total_atoms_non_filler = num_total_atoms - total_non_mag_kept_atoms + total_non_mag_removed_atoms;
          MPI_Bcast(&total_atoms_non_filler,1,MPI_INT,0,MPI_COMM_WORLD);
       #else
-         int total_atoms_non_filler = atoms::num_atoms+create::num_total_atoms_non_filler;
+         int total_atoms_non_filler = atoms::num_atoms - num_local_non_magnetic_kept_atoms + create::num_total_atoms_non_filler;
       #endif
       // std::cout << "\nTotal number of atoms generated including non-magnetic atoms after Allreduce operation (all CPUs): " << total_atoms_non_filler << std::endl;
 
