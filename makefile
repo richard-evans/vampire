@@ -184,19 +184,25 @@ PEXECUTABLE=vampire-parallel
 # make serial and parallel versions and utilities
 all: serial parallel vdc
 
+#-------------------------------------------------------------------------------
 # Serial Targets
+#-------------------------------------------------------------------------------
+
+# serial - use for linux systems (default)
 serial: $(OBJECTS)
 	$(GCC) $(GCC_LDFLAGS)  $(OBJECTS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
+# serial - use for linux systems with the intel compiler
 serial-intel: $(ICC_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)-intel
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $(OPTIONS) $<
 
+# serial - use for macOS systems
 serial-llvm: $(LLVM_OBJECTS)
 	$(LLVM) $(LLVM_LDFLAGS) $(LIBS) $(LLVM_OBJECTS) -o $(EXECUTABLE)
 
@@ -239,8 +245,11 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 #$(IBMDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 #	$(PCC) -c -o $@ $(PCC_DBCFLAGS) $<
 
+#-------------------------------------------------------------------------------
 # MPI Targets
+#-------------------------------------------------------------------------------
 
+# parallel - use for linux systems (default)
 parallel: $(MPI_OBJECTS)
 	$(MPICC) $(GCC_LDFLAGS) $(MPI_OBJECTS) $(LIBS) -o $(PEXECUTABLE)
 
@@ -251,7 +260,7 @@ parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPIICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)-intel
 
 $(MPI_ICC_OBJECTS): obj/%_i_par.o: src/%.cpp
-	$(MPIICC) -c -o $@ $(ICC_CFLAGS) $<
+	$(MPIICC) -c -o $@ $(ICC_CFLAGS) $(OPTIONS) $<
 
 parallel-cray: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(PEXECUTABLE)
@@ -263,8 +272,9 @@ parallel-archer: $(MPI_ARCHER_OBJECTS)
 	CC -DMPICF $(GCC_LDFLAGS) $(LIBS) $(MPI_ARCHER_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_ARCHER_OBJECTS): obj/%_archer_par.o: src/%.cpp
-	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $<
+	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
+# parallel - use for macOS systems
 parallel-llvm: $(MPI_LLVM_OBJECTS)
 	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(PEXECUTABLE)
 

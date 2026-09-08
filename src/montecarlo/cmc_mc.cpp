@@ -507,34 +507,33 @@ int cmc_mc_step(){
 						(cmc::cmc_mat[imat].M_other[1] + spin1_final[1] + spin2_final[1]- spin1_initial[1] - spin2_initial[1])*cmc::cmc_mat[imat].ppolar_vector[1] +
 						(cmc::cmc_mat[imat].M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*cmc::cmc_mat[imat].ppolar_vector[2];
 
-			// Check for lower energy state and accept unconditionally
-			//if((delta_energy21<0.0) && (Mz_new>=0.0) ) continue;
+			// Check for lower energy state and accept unconditionally. Tested on the raw
+			// (unscaled) energy change rather than delta_energy21, since delta_energy21 is
+			// itself +/-infinity (or NaN, if the two terms have opposite sign) at T=0, where
+			// rescaled_material_kBTBohr diverges because sim::temperature=0 - mirrors the
+			// DE<0 shortcut used for the same reason in mc.cpp/mc_mpi.cpp/lsf_mc.cpp.
+			const bool lower_energy_state = (delta_energy1 + delta_energy2)<0.0;
+			probability = lower_energy_state ? 1.0 : exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
+			if((lower_energy_state || (probability>=mtrandom::grnd())) && (Mz_new>=0.0) ){
+				cmc::cmc_mat[imat].M_other[0] = cmc::cmc_mat[imat].M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
+				cmc::cmc_mat[imat].M_other[1] = cmc::cmc_mat[imat].M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];
+				cmc::cmc_mat[imat].M_other[2] = cmc::cmc_mat[imat].M_other[2] + spin1_final[2] + spin2_final[2] - spin1_initial[2] - spin2_initial[2];
+				cmc::mc_success += 1.0;
+			}
+			//if both p1 and p2 not allowed then
+			else{
+				// reset spin positions
+				atoms::x_spin_array[atom_number1] = spin1_initial[0];
+				atoms::y_spin_array[atom_number1] = spin1_initial[1];
+				atoms::z_spin_array[atom_number1] = spin1_initial[2];
 
-			// Otherwise evaluate probability for move
-			//else{
-				// If move is favorable then accept
-				probability = exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
-				if((probability>=mtrandom::grnd()) && (Mz_new>=0.0) ){
-					cmc::cmc_mat[imat].M_other[0] = cmc::cmc_mat[imat].M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
-					cmc::cmc_mat[imat].M_other[1] = cmc::cmc_mat[imat].M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];
-					cmc::cmc_mat[imat].M_other[2] = cmc::cmc_mat[imat].M_other[2] + spin1_final[2] + spin2_final[2] - spin1_initial[2] - spin2_initial[2];
-					cmc::mc_success += 1.0;
-				}
-				//if both p1 and p2 not allowed then
-				else{
-					// reset spin positions
-					atoms::x_spin_array[atom_number1] = spin1_initial[0];
-					atoms::y_spin_array[atom_number1] = spin1_initial[1];
-					atoms::z_spin_array[atom_number1] = spin1_initial[2];
+				atoms::x_spin_array[atom_number2] = spin2_initial[0];
+				atoms::y_spin_array[atom_number2] = spin2_initial[1];
+				atoms::z_spin_array[atom_number2] = spin2_initial[2];
 
-					atoms::x_spin_array[atom_number2] = spin2_initial[0];
-					atoms::y_spin_array[atom_number2] = spin2_initial[1];
-					atoms::z_spin_array[atom_number2] = spin2_initial[2];
-
-					cmc::energy_reject += 1.0;
-					statistics_reject += 1.0;
-				}
-			//}
+				cmc::energy_reject += 1.0;
+				statistics_reject += 1.0;
+			}
 		}
 		// if s2 not on unit sphere
 		else{

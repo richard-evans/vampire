@@ -461,14 +461,14 @@ int cmc_step(){
 						(M_other[1] + mu1*spin1_final[1] + mu2*spin2_final[1]- mu1*spin1_initial[1] - mu2*spin2_initial[1])*ppolar_vector[1] +
 						(M_other[2] + mu1*spin1_final[2] + mu2*spin2_final[2]- mu1*spin1_initial[2] - mu2*spin2_initial[2])*ppolar_vector[2];
 
-			// Check for lower energy state and accept unconditionally
-			//if((delta_energy21<0.0) && (Mz_new>0.0)) continue;
-
-			// Otherwise evaluate probability for move
-			//else{
-				// If move is favorable then accept
-				probability = exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
-				if((probability>=mtrandom::grnd()) && (Mz_new>0.0) ){
+				// Check for lower energy state and accept unconditionally. Tested on the raw
+				// (unscaled) energy change rather than delta_energy21, since delta_energy21 is
+				// itself +/-infinity (or NaN, if the two terms have opposite sign) at T=0, where
+				// rescaled_material_kBTBohr diverges because sim::temperature=0 - mirrors the
+				// DE<0 shortcut used for the same reason in mc.cpp/mc_mpi.cpp/lsf_mc.cpp.
+				const bool lower_energy_state = (delta_energy1 + delta_energy2)<0.0;
+				probability = lower_energy_state ? 1.0 : exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
+				if((lower_energy_state || (probability>=mtrandom::grnd())) && (Mz_new>0.0) ){
 					M_other[0] = M_other[0] + mu1*spin1_final[0] + mu2*spin2_final[0] - mu1*spin1_initial[0] - mu2*spin2_initial[0];
 					M_other[1] = M_other[1] + mu1*spin1_final[1] + mu2*spin2_final[1] - mu1*spin1_initial[1] - mu2*spin2_initial[1];
 					M_other[2] = M_other[2] + mu1*spin1_final[2] + mu2*spin2_final[2] - mu1*spin1_initial[2] - mu2*spin2_initial[2];
@@ -488,7 +488,6 @@ int cmc_step(){
 					cmc::energy_reject += 1.0;
 					statistics_reject += 1.0;
 				}
-			//}
 		}
 		// if s2 not on unit sphere
 		else{

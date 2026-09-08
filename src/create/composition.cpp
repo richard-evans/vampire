@@ -32,7 +32,7 @@ void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
 	zlog<< zTs() << "Determining atomic composition:" << std::endl;
 
    // temporary counter for number of (local) atoms
-   unsigned int num_atoms = 0;
+   uint64_t num_atoms = 0;
 
    // array to store number of atoms in each material
    std::vector<uint64_t> material_numbers(mp::num_materials,0);

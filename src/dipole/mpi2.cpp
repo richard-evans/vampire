@@ -352,10 +352,14 @@ namespace internal{
 
             MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
             //int error;
+
+            // Ensure every rank has posted its receives (above) before any
+            // rank starts sending
+            vmpi::barrier();
+
             int send_message_ID = 0;
             // loop over all processors and dispatch only necessary sends and recieves
             for ( int cpu = 0; cpu < vmpi::num_processors; cpu++){
-               vmpi::barrier();
                //int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request)
                if ( num_atoms_to_send[cpu] > 0 ){
                   int offset = send_atom_offsets[send_message_ID];

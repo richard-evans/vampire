@@ -16,8 +16,6 @@
 // dipole module headers
 #include "internal.hpp"
 
-
-
 namespace dipole{
 
    //------------------------------------------------------------------------------
@@ -58,6 +56,10 @@ namespace dipole{
    double atomistic_cutoff = 20.0; //distance in A;
    bool atomsitic_tensor_enabled = true;
 
+   int cells_num_cells;
+   int cells_num_local_cells;
+   std::vector <double> cells_volume_array;
+
    namespace internal{
 
       std::vector < int > cell_dx;
@@ -91,11 +93,8 @@ namespace dipole{
       std::vector < int > atom_type_array;
       std::vector < int > atom_cell_id_array;
 
-      int cells_num_cells;
-      int cells_num_local_cells;
       std::vector <int>  cells_local_cell_array;
       std::vector <int>  cells_num_atoms_in_cell;
-      std::vector < double > cells_volume_array;
 
       std::vector<double> cells_pos_and_mom_array;
       std::vector < int > proc_cell_index_array1D;

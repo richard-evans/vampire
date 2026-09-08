@@ -61,6 +61,14 @@ int min(int x, int y, int z){
 
 namespace hierarchical{
 
+   // Forward declaration of cells_in_cells functions
+   void build_cells_in_cells_original();
+   void build_cells_in_cells(const std::vector<int>& cell_grid_i,
+                             const std::vector<int>& cell_grid_j,
+                             const std::vector<int>& cell_grid_k,
+                             const std::vector<int>& level_ncy,
+                             const std::vector<int>& level_ncz);
+
 //----------------------------------------------------------------------------
 // Function to initialize hierarchical module
 //----------------------------------------------------------------------------
@@ -247,6 +255,17 @@ void initialize(const double system_dimensions_x,
    // incrementing 1D index counter separating cells from different levels
    int index = 0;
 
+   // per-cell grid indices (i,j,k) within their level, index-aligned with
+   // ha::cell_positions/ha::cell_dimensions, and per-level grid dimensions.
+   // Used by Segment 4 below to locate each cell's parent by direct index
+   // arithmetic instead of an O(N^2) bounding-box search.
+   std::vector<int> cell_grid_i;
+   std::vector<int> cell_grid_j;
+   std::vector<int> cell_grid_k;
+   std::vector<int> level_ncx(ha::num_levels,0);
+   std::vector<int> level_ncy(ha::num_levels,0);
+   std::vector<int> level_ncz(ha::num_levels,0);
+
    //loop over all levels to calculate the positions and sizes of the cells in the levels.
    for (int level = 0; level < ha::num_levels; level ++){
 
@@ -273,6 +292,11 @@ void initialize(const double system_dimensions_x,
       int ncz = static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cell_size_z));
 
       const int temp_num_cells = ncx*ncy*ncz;
+
+      // record per-level grid dimensions for Segment 4's parent lookup
+      level_ncx[level] = ncx;
+      level_ncy[level] = ncy;
+      level_ncz[level] = ncz;
 
       //set the start and end index for the level
       ha::cells_level_start_index[level] = index;
@@ -304,6 +328,9 @@ void initialize(const double system_dimensions_x,
                ha::cell_dimensions.push_back(size_x);
                ha::cell_dimensions.push_back(size_y);
                ha::cell_dimensions.push_back(size_z);
+               cell_grid_i.push_back(i);
+               cell_grid_j.push_back(j);
+               cell_grid_k.push_back(k);
                //    index++; - this part to delete
                //    ha::cells_level_end_index[level] = index;
                // }
@@ -350,66 +377,8 @@ void initialize(const double system_dimensions_x,
    // restart the timer
    timer.start();
 
-   // temporary data structure for debugging (RE- to delete?)
-   //std::vector <int > cells_help(ha::total_num_cells, 0);
-
-   // incrementing 1D index counter separating cells from different levels
-   int index2 = 0;
-
-   // loop over all levels
-   for (int level = 1; level < ha::num_levels; level ++){
-
-      int sublevel         = level - 1;
-      int start_level      = ha::cells_level_start_index[level];
-      int start_sublevel   = ha::cells_level_start_index[sublevel];
-      int end_level        = ha::cells_level_end_index[level];
-      int end_sublevel     = ha::cells_level_end_index[sublevel];
-
-      // loop over all cells in level
-      for (int cell_l = start_level; cell_l < end_level; cell_l++){
-         ha::cells_in_cells_start_index[cell_l] = index2;
-         //  std::cout << ha::cells_in_cells_start_index[cell_l] <<std::endl;
-         double x = ha::cell_positions[cell_l*3 + 0];
-         double y = ha::cell_positions[cell_l*3 + 1];
-         double z = ha::cell_positions[cell_l*3 + 2];
-         double size_x = ha::cell_dimensions[cell_l*3 + 0];
-         double size_y = ha::cell_dimensions[cell_l*3 + 1];
-         double size_z = ha::cell_dimensions[cell_l*3 + 2];
-
-         double min_x = x - size_x/2.0;
-         double min_y = y - size_y/2.0;
-         double min_z = z - size_z/2.0;
-
-         double max_x = x + size_x/2.0;
-         double max_y = y + size_y/2.0;
-         double max_z = z + size_z/2.0;
-
-         // loop over all cells in the level below
-         for (int cell_sl = start_sublevel; cell_sl < end_sublevel; cell_sl++){
-
-            double sc_x = ha::cell_positions[cell_sl*3 + 0];
-            double sc_y = ha::cell_positions[cell_sl*3 + 1];
-            double sc_z = ha::cell_positions[cell_sl*3 + 2];
-
-            // if cell is in cell at higher level, then add to the list
-            if ((sc_x >= min_x) && (sc_x <= max_x) && (sc_y >= min_y) && (sc_y <= max_y) && (sc_z >= min_z) && (sc_z <= max_z)){
-               //std::cout << "A" << index2 << '\t' << ha::cells_in_cells.size() <<std::endl;
-               ha::cells_in_cells.push_back(cell_sl);
-               index2 ++;
-               ha::cells_in_cells_end_index[cell_l] = index2;
-               // debugging code (RE- to remove?)
-               //cells_help[cell_sl] ++;
-               //if (level == 1 ){
-                  //     std::cout << "cell\t" << cell_l << "\t" << ha::cell_positions[cell_l*3 + 0] << "\t" << ha::cell_positions[cell_l*3 + 1] << "\t" << ha::cell_positions[cell_l*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_l*3 + 0] << "\t" <<ha::cell_dimensions[cell_l*3 + 1] <<"\t" <<ha::cell_dimensions[cell_l*3 + 2] << std::endl;
-                  //           std::cout  <<"subcell" << '\t' <<  index2 << '\t' << ha::cells_in_cells_start_index[cell_l] << '\t' <<ha::cells_in_cells_end_index[cell_l] << '\t' << cell_sl <<  "\t" << ha::cell_positions[cell_sl*3 + 0] << "\t" << ha::cell_positions[cell_sl*3 + 1] << "\t" << ha::cell_positions[cell_sl*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_sl*3 + 0] << "\t" <<ha::cell_dimensions[cell_sl*3 + 1] <<"\t" <<ha::cell_dimensions[cell_sl*3 + 2] << std::endl;
-                  //std::cout << cell_l << "\t" << ha::cell_positions[cell_l*3 + 0] << "\t" << ha::cell_positions[cell_l*3 + 1] << "\t" << ha::cell_positions[cell_l*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_l*3 + 0] << "\t" <<ha::cell_dimensions[cell_l*3 + 1] <<"\t" <<ha::cell_dimensions[cell_l*3 + 2] << std::endl;
-               //}
-
-            }
-
-         }
-      }
-   }
+   // build_cells_in_cells_original(); // reference implementation, O(N_level * N_sublevel) bounding-box search -- kept for readability, not used
+   build_cells_in_cells(cell_grid_i, cell_grid_j, cell_grid_k, level_ncy, level_ncz);
 
    // stop the timer for segment 4 and save it
    timer.stop();
@@ -775,6 +744,148 @@ void initialize(const double system_dimensions_x,
 
    // Woohoo we made it!
    return;
+
+}
+
+//----------------------------------------------------------------------------
+// Segment 4, original implementation: determine, for every cell, the list
+// of cells in the level below that it contains, by an O(N_level *
+// N_sublevel) bounding-box search over every level/sublevel cell pair.
+//
+// Kept here for reference only (not called) -- see build_cells_in_cells()
+// below for the O(N) replacement currently in use.
+//----------------------------------------------------------------------------
+void build_cells_in_cells_original(){
+
+   // incrementing 1D index counter separating cells from different levels
+   int index2 = 0;
+
+   // loop over all levels
+   for (int level = 1; level < ha::num_levels; level ++){
+
+      int sublevel         = level - 1;
+      int start_level      = ha::cells_level_start_index[level];
+      int start_sublevel   = ha::cells_level_start_index[sublevel];
+      int end_level        = ha::cells_level_end_index[level];
+      int end_sublevel     = ha::cells_level_end_index[sublevel];
+
+      // loop over all cells in level
+      for (int cell_l = start_level; cell_l < end_level; cell_l++){
+         ha::cells_in_cells_start_index[cell_l] = index2;
+         double x = ha::cell_positions[cell_l*3 + 0];
+         double y = ha::cell_positions[cell_l*3 + 1];
+         double z = ha::cell_positions[cell_l*3 + 2];
+         double size_x = ha::cell_dimensions[cell_l*3 + 0];
+         double size_y = ha::cell_dimensions[cell_l*3 + 1];
+         double size_z = ha::cell_dimensions[cell_l*3 + 2];
+
+         double min_x = x - size_x/2.0;
+         double min_y = y - size_y/2.0;
+         double min_z = z - size_z/2.0;
+
+         double max_x = x + size_x/2.0;
+         double max_y = y + size_y/2.0;
+         double max_z = z + size_z/2.0;
+
+         // loop over all cells in the level below
+         for (int cell_sl = start_sublevel; cell_sl < end_sublevel; cell_sl++){
+
+            double sc_x = ha::cell_positions[cell_sl*3 + 0];
+            double sc_y = ha::cell_positions[cell_sl*3 + 1];
+            double sc_z = ha::cell_positions[cell_sl*3 + 2];
+
+            // if cell is in cell at higher level, then add to the list
+            if ((sc_x >= min_x) && (sc_x <= max_x) && (sc_y >= min_y) && (sc_y <= max_y) && (sc_z >= min_z) && (sc_z <= max_z)){
+               ha::cells_in_cells.push_back(cell_sl);
+               index2 ++;
+               ha::cells_in_cells_end_index[cell_l] = index2;
+            }
+
+         }
+      }
+   }
+
+}
+
+//----------------------------------------------------------------------------
+// Segment 4, optimised implementation: determine the same parent -> children
+// cell map as build_cells_in_cells_original() above, but with O(N) index
+// arithmetic instead of an O(N_level * N_sublevel) bounding-box search.
+//
+// Valid because macrocell size doubles exactly each level (Segment 3), so a
+// sublevel cell's grid index (i,j,k) always maps to parent grid index
+// (i/2, j/2, k/2) -- including at the truncated last cell in each
+// dimension, whose position (only its size) is unaffected by the
+// truncation.
+//
+// Implemented as a three-pass counting sort per level pair: (1) find each
+// sublevel cell's parent and tally children per parent, (2) prefix-sum
+// those counts into contiguous slots of the shared, monotonically growing
+// ha::cells_in_cells array (preserving the exact start/end-index semantics
+// the original function produced), (3) scatter each sublevel cell into its
+// parent's slot. Order within a parent's slot differs from the original's
+// push_back order, but downstream readers (Segment 6/7 here,
+// hierarchical::mag.cpp) only ever sum/mark over a parent's full child
+// list, so order is immaterial.
+//----------------------------------------------------------------------------
+void build_cells_in_cells(const std::vector<int>& cell_grid_i,
+                           const std::vector<int>& cell_grid_j,
+                           const std::vector<int>& cell_grid_k,
+                           const std::vector<int>& level_ncy,
+                           const std::vector<int>& level_ncz){
+
+   // incrementing 1D index counter separating cells from different levels
+   int index2 = 0;
+
+   for (int level = 1; level < ha::num_levels; level ++){
+
+      int sublevel         = level - 1;
+      int start_level      = ha::cells_level_start_index[level];
+      int start_sublevel   = ha::cells_level_start_index[sublevel];
+      int end_level        = ha::cells_level_end_index[level];
+      int end_sublevel     = ha::cells_level_end_index[sublevel];
+
+      const int n_parents  = end_level - start_level;
+      const int n_children = end_sublevel - start_sublevel;
+
+      const int pncy = level_ncy[level];
+      const int pncz = level_ncz[level];
+
+      // pass 1: locate each child's parent (local index within `level`)
+      // and count children per parent
+      std::vector<int> parent_local(n_children);
+      std::vector<int> child_count(n_parents, 0);
+
+      for (int c = 0; c < n_children; c++){
+         const int cell_sl = start_sublevel + c;
+         const int ii = cell_grid_i[cell_sl] / 2;
+         const int jj = cell_grid_j[cell_sl] / 2;
+         const int kk = cell_grid_k[cell_sl] / 2;
+         const int local_parent = (ii * pncy + jj) * pncz + kk;
+         parent_local[c] = local_parent;
+         child_count[local_parent]++;
+      }
+
+      // pass 2: prefix sum to assign each parent a contiguous slot
+      std::vector<int> parent_offset(n_parents);
+      int running = index2;
+      for (int p = 0; p < n_parents; p++){
+         parent_offset[p] = running;
+         ha::cells_in_cells_start_index[start_level + p] = running;
+         running += child_count[p];
+         ha::cells_in_cells_end_index[start_level + p] = running;
+      }
+      index2 = running;
+      ha::cells_in_cells.resize(index2);
+
+      // pass 3: scatter children into their parent's slot
+      std::vector<int> fill_cursor = parent_offset;
+      for (int c = 0; c < n_children; c++){
+         const int cell_sl = start_sublevel + c;
+         const int local_parent = parent_local[c];
+         ha::cells_in_cells[fill_cursor[local_parent]++] = cell_sl;
+      }
+   }
 
 }
 

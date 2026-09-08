@@ -81,6 +81,7 @@ namespace vcuda{
       void update_hamr_field ();
       void update_global_thermal_field ();
       void update_applied_fields ();
+      void update_fmr_fields ();
       void update_neel_fields ();
       void update_rotational_fields ();
 
@@ -170,6 +171,13 @@ namespace vcuda{
             cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
             const cu_real_t Hx, const cu_real_t Hy, const cu_real_t Hz,
             int *  material, vcuda::internal::material_parameters_t * material_params,
+            const int n_atoms);
+
+      __global__ void update_fmr_fields_kernel(
+            cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
+            const cu_real_t Hx, const cu_real_t Hy, const cu_real_t Hz,
+            const double real_time, const bool local_fmr_field,
+            int * material, material_parameters_t * material_params,
             const int n_atoms);
 
       __global__ void update_neel_fields_kernel (

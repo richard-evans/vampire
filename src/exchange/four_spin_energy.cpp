@@ -81,7 +81,7 @@ double single_spin_four_spin_energy(const int atom, const double sx, const doubl
 
     }
 
-    return 0;
+    return energy;
 }
 
 } // end of namespace

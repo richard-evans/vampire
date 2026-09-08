@@ -410,12 +410,14 @@ void cmc_mc_step_mask(){
 											 (cmc::cmc_mask[mask1].M_other[1] + spin1_final[1] + spin2_final[1]- spin1_initial[1] - spin2_initial[1])*cmc::cmc_mask[mask1].ppolar_vector[1] +
 											 (cmc::cmc_mask[mask1].M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*cmc::cmc_mask[mask1].ppolar_vector[2];
 
-				// Check for lower energy state and accept unconditionally (this allows it to flip sign, why?)
-				//if((delta_energy21<0.0) && (Mz_new >= 1e-15) ) continue;
-
-				// If move is favorable then accept
-				const double probability = exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
-				if( ( probability >= mtrandom::grnd() ) && ( Mz_new >= 1e-15 ) ){
+				// Check for lower energy state and accept unconditionally. Tested on the raw
+				// (unscaled) energy change rather than delta_energy21, since delta_energy21 is
+				// itself +/-infinity (or NaN, if the two terms have opposite sign) at T=0, where
+				// rescaled_material_kBTBohr diverges because sim::temperature=0 - mirrors the
+				// DE<0 shortcut used for the same reason in mc.cpp/mc_mpi.cpp/lsf_mc.cpp.
+				const bool lower_energy_state = (delta_energy1 + delta_energy2)<0.0;
+				const double probability = lower_energy_state ? 1.0 : exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
+				if( ( lower_energy_state || ( probability >= mtrandom::grnd() ) ) && ( Mz_new >= 1e-15 ) ){
 					cmc::cmc_mask[mask1].M_other[0] = cmc::cmc_mask[mask1].M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
 					cmc::cmc_mask[mask1].M_other[1] = cmc::cmc_mask[mask1].M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];
 					cmc::cmc_mask[mask1].M_other[2] = cmc::cmc_mask[mask1].M_other[2] + spin1_final[2] + spin2_final[2] - spin1_initial[2] - spin2_initial[2];

@@ -123,6 +123,7 @@ namespace vmpi{
 	extern void barrier();
    extern uint64_t reduce_sum(uint64_t local);
    extern double reduce_sum(double local);
+   extern double reduce_max(double local);
    extern uint64_t all_reduce_sum(uint64_t local);
    extern double all_reduce_sum(double local);
    extern void all_reduce_sum(std::vector<double>& array);
