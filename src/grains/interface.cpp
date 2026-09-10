@@ -127,6 +127,21 @@ namespace grains{
          internal::voronoi_elliptical_rounding_height=erh;
          return true;
       }
+      //-------------------------------------------------------------------
+      // Physical grain/film thickness that create:voronoi-elliptical-rounding-height
+      // is measured against, independent of the total simulation cell height
+      // (dimensions:system-size-z). Needed when a non-magnetic layer (e.g. a
+      // dense dipole-field sensor slab) sits above the magnetic grains: without
+      // this, the cap rounding would be computed relative to the whole cell and
+      // would incorrectly taper into the layer above the grains. Defaults to
+      // the full system height (old behaviour) if not set.
+      test="grain-height";
+      if(word==test){
+         double gh=atof(value.c_str());
+         vin::check_for_valid_value(gh, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         internal::grain_film_height=gh;
+         return true;
+      }
       // create:voronoi-bimodal-grains and its small-grain-* companions are
       // deprecated and map onto the general grain-size-distribution
       // mechanism below.

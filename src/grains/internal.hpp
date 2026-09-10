@@ -352,8 +352,9 @@ namespace grains{
       extern bool parity;
       extern double voronoi_sd;
 
-      extern double voronoi_elliptical_rounding;        // degree of elliptical grain rounding (0-1)
-      extern double voronoi_elliptical_rounding_height; // height of widest grain cross-section as a fraction of system size z
+      extern double voronoi_elliptical_rounding;        // degree of grain cap rounding (0 = vertical/"shear" sides, 1 = fully rounded/ellipsoidal cap)
+      extern double voronoi_elliptical_rounding_height; // fraction of grain_film_height, measured from the grain base, at which the flat column ends and the rounded cap begins
+      extern double grain_film_height;                  // physical grain/film thickness (Angstroms) that voronoi_elliptical_rounding_height is measured against; < 0 (unset) falls back to cs::system_dimensions[2] for backwards compatibility
 
       extern bool output_gv_file; // toggle output of grain positions to file
 

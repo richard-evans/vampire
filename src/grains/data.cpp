@@ -42,8 +42,9 @@ namespace grains{
       bool parity = 0;
       double voronoi_sd = 0.1;
 
-      double voronoi_elliptical_rounding = 0.0;        // 0.0 = vertical grain walls (default), 1.0 = ellipsoidal grains
-      double voronoi_elliptical_rounding_height = 0.5; // centre height of system
+      double voronoi_elliptical_rounding = 0.0;        // 0.0 = vertical grain walls (default), 1.0 = fully rounded cap
+      double voronoi_elliptical_rounding_height = 0.5; // fraction of grain_film_height where the flat column ends and the cap begins
+      double grain_film_height = -1.0;                 // < 0 (unset) falls back to cs::system_dimensions[2]
 
       bool output_gv_file = false; // toggle output of grain positions to file (create:grain-shape-output)
 
