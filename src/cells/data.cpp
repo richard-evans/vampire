@@ -74,6 +74,8 @@ namespace cells{
       //------------------------------------------------------------------------
       //bool enabled=false; // enable localised temperature pulse calculation
       bool initialised=false; /// flag set if initialised
+      bool probe_non_magnetic_cells=false; /// cells:probe-non-magnetic-cells opt-in flag (default off)
+      std::vector<int> num_any_atoms_in_cell; /// number of atoms of any kind (magnetic + non-magnetic) in each cell
       std::vector<double> volume_array;
       std::vector<double> total_moment_array;
       std::vector<double> cell_position_array;

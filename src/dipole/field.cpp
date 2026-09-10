@@ -36,6 +36,7 @@ namespace dipole{
 
    namespace internal{
       void calculate_macrocell_dipole_field();
+      void broadcast_cell_field_to_atoms();
 
       // Human-readable name for the active solver, for scaling-study log output
       const char* dipole_solver_name(){
@@ -104,6 +105,12 @@ namespace dipole{
 
                case dipole::internal::hierarchical:
                   hierarchical::update(x_spin_array, y_spin_array, z_spin_array, m_spin_array, magnetic);
+                  // hierarchical::update() only fills the per-macrocell
+                  // dipole::cells_field_array_*; broadcast it down to
+                  // dipole::atom_dipolar_field_array_* (read by
+                  // dipole:output-atomistic-dipole-field) the same way the
+                  // macrocell/tensor path does below.
+                  dipole::internal::broadcast_cell_field_to_atoms();
                   break;
 
                case dipole::internal::fft:
@@ -164,6 +171,30 @@ namespace dipole{
          // recalculate dipole fields
          dipole::internal::update_field();
 
+         // Update Atomistic Dipolar Field and Demag Field Array
+         broadcast_cell_field_to_atoms();
+
+         return;
+
+      } // end of function
+
+      //------------------------------------------------------------------------
+      // Copy each atom's host macrocell dipole (and demag) field down onto
+      // dipole::atom_dipolar_field_array_*/atom_mu0demag_field_array_*. Shared
+      // by the macrocell/tensor path (calculate_macrocell_dipole_field(), above)
+      // and the hierarchical path (calculate_field(), which has no equivalent
+      // broadcast of its own since hierarchical::update() only fills the
+      // per-cell field arrays).
+      //
+      // Non-magnetic atoms (e.g. a dense non-magnetic sensor/read-back layer
+      // stacked above a granular medium) are deliberately included here: they
+      // carry no moment and so contribute nothing to cells::mag() or to any
+      // LLG torque, but they still sit in a macrocell and are valid dipole
+      // field *probes* for dipole:output-atomistic-dipole-field. Only skip a
+      // cell with no atoms in it at all (field undefined/meaningless there).
+      //------------------------------------------------------------------------
+      void broadcast_cell_field_to_atoms(){
+
          // For MPI version, only add local atoms
          #ifdef MPICF
             const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
@@ -171,28 +202,38 @@ namespace dipole{
             const int num_local_atoms = dipole::internal::num_atoms;
          #endif
 
-         // Update Atomistic Dipolar Field and Demag Field Array
          for(int atom=0;atom<num_local_atoms;atom++){
 
             const int cell = dipole::internal::atom_cell_id_array[atom];
 
-            int type = dipole::internal::atom_type_array[atom];
+            // No guard on dipole::internal::cells_num_atoms_in_cell[cell] here:
+            // that count is magnetic atoms only, and would incorrectly skip
+            // every atom (magnetic or not) hosted in a non-magnetic-only
+            // probe cell (cells:probe-non-magnetic-cells). The atom's own
+            // presence in `cell` already proves the cell is non-empty, and
+            // dipole::cells_field_array_*[cell] is always well-defined by
+            // this point (either genuinely computed, or defaulted to 0.0 by
+            // the sentinel clean-up in update_field()/hierarchical::update()
+            // for a cell nobody visited), so it is always safe to copy.
 
-            if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==false){
+            // Copy B-field from macrocell to atomistic spin
+            dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
+            dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
+            dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
 
-               // Copy B-field from macrocell to atomistic spin
-               // Copy B-field from macrocell to atomistic spin
-               dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
-               dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
-               dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
-
-               // Unroll Hdemag field
-               dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_mu0Hd_field_array_x[cell];
-               dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_mu0Hd_field_array_y[cell];
-               dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_mu0Hd_field_array_z[cell];
-
-            }
+            // Unroll Hdemag field
+            dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_mu0Hd_field_array_x[cell];
+            dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_mu0Hd_field_array_y[cell];
+            dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_mu0Hd_field_array_z[cell];
          }
+
+         // dipole:output-atomistic-dipole-field for the macrocell/tensor/
+         // hierarchical solvers: the atomistic/atomisticfft solvers write
+         // atomistic_dipole_field.txt themselves (calculate_atomistic_dipole_field(),
+         // atomistic.cpp); this is the equivalent hook for everything routed
+         // through this broadcast, using the one-time coordinate output added
+         // to dipole::initialize() (initialize.cpp).
+         if(dipole::internal::output_atomistic_dipole_field) dipole::internal::output_atomistic_dipole_fields();
 
          return;
 

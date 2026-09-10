@@ -58,16 +58,29 @@ namespace dipole{
     	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
          int i = cells::cell_id_array[lc];
-        	if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+         {
+            // Self demagnetisation factor multiplying m(i). Only meaningful
+            // for a cell that actually has magnetic atoms: a non-magnetic-
+            // only probe cell (cells:probe-non-magnetic-cells) has
+            // cells_volume_array[i]==0 and zero magnetisation, so skip this
+            // term entirely rather than divide by zero volume (which would
+            // otherwise silently produce 8pi/(3*0)*0 = NaN). Such a cell is
+            // still a valid *receiver* below -- it just has no self term.
+            double self_demag = 0.0;
+            double mx_i = 0.0;
+            double my_i = 0.0;
+            double mz_i = 0.0;
 
-            // Self demagnetisation factor multiplying m(i)
-            const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
-            double self_demag = eightPI_three_cell_volume;
+            if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
-            // Normalise cell magnetisation by the Bohr magneton
-            const double mx_i = cells::mag_array_x[i]*imuB;
-            const double my_i = cells::mag_array_y[i]*imuB;
-            const double mz_i = cells::mag_array_z[i]*imuB;
+               const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
+               self_demag = eightPI_three_cell_volume;
+
+               // Normalise cell magnetisation by the Bohr magneton
+               mx_i = cells::mag_array_x[i]*imuB;
+               my_i = cells::mag_array_y[i]*imuB;
+               mz_i = cells::mag_array_z[i]*imuB;
+            }
 
             // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
             dipole::cells_field_array_x[i] = self_demag * mx_i;//*0.0; //*0.0

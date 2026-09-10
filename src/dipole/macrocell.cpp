@@ -163,8 +163,15 @@ namespace dipole{
             //int i = dipole::internal::cells_local_cell_array[lc];
             int i = cells::cell_id_array[lc];
 
-            // check that the cell constains at least one atom
-            if(cells_num_atoms_in_cell[i]>0){
+            // i is guaranteed present in cells::cell_id_array only when it is
+            // a valid receiver: either a magnetic cell (cells_num_atoms_in_cell[i]>0,
+            // the only case possible with cells:probe-non-magnetic-cells off,
+            // so this is behaviour-preserving by construction) or -- when
+            // that flag is enabled -- a non-magnetic-only probe cell. Either
+            // way it should be visited; the sender-side checks below
+            // (cells_num_atoms_in_cell[j]>0) already correctly keep a
+            // zero-moment cell from contributing to any other cell's field.
+            {
 
             	// Loop over all other cells to calculate contribution to local cell
                for(int j=0;j<cells_num_cells;j++){

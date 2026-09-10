@@ -116,8 +116,15 @@ namespace dipole{
             // get global cell ID of source cell
             int celli = cells_local_cell_array[lc];
 
-            // check that local cell contains some local atoms (if not we don't need the tensor)
-            if( cells_num_atoms_in_cell[celli] > 0 ){
+            // celli is guaranteed present in cells_local_cell_array only when
+            // it is a valid receiver: either a magnetic cell (the only case
+            // possible with cells:probe-non-magnetic-cells off, so this is
+            // behaviour-preserving by construction) or -- when that flag is
+            // enabled -- a non-magnetic-only probe cell. Either way it
+            // should get a tensor row built; compute_inter_tensor/
+            // compute_intra_tensor guard the case where celli itself has no
+            // magnetic atoms to avoid dividing by zero.
+            {
             //std::cout << i << '\t' << "interaction" << "\t"  << cells_num_cells << "\t" << cells_num_atoms_in_cell[i] <<  std::endl;
 
             	// Loop over all other cells to calculate contribution to local cell

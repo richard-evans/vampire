@@ -70,16 +70,27 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       const int start = ha::interaction_list_start_index[lc];
       const int end = ha::interaction_list_end_index[lc];
 
-      // Self demagnetisation factor multiplying m(i)
+      // Self demagnetisation factor multiplying m(i). Only meaningful for a
+      // cell that actually has magnetic atoms: a non-magnetic-only probe
+      // cell (cells:probe-non-magnetic-cells) has V==0 and zero
+      // magnetisation, so skip this term entirely rather than divide by
+      // zero volume (which would otherwise silently produce
+      // 8pi/(3*0)*0 = NaN). Such a cell is still a valid *receiver* below
+      // via the ha::interaction_list loop -- it just has no self term.
       const double V = dipole::cells_volume_array[cell_i];
-      const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
-      const double self_demag = eightPI_three_cell_volume;
-      //std::cout << self_demag << std::endl;
+      double self_demag = 0.0;
+      double mx_i = 0.0;
+      double my_i = 0.0;
+      double mz_i = 0.0;
+      if( V > 0.0 ){
+         const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
+         self_demag = eightPI_three_cell_volume;
 
-      // Normalise cell magnetisation by the Bohr magneton
-      const double mx_i = cells::mag_array_x[cell_i]*imuB;
-      const double my_i = cells::mag_array_y[cell_i]*imuB;
-      const double mz_i = cells::mag_array_z[cell_i]*imuB;
+         // Normalise cell magnetisation by the Bohr magneton
+         mx_i = cells::mag_array_x[cell_i]*imuB;
+         my_i = cells::mag_array_y[cell_i]*imuB;
+         mz_i = cells::mag_array_z[cell_i]*imuB;
+      }
       // std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
 
       // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V

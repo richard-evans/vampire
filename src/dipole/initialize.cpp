@@ -188,6 +188,18 @@ namespace dipole{
          gpu::initialize_dipole();
       #endif
 
+      // dipole:output-atomistic-dipole-field: the atomistic/atomisticfft
+      // solvers write their own one-time atom position/moment file inside
+      // initialize_atomistic_solver()/the fft init path above. Every other
+      // solver (macrocell, tensor, hierarchical) shares this generic
+      // one-time coordinate output instead, paired with the per-update
+      // field output added to broadcast_cell_field_to_atoms() in field.cpp.
+      if(dipole::internal::output_atomistic_dipole_field &&
+         dipole::internal::solver != dipole::internal::atomistic &&
+         dipole::internal::solver != dipole::internal::atomisticfft){
+         dipole::internal::output_atomistic_coordinates(num_atoms, atom_coords_x, atom_coords_y, atom_coords_z, atom_moments);
+      }
+
       //------------------------------------------------------------------------
       // Precalculate dipole field and time for performance
       //------------------------------------------------------------------------

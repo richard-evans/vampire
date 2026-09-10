@@ -52,6 +52,12 @@ namespace dipole{
 
          const int num_atoms = global_atoms_in_cell_count[celli];
 
+         // A non-magnetic-only probe cell (cells:probe-non-magnetic-cells)
+         // has no magnetic atoms and therefore no intra-cell self term;
+         // leave the tensor entries at their default-initialised zero rather
+         // than dividing tmp_rij_intra_*(==0) by inorm=1/(0*0).
+         if( num_atoms == 0 ) return;
+
          // search for cells i and j in local atom-cells list
          int cell_with_atoms_index_i = -1;
          for(size_t idx = 0; idx < atoms_in_cells_array.size(); idx++){
