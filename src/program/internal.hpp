@@ -85,6 +85,11 @@ namespace program{
       extern double exchange_stiffness_delta_constraint_angle; // degrees
 
       //------------------------------------------------------------------------
+      // Effective damping program
+      //------------------------------------------------------------------------
+      extern double effective_damping_rotation_angle; // initial rotation of magnetisation from z-axis (degrees)
+
+      //------------------------------------------------------------------------
       // Material level parameters
       //------------------------------------------------------------------------
       extern std::vector<internal::mp_t> mp; // array of material properties

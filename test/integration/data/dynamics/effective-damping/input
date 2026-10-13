@@ -1,0 +1,58 @@
+#------------------------------------------
+# Integration test: effective-damping program
+#
+# A single isolated spin, initially along +z,
+# is rotated about the x-axis by the user
+# defined angle
+#   sim:effective-damping-rotation-angle
+# and then relaxes back towards z in a 1T
+# field along z at T=0. A non-default angle
+# of 120 degrees is used so that the test
+# fails if the input parameter is ignored.
+#
+# After rotation S(0) = (0, -sin t0, cos t0)
+# and the analytical solution (Evans et al.,
+# J. Phys.: Condens. Matter 26, 103202 (2014))
+# with w = gamma H / (1+a^2) is
+#
+#   Sx = sech(u) cos(w t - pi/2)
+#   Sy = sech(u) sin(w t - pi/2)
+#   Sz = tanh(u),  u = a w t + atanh(cos t0)
+#
+# At t = 9.75e-11 s with t0 = 120 degrees
+# this gives
+#   S = (-0.552854, 0.159192, 0.817931)
+#------------------------------------------
+
+#------------------------------------------
+# Creation: single spin
+#------------------------------------------
+create:single-spin
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:temperature=0.0
+sim:equilibration-time-steps = 0
+sim:time-steps-increment = 100
+sim:total-time-steps = 100000
+sim:time-step=1.0E-15
+sim:applied-field-strength = 1.0 !T
+sim:effective-damping-rotation-angle = 120.0
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program=effective-damping
+sim:integrator=llg-heun
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:real-time
+output:magnetisation

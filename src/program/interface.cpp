@@ -269,6 +269,14 @@ namespace program{
          program::internal::exchange_stiffness_delta_constraint_angle = ai;
          return true;
       }
+      //--------------------------------------------------------------------
+      test="effective-damping-rotation-angle";
+      if(word==test){
+         double ra = atof(value.c_str());
+         vin::check_for_valid_value(ra, word, line, prefix, unit, "", 0.0, 180.0,"input","0 - 180 degrees");
+         program::internal::effective_damping_rotation_angle = ra;
+         return true;
+      }
       //-------------------------------------------------------------------
       test = "field-pulse-time";
       if(word == test){

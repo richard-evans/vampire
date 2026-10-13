@@ -49,6 +49,10 @@ int main(){
    if( !integrator_test("dynamics/heun",    -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
    if( !integrator_test("dynamics/midpoint",-0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
 
+   // Program tests
+   // effective-damping: single spin rotated 120 degrees from z relaxing in 1T field along z
+   if( !integrator_test("dynamics/effective-damping", -0.552854, 0.159192, 0.817931, exe ) ) fail += 1;
+
    // Structure tests
    if( !material_atoms_test("structure/core-shell", 3474, 485, 0, 0, exe ) ) fail += 1;
    if( !material_atoms_test("structure/multilayer", 1000, 1000, 0, 0, exe ) ) fail += 1;

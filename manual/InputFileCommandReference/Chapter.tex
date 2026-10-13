@@ -598,6 +598,20 @@ with a maximum field at $t = 3\tau_\mathrm{P}$. The time dependence of the
 applied field can be printed in the output file with the parameter
 \textit{output:applied-field-strength}.
 
+{\zicf sim:program = effective-damping}\phantomsection\addcontentsline{toc}{subsubsection}{effective-damping}
+Program to calculate the effective Gilbert damping of the system from the
+relaxation of the magnetisation [M O A Ellis et al, Phys. Rev. B 86, 174418 (2012)].
+The system is first equilibrated for \textit{sim:equilibration-time-steps} time
+steps at \textit{sim:equilibration-temperature}, with the magnetisation along
+the $z$-axis. All spins are then rotated around the $x$-axis by an angle
+defined by \textit{sim:effective-damping-rotation-angle} (default 30 degrees),
+the temperature is set to \textit{sim:temperature} and the system is integrated
+for \textit{sim:total-time-steps} time steps while the magnetisation relaxes
+back towards the $z$-axis under the action of an applied field or
+magnetocrystalline anisotropy. The time dependence of the magnetisation can
+then be fitted to a macroscopic equation of motion to extract the effective
+damping.
+
 {\zicf sim:program = cmc-anisotropy}\phantomsection\addcontentsline{toc}{subsubsection}{cmc-anisotropy} Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques.
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
@@ -810,6 +824,11 @@ Gaussian width $\tau_\mathrm{elec}$ rather than a trapezoidal constant-phase dur
  {\zicf sim:field-pulse-time = float [default $1.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:field-pulse-time}
  Defines the pulse time in the program \textit{field-pulse} with default
  units of seconds and a default pulse time of 1 ns.
+
+ {\zicf sim:effective-damping-rotation-angle = float [default $30$ degrees]}\phantomsection\addcontentsline{toc}{subsection}{sim:effective-damping-rotation-angle}
+ Defines the angle in degrees by which all spins are rotated around the $x$-axis,
+ away from the $z$-axis, at the start of the relaxation phase in the program
+ \textit{effective-damping}. Valid values are in the range 0 -- 180 degrees.
 
 \section*{Data output}
 \phantomsection\addcontentsline{toc}{section}{Data output}
