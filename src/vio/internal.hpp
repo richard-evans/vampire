@@ -25,6 +25,7 @@
 #include <iostream>
 
 // Vampire headers
+#include "vio.hpp"
 
 #ifdef WIN_COMPILE
    #include <direct.h>
@@ -105,7 +106,7 @@ namespace vout{
    // New match functions
    //-------------------------------------------------------------------------
    bool match_vout_grain_list(std::string const word, std::string const value, int const line, std::vector<grain::output_t> & output_list);
-   bool match_vout_list(std::string const word, std::string const value, int const line, std::vector<unsigned int> & output_list);
+   bool match_vout_list(std::string const word, std::string const value, int const line, std::vector<output_t> & output_list);
 
 
    //-------------------------------------------------------------------------

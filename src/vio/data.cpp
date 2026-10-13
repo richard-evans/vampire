@@ -46,8 +46,8 @@ namespace vout{
    bool header_option = false; // output column headers on output file
    int max_header=14;
 	// Namespace variable declarations
-	std::vector<unsigned int> file_output_list(0);
-	std::vector<unsigned int> screen_output_list(0);
+	std::vector<output_t> file_output_list(0);
+	std::vector<output_t> screen_output_list(0);
 
 	// Variables to control rate of data output to screen, output file and grain file
 	int output_rate=1;

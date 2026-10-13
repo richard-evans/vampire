@@ -28,149 +28,149 @@ namespace vout{
    //---------------------------------------------------------------------------
    // Function to process output: and screen: list keywords
    //---------------------------------------------------------------------------
-   bool match_vout_list(std::string const word, std::string const value, int const line, std::vector<unsigned int> & output_list){
+   bool match_vout_list(std::string const word, std::string const value, int const line, std::vector<output_t> & output_list){
 
         std::string prefix="output:";
 
         std::string test="time-steps";
         if(word==test){
-            output_list.push_back(0);
+            output_list.push_back(output_t::time_steps);
             return true;
         }
         //--------------------------------------------------------------------
         test="real-time";
         if(word==test){
-            output_list.push_back(1);
+            output_list.push_back(output_t::real_time);
             return true;
         }
         //--------------------------------------------------------------------
         test="temperature";
         if(word==test){
-            output_list.push_back(2);
+            output_list.push_back(output_t::temperature);
             return true;
         }
         //--------------------------------------------------------------------
         test="applied-field-strength";
         if(word==test){
-            output_list.push_back(3);
+            output_list.push_back(output_t::applied_field_strength);
             return true;
         }
         //--------------------------------------------------------------------
         test="applied-field-unit-vector";
         if(word==test){
-            output_list.push_back(4);
+            output_list.push_back(output_t::applied_field_unit_vector);
             return true;
         }
         //--------------------------------------------------------------------
         test="applied-field-alignment";
         if(word==test){
             stats::calculate_system_magnetization=true;
-            output_list.push_back(12);
+            output_list.push_back(output_t::applied_field_alignment);
             return true;
         }
         //--------------------------------------------------------------------
         test="magnetisation";
         if(word==test){
             stats::calculate_system_magnetization=true;
-            output_list.push_back(5);
+            output_list.push_back(output_t::magnetisation);
             return true;
         }
         //-------------------------------------------------------------------
         test="magnetisation-length";
         if(word==test){
             stats::calculate_system_magnetization=true;
-            output_list.push_back(6);
+            output_list.push_back(output_t::magnetisation_length);
             return true;
         }
         //--------------------------------------------------------------------
         test="mean-magnetisation-length";
         if(word==test){
             stats::calculate_system_magnetization=true;
-            output_list.push_back(7);
+            output_list.push_back(output_t::mean_magnetisation_length);
             return true;
         }
         //--------------------------------------------------------------------
         test="mean-magnetisation";
         if(word==test){
             stats::calculate_system_magnetization=true;
-            output_list.push_back(48);
+            output_list.push_back(output_t::mean_magnetisation);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-magnetisation";
         if(word==test){
             stats::calculate_material_magnetization=true;
-            output_list.push_back(8);
+            output_list.push_back(output_t::material_magnetisation);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-mean-magnetisation-length";
         if(word==test){
             stats::calculate_material_magnetization=true;
-            output_list.push_back(9);
+            output_list.push_back(output_t::material_mean_magnetisation_length);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-mean-magnetisation";
         if(word==test){
             stats::calculate_material_magnetization=true;
-            output_list.push_back(49);
+            output_list.push_back(output_t::material_mean_magnetisation);
             return true;
         }
         //--------------------------------------------------------------------
         test="total-torque";
         if(word==test){
             stats::calculate_system_torque = true;
-            output_list.push_back(14);
+            output_list.push_back(output_t::total_torque);
             return true;
         }
         //--------------------------------------------------------------------
         test="mean-total-torque";
         if(word==test){
             stats::calculate_system_torque = true;
-            output_list.push_back(15);
+            output_list.push_back(output_t::mean_total_torque);
             return true;
         }
         //--------------------------------------------------------------------
         test="constraint-phi";
         if(word==test){
             //stats::calculate_torque=true;
-            output_list.push_back(16);
+            output_list.push_back(output_t::constraint_phi);
             return true;
         }
         //--------------------------------------------------------------------
         test="constraint-theta";
         if(word==test){
             //stats::calculate_torque=true;
-            output_list.push_back(17);
+            output_list.push_back(output_t::constraint_theta);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-constraint-phi";
         if(word==test){
             //stats::calculate_torque=true;
-            output_list.push_back(18);
+            output_list.push_back(output_t::material_constraint_phi);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-constraint-theta";
         if(word==test){
             //stats::calculate_torque=true;
-            output_list.push_back(19);
+            output_list.push_back(output_t::material_constraint_theta);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-torque";
         if(word==test){
             stats::calculate_material_torque = true;
-            output_list.push_back(31);
+            output_list.push_back(output_t::material_torque);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-mean-torque";
         if(word==test){
             stats::calculate_material_torque = true;
-            output_list.push_back(20);
+            output_list.push_back(output_t::material_mean_torque);
             return true;
         }
         //--------------------------------------------------------------------
@@ -179,7 +179,7 @@ namespace vout{
             // Set flags for calculations of standard deviation and magnetization
             stats::calculate_material_standard_deviation=true;
             stats::calculate_material_magnetization=true;
-            output_list.push_back(999); //AJN
+            output_list.push_back(output_t::material_standard_deviation); //AJN
             return true;
         }
         //-------------------------------------------------------------------
@@ -188,7 +188,7 @@ namespace vout{
             // Set flags for calculations of susceptibility and magnetization
             stats::calculate_system_susceptibility=true;
             stats::calculate_system_magnetization=true;
-            output_list.push_back(21);
+            output_list.push_back(output_t::mean_susceptibility);
             return true;
         }
         //--------------------------------------------------------------------
@@ -197,7 +197,7 @@ namespace vout{
             // Set flags for calculations of susceptibility and magnetization
             stats::calculate_material_susceptibility=true;
             stats::calculate_material_magnetization=true;
-            output_list.push_back(50);
+            output_list.push_back(output_t::material_mean_susceptibility);
             return true;
         }
         //-------------------------------------------------------------------
@@ -206,7 +206,7 @@ namespace vout{
             // Set flags for calculations of binder cumulant and magnetization
             stats::calculate_system_binder_cumulant=true;
             stats::calculate_system_magnetization=true;
-            output_list.push_back(998);
+            output_list.push_back(output_t::binder_cumulant);
             return true;
         }
         //-------------------------------------------------------------------
@@ -215,113 +215,113 @@ namespace vout{
             // Set flags for calculations of binder cumulant and magnetization
             stats::calculate_material_binder_cumulant=true;
             stats::calculate_material_magnetization=true;
-            output_list.push_back(997);
+            output_list.push_back(output_t::material_binder_cumulant);
             return true;
         }
         //-------------------------------------------------------------------
         test="electron-temperature"; // identical to temperature
         if(word==test){
-            output_list.push_back(2);
+            output_list.push_back(output_t::temperature);
             return true;
         }
         //-------------------------------------------------------------------
         test="phonon-temperature";
         if(word==test){
-            output_list.push_back(22);
+            output_list.push_back(output_t::phonon_temperature);
             return true;
         }
         //-------------------------------------------------------------------
         test="material-temperature";
         if(word==test){
-            output_list.push_back(23);
+            output_list.push_back(output_t::material_temperature);
             return true;
         }
         //-------------------------------------------------------------------
         test="material-applied-field-strength";
         if(word==test){
-            output_list.push_back(24);
+            output_list.push_back(output_t::material_applied_field_strength);
             return true;
         }
         //-------------------------------------------------------------------
         test="material-fmr-field-strength";
         if(word==test){
-            output_list.push_back(25);
+            output_list.push_back(output_t::material_fmr_field_strength);
             return true;
         }
         //-------------------------------------------------------------------
         test="material-applied-field-alignment";
         if(word==test){
             stats::calculate_material_magnetization=true;
-            output_list.push_back(26);
+            output_list.push_back(output_t::material_applied_field_alignment);
             return true;
         }
         //-------------------------------------------------------------------
         test="total-energy";
         if(word==test){
-            output_list.push_back(27);
+            output_list.push_back(output_t::total_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="mean-total-energy";
         if(word==test){
-            output_list.push_back(28);
+            output_list.push_back(output_t::mean_total_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="anisotropy-energy";
         if(word==test){
-            output_list.push_back(29);
+            output_list.push_back(output_t::anisotropy_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="mean-anisotropy-energy";
         if(word==test){
-            output_list.push_back(30);
+            output_list.push_back(output_t::mean_anisotropy_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="exchange-energy";
         if(word==test){
-            output_list.push_back(35);
+            output_list.push_back(output_t::exchange_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="mean-exchange-energy";
         if(word==test){
-            output_list.push_back(36);
+            output_list.push_back(output_t::mean_exchange_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="applied-field-energy";
         if(word==test){
-            output_list.push_back(37);
+            output_list.push_back(output_t::applied_field_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="mean-applied-field-energy";
         if(word==test){
-            output_list.push_back(38);
+            output_list.push_back(output_t::mean_applied_field_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="magnetostatic-energy";
         if(word==test){
-            output_list.push_back(39);
+            output_list.push_back(output_t::magnetostatic_energy);
             stats::calculate_system_energy = true;
             return true;
         }
         //-------------------------------------------------------------------
         test="mean-magnetostatic-energy";
         if(word==test){
-            output_list.push_back(40);
+            output_list.push_back(output_t::mean_magnetostatic_energy);
             stats::calculate_system_energy = true;
             return true;
         }
@@ -329,55 +329,55 @@ namespace vout{
         test="height-magnetisation-normalised";
         if(word==test){
             stats::calculate_height_magnetization=true;
-            output_list.push_back(43);
+            output_list.push_back(output_t::height_magnetisation_normalised);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-height-magnetisation-normalised";
         if(word==test){
             stats::calculate_material_height_magnetization=true;
-            output_list.push_back(44);
+            output_list.push_back(output_t::material_height_magnetisation_normalised);
             return true;
         }
         //--------------------------------------------------------------------
         test="height-magnetisation";
         if(word==test){
             stats::calculate_height_magnetization=true;
-            output_list.push_back(45);
+            output_list.push_back(output_t::height_magnetisation);
             return true;
         }
         //--------------------------------------------------------------------
         test="material-height-magnetisation";
         if(word==test){
             stats::calculate_material_height_magnetization=true;
-            output_list.push_back(46);
+            output_list.push_back(output_t::material_height_magnetisation);
             return true;
         }
         //--------------------------------------------------------------------
         test="fmr-field-strength";
         if(word==test){
-            output_list.push_back(47);
+            output_list.push_back(output_t::fmr_field_strength);
             return true;
         }
         //--------------------------------------------------------------------
         test="mean-height-magnetisation-length";
         if(word==test){
             stats::calculate_height_magnetization=true;
-            output_list.push_back(51);
+            output_list.push_back(output_t::mean_height_magnetisation_length);
             return true;
         }
         //--------------------------------------------------------------------
         test="mean-height-magnetisation";
         if(word==test){
             stats::calculate_height_magnetization=true;
-            output_list.push_back(52);
+            output_list.push_back(output_t::mean_height_magnetisation);
             return true;
         }
         //-------------------------------------------------------------------
         test="mpi-timings";
         if(word==test){
             vmpi::DetailedMPITiming=true;
-            output_list.push_back(60);
+            output_list.push_back(output_t::mpi_timings);
             return true;
         }
         //-------------------------------------------------------------------
@@ -385,7 +385,7 @@ namespace vout{
         if(word==test){
            stats::calculate_system_energy = true;
            stats::calculate_system_specific_heat = true;
-           output_list.push_back(61);
+           output_list.push_back(output_t::mean_specific_heat);
            return true;
         }
         //--------------------------------------------------------------------
@@ -393,75 +393,75 @@ namespace vout{
         if(word==test){
            stats::calculate_material_energy = true;
            stats::calculate_material_specific_heat = true;
-           output_list.push_back(62);
+           output_list.push_back(output_t::material_mean_specific_heat);
            return true;
         }
         //--------------------------------------------------------------------
         test="material-total-energy";
         if(word==test){
            stats::calculate_material_energy = true;
-           output_list.push_back(63);
+           output_list.push_back(output_t::material_total_energy);
            return true;
         }
         //--------------------------------------------------------------------
         test="material-mean-total-energy";
         if(word==test){
            stats::calculate_material_energy = true;
-           output_list.push_back(64);
+           output_list.push_back(output_t::material_mean_total_energy);
            return true;
         }
         //--------------------------------------------------------------------
         test="resistance";
         if(word==test){
-           output_list.push_back(65);
+           output_list.push_back(output_t::resistance);
            return true;
         }
         //--------------------------------------------------------------------
         test="current";
         if(word==test){
-           output_list.push_back(66);
+           output_list.push_back(output_t::current);
            return true;
         }
         //--------------------------------------------------------------------
         test="domain-wall-centre";
         if(word==test){
-            output_list.push_back(67);
+            output_list.push_back(output_t::domain_wall_centre);
             return true;
         }
         //--------------------------------------------------------------------
         test="magneto-resistance";
         if(word==test){
            micromagnetic::enable_resistance = true;
-           output_list.push_back(68);
+           output_list.push_back(output_t::magneto_resistance);
            return true;
         }
         //--------------------------------------------------------------------
         test="lfa-ms";
         if(word==test){
-           output_list.push_back(69);
+           output_list.push_back(output_t::lfa_ms);
            return true;
         }
         test="track-pos-x";
         if(word==test){
-           output_list.push_back(70);
+           output_list.push_back(output_t::track_pos_x);
            return true;
         }
         test="track-pos-z";
         if(word==test){
-           output_list.push_back(71);
+           output_list.push_back(output_t::track_pos_z);
            return true;
         }
         //--------------------------------------------------------------------
         test="fractional-electric-field-strength";
         if(word==test){
-           output_list.push_back(72);
+           output_list.push_back(output_t::fractional_electric_field_strength);
            return true;
         }
          //--------------------------------------------------------------------
          test="spin-temperature";
          if(word==test){
             stats::calculate_system_spin_temp = true;
-            output_list.push_back(74);
+            output_list.push_back(output_t::spin_temperature);
             return true;
 
          }
@@ -469,21 +469,21 @@ namespace vout{
          test="mean-spin-temperature";
          if(word==test){
             stats::calculate_system_spin_temp = true;
-            output_list.push_back(75);
+            output_list.push_back(output_t::mean_spin_temperature);
             return true;
          }
          //--------------------------------------------------------------------
          test="material-spin-temperature";
          if(word==test){
             stats::calculate_material_spin_temp = true;
-            output_list.push_back(77);
+            output_list.push_back(output_t::material_spin_temperature);
             return true;
          }
          //--------------------------------------------------------------------
          test="material-mean-spin-temperature";
          if(word==test){
             stats::calculate_material_spin_temp = true;
-            output_list.push_back(76);
+            output_list.push_back(output_t::material_mean_spin_temperature);
             return true;
          }
          //--------------------------------------------------------------------
@@ -491,7 +491,7 @@ namespace vout{
          if(word==test){
             // Set flags for calculation of spin length
             stats::calculate_system_spin_length=true;
-            output_list.push_back(78);
+            output_list.push_back(output_t::mean_spin_length);
             return true;
          }
          //--------------------------------------------------------------------
@@ -499,7 +499,7 @@ namespace vout{
          if(word==test){
             // Set flags for calculation of spin length
             stats::calculate_material_spin_length=true;
-            output_list.push_back(79);
+            output_list.push_back(output_t::material_mean_spin_length);
             return true;
          }
          //--------------------------------------------------------------------
@@ -507,49 +507,49 @@ namespace vout{
          if(word==test){
             // Set flags for calculation of spin length
             stats::calculate_height_spin_length=true;
-            output_list.push_back(80);
+            output_list.push_back(output_t::mean_height_spin_length);
             return true;
          }
          //--------------------------------------------------------------------
          test="potential-energy";
          if(word==test){
             stats::calculate_system_sld_energy = true;
-            output_list.push_back(81);
+            output_list.push_back(output_t::potential_energy);
             return true;
          }
          //--------------------------------------------------------------------
          test="kinetic-energy";
          if(word==test){
             stats::calculate_system_sld_energy = true;
-            output_list.push_back(82);
+            output_list.push_back(output_t::kinetic_energy);
             return true;
          }
          //--------------------------------------------------------------------
          test="sld-exchange-energy";
          if(word==test){
             stats::calculate_system_sld_energy = true;
-            output_list.push_back(83);
+            output_list.push_back(output_t::sld_exchange_energy);
             return true;
          }
          //--------------------------------------------------------------------
          test="sld-coupling-energy";
          if(word==test){
             stats::calculate_system_sld_energy = true;
-            output_list.push_back(84);
+            output_list.push_back(output_t::sld_coupling_energy);
             return true;
          }
          //--------------------------------------------------------------------
          test="sld-total-energy";
          if(word==test){
             stats::calculate_system_sld_energy = true;
-            output_list.push_back(85);
+            output_list.push_back(output_t::sld_total_energy);
             return true;
          }
 
          //--------------------------------------------------------------------
         test="mean-coupling-field-vec";
         if(word==test){
-        output_list.push_back(91);
+        output_list.push_back(output_t::mean_coupling_field_vec);
          return true;
       }
 
@@ -566,27 +566,27 @@ namespace vout{
          test="lattice-temperature";
          if(word==test){
             stats::calculate_system_lattice_temp = true;
-            output_list.push_back(87);
+            output_list.push_back(output_t::lattice_temperature);
             return true;
          }
          test="mean-lattice-temperature";
          if(word==test){
             stats::calculate_system_lattice_temp = true;
-            output_list.push_back(88);
+            output_list.push_back(output_t::mean_lattice_temperature);
             return true;
          }
          //--------------------------------------------------------------------
          test="material-lattice-temperature";
          if(word==test){
             stats::calculate_material_lattice_temp = true;
-            output_list.push_back(89);
+            output_list.push_back(output_t::material_lattice_temperature);
             return true;
          }
          //--------------------------------------------------------------------
          test="material-mean-lattice-temperature";
          if(word==test){
             stats::calculate_material_lattice_temp = true;
-            output_list.push_back(90);
+            output_list.push_back(output_t::material_mean_lattice_temperature);
             return true;
          }
         //--------------------------------------------------------------------

@@ -30,7 +30,7 @@
 ///-------------------------------------------------------
 /// Function to write header information about simulation
 ///-------------------------------------------------------
-void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& file_output_list){
+void write_output_file_header(std::ofstream& ofile, std::vector<vout::output_t>& file_output_list){
 
 	//------------------------------------
 	// Determine current time
@@ -82,259 +82,241 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 
 namespace vout{
 
-   void output_switch(std::ostream& stream,unsigned int idx,bool header){
+   void output_switch(std::ostream& stream,output_t id,bool header){
       //stream.precision(vout::precision);
-      switch(idx){
-      	case 0:
+      switch(id){
+      	case output_t::time_steps:
       		vout::time(stream,header);
       		break;
-      	case 1:
+      	case output_t::real_time:
       		vout::real_time(stream,header);
       		break;
-      	case 2:
+      	case output_t::temperature:
       		vout::temperature(stream,header);
       		break;
-      	case 3:
+      	case output_t::applied_field_strength:
       		vout::Happ(stream,header);
       		break;
-      	case 4:
+      	case output_t::applied_field_unit_vector:
       		vout::Hvec(stream,header);
       		break;
-      	case 5:
+      	case output_t::magnetisation:
       		vout::mvec(stream,header);
       		break;
-      	case 6:
+      	case output_t::magnetisation_length:
       		vout::magm(stream,header);
       		break;
-      	case 7:
+      	case output_t::mean_magnetisation_length:
       		vout::mean_magm(stream,header);
       		break;
-      	case 8:
+      	case output_t::material_magnetisation:
       		vout::mat_mvec(stream,header);
       		break;
-      	case 9:
+      	case output_t::material_mean_magnetisation_length:
       		vout::mat_mean_magm(stream,header);
       		break;
-      	case 12:
+      	case output_t::applied_field_alignment:
       		vout::mdoth(stream,header);
       		break;
-      	case 14:
+      	case output_t::total_torque:
       		vout::systorque(stream, header);
       		break;
-      	case 15:
+      	case output_t::mean_total_torque:
       		vout::mean_systorque(stream, header);
       		break;
-      	case 16:
+      	case output_t::constraint_phi:
       		vout::constraint_phi(stream,header);
       		break;
-      	case 17:
+      	case output_t::constraint_theta:
       		vout::constraint_theta(stream,header);
       		break;
-      	case 18:
+      	case output_t::material_constraint_phi:
       		vout::material_constraint_phi(stream,header);
       		break;
-      	case 19:
+      	case output_t::material_constraint_theta:
       		vout::material_constraint_theta(stream,header);
       		break;
-      	case 20:
+      	case output_t::material_mean_torque:
       		vout::material_mean_systorque(stream, header);
       		break;
-      	case 21:
+      	case output_t::mean_susceptibility:
       		vout::mean_system_susceptibility(stream,header);
       		break;
-      	case 22:
+      	case output_t::phonon_temperature:
       		vout::phonon_temperature(stream,header);
       		break;
-      	case 23:
+      	case output_t::material_temperature:
       		vout::material_temperature(stream,header);
       		break;
-      	case 24:
+      	case output_t::material_applied_field_strength:
       		vout::material_applied_field_strength(stream,header);
       		break;
-      	case 25:
+      	case output_t::material_fmr_field_strength:
       		vout::material_fmr_field_strength(stream,header);
       		break;
-      	case 26:
+      	case output_t::material_applied_field_alignment:
       		vout::mat_mdoth(stream,header);
       		break;
-      	case 27:
+      	case output_t::total_energy:
       		vout::total_energy(stream,header);
       		break;
-      	case 28:
+      	case output_t::mean_total_energy:
       		vout::mean_total_energy(stream,header);
       		break;
-      	case 29:
+      	case output_t::anisotropy_energy:
       		vout::total_anisotropy_energy(stream,header);
       		break;
-      	case 30:
+      	case output_t::mean_anisotropy_energy:
       		vout::mean_total_anisotropy_energy(stream,header);
       		break;
-      	case 31:
+      	case output_t::material_torque:
       		vout::material_torque(stream, header);
       		break;
-      	case 32:
-      		//vout::mean_total_cubic_anisotropy_energy(stream,header);
-      		break;
-      	case 33:
-      		//vout::total_surface_anisotropy_energy(stream,header);
-      		break;
-      	case 34:
-      		//vout::mean_total_surface_anisotropy_energy(stream,header);
-      		break;
-      	case 35:
+      	case output_t::exchange_energy:
       		vout::total_exchange_energy(stream,header);
       		break;
-      	case 36:
+      	case output_t::mean_exchange_energy:
       		vout::mean_total_exchange_energy(stream,header);
       		break;
-      	case 37:
+      	case output_t::applied_field_energy:
       		vout::total_applied_field_energy(stream,header);
       		break;
-      	case 38:
+      	case output_t::mean_applied_field_energy:
       		vout::mean_total_applied_field_energy(stream,header);
       		break;
-      	case 39:
+      	case output_t::magnetostatic_energy:
       		vout::total_magnetostatic_energy(stream,header);
       		break;
-      	case 40:
+      	case output_t::mean_magnetostatic_energy:
       		vout::mean_total_magnetostatic_energy(stream,header);
       		break;
-      	case 41:
-      		//vout::total_so_anisotropy_energy(stream,header);
-      		break;
-      	case 42:
-      		//vout::mean_total_so_anisotropy_energy(stream,header);
-      		break;
-      	case 43:
+      	case output_t::height_magnetisation_normalised:
       		vout::height_mvec(stream,header);
       		break;
-      	case 44:
+      	case output_t::material_height_magnetisation_normalised:
       		vout::material_height_mvec(stream,header);
       		break;
-      	case 45:
+      	case output_t::height_magnetisation:
       		vout::height_mvec_actual(stream,header);
       		break;
-      	case 46:
+      	case output_t::material_height_magnetisation:
       		vout::material_height_mvec_actual(stream,header);
       		break;
-      	case 47:
+      	case output_t::fmr_field_strength:
       		vout::fmr_field_strength(stream,header);
       		break;
-         case 48:
+         case output_t::mean_magnetisation:
       		vout::mean_mvec(stream,header);
       		break;
-         case 49:
+         case output_t::material_mean_magnetisation:
       		vout::mat_mean_mvec(stream,header);
       		break;
-         case 50:
+         case output_t::material_mean_susceptibility:
       		vout::mean_material_susceptibility(stream,header);
       		break;
-      	case 51:
+      	case output_t::mean_height_magnetisation_length:
       		vout::mean_height_magnetisation_length(stream,header);
       		break;
-      	case 52:
+      	case output_t::mean_height_magnetisation:
       		vout::mean_height_magnetisation(stream,header);
       		break;
-      	case 60:
+      	case output_t::mpi_timings:
       		vout::MPITimings(stream,header);
       		break;
-      	case 61:
+      	case output_t::mean_specific_heat:
       		vout::mean_system_specific_heat(stream,header);
       		break;
-      	case 62:
+      	case output_t::material_mean_specific_heat:
       		vout::mean_material_specific_heat(stream,header);
       		break;
-			case 63:
+			case output_t::material_total_energy:
 				vout::material_total_energy(stream,header);
 				break;
-			case 64:
+			case output_t::material_mean_total_energy:
 				vout::material_mean_total_energy(stream,header);
 				break;
-			case 65:
+			case output_t::resistance:
 				vout::resistance(stream, header);
 			  	break;
-			case 66:
+			case output_t::current:
 			  	vout::current(stream, header);
 			  	break;
-			case 67:
+			case output_t::domain_wall_centre:
 				vout::domain_wall_position(stream,header);
 				break;
-			case 68:
+			case output_t::magneto_resistance:
 				vout::MRresistance(stream,header);
 				break;
-			case 69:
+			case output_t::lfa_ms:
 				vout::lfa_ms(stream,header);
 				break;
-			case 70:
+			case output_t::track_pos_x:
 				vout::x_track_pos(stream,header);
 				break;
-			case 71:
+			case output_t::track_pos_z:
 				vout::z_track_pos(stream,header);
 				break;
-			case 72:
+			case output_t::fractional_electric_field_strength:
 			   vout::fractional_electric_field_strength(stream, header);
    			break;
-			case 74:
+			case output_t::spin_temperature:
 				vout::sysspintemp(stream, header);
 				break;
-			case 75:
+			case output_t::mean_spin_temperature:
 				vout::mean_sysspintemp(stream, header);
 				break;
-			case 76:
+			case output_t::material_mean_spin_temperature:
 				vout::material_mean_sysspintemp(stream, header);
 				break;
-			case 77:
+			case output_t::material_spin_temperature:
 				vout::material_spin_temp(stream, header);
 				break;
-			case 78:
+			case output_t::mean_spin_length:
 				vout::mean_system_spin_length(stream,header);
 				break;
-			case 79:
+			case output_t::material_mean_spin_length:
 				vout::mean_material_spin_length(stream,header);
 				break;
-			case 80:
+			case output_t::mean_height_spin_length:
 				vout::mean_height_spin_length(stream,header);
 				break;
-			case 81:
+			case output_t::potential_energy:
 				vout::potential_energy(stream, header);
 				break;
-			case 82:
+			case output_t::kinetic_energy:
 				vout::kinetic_energy(stream, header);
 				break;
-			case 83:
+			case output_t::sld_exchange_energy:
 				vout::sld_exchange_energy(stream, header);
 				break;
-			case 84:
+			case output_t::sld_coupling_energy:
 				vout::sld_coupling_energy(stream, header);
 				break;
-			case 85:
+			case output_t::sld_total_energy:
 				vout::sld_total_energy(stream, header);
 				break;
-			//case 86:
-				//vout::sld_total_spin_energy(stream, header);
-				//break;
-			case 87:
+			case output_t::lattice_temperature:
 				vout::syslatticetemp(stream, header);
 				break;
-			case 88:
+			case output_t::mean_lattice_temperature:
 				vout::mean_syslatticetemp(stream, header);
 				break;
-			case 89:
+			case output_t::material_lattice_temperature:
 				vout::material_lattice_temp(stream, header);
 				break;
-			case 90:
+			case output_t::material_mean_lattice_temperature:
 			   vout::material_mean_syslatticetemp(stream, header);
 			   break;
-			case 91:
+			case output_t::mean_coupling_field_vec:
 				vout::mean_coupling_field_vec(stream,header);
 				break;
-			case 997: //MP
+			case output_t::material_binder_cumulant:
 				vout::material_binder_cumulant(stream,header);
 				break;
-   		case 998:
+   		case output_t::binder_cumulant:
       		vout::system_binder_cumulant(stream,header);
       		break;
-			case 999: //AJN
+			case output_t::material_standard_deviation:
 				vout::standard_deviation(stream,header);
 				break;
 
@@ -344,7 +326,7 @@ namespace vout{
 
    }
 
-   void write_out(std::ostream& stream,std::vector<unsigned int>& list){
+   void write_out(std::ostream& stream,std::vector<output_t>& list){
       static bool header = true;
       // if header is false then header_option is never checked.
       if(header && !vout::header_option){
