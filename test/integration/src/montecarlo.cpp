@@ -38,7 +38,8 @@
 // 2. Choose a physical observable whose final value has a known analytic
 //    result (e.g. magnetisation length = 1 for a T=0 ferromagnet).
 // 3. Call final_value_test() from main.cpp with the directory, expected
-//    value, and tolerance.
+//    value, and tolerance. To check several output columns from a single
+//    simulation, use final_values_test() with a list of expected values.
 //
 //------------------------------------------------------------------------------
 
@@ -46,28 +47,29 @@
 #include "internal.hpp"
 
 //------------------------------------------------------------------------------
-// final_value_test
+// final_values_test
 //
-// Runs a vampire simulation in the given subdirectory, reads the last scalar
-// value written to the output file, and checks it matches 'expected' to
-// within a relative tolerance 'tol' (i.e. |value/expected - 1| < tol).
+// Runs a vampire simulation in the given subdirectory, reads the last data
+// line of the output file, and checks one or more columns against expected
+// values, each to within its own relative tolerance
+// (i.e. |value/expected - 1| < tol). Each value is reported on its own line.
 //
 // Parameters:
 //   dir        - path relative to test/integration/data/
-//   expected   - the value the last output line should converge to
-//   tol        - relative tolerance for the comparison (e.g. 1e-4)
+//   values     - list of {label, column, expected, tol} to check, where
+//                column is the 0-based index of the column in the output
 //   executable - full shell command used to invoke vampire-serial
 //
-// Returns true if the test passes, false otherwise.
+// Returns true if all values pass, false otherwise.
 //------------------------------------------------------------------------------
-bool final_value_test(const std::string dir, double expected, double tol, const std::string executable){
+bool final_values_test(const std::string dir, const std::vector<expected_value_t> values, const std::string executable){
 
    // record where we started so we can return after the test
    std::string path = std::filesystem::current_path();
 
-   // fixed-width label for aligned terminal output
+   // fixed-width label for aligned terminal output of first value
    std::stringstream test_name;
-   test_name << "Testing convergence for " << dir;
+   test_name << "Testing " << values[0].label << " for " << dir;
    std::cout << std::setw(60) << std::left << test_name.str() << " : " << std::flush;
 
    // enter the test data directory
@@ -97,20 +99,64 @@ bool final_value_test(const std::string dir, double expected, double tol, const 
    // return to the directory we started in
    if( !vt::chdir(path) ) return false;
 
-   // parse the first token on the last data line as a double
+   // parse all columns on the last data line as doubles
    std::stringstream ss(last_line);
-   double value = 0.0;
-   ss >> value;
+   std::vector<double> columns;
+   double column_value = 0.0;
+   while(ss >> column_value) columns.push_back(column_value);
 
-   // relative comparison: pass if |value/expected - 1| < tol
-   const double ratio = value / expected;
-   if(ratio > 1.0 - tol && ratio < 1.0 + tol){
-      std::cout << "OK" << std::endl;
-      return true;
+   // check each requested value
+   bool pass = true;
+   for(size_t i = 0; i < values.size(); ++i){
+
+      // print fixed-width label for subsequent values (first already printed before running)
+      if(i > 0){
+         std::stringstream value_name;
+         value_name << "Testing " << values[i].label << " for " << dir;
+         std::cout << std::setw(60) << std::left << value_name.str() << " : ";
+      }
+
+      // check requested column exists in output
+      if(values[i].column < 0 || values[i].column >= static_cast<int>(columns.size())){
+         std::cout << "FAIL | column " << values[i].column << " not found in output" << std::endl;
+         pass = false;
+         continue;
+      }
+
+      // relative comparison: pass if |value/expected - 1| < tol
+      const double value = columns[values[i].column];
+      const double ratio = value / values[i].expected;
+      if(ratio > 1.0 - values[i].tol && ratio < 1.0 + values[i].tol){
+         std::cout << "OK" << std::endl;
+      }
+      else{
+         std::cout << "FAIL | expected: " << values[i].expected << "\tobtained: " << value << std::endl;
+         pass = false;
+      }
+
    }
-   else{
-      std::cout << "FAIL | expected: " << expected << "\tobtained: " << value << std::endl;
-      return false;
-   }
+
+   return pass;
+
+}
+
+//------------------------------------------------------------------------------
+// final_value_test
+//
+// Runs a vampire simulation in the given subdirectory, reads the last scalar
+// value written to the output file, and checks it matches 'expected' to
+// within a relative tolerance 'tol' (i.e. |value/expected - 1| < tol).
+//
+// Parameters:
+//   dir        - path relative to test/integration/data/
+//   expected   - the value the last output line should converge to
+//   tol        - relative tolerance for the comparison (e.g. 1e-4)
+//   executable - full shell command used to invoke vampire-serial
+//
+// Returns true if the test passes, false otherwise.
+//------------------------------------------------------------------------------
+bool final_value_test(const std::string dir, double expected, double tol, const std::string executable){
+
+   return final_values_test(dir, { {"convergence", 0, expected, tol} }, executable);
 
 }

@@ -1,0 +1,84 @@
+#------------------------------------------
+# Integration test: specific heat and
+# susceptibility
+#
+# Tests the units and normalisation of the
+# mean specific heat and mean susceptibility
+# outputs against exact analytic results.
+#
+# The system is a set of non-interacting
+# classical spins (zero exchange and anisotropy)
+# in an applied field B along z. Each spin is
+# then independent and the partition function is
+# exactly solvable (Langevin paramagnet). With
+# x = mu_s B / (kB T) and L(x) = coth(x) - 1/x:
+#
+#    C / kB = 1 - x^2 / sinh^2(x)   (per spin)
+#
+#    chi_x = chi_y = (mu_s / kB T) L(x) / x
+#
+#    chi_z = (mu_s / kB T) (1/x^2 - 1/sinh^2(x))
+#
+# For mu_s = 2 muB, B = 1 T and T = 1 K,
+# x = 1.343428 and
+#
+#    C / kB        = 0.433945 per spin
+#    chi_x = chi_y = 0.401776 1/T
+#    chi_z         = 0.323013 1/T
+#
+# Any missing factor of muB/kB or incorrect
+# normalisation will fail the test. The
+# transverse susceptibility is independent of
+# the energy fluctuations and so tests the
+# susceptibility separately from the specific
+# heat.
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+
+#------------------------------------------
+# System Dimensions:
+# 10x10x10 SC unit cells = 1000 atoms.
+#------------------------------------------
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 3.5 !nm
+dimensions:system-size-y = 3.5 !nm
+dimensions:system-size-z = 3.5 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=paramagnet.mat
+
+#------------------------------------------
+# Simulation attributes:
+# Statistics are reset after equilibration
+# and averaged over the remaining steps.
+#------------------------------------------
+sim:temperature = 1.0
+sim:equilibration-temperature = 1.0
+sim:applied-field-strength = 1.0 !T
+sim:applied-field-unit-vector = 0,0,1
+sim:equilibration-time-steps = 1000
+sim:total-time-steps = 50000
+sim:time-steps-increment = 1
+sim:time-step=1.0E-15
+
+#------------------------------------------
+# Program and integrator details:
+#------------------------------------------
+sim:program=time-series
+sim:integrator=monte-carlo
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:output-rate = 1000
+output:mean-specific-heat
+output:mean-susceptibility

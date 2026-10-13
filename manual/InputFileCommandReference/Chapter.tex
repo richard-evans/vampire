@@ -969,10 +969,10 @@ E_{\mathrm{DMI}} = \frac{1}{2}\sum_{i,j} \mathbf{D}_{ij} \cdot \left(\mathbf{S}_
 {\zicf output:mean-specific-heat}\phantomsection\addcontentsline{toc}{subsection}{output:mean-specific-heat} Outputs the mean total specific heat $C_{\mathrm{v}}$ defined by:
 
 \begin{equation*}
-C_{\mathrm{v}} = \frac{\left(\langle U^2 \rangle - \langle U \rangle^2 \right)}{k_{\mathrm{B}} T^2}
+\frac{C_{\mathrm{v}}}{k_{\mathrm{B}}} = \frac{\left(\langle U^2 \rangle - \langle U \rangle^2 \right)}{N k_{\mathrm{B}}^2 T^2}
 \end{equation*}
 
-\noindent where $U$ is the internal (total) energy, $T$ is the system temperature and $k_{\mathrm{B}}$ is the Boltzmann constant. The outputted value has units of $k_{\mathrm{B}}$ per spin. For classical magnets the specific heat tends to a non-zero constant approaching zero temperature. When using spin temperature rescaling the specific heat tends to zero as expected for a quantum system.
+\noindent where $U$ is the internal (total) energy, $N$ is the number of magnetic spins, $T$ is the system temperature and $k_{\mathrm{B}}$ is the Boltzmann constant. The outputted value is dimensionless with units of $k_{\mathrm{B}}$ per spin. As an example, a system of non-interacting classical spins in an applied field $B$ has $C_{\mathrm{v}}/k_{\mathrm{B}} = 1 - x^2/\sinh^2 x$ per spin, where $x = \mu_s B / k_{\mathrm{B}} T$. For classical magnets the specific heat tends to a non-zero constant approaching zero temperature. When using spin temperature rescaling the specific heat tends to zero as expected for a quantum system.
 
 {\zicf output:material-mean-specific-heat}\phantomsection\addcontentsline{toc}{subsection}{output:material-mean-specific-heat} Outputs the mean specific heat for each defined material in the system in units of $k_{\mathrm{B}}$ per spin. The data is formatted as one column per material.
 

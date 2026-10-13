@@ -85,6 +85,9 @@ void specific_heat_statistic_t::initialize(stats::energy_statistic_t& energy_sta
 //               -------------------
 //                    k_B T^2
 //
+// Energies are accumulated in internal units of mu_B T and converted to
+// units of k_B per spin on output.
+//
 //-------------------------------------------------------------------------------------------------------
 void specific_heat_statistic_t::calculate(const std::vector<double>& energy){
 
@@ -193,8 +196,9 @@ std::string specific_heat_statistic_t::output_mean_specific_heat(const double te
       if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
    }
 
-   // determine inverse temperature mu_B/(kB T) (flushing to zero for very low temperatures to avoid NaN)
-   const double itemp2 = temperature < 1.e-300 ? +0.0 : constants::muB / ( constants::kB * temperature * temperature );
+   // determine prefactor (mu_B / kB T)^2 converting energy variance in (mu_B T)^2 to units of kB
+   // (flushing to zero for very low temperatures to avoid NaN)
+   const double itemp2 = temperature < 1.e-300 ? +0.0 : ( constants::muB * constants::muB ) / ( constants::kB * constants::kB * temperature * temperature );
 
    // determine inverse mean counter and its square
    const double imean_counter = 1.0 / mean_counter;
@@ -203,7 +207,7 @@ std::string specific_heat_statistic_t::output_mean_specific_heat(const double te
    // loop over all elements
    for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
 
-      const double prefactor = itemp2 / normalisation[id]; // in 1 / Kelvin per spin
+      const double prefactor = itemp2 / normalisation[id]; // in kB per spin
       const double sh = prefactor * ( ( mean_specific_heat_squared[id] * imean_counter ) - ( mean_specific_heat[id] * mean_specific_heat[id] * imean_counter_sq) );
 
       if(header){

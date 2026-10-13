@@ -1,0 +1,18 @@
+#===================================================
+# Material file for specific heat test
+#
+# Zero exchange and anisotropy gives a system of
+# independent classical spins in an applied field,
+# whose specific heat is known exactly.
+#===================================================
+
+material:num-materials=1
+
+material[1]:material-name=Paramagnet
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=0.0
+material[1]:atomic-spin-moment=2.0 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Fe
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
