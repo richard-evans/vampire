@@ -20,7 +20,6 @@ namespace sim{
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
-   integrator_t integrator = llg_heun; // variable to specify integrator
 
 
    std::vector < double > track_field_x;
@@ -102,9 +101,6 @@ namespace sim{
 
       std::vector<double> vcmak;   // voltage controlled anisotropy coefficient
 
-      std::vector<double> lsf_second_order_coefficient;
-      std::vector<double> lsf_fourth_order_coefficient; // LSF coefficients
-      std::vector<double> lsf_sixth_order_coefficient;
 
    } // end of internal namespace
 

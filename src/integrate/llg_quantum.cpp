@@ -18,9 +18,12 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
-#include "LLG.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+
+// integrate module headers
+#include "integrate.hpp"
+#include "internal.hpp"
 
 namespace LLGQ_arrays{
 
@@ -45,7 +48,8 @@ namespace LLGQ_arrays{
 
 }
 
-namespace sim{
+namespace integrate{
+namespace internal{
 
 /// @brief LLG Initialisation function
 ///
@@ -70,7 +74,7 @@ namespace sim{
 int LLGQinit(){
 
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "sim::LLG_init has been called" << std::endl;}
+	if(err::check==true){std::cout << "integrate::internal::LLG_init has been called" << std::endl;}
 
 	using namespace LLGQ_arrays;
 
@@ -95,7 +99,6 @@ int LLGQinit(){
   	return EXIT_SUCCESS;
 }
 
-namespace internal{
 
 /// @brief LLG Heun Integrator Corrector
 ///
@@ -123,12 +126,12 @@ namespace internal{
 void llg_quantum_step(){
 
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "sim::LLG_Heun has been called" << std::endl;}
+	if(err::check==true){std::cout << "integrate::internal::LLG_Heun has been called" << std::endl;}
 
 	using namespace LLGQ_arrays;
 
 	// Check for initialisation of LLG integration arrays
-	if(LLG_set==false) sim::LLGQinit();
+	if(LLG_set==false) LLGQinit();
 
 	// Local variables for system integration
 	const int num_atoms=atoms::num_atoms;
@@ -244,6 +247,6 @@ void llg_quantum_step(){
 	return;
 }
 
-} // end of intental namespace
 
-} // end of sim namespace
+} // end of internal namespace
+} // end of integrate namespace

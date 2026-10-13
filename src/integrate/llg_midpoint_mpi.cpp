@@ -1,44 +1,32 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard F L Evans 2026. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 #ifdef MPICF
 // Vampire Header Files
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
-#include "LLG.hpp"
 #include "sim.hpp"
+
+// integrate module headers
+#include "integrate.hpp"
+#include "internal.hpp"
 #include "vmpi.hpp"
 
 // Standard Libraries
 #include <cmath>
 
-int calculate_spin_fields(const int,const int);
-int calculate_external_fields(const int,const int);
-int set_LLG();
 
-namespace sim{
+namespace integrate{
+namespace internal{
 
 int LLG_Midpoint_mpi(){
 
@@ -48,7 +36,7 @@ int LLG_Midpoint_mpi(){
 	using namespace LLG_arrays;
 
 	// Check for initialisation of LLG integration arrays
-	if(LLG_set==false) sim::LLGinit();
+	if(LLG_set==false) LLGinit();
 
 	// Local variables for core / boundary integration
 	const int pre_comm_si = 0;
@@ -67,8 +55,8 @@ int LLG_Midpoint_mpi(){
 		}
 
 	// Calculate fields (core)
-	calculate_spin_fields(pre_comm_si,pre_comm_ei);
-	calculate_external_fields(pre_comm_si,pre_comm_ei);
+	sim::calculate_spin_fields(pre_comm_si,pre_comm_ei);
+	sim::calculate_external_fields(pre_comm_si,pre_comm_ei);
 
 	// Calculate Predictor Step (Core)
 	for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
@@ -106,8 +94,8 @@ int LLG_Midpoint_mpi(){
 	vmpi::mpi_complete_halo_swap();
 
 	// Calculate fields (boundary)
-	calculate_spin_fields(post_comm_si,post_comm_ei);
-	calculate_external_fields(post_comm_si,post_comm_ei);
+	sim::calculate_spin_fields(post_comm_si,post_comm_ei);
+	sim::calculate_external_fields(post_comm_si,post_comm_ei);
 
 	// Calculate Predictor Step (boundary)
 	for(int atom=post_comm_si;atom<post_comm_ei;atom++){
@@ -151,7 +139,7 @@ int LLG_Midpoint_mpi(){
 	vmpi::mpi_init_halo_swap();
 
 	// Recalculate spin dependent fields (core)
-	calculate_spin_fields(pre_comm_si,pre_comm_ei);
+	sim::calculate_spin_fields(pre_comm_si,pre_comm_ei);
 
 	// Calculate Corrector Step (core)
 	for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
@@ -188,7 +176,7 @@ int LLG_Midpoint_mpi(){
 	vmpi::mpi_complete_halo_swap();
 
 	// Recalculate spin dependent fields (boundary)
-	calculate_spin_fields(post_comm_si,post_comm_ei);
+	sim::calculate_spin_fields(post_comm_si,post_comm_ei);
 
 	// Calculate Corrector Step (boundary)
 	for(int atom=post_comm_si;atom<post_comm_ei;atom++){
@@ -234,5 +222,6 @@ int LLG_Midpoint_mpi(){
 	return EXIT_SUCCESS;
 }
 
-} // end of namespace sim
+} // end of internal namespace
+} // end of integrate namespace
 #endif

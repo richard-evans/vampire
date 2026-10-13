@@ -48,6 +48,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
+#include "integrate.hpp"
 #include "montecarlo.hpp"
 #include "program.hpp"
 #include "random.hpp"
@@ -90,7 +91,7 @@ void cmc_anisotropy(){
 	if(err::check==true){std::cout << "program::cmc_anisotropy has been called" << std::endl;}
 
 	// Check integrator is CMC, if not then exit disgracefully
-	if(sim::integrator!=3){
+	if(integrate::integrator != integrate::integrator_t::cmc){
 		err::zexit("Program CMC-anisotropy requires Constrained Monte Carlo as the integrator. Check input file.");
 	}
 

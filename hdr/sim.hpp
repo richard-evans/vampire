@@ -74,11 +74,6 @@ namespace sim{
 	extern std::vector < double > track_field_y;
 	extern std::vector < double > track_field_z;
 
-	// enumerated list for integrators
-	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
-							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5, lsf = 6,
-							 lsf_mc = 7, lsf_rk4 = 8, suzuki_trotter = 9};
-
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;
@@ -160,7 +155,6 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 
-	extern integrator_t integrator; // variable to specify integrator
 	extern int program;
 
    // Local system variables
@@ -189,24 +183,8 @@ namespace sim{
 	extern int integrate(uint64_t);
 
 	// Legacy integrators
-	extern int LLB(int);
 	extern int LLG(int);
 	extern int LLG_relax(int);
-
-	// New Integrators
-	extern int LLG_Heun();
-	extern int LLG_Heun_mpi();
-	extern int LLG_Heun_cuda();
-	extern int LLG_Midpoint();
-	extern int LLG_Midpoint_mpi();
-	extern int LLG_Midpoint_cuda();
-	extern int LSF_mpi();
-	extern int LSF_RK4_mpi();
-
-	// Integrator initialisers
-	extern int LLGinit();
-	extern int LSFinit();
-	extern int LSF_RK4_init();
 
 	// Field and energy functions
    extern double calculate_spin_energy(const int atom);

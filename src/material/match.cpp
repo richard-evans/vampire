@@ -22,6 +22,7 @@
 #include "environment.hpp"
 #include "exchange.hpp"
 #include "hierarchical.hpp"
+#include "integrate.hpp"
 #include "material.hpp"
 #include "micromagnetic.hpp"
 #include "montecarlo.hpp"
@@ -68,6 +69,7 @@ namespace internal{
       else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(hierarchical::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+      else if(integrate::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(montecarlo::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(program::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;

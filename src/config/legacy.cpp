@@ -28,7 +28,6 @@
 #include "constants.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
-#include "LLG.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "stats.hpp"

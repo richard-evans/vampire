@@ -16,6 +16,7 @@
 
 // Vampire headers
 #include "errors.hpp"
+#include "integrate.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
@@ -118,84 +119,6 @@ namespace sim{
          vin::check_for_valid_int(tt, word, line, prefix, 1, max_time,"input","1 - "+max_time_str);
          sim::partial_time = tt;
          return true;
-      }
-      test = "integrator";
-      if( word == test ){
-         //--------------------------------------------------------------------
-         test="llg-heun";
-         if( value == test ){
-            sim::integrator = sim::llg_heun;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         test="monte-carlo";
-         if( value == test ){
-            sim::integrator = sim::monte_carlo;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         test="llg-midpoint";
-         if( value == test ){
-            sim::integrator = sim::llg_midpoint;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         test="constrained-monte-carlo";
-         if( value == test ){
-            sim::integrator = sim::cmc;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         test="hybrid-constrained-monte-carlo";
-         if( value == test ){
-            sim::integrator = sim::hybrid_cmc;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         test="llg-quantum";
-         if( value == test ){
-            sim::integrator = sim::llg_quantum;
-            return true;
-         }
-         test="spin-lattice";
-         if( value == test ){
-            sim::integrator = sim::suzuki_trotter;
-            return true;
-         }
-         //
-         //--------------------------------------------------------------------
-         test="lsf";
-         if( value == test ){
-            sim::integrator = sim::lsf;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         test="lsf-mc";
-         if( value == test ){
-            sim::integrator = sim::lsf_mc;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         test="lsf-rk4";
-         if( value == test ){
-            sim::integrator = sim::lsf_rk4;
-            return true;
-         }
-         //--------------------------------------------------------------------
-         else{
-            terminaltextcolor(RED);
-               std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-               std::cerr << "\t\"llg-heun\"" << std::endl;
-               std::cerr << "\t\"llg-midpoint\"" << std::endl;
-               std::cerr << "\t\"llg-quantum\"" << std::endl;
-               std::cerr << "\t\"monte-carlo\"" << std::endl;
-               std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
-               std::cerr << "\t\"lsf\"" << std::endl;
-               std::cerr << "\t\"lsf-mc\"" << std::endl;
-               std::cerr << "\t\"lsf-rk4\"" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-          }
       }
       //--------------------------------------------------------------------
       test="domain-wall-axis";
@@ -756,14 +679,6 @@ namespace sim{
          }
       }
       //--------------------------------------------------------------------
-      test="integrator-random-seed";
-      if(word==test){
-         int is=atoi(value.c_str());
-         vin::check_for_valid_int(is, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-         mtrandom::integration_seed=is;
-         return true;
-      }
-      //--------------------------------------------------------------------
       // input parameter not found here
       return false;
    }
@@ -924,33 +839,6 @@ namespace sim{
          vin::check_for_valid_value(vcmak, word, line, prefix, unit, "", -1.0e-15, 1.0e-15,"input","0 - 1e-21");
          sim::internal::mp[super_index].vcmak.set(vcmak);
          sim::internal::enable_vcma_fields = true; // enable vcma fields
-         return true;
-      }
-      //------------------------------------------------------------
-      test="lsf-second-order-coefficient"; // Landau coefficient A
-      if( word==test ){
-         double a_l=atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(a_l, word, line, prefix, unit, "energy", -1.0e-16, 1.0e-16,"material","-1.0e-16 - 1.0e-16");
-         sim::internal::mp[super_index].lsf_second_order_coefficient.set(a_l);
-         return true;
-      }
-      //------------------------------------------------------------
-      test="lsf-fourth-order-coefficient"; // Landau coefficient B
-      if( word==test ){
-         double b_l=atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(b_l, word, line, prefix, unit, "energy", -1.0e-16, 1.0e-16,"material","-1.0e-16 - 1.0e-16");
-         sim::internal::mp[super_index].lsf_fourth_order_coefficient.set(b_l);
-         return true;
-      }
-      //------------------------------------------------------------
-      test="lsf-sixth-order-coefficient"; // Landau coefficient C
-      if( word==test ){
-         double c_l=atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(c_l, word, line, prefix, unit, "energy", -1.0e-16, 1.0e-16,"material","-1.0e-16 - 1.0e-16");
-         sim::internal::mp[super_index].lsf_sixth_order_coefficient.set(c_l);
          return true;
       }
       //--------------------------------------------------------------------

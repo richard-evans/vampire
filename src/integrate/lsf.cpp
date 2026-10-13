@@ -17,20 +17,20 @@
 #include <stdio.h>
 
 // Vampire Header files
-#include "lsf.hpp"
 #include "atoms.hpp"
 #include "constants.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
-#include "internal.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+
+// integrate module headers
+#include "integrate.hpp"
+#include "internal.hpp"
 #include "vio.hpp"
 
 // Field calculation functions
-int calculate_spin_fields(const int, const int);
-int calculate_external_fields(const int, const int);
 
 namespace LSF_arrays{
 
@@ -65,7 +65,8 @@ namespace LSF_arrays{
    std::vector<double> tz;
 
 }
-namespace sim{
+namespace integrate{
+namespace internal{
 
    int LSFinit(){
       // Check calling of routine if error checking is activated
@@ -128,9 +129,9 @@ namespace sim{
 
          const double imu_S = -1.0 / mp::material[imaterial].mu_s_SI;
 
-         const double L2 = 2.0 * sim::internal::lsf_second_order_coefficient[imaterial] * imu_S;
-         const double L4 = 4.0 * sim::internal::lsf_fourth_order_coefficient[imaterial] * imu_S;
-         const double L6 = 6.0 * sim::internal::lsf_sixth_order_coefficient[imaterial] * imu_S;
+         const double L2 = 2.0 * internal::lsf_second_order_coefficient[imaterial] * imu_S;
+         const double L4 = 4.0 * internal::lsf_fourth_order_coefficient[imaterial] * imu_S;
+         const double L6 = 6.0 * internal::lsf_sixth_order_coefficient[imaterial] * imu_S;
 
          const double ss2 = sx*sx + sy*sy + sz*sz;
 
@@ -140,29 +141,28 @@ namespace sim{
       }
    }
 
-   namespace internal{
 
       void lsf_step(){
 
          // Check calling of routine if error checking is activated
          if (err::check == true){
-            std::cout << "sim::LSF has been called" << std::endl;
+            std::cout << "integrate::internal::LSF has been called" << std::endl;
          }
 
          using namespace LSF_arrays;
 
          // Check for initialisation of LSF integration arrays
          if (LSF_set == false)
-            sim::LSFinit();
+            LSFinit();
 
          // Local variables for system integration
          const int num_atoms = atoms::num_atoms;
          double xyz[3];   // Local delta spin components
          double S_new[3]; // New local spin moment
          const double kB = constants::kB;
-         calculate_spin_fields(0, num_atoms);
+         sim::calculate_spin_fields(0, num_atoms);
          calculate_lsf_magnetic_field(0, num_atoms);
-         calculate_external_fields(0, num_atoms);
+         sim::calculate_external_fields(0, num_atoms);
 
          // Store initial spin positions
          for (int atom = 0; atom < num_atoms; atom++){
@@ -219,7 +219,7 @@ namespace sim{
          }
 
          // Recalculate spin dependent fields
-         calculate_spin_fields(0, num_atoms);
+         sim::calculate_spin_fields(0, num_atoms);
          calculate_lsf_magnetic_field(0, num_atoms);
 
          // Calculate second GSE step
@@ -271,6 +271,6 @@ namespace sim{
          return;
       }
 
-   } // End of indental namespace
 
-} // End of sim namespace
+} // end of internal namespace
+} // end of integrate namespace

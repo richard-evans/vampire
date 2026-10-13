@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "integrate.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
 #include "sim.hpp"
@@ -50,7 +51,7 @@ namespace montecarlo{
       if(cmc::constrain_by_grain){
 
          // first check for hybrid cmc
-         if(sim::integrator == sim::hybrid_cmc){
+         if(integrate::integrator == integrate::integrator_t::hybrid_cmc){
             // implementation not yet done - give message to user
             std::cerr << "Error - grain constraints with materials are not yet supported with cmc. Please use sim:integrator = contrained-monte-carlo. Exiting" << std::endl;
             zlog << zTs() << "Error - grain constraints with materials are not yet supported with cmc. Please use sim:integrator = contrained-monte-carlo. Exiting" << std::endl;
@@ -58,7 +59,7 @@ namespace montecarlo{
          }
 
          // standard mode with global constraint (integrator = cmc)
-         if(sim::integrator == sim::cmc){
+         if(integrate::integrator == integrate::integrator_t::cmc){
             // these should be refactored into the mc module
             const double constraint_phi   = sim::constraint_phi;
             const double constraint_theta = sim::constraint_theta;
@@ -81,7 +82,7 @@ namespace montecarlo{
             montecarlo::initialise_masked_cmc_mc(num_grains, constraint_mask, constrained, phi_theta_constraints);
 
             // now reset integrator to hybrid
-            sim::integrator = sim::hybrid_cmc;
+            integrate::integrator = integrate::integrator_t::hybrid_cmc;
 
             // and turn on masked cmc integrator
             cmc::masked_cmc = true;

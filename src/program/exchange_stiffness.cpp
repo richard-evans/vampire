@@ -16,6 +16,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
+#include "integrate.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
 #include "program.hpp"
@@ -91,7 +92,7 @@ void exchange_stiffness(){
  	if(err::check==true) std::cout << "program::exchange_stiffness has been called" << std::endl;
 
 	// Check integrator is hybrid CMC, if not then exit disgracefully
-	if( sim::integrator != sim::hybrid_cmc ){
+	if( integrate::integrator != integrate::integrator_t::hybrid_cmc ){
 		err::zexit("Program exchange-anisotropy requires Hybrid Constrained Monte Carlo as the integrator. Exiting.");
 	}
 

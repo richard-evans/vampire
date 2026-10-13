@@ -27,6 +27,7 @@
 #include "gpu.hpp"
 #include "hamr.hpp"
 #include "hierarchical.hpp"
+#include "integrate.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
 #include "micromagnetic.hpp"
@@ -69,6 +70,7 @@ namespace vin{
       else if(hierarchical::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(program::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+      else if(integrate::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(stats::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;

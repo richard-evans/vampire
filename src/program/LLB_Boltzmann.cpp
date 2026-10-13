@@ -24,6 +24,7 @@
 //
 #include "constants.hpp"
 #include "atoms.hpp"
+#include "integrate.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "program.hpp"
@@ -119,7 +120,7 @@ int LLB_Boltzmann(){
 		// Simulate system
 		for(sim::time=0;sim::time<10000000;sim::time+=1){
 			// Calculate LLB
-			sim::LLB(1);
+			integrate::LLB(1);
 			  if(sim::time%100000==0){
 				  std::cout << sim::time << std::endl;
 			  }

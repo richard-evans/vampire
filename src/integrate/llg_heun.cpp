@@ -1,50 +1,14 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard F L Evans 2026. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-///
-/// @file
-/// @brief Contains the LLG (Heun) integrator
-///
-/// @details The LLG integrator...
-///
-/// @section notes Implementation Notes
-/// This is a list of other notes, not related to functionality but rather to implementation.
-/// Also include references, formulae and other notes here.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section info File Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.0
-/// @date    07/02/2011
-/// @internal
-///	Created:		05/02/2011
-///	Revision:	  ---
-///=====================================================================================
-///
 
 // Standard Libraries
 #include <cmath>
@@ -54,9 +18,12 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
-#include "LLG.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+
+// integrate module headers
+#include "integrate.hpp"
+#include "internal.hpp"
 
 namespace LLG_arrays{
 
@@ -81,7 +48,8 @@ namespace LLG_arrays{
 
 }
 
-namespace sim{
+namespace integrate{
+namespace internal{
 
 /// @brief LLG Initialisation function
 ///
@@ -106,7 +74,7 @@ namespace sim{
 int LLGinit(){
 
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "sim::LLG_init has been called" << std::endl;}
+	if(err::check==true){std::cout << "integrate::internal::LLG_init has been called" << std::endl;}
 
 	using namespace LLG_arrays;
 
@@ -157,12 +125,12 @@ int LLGinit(){
 int LLG_Heun(){
 
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "sim::LLG_Heun has been called" << std::endl;}
+	if(err::check==true){std::cout << "integrate::internal::LLG_Heun has been called" << std::endl;}
 
 	using namespace LLG_arrays;
 
 	// Check for initialisation of LLG integration arrays
-	if(LLG_set==false) sim::LLGinit();
+	if(LLG_set==false) LLGinit();
 
 	// Local variables for system integration
 	const int num_atoms=atoms::num_atoms;
@@ -178,8 +146,8 @@ int LLG_Heun(){
 	}
 
 	// Calculate fields
-	calculate_spin_fields(0,num_atoms);
-	calculate_external_fields(0,num_atoms);
+	sim::calculate_spin_fields(0,num_atoms);
+	sim::calculate_external_fields(0,num_atoms);
 
 	// Calculate Euler Step
 	for(int atom=0;atom<num_atoms;atom++){
@@ -230,7 +198,7 @@ int LLG_Heun(){
 	}
 
 	// Recalculate spin dependent fields
-	calculate_spin_fields(0,num_atoms);
+	sim::calculate_spin_fields(0,num_atoms);
 
 	// Calculate Heun Gradients
 	for(int atom=0;atom<num_atoms;atom++){
@@ -307,4 +275,5 @@ int LLG_Heun_cuda(){
 	return EXIT_SUCCESS;
 }
 
-}
+} // end of internal namespace
+} // end of integrate namespace

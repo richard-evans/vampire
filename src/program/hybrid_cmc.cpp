@@ -48,6 +48,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
+#include "integrate.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
 #include "program.hpp"
@@ -91,7 +92,7 @@ void hybrid_cmc(){
 	if(err::check==true){std::cout << "program::hybrid_cmc has been called" << std::endl;}
 
 	// Check integrator is CMC, if not then exit disgracefully
-	if(sim::integrator!=4){
+	if(integrate::integrator != integrate::integrator_t::hybrid_cmc){
 		terminaltextcolor(RED);
 		std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl;
 		terminaltextcolor(WHITE);
@@ -208,7 +209,7 @@ void reverse_hybrid_cmc(){
    if(err::check==true){std::cout << "program::reversed_hybrid_cmc has been called" << std::endl;}
 
    // Check integrator is CMC, if not then exit disgracefully
-   if(sim::integrator!=4){
+   if(integrate::integrator != integrate::integrator_t::hybrid_cmc){
 	  terminaltextcolor(RED);
       std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl;
 	  terminaltextcolor(WHITE);

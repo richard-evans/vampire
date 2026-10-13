@@ -16,7 +16,6 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
-#include "LLG.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "micromagnetic.hpp"

@@ -37,8 +37,11 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+
+// integrate module headers
+#include "integrate.hpp"
+#include "internal.hpp"
 #include "errors.hpp"
-#include "LLG.hpp"
 #include "vmpi.hpp"
 #include "random.hpp"
 
@@ -99,7 +102,7 @@ double chi_parallel(double x, double TC){
 
   return(chi); // [T]
 }
-namespace sim{
+namespace integrate{
 /// Master LLB Function - dispatches code path to desired LLB routine
 /// \f$ \frac{\partial S}{\partial t} \f$
 int LLB(const int num_steps){
@@ -117,7 +120,7 @@ int LLB(const int num_steps){
 
 	return 0;
 }
-}
+} // end of integrate namespace
 
 
 

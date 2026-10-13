@@ -14,11 +14,13 @@
 #include "exchange.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+
+// integrate module headers
+#include "integrate.hpp"
+#include "internal.hpp"
 #include "constants.hpp"
 #include "random.hpp"
-#include "lsf_rk4.hpp"
 #include "vio.hpp"
-#include "../simulate/internal.hpp"
 
 #include <cmath>
 #include <cstdlib>
@@ -27,10 +29,9 @@
 #include <random>
 #include <fstream>
 
-int calculate_spin_fields(const int,const int);
-int calculate_external_fields(const int,const int);
 
-namespace sim{
+namespace integrate{
+namespace internal{
 
 // LSF magnetic field function
 void calculate_lsf_rk4_field(const int start_index, const int end_index){
@@ -49,9 +50,9 @@ void calculate_lsf_rk4_field(const int start_index, const int end_index){
 
       const double imu_S = -1.0/mp::material[imaterial].mu_s_SI;
 
-      const double L2 = 2.0*sim::internal::lsf_second_order_coefficient[imaterial]*imu_S;
-      const double L4 = 4.0*sim::internal::lsf_fourth_order_coefficient[imaterial]*imu_S;
-      const double L6 = 6.0*sim::internal::lsf_sixth_order_coefficient[imaterial]*imu_S;
+      const double L2 = 2.0*internal::lsf_second_order_coefficient[imaterial]*imu_S;
+      const double L4 = 4.0*internal::lsf_fourth_order_coefficient[imaterial]*imu_S;
+      const double L6 = 6.0*internal::lsf_sixth_order_coefficient[imaterial]*imu_S;
 
    	const double ss2 = sx*sx + sy*sy + sz*sz;
 
@@ -77,7 +78,7 @@ int LSF_RK4_mpi(){
 	using namespace LSF_RK4_arrays;
 
 	// Check for initialisation of LSF integration arrays
-	if(LSF_RK4_set==false) sim::LSF_RK4_init();
+	if(LSF_RK4_set==false) LSF_RK4_init();
 
 	//----------------------------------------
 	// Local variables for system generation
@@ -100,9 +101,9 @@ int LSF_RK4_mpi(){
 		// Calculate fields (core)
 		//----------------------------------------
 
-		calculate_spin_fields(pre_comm_si,pre_comm_ei);
+		sim::calculate_spin_fields(pre_comm_si,pre_comm_ei);
       calculate_lsf_rk4_field(pre_comm_si,pre_comm_ei);
-		calculate_external_fields(pre_comm_si,pre_comm_ei);
+		sim::calculate_external_fields(pre_comm_si,pre_comm_ei);
 
 		//----------------------------------------
 		// Store initial spin positions (all)
@@ -164,9 +165,9 @@ int LSF_RK4_mpi(){
 		// Calculate fields (boundary)
 		//----------------------------------------
 
-		calculate_spin_fields(post_comm_si,post_comm_ei);
+		sim::calculate_spin_fields(post_comm_si,post_comm_ei);
       calculate_lsf_rk4_field(post_comm_si,post_comm_ei);
-		calculate_external_fields(post_comm_si,post_comm_ei);
+		sim::calculate_external_fields(post_comm_si,post_comm_ei);
 
       //----------------------------------------
 		// Generate random temperature fluctuations
@@ -217,7 +218,7 @@ int LSF_RK4_mpi(){
 		// Recalculate spin dependent fields (core)
 		//------------------------------------------
 
-		calculate_spin_fields(pre_comm_si,pre_comm_ei);
+		sim::calculate_spin_fields(pre_comm_si,pre_comm_ei);
       calculate_lsf_rk4_field(pre_comm_si,pre_comm_ei);
 
 		//----------------------------------------
@@ -262,7 +263,7 @@ int LSF_RK4_mpi(){
 		// Recalculate spin dependent fields (boundary)
 		//------------------------------------------
 
-		calculate_spin_fields(post_comm_si,post_comm_ei);
+		sim::calculate_spin_fields(post_comm_si,post_comm_ei);
       calculate_lsf_rk4_field(post_comm_si,post_comm_ei);
 
 		//----------------------------------------
@@ -383,7 +384,7 @@ int LSF_RK4_mpi(){
 		// Recalculate spin dependent fields (core)
 		//------------------------------------------
 
-		calculate_spin_fields(pre_comm_si,pre_comm_ei);
+		sim::calculate_spin_fields(pre_comm_si,pre_comm_ei);
       calculate_lsf_rk4_field(pre_comm_si,pre_comm_ei);
 
 		//----------------------------------------
@@ -423,7 +424,7 @@ int LSF_RK4_mpi(){
 		// Recalculate spin dependent fields (boundary)
 		//------------------------------------------
 
-		calculate_spin_fields(post_comm_si,post_comm_ei);
+		sim::calculate_spin_fields(post_comm_si,post_comm_ei);
       calculate_lsf_rk4_field(post_comm_si,post_comm_ei);
 
 		//----------------------------------------
@@ -476,5 +477,6 @@ int LSF_RK4_mpi(){
    return EXIT_SUCCESS;
 }
 
-} // end of namespace sim
+} // end of internal namespace
+} // end of integrate namespace
 #endif

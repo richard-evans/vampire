@@ -55,6 +55,7 @@
 #include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "exchange.hpp"
+#include "integrate.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "dipole.hpp"
@@ -154,9 +155,8 @@ double spin_longitudinal_energy(const int atom){
    double mod_S4_i = mod_S2_i * mod_S2_i;
    double mod_S6_i = mod_S4_i * mod_S2_i;
 
-   double A = sim::internal::lsf_second_order_coefficient[imaterial];
-   double B = sim::internal::lsf_fourth_order_coefficient[imaterial];
-   double C = sim::internal::lsf_sixth_order_coefficient[imaterial];
+   double A, B, C;
+   integrate::get_lsf_coefficients(imaterial, A, B, C);
 
    double landau_energy = (1 / mp::material[imaterial].mu_s_SI) * ((A * mod_S2_i) + (B * mod_S4_i) + (C * mod_S6_i));
 
@@ -207,7 +207,7 @@ double calculate_spin_energy(const int atom){
    energy += anisotropy::single_spin_energy(atom, imaterial, Sx, Sy, Sz, sim::temperature);
 
 	// Landau energy
-	if(sim::integrator==sim::lsf_mc){
+	if(integrate::integrator==integrate::integrator_t::lsf_mc){
 		energy += spin_longitudinal_energy(atom);
 	}
 

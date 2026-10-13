@@ -16,16 +16,17 @@
 #include "atoms.hpp"
 #include "dipole.hpp"
 #include "sim.hpp"
+
+// integrate module headers
+#include "integrate.hpp"
+#include "internal.hpp"
 #include "spintorque.hpp"
 #include "spintransport.hpp"
 #include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 
-// sim namespace
-namespace sim{
-
-// sim::internal namespace
+namespace integrate{
 namespace internal{
 
 //------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ void increment_time(){
    // Update dipole fields
    dipole::calculate_field(sim::time, atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::magnetic);
 
-	if(sim::lagrange_multiplier) update_lagrange_lambda();
+	if(sim::lagrange_multiplier) sim::update_lagrange_lambda();
    st::update_spin_torque_fields(atoms::x_spin_array,
                                atoms::y_spin_array,
                                atoms::z_spin_array,
@@ -70,4 +71,4 @@ void increment_time(){
 }
 
 } // end of internal namespace
-} // end of sim namespace
+} // end of integrate namespace
