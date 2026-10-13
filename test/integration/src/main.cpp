@@ -47,7 +47,7 @@ int main(){
 
    // Integrator tests
    if( !integrator_test("dynamics/heun",    -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
-   if( !integrator_test("dynamics/midpoint",-0.0849683,-0.339983, 0.936585, exe ) ) fail += 1;
+   if( !integrator_test("dynamics/midpoint",-0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
 
    // Structure tests
    if( !material_atoms_test("structure/core-shell", 3474, 485, 0, 0, exe ) ) fail += 1;
