@@ -36,6 +36,8 @@ namespace vdc{
    extern bool verbose;
    extern bool xyz;
    extern bool grains; // flag to enable grain calculations
+   extern bool grain_data_in_file; // flag to specify grain IDs are included in coordinate data files
+   extern bool nm_grain_data_in_file; // flag to specify grain IDs are included in non-magnetic data files
    extern bool povray;
    extern bool povcells;
    extern bool povsticks;
@@ -211,7 +213,7 @@ namespace vdc{
 
    // grains
    void load_grain_vertices();
-   void determine_atom_grain_id();
+   void determine_atom_grain_id(const bool magnetic, const bool non_magnetic);
    //void generate_povray_grains()
 
    // Colour

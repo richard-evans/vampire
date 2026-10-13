@@ -123,6 +123,14 @@ void read_nm_metadata(){
       if(vdc::verbose) std::cout << "      " << line << std::endl;
    }
 
+   // check for optional grain data flag (absent in files from older versions)
+   while(getline(cmfile, line)){
+      if(line.compare(0, 11, "Grain data:") == 0){
+         vdc::nm_grain_data_in_file = (line.find("true") != std::string::npos);
+         if(vdc::verbose) std::cout << "   Grain data: " << vdc::nm_grain_data_in_file << std::endl;
+      }
+   }
+
    return;
 
 }
@@ -138,6 +146,7 @@ void read_nm_data(){
    vdc::nm_coordinates.resize(3*vdc::num_nm_atoms);
    vdc::nm_category.resize(vdc::num_nm_atoms);
    vdc::nm_type.resize(vdc::num_nm_atoms);
+   if(vdc::nm_grain_data_in_file) vdc::nm_grain.resize(vdc::num_nm_atoms);
 
    // index counter
    uint64_t atom_id = 0;
@@ -165,6 +174,8 @@ void read_nm_data(){
             // read category array
             ifile.read((char*)&vdc::nm_category[atom_id], sizeof(int)*num_atoms_in_file);
             ifile.read((char*)&vdc::nm_coordinates[3*atom_id], sizeof(double)*num_atoms_in_file*3);
+            // read grain array (if present)
+            if(vdc::nm_grain_data_in_file) ifile.read((char*)&vdc::nm_grain[atom_id], sizeof(int)*num_atoms_in_file);
             // increment counter
             atom_id += num_atoms_in_file;
             ifile.close();
@@ -190,7 +201,7 @@ void read_nm_data(){
                ss >> num_atoms_in_file; // interpret as uint64_t
             }
             double x,y,z;
-            int type_id, category_id;
+            int type_id, category_id, grain_id;
             // loop over all atoms in file and load as x,y,z sets
             for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){
                getline(ifile, line);
@@ -198,6 +209,10 @@ void read_nm_data(){
                ss >> type_id >> category_id >> x >> y >> z;
                vdc::nm_type[atom_id] = type_id;
                vdc::nm_category[atom_id] = category_id;
+               if(vdc::nm_grain_data_in_file){
+                  ss >> grain_id;
+                  vdc::nm_grain[atom_id] = grain_id;
+               }
                vdc::nm_coordinates[3*atom_id + 0] = x;
                vdc::nm_coordinates[3*atom_id + 1] = y;
                vdc::nm_coordinates[3*atom_id + 2] = z;

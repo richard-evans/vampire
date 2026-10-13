@@ -126,6 +126,7 @@ namespace cs{
       double z;
       int mat;
       int cat;
+      int grain;
    };
 
   // Array for storing non-magnetic atoms

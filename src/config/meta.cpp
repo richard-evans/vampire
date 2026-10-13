@@ -82,6 +82,10 @@ namespace config{
             scmf << std::flush;
          }
 
+         // flag presence of grain ID data (appended to data files for backwards compatibility)
+         scmf << "#--------------------------------------------" << std::endl;
+         scmf << "Grain data: true" << std::endl;
+
          // number of cell files + file list
 
          // close file
@@ -193,6 +197,10 @@ namespace config{
             // flush data to disk
             scmf << std::flush;
          }
+
+         // flag presence of grain ID data (appended to data files for backwards compatibility)
+         scmf << "#--------------------------------------------" << std::endl;
+         scmf << "Grain data: true" << std::endl;
 
          // number of cell files + file list
 

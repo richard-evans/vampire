@@ -107,16 +107,16 @@ namespace vdc{
    //---------------------------------------------------------------------------
    // Function to determine grain ID of each atom
    //---------------------------------------------------------------------------
-   void determine_atom_grain_id(){
+   void determine_atom_grain_id(const bool magnetic, const bool non_magnetic){
 
       // set last grain number (for atoms outside of grains)
       const int last_grain = vdc::grain_vertices_array.size()+1;
 
       // resize grain ID arrays
-      vdc::grain.resize( vdc::type.size(), last_grain );
-      vdc::nm_grain.resize( vdc::nm_type.size(), last_grain );
+      if(magnetic)     vdc::grain.resize( vdc::type.size(), last_grain );
+      if(non_magnetic) vdc::nm_grain.resize( vdc::nm_type.size(), last_grain );
 
-      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; magnetic && i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID and coordinates
          const unsigned int atom = vdc::sliced_atoms_list[i];
@@ -135,7 +135,7 @@ namespace vdc{
 
       }
 
-      for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+      for(size_t i=0; non_magnetic && i < vdc::sliced_nm_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_nm_atoms_list[i];

@@ -24,6 +24,8 @@ namespace vdc{
    bool verbose  = false; // flag to specify verbosity of output to user
    bool xyz      = false; // flag to specify crystal.xyz file output
    bool grains   = false; // flag to enable grain calculations
+   bool grain_data_in_file    = false; // flag to specify grain IDs are included in coordinate data files
+   bool nm_grain_data_in_file = false; // flag to specify grain IDs are included in non-magnetic data files
    bool povray   = false; // flag to specify povray file output
    bool povcells = false; // flag to specify povray cells output
    bool povsticks= false; // flag to specify povray sticks output

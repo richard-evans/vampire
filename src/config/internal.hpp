@@ -118,7 +118,7 @@ namespace internal
    void legacy_cells_coords();
 
    double write_data(std::string, const std::vector<double> &buffer);
-   double write_coord_data(std::string filename, const std::vector<double>& buffer, const std::vector<int>& type_buffer, const std::vector<int>& category_buffer);
+   double write_coord_data(std::string filename, const std::vector<double>& buffer, const std::vector<int>& type_buffer, const std::vector<int>& category_buffer, const std::vector<int>& grain_buffer);
 
    void copy_data_to_buffer(const std::vector<double> &x, // vector data
                             const std::vector<double> &y,

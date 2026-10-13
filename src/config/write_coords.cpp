@@ -29,25 +29,25 @@ namespace internal
 {
 
 // Forward function declarations
-double write_coord_data_text(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer);
-double write_coord_data_binary(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer);
+double write_coord_data_text(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer, const std::vector<int> &grain_buffer);
+double write_coord_data_binary(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer, const std::vector<int> &grain_buffer);
 
 //----------------------------------------------------------------------------------------------------
 // Simple wrapper function to call output function for correct format
 //----------------------------------------------------------------------------------------------------
 //
-double write_coord_data(std::string filename, const std::vector<double>& buffer, const std::vector<int>& type_buffer, const std::vector<int>& category_buffer){
+double write_coord_data(std::string filename, const std::vector<double>& buffer, const std::vector<int>& type_buffer, const std::vector<int>& category_buffer, const std::vector<int>& grain_buffer){
 
    double io_time;
 
    switch (config::internal::format){
 
       case config::internal::binary:
-         io_time = write_coord_data_binary(filename, buffer, type_buffer, category_buffer);
+         io_time = write_coord_data_binary(filename, buffer, type_buffer, category_buffer, grain_buffer);
          break;
 
       case config::internal::text:
-         io_time = write_coord_data_text(filename, buffer, type_buffer, category_buffer);
+         io_time = write_coord_data_text(filename, buffer, type_buffer, category_buffer, grain_buffer);
          break;
 
    }
@@ -60,7 +60,7 @@ double write_coord_data(std::string filename, const std::vector<double>& buffer,
 // Function to output coord data formatted as text
 //----------------------------------------------------------------------------------------------------
 //
-double write_coord_data_text(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer){
+double write_coord_data_text(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer, const std::vector<int> &grain_buffer){
 
    // Declare and open output file
    std::ofstream ofile;
@@ -85,7 +85,8 @@ double write_coord_data_text(std::string filename, const std::vector<double> &bu
                category_buffer[index] << "\t" <<
                buffer[3 * index + 0] << "\t" <<
                buffer[3 * index + 1] << "\t" <<
-               buffer[3 * index + 2] << "\n";
+               buffer[3 * index + 2] << "\t" <<
+               grain_buffer[index] << "\n";
 
    }
 
@@ -104,7 +105,7 @@ double write_coord_data_text(std::string filename, const std::vector<double> &bu
 // Function to output coord data in binary format
 //----------------------------------------------------------------------------------------------------
 //
-double write_coord_data_binary(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer){
+double write_coord_data_binary(std::string filename, const std::vector<double> &buffer, const std::vector<int> &type_buffer, const std::vector<int> &category_buffer, const std::vector<int> &grain_buffer){
    // Declare and open output file
    std::ofstream ofile;
    ofile.open(filename.c_str(), std::ios::binary);
@@ -125,6 +126,7 @@ double write_coord_data_binary(std::string filename, const std::vector<double> &
    ofile.write(reinterpret_cast<const char *>(&type_buffer[0]), sizeof(int) * type_buffer.size());
    ofile.write(reinterpret_cast<const char *>(&category_buffer[0]), sizeof(int) * category_buffer.size());
    ofile.write(reinterpret_cast<const char *>(&buffer[0]), sizeof(double) * buffer.size());
+   ofile.write(reinterpret_cast<const char *>(&grain_buffer[0]), sizeof(int) * grain_buffer.size());
 
    // end timer
    timer.stop();

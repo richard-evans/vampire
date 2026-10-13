@@ -63,6 +63,9 @@ void atoms_coords()
       std::vector<int> atom_category_buffer(local_atoms);
       for(unsigned int atom = 0; atom < local_atoms; atom++) atom_category_buffer[atom] = atoms::category_array[local_output_atom_list[atom]];
 
+      std::vector<int> atom_grain_buffer(local_atoms);
+      for(unsigned int atom = 0; atom < local_atoms; atom++) atom_grain_buffer[atom] = atoms::grain_array[local_output_atom_list[atom]];
+
       //------------------------------------------
       // Output coordinate data
       //------------------------------------------
@@ -83,7 +86,7 @@ void atoms_coords()
 
       // Calculate number of bytes to be written to disk
       const double spin_data_size = double(config::internal::total_output_atoms) * 1.0e-9 * (3.0*double(sizeof(double)) );
-      const double coord_data_size = double(config::internal::total_output_atoms) * 1.0e-9 * (3.0*double(sizeof(double) + 2.0*double(sizeof(int)) ) );
+      const double coord_data_size = double(config::internal::total_output_atoms) * 1.0e-9 * (3.0*double(sizeof(double)) + 3.0*double(sizeof(int)) );
 
       // Output informative messages of actual data size to be outputed to disk (in binary mode)
       zlog << zTs() << "Total coordinate data filesize: " << 1000.0 * coord_data_size << " MB" << std::endl;
@@ -123,6 +126,7 @@ void atoms_coords()
             MPI_Offset type_offset = config::internal::linear_offset + sizeof(uint64_t);
             MPI_Offset category_offset = config::internal::linear_offset + total_output_atoms * sizeof(int) + sizeof(uint64_t);
             MPI_Offset data_offset = config::internal::buffer_offset + 2 * total_output_atoms * sizeof(int) + sizeof(uint64_t);
+            MPI_Offset grain_offset = config::internal::linear_offset + 2 * total_output_atoms * sizeof(int) + 3 * total_output_atoms * sizeof(double) + sizeof(uint64_t);
 
             timer.start(); // start timer
 
@@ -130,6 +134,7 @@ void atoms_coords()
             MPI_File_write_at_all(fh, type_offset, &atom_type_buffer[0], atom_type_buffer.size(), MPI_INT, &status);
             MPI_File_write_at_all(fh, category_offset, &atom_category_buffer[0], atom_category_buffer.size(), MPI_INT, &status);
             MPI_File_write_at_all(fh, data_offset, &config::internal::local_buffer[0], config::internal::local_buffer.size(), MPI_DOUBLE, &status);
+            MPI_File_write_at_all(fh, grain_offset, &atom_grain_buffer[0], atom_grain_buffer.size(), MPI_INT, &status);
 
             timer.stop(); // Stop timer
 
@@ -142,7 +147,7 @@ void atoms_coords()
          }
 
          case config::internal::fpprocess:
-            io_time = write_coord_data(filename, config::internal::local_buffer, atom_type_buffer, atom_category_buffer);
+            io_time = write_coord_data(filename, config::internal::local_buffer, atom_type_buffer, atom_category_buffer, atom_grain_buffer);
             break;
 
          case config::internal::fpnode:{
@@ -151,11 +156,13 @@ void atoms_coords()
             collate_int_data(atom_type_buffer, collated_atom_type_buffer);
             std::vector<int> collated_atom_category_buffer(0);
             collate_int_data(atom_category_buffer, collated_atom_category_buffer);
+            std::vector<int> collated_atom_grain_buffer(0);
+            collate_int_data(atom_grain_buffer, collated_atom_grain_buffer);
             // Gather coord data from all processors in io group
             MPI_Gatherv(&local_buffer[0], local_buffer.size(), MPI_DOUBLE, &collated_buffer[0], &io_group_recv_counts[0], &io_group_displacements[0], MPI_DOUBLE, io_group_master_id, io_comm);
 
             // output data on master io processes
-            if(config::internal::io_group_master) io_time = write_coord_data(filename, config::internal::collated_buffer, collated_atom_type_buffer, collated_atom_category_buffer);
+            if(config::internal::io_group_master) io_time = write_coord_data(filename, config::internal::collated_buffer, collated_atom_type_buffer, collated_atom_category_buffer, collated_atom_grain_buffer);
             // find longest time in all io nodes
             double max_io_time = 0.0;
             // calculate actual bandwidth on root process
@@ -173,7 +180,7 @@ void atoms_coords()
          // check for legacy output
          if(config::internal::mode == config::internal::legacy) io_time = config::internal::legacy_atoms_coords();
          // otherwise use new one by default
-         else io_time = write_coord_data(filename, config::internal::local_buffer, atom_type_buffer, atom_category_buffer);
+         else io_time = write_coord_data(filename, config::internal::local_buffer, atom_type_buffer, atom_category_buffer, atom_grain_buffer);
       #endif
 
       // Output bandwidth to log file

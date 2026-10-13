@@ -60,10 +60,15 @@ void process_coordinates(){
    // Calculate systenm dimensions after slicing
    vdc::calculate_system_extent(vdc::sliced_atoms_list,vdc::sliced_nm_atoms_list);
 
-   // calculate grain properties
+   // calculate grain properties, using grain IDs from data files where available
    if(vdc::grains){
-      vdc::load_grain_vertices();
-      vdc::determine_atom_grain_id();
+      const bool magnetic     = !vdc::grain_data_in_file;
+      const bool non_magnetic = !vdc::nm_grain_data_in_file && vdc::num_nm_atoms > 0;
+      if(vdc::verbose) std::cout << "Grain IDs for magnetic atoms read from " << (magnetic ? "grain_shapes.txt" : "data files") << std::endl;
+      if(magnetic || non_magnetic){
+         vdc::load_grain_vertices();
+         vdc::determine_atom_grain_id(magnetic, non_magnetic);
+      }
    }
 
    // output atoms text file
@@ -206,6 +211,14 @@ void read_coord_metadata(){
       if(vdc::verbose) std::cout << "      " << line << std::endl;
    }
 
+   // check for optional grain data flag (absent in files from older versions)
+   while(getline(cmfile, line)){
+      if(line.compare(0, 11, "Grain data:") == 0){
+         vdc::grain_data_in_file = (line.find("true") != std::string::npos);
+         if(vdc::verbose) std::cout << "   Grain data: " << vdc::grain_data_in_file << std::endl;
+      }
+   }
+
    return;
 
 }
@@ -221,6 +234,7 @@ void read_coord_data(){
    vdc::coordinates.resize(3*vdc::num_atoms);
    vdc::category.resize(vdc::num_atoms);
    vdc::type.resize(vdc::num_atoms);
+   if(vdc::grain_data_in_file) vdc::grain.resize(vdc::num_atoms);
 
    // index counter
    uint64_t atom_id = 0;
@@ -248,6 +262,8 @@ void read_coord_data(){
             // read category array
             ifile.read((char*)&vdc::category[atom_id], sizeof(int)*num_atoms_in_file);
             ifile.read((char*)&vdc::coordinates[3*atom_id], sizeof(double)*num_atoms_in_file*3);
+            // read grain array (if present)
+            if(vdc::grain_data_in_file) ifile.read((char*)&vdc::grain[atom_id], sizeof(int)*num_atoms_in_file);
             // increment counter
             atom_id += num_atoms_in_file;
             ifile.close();
@@ -273,7 +289,7 @@ void read_coord_data(){
                ss >> num_atoms_in_file; // interpret as uint64_t
             }
             double x,y,z;
-            int type_id, category_id;
+            int type_id, category_id, grain_id;
             // loop over all atoms in file and load as x,y,z sets
             for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){
                getline(ifile, line);
@@ -281,6 +297,10 @@ void read_coord_data(){
                ss >> type_id >> category_id >> x >> y >> z;
                vdc::type[atom_id] = type_id;
                vdc::category[atom_id] = category_id;
+               if(vdc::grain_data_in_file){
+                  ss >> grain_id;
+                  vdc::grain[atom_id] = grain_id;
+               }
                vdc::coordinates[3*atom_id + 0] = x;
                vdc::coordinates[3*atom_id + 1] = y;
                vdc::coordinates[3*atom_id + 2] = z;

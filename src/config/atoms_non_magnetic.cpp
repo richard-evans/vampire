@@ -88,6 +88,9 @@ void atoms_non_magnetic(){
       std::vector<int> atom_category_buffer(num_local_atoms);
       for(unsigned int atom = 0; atom < num_local_atoms; atom++) atom_category_buffer[atom] = cs::non_magnetic_atoms_array[ atom_list[atom] ].cat;
 
+      std::vector<int> atom_grain_buffer(num_local_atoms);
+      for(unsigned int atom = 0; atom < num_local_atoms; atom++) atom_grain_buffer[atom] = cs::non_magnetic_atoms_array[ atom_list[atom] ].grain;
+
       std::vector<double> atom_coord_buffer(3*num_local_atoms);
       for(unsigned int atom = 0; atom < num_local_atoms; atom++){
          const uint64_t atom_id = atom_list[atom]; // get atom array index
@@ -122,7 +125,7 @@ void atoms_non_magnetic(){
       std::string filename = file_sstr.str();
 
       // Calculate number of bytes to be written to disk
-      const double data_size = double(num_total_atoms) * 1.0e-9 * (3.0*double(sizeof(double) + 2.0*double(sizeof(int)) ) );
+      const double data_size = double(num_total_atoms) * 1.0e-9 * (3.0*double(sizeof(double)) + 3.0*double(sizeof(int)) );
 
       // Output informative messages of actual data size to be outputed to disk (in binary mode)
       zlog << zTs() << "Total non-magnetic data filesize: " << 1000.0 * data_size << " MB" << std::endl;
@@ -156,10 +159,18 @@ void atoms_non_magnetic(){
             // write number of atoms on root process
             if(vmpi::my_rank == 0) MPI_File_write(fh, &num_total_atoms, 1, MPI_UINT64_T, &status);
 
+            // Calculate number of non-magnetic atoms on lower ranks (offsets differ from magnetic atoms)
+            uint64_t rank_offset = 0;
+            MPI_Exscan(&num_local_atoms, &rank_offset, 1, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+            if(vmpi::my_rank == 0) rank_offset = 0; // result undefined on rank 0
+            const MPI_Offset linear_offset = rank_offset * sizeof(int);
+            const MPI_Offset buffer_offset = rank_offset * 3 * sizeof(double);
+
             // Calculate local byte offsets since MPI-IO is simple and doesn't update the file handle pointer after I/O
-            MPI_Offset type_offset     = config::internal::linear_offset + sizeof(uint64_t);
-            MPI_Offset category_offset = config::internal::linear_offset + num_total_atoms * sizeof(int) + sizeof(uint64_t);
-            MPI_Offset data_offset     = config::internal::buffer_offset + 2 * num_total_atoms * sizeof(int) + sizeof(uint64_t);
+            MPI_Offset type_offset     = linear_offset + sizeof(uint64_t);
+            MPI_Offset category_offset = linear_offset + num_total_atoms * sizeof(int) + sizeof(uint64_t);
+            MPI_Offset data_offset     = buffer_offset + 2 * num_total_atoms * sizeof(int) + sizeof(uint64_t);
+            MPI_Offset grain_offset    = linear_offset + 2 * num_total_atoms * sizeof(int) + 3 * num_total_atoms * sizeof(double) + sizeof(uint64_t);
 
             timer.start(); // start timer
 
@@ -167,6 +178,7 @@ void atoms_non_magnetic(){
             MPI_File_write_at_all(fh, type_offset, &atom_type_buffer[0], atom_type_buffer.size(), MPI_INT, &status);
             MPI_File_write_at_all(fh, category_offset, &atom_category_buffer[0], atom_category_buffer.size(), MPI_INT, &status);
             MPI_File_write_at_all(fh, data_offset, &atom_coord_buffer[0], atom_coord_buffer.size(), MPI_DOUBLE, &status);
+            MPI_File_write_at_all(fh, grain_offset, &atom_grain_buffer[0], atom_grain_buffer.size(), MPI_INT, &status);
 
             timer.stop(); // Stop timer
 
@@ -179,7 +191,7 @@ void atoms_non_magnetic(){
          }
 
          case config::internal::fpprocess:
-            io_time = write_coord_data(filename, atom_coord_buffer, atom_type_buffer, atom_category_buffer);
+            io_time = write_coord_data(filename, atom_coord_buffer, atom_type_buffer, atom_category_buffer, atom_grain_buffer);
             break;
 
          case config::internal::fpnode:{
@@ -188,10 +200,12 @@ void atoms_non_magnetic(){
             collate_int_data(atom_type_buffer, collated_atom_type_buffer);
             std::vector<int> collated_atom_category_buffer(0);
             collate_int_data(atom_category_buffer, collated_atom_category_buffer);
+            std::vector<int> collated_atom_grain_buffer(0);
+            collate_int_data(atom_grain_buffer, collated_atom_grain_buffer);
             std::vector<double> collated_atom_coord_buffer(0);
             collate_double_data(atom_coord_buffer, collated_atom_coord_buffer);
             // output data on master io processes
-            if(config::internal::io_group_master) io_time = write_coord_data(filename, collated_atom_coord_buffer, collated_atom_type_buffer, collated_atom_category_buffer);
+            if(config::internal::io_group_master) io_time = write_coord_data(filename, collated_atom_coord_buffer, collated_atom_type_buffer, collated_atom_category_buffer, collated_atom_grain_buffer);
             // find longest time in all io nodes
             double max_io_time = 0.0;
             // calculate actual bandwidth on root process
@@ -207,7 +221,7 @@ void atoms_non_magnetic(){
          // Serial mode output (ignores most io directives)
          //-----------------------------------------------------
          // if new output (not legacy) then output non magnetic atoms
-         if(config::internal::mode != config::internal::legacy) io_time = write_coord_data(filename, atom_coord_buffer, atom_type_buffer, atom_category_buffer);
+         if(config::internal::mode != config::internal::legacy) io_time = write_coord_data(filename, atom_coord_buffer, atom_type_buffer, atom_category_buffer, atom_grain_buffer);
       #endif
 
       // Output bandwidth to log file
