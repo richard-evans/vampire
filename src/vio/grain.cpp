@@ -127,6 +127,14 @@ void write_grain_file(){
                //   zgrain << stats::grain_specific_heat.output_mean_specific_heat(sim::temperature, header);
                //   break;
                //------------------------------------------
+               // not implemented for grain output (never added to output list)
+               case grain::mean_spin_temp:
+               case grain::mean_lattice_temp:
+               case grain::SxH2:
+               case grain::SH:
+               case grain::mean_coupling_field_vec:
+                  break;
+               //------------------------------------------
 
             } // end of case statement
 

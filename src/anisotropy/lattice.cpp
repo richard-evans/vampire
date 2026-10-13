@@ -129,7 +129,7 @@ namespace anisotropy{
 void anisotropy::internal::lattice_anis_t::add_point(double temperature, double anisotropy){
 
    // check for valid temperature value
-   if( temperature < 0.0 && temperature > 10000.0 ){
+   if( temperature < 0.0 || temperature > 10000.0 ){
       std::cerr << "Error: Temperature value " << temperature << " in lattice anisotropy file is invalid. Temperature values must be in the range 0 - 10000 K. Exiting." << std::endl;
       zlog << zTs() << "Error: Temperature value " << temperature << " in lattice anisotropy file is invalid. Temperature values must be in the range 0 - 10000 K. Exiting." << std::endl;
       err::vexit();

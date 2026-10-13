@@ -51,16 +51,17 @@ gcc: $(TEST_OBJECTS) $(VAMPIRE_OBJECTS)
 	$(GCC) $(TEST_OBJECTS) $(VAMPIRE_OBJECTS) $(GCC_CFLAGS) $(LIBS) -o $(EXECUTABLE)
 
 $(TEST_OBJECTS): obj/%.o: src/%.cpp
+	@mkdir -p $(@D)
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
 # compile vampire objects to vampire object folder
 $(VAMPIRE_OBJECTS): ../../obj/%.o: ../../src/%.cpp
+	@mkdir -p $(@D)
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
+# vampire objects are shared with the main build - use make clean in the root directory to remove them
 clean:
-	@rm -f obj/*.o
-	@rm -f ../../obj/*.o
+	@rm -f $(TEST_OBJECTS)
 
-purge:
-	@rm -f obj/*.o
+purge: clean
 	@rm -f $(EXECUTABLE)

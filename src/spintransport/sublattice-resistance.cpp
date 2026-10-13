@@ -43,7 +43,6 @@ void calculate_sublattice_resistance(){
 
    // define local constants for number of cells sublattices to avoid repeated access to global variables
    const int num_sublattices = st::internal::num_sublattices;
-   const int num_cells_x_sl  = int(st::internal::total_num_cells) * num_sublattices;
 
    // variable to compute sum of inverse resistances over all stacks
    double sum_inv_resistance = 0.0;
@@ -141,6 +140,7 @@ void calculate_sublattice_resistance(){
    // Single reduction per component over the entire flat array
    //------------------------------------------------------------------------------------------
    #ifdef MPICF
+      const int num_cells_x_sl  = int(st::internal::total_num_cells) * num_sublattices;
       MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_x[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_y[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_spin_torque_fields_z[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);

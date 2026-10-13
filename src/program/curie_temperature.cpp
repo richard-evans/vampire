@@ -99,7 +99,9 @@ int curie_temperature(){
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
       sim::temperature+=sim::delta_temperature;
    }
-   else sim::temperature=sim::Tmin;
+   else{
+      sim::temperature=sim::Tmin;
+   }
 
 	// Perform Temperature Loop
 	while(sim::temperature<=sim::Tmax){

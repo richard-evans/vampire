@@ -31,11 +31,11 @@ gcc: $(OBJECTS)
 	$(GCC) $(OBJECTS) $(GCC_CFLAGS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: ./src/%.cpp
+	@mkdir -p $(@D)
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
 clean:
-	@rm -f obj/*.o
+	@rm -f $(OBJECTS)
 
-purge:
-	@rm -f obj/*.o
+purge: clean
 	@rm -f $(EXECUTABLE)

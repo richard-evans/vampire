@@ -36,8 +36,6 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
 
    // define local constants for number of cells sublattices to avoid repeated access to global variables
    const int num_sublattices = st::internal::num_sublattices;
-   const int num_cells = st::internal::total_num_cells;
-   const int num_cells_x_sl = num_cells * num_sublattices;
 
    //---------------------------------------------------------------------------
    // reset magnetization vector to zero
@@ -83,6 +81,8 @@ void calculate_cell_sublattice_magnetization(const unsigned int num_local_atoms,
    // Reduce cell material magnetizations on all processors
    //---------------------------------------------------------------------------
    #ifdef MPICF
+      const int num_cells = st::internal::total_num_cells;
+      const int num_cells_x_sl = num_cells * num_sublattices;
       // single reduction per component over the entire flat array
       MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_x[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_sl_magnetization_y[0], num_cells_x_sl, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);

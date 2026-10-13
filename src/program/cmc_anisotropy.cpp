@@ -99,7 +99,9 @@ void cmc_anisotropy(){
 	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::checkpoint_loaded_flag==true){
       zlog << zTs() << "Constrained angles theta loaded from checkpoint " << sim::constraint_theta <<  std::endl;
    }
-   else sim::constraint_theta=sim::constraint_theta_min;
+   else{
+      sim::constraint_theta=sim::constraint_theta_min;
+   }
 
 	// perform rotational angle sweep
 	while(sim::constraint_theta<=sim::constraint_theta_max){
