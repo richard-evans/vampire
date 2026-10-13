@@ -37,12 +37,7 @@ namespace vin{
    //----------------------------------------------------------------------------------
    int match(std::string const, std::string const, std::string const, std::string const, int const);
    int match(std::string const, std::string const, std::string const, std::string const, int const, int const, int const);
-   int match_create(std::string const, std::string const, std::string const, int const);
-   int match_dimension(std::string const, std::string const, std::string const, int const);
-   int match_sim(std::string const, std::string const, std::string const, int const);
-   int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
    int match_material(std::string const, std::string const, std::string const, int const, int const, int const, std::string const, std::string const);
-   int match_config(std::string const, std::string const, std::string const, int const);
 
    //----------------------------------------------------------------------------------
    //Function protypes for functions inside: read.cpp
@@ -109,7 +104,8 @@ namespace vout{
    //-------------------------------------------------------------------------
    // New match functions
    //-------------------------------------------------------------------------
-   int match_vout_grain_list(std::string const word, std::string const value, int const line, std::vector<grain::output_t> & output_list);
+   bool match_vout_grain_list(std::string const word, std::string const value, int const line, std::vector<grain::output_t> & output_list);
+   bool match_vout_list(std::string const word, std::string const value, int const line, std::vector<unsigned int> & output_list);
 
 
    //-------------------------------------------------------------------------

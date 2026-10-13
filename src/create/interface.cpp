@@ -26,14 +26,116 @@ namespace create{
    //-----------------------------------------------------------------------------
    bool match_input_parameter(string const key, string const word, string const value, string const unit, int const line){
 
+      std::string test="";
+
+      //----------------------------------
+      // System dimension variables
+      //----------------------------------
+      std::string prefix="dimensions";
+      if(key==prefix){
+         //--------------------------------------------------------------------
+         test="system-size";
+         if(word==test){
+            double d=atof(value.c_str());
+            vin::check_for_valid_value(d, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+            cs::system_dimensions[0]=d;
+            cs::system_dimensions[1]=d;
+            cs::system_dimensions[2]=d;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="system-size-x";
+         if(word==test){
+            double dx=atof(value.c_str());
+            vin::check_for_valid_value(dx, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+            cs::system_dimensions[0]=dx;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="system-size-y";
+         if(word==test){
+            double dy=atof(value.c_str());
+            vin::check_for_valid_value(dy, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+            cs::system_dimensions[1]=dy;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="system-size-z";
+         if(word==test){
+            double dz=atof(value.c_str());
+            vin::check_for_valid_value(dz, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+            cs::system_dimensions[2]=dz;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="particle-size";
+         if(word==test){
+            double psize=atof(value.c_str());
+            vin::check_for_valid_value(psize, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+            cs::particle_scale=psize;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="particle-spacing";
+         if(word==test){
+            double pspacing=atof(value.c_str());
+            vin::check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+            cs::particle_spacing=pspacing;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="particle-shape-factor-x";
+         if(word==test){
+            double sfx=atof(value.c_str());
+            vin::check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
+            cs::particle_shape_factor_x=sfx;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="particle-shape-factor-y";
+         if(word==test){
+            double sfy=atof(value.c_str());
+            vin::check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
+            cs::particle_shape_factor_y=sfy;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="particle-shape-factor-z";
+         if(word==test){
+            double sfz=atof(value.c_str());
+            vin::check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
+            cs::particle_shape_factor_z=sfz;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="particle-array-offset-x";
+         if(word==test){
+            double paox=atof(value.c_str());
+            vin::check_for_valid_value(paox, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
+            cs::particle_array_offset_x=paox;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="particle-array-offset-y";
+         if(word==test){
+            double paoy=atof(value.c_str());
+            vin::check_for_valid_value(paoy, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
+            cs::particle_array_offset_y=paoy;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         // input parameter not found here
+         return false;
+      }
+
       // Check for valid key, if no match return false
-      std::string prefix="create";
+      prefix="create";
       if(key!=prefix) return false;
 
       //----------------------------------
       // Now test for all valid options
       //----------------------------------
-      std::string test="faceted-particle";
+      test="faceted-particle";
       if(word==test){
          // check for blank value
          test="";
@@ -916,6 +1018,71 @@ namespace create{
           create::internal::select_material_by_z_height = true; // default
           create::internal::mp[super_index].max=max;
           return true;
+      }
+      //--------------------------------------------------------------------
+      test="core-shell-size";
+      if(word==test){
+         double css=atof(value.c_str());
+         vin::check_for_valid_positive_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         vin::read_material[super_index].core_shell_size=css;
+         cs::core_shell_particles = true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="interface-roughness";
+      if(word==test){
+         double ir=atof(value.c_str());
+         vin::check_for_valid_value(ir, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         vin::read_material[super_index].interface_roughness=ir;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="intermixing";
+      if(word==test){
+         double i=atof(value.c_str());
+         //vin::check_for_valid_value(i, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         if((i<0.0) || (i > 1.0)){
+            terminaltextcolor(RED);
+            std::cerr << "Error in input file - material[" << super_index+1 << "]:intermixing[" << sub_index+1 <<"] is outside of valid range (0.0-1.0)" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();}
+         else{
+            vin::read_material[super_index].intermixing[sub_index]=i;
+            return true;
+         }
+      }
+      //--------------------------------------------------------------------
+      test="density";
+      if(word==test){
+         double d=atof(value.c_str());
+         vin::check_for_valid_positive_value(d, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         vin::read_material[super_index].density=d;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="continuous";
+      if(word==test){
+         vin::read_material[super_index].continuous=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="fill-space";
+      /*
+      logical fill-space [false]
+          This flag causes the material to be a fill material, instead of
+          have atoms generated as part of the usual structure, for example
+          particle shpaes, particle arrays and voronoi films. The default
+          value is false for all materials. Valid values are true,
+          false or (blank) [same as true].
+      */
+      if(word==test){
+         // Test for sane input
+         //bool sanitised_bool=vin::check_for_valid_bool(value, word, line, prefix,"material");
+
+         // set flag
+         vin::read_material[super_index].fill=true; //sanitised_bool;
+
+         return true;
       }
       //--------------------------------------------------------------------
       // keyword not found

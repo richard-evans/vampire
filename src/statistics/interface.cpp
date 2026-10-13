@@ -17,7 +17,7 @@
 #include "errors.hpp"
 #include "vio.hpp"
 
-namespace statistics{
+namespace stats{
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for statistics module
@@ -50,4 +50,4 @@ namespace statistics{
 
    }
 
-} // end of statistics namespace
+} // end of stats namespace

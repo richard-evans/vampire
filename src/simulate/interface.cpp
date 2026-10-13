@@ -11,12 +11,17 @@
 //
 
 // C++ standard library headers
+#include <fstream>
 #include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
+#include "random.hpp"
 #include "sim.hpp"
+#include "stats.hpp"
+#include "units.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 
 // Internal sim header
 #include "internal.hpp"
@@ -257,6 +262,508 @@ namespace sim{
          return true;
       }
       //--------------------------------------------------------------------
+      test="enable-fmr-field";
+      if(word==test){
+         sim::hamiltonian_simulation_flags[5]=1;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="simulation-cycles";
+      if(word==test){
+         int r=atoi(value.c_str());
+         vin::check_for_valid_int(r, word, line, prefix, 0, 2000000000,"input","1 - 2,000,000,000");
+         sim::runs=r;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="maximum-temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+         sim::Tmax=T;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="minimum-temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+         sim::Tmin=T;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="equilibration-temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+         sim::Teq=T;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+         sim::temperature=T;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="temperature-increment";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 1.0e-10, 1.0e6,"input","1.0e-10 - 1,000,000 K");
+         sim::delta_temperature=T;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="cooling-time";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+         sim::cooling_time=T;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="cooling-function";
+      if(word==test){
+         test="exponential";
+         if(value==test){
+            sim::cooling_function_flag=0;
+            return true;
+         }
+         test="gaussian";
+         if(value==test){
+            sim::cooling_function_flag=1;
+            return true;
+         }
+         test="double-gaussian";
+         if(value==test){
+            sim::cooling_function_flag=2;
+            return true;
+         }
+         test="linear";
+         if(value==test){
+            sim::cooling_function_flag=3;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"exponential\"" << std::endl;
+            std::cerr << "\t\"gaussian\"" << std::endl;
+            std::cerr << "\t\"double-gaussian\"" << std::endl;
+            std::cerr << "\t\"linear\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="laser-pulse-temporal-profile";
+      if(word==test){
+         test="square";
+         if(value==test){
+            sim::pump_function=square;
+            return true;
+         }
+         test="two-temperature";
+         if(value==test){
+            sim::pump_function=two_temperature;
+            return true;
+         }
+         test="double-pulse-two-temperature";
+         if(value==test){
+            sim::pump_function=double_pump_two_temperature;
+            return true;
+         }
+         test="double-pulse-square";
+         if(value==test){
+            sim::pump_function=double_pump_square;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"square\"" << std::endl;
+            std::cerr << "\t\"double-pulse-square\"" << std::endl;
+            std::cerr << "\t\"two-temperature\"" << std::endl;
+            std::cerr << "\t\"double-pulse-two-temperature\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="laser-pulse-time";
+      if(word==test){
+         double pt=atof(value.c_str());
+         vin::check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+         sim::pump_time=pt;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="laser-pulse-power";
+      if(word==test){
+         double pp=atof(value.c_str());
+         vin::check_for_valid_value(pp, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         sim::pump_power=pp;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="second-laser-pulse-time";
+      if(word==test){
+         double pt=atof(value.c_str());
+         vin::check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+         sim::double_pump_time=pt;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="second-laser-pulse-power";
+      if(word==test){
+         double pp=atof(value.c_str());
+         vin::check_for_valid_value(pp, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         sim::double_pump_power=pp;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="second-laser-pulse-maximum-temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+         sim::double_pump_Tmax=T;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="second-laser-pulse-delay-time";
+      if(word==test){
+         double pd=atof(value.c_str());
+         vin::check_for_valid_value(pd, word, line, prefix, unit, "time", 0.0, 1.0,"input","0 - 1 s");
+         sim::double_pump_delay=pd;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-heat-sink-coupling";
+      if(word==test){
+         double hscc=atof(value.c_str());
+         vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         sim::HeatSinkCouplingConstant=hscc;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-electron-heat-capacity";
+      if(word==test){
+         double hscc=atof(value.c_str());
+         vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         sim::TTCe=hscc;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-phonon-heat-capacity";
+      if(word==test){
+         double hscc=atof(value.c_str());
+         vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         sim::TTCl=hscc;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-electron-phonon-coupling";
+      if(word==test){
+         double hscc=atof(value.c_str());
+         vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         sim::TTG=hscc;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="applied-field-strength";
+      if(word==test){
+         double H=atof(value.c_str());
+         vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+         sim::H_applied=H;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="minimum-applied-field-strength";
+      if(word==test){
+         double H=atof(value.c_str());
+         vin::check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e3,"input","0 - 1,000 T");
+         sim::Hmin=H;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="maximum-applied-field-strength";
+      if(word==test){
+         double H=atof(value.c_str());
+         vin::check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e3,"input","0 - 1,000 T");
+         sim::Hmax=H;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="equilibration-applied-field-strength";
+      if(word==test){
+         double H=atof(value.c_str());
+         vin::check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e3,"input","0 - 1,000 T");
+         sim::Heq=H;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="applied-field-strength-increment";
+      if(word==test){
+         double H=atof(value.c_str());
+         vin::check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+         sim::Hinc=H;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="applied-field-angle-theta";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::applied_field_angle_theta=angle;
+         sim::applied_field_set_by_angle=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="applied-field-angle-phi";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::applied_field_angle_phi=angle;
+         sim::applied_field_set_by_angle=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="applied-field-unit-vector";
+      if(word==test){
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+         sim::H_vec[0]=u.at(0);
+         sim::H_vec[1]=u.at(1);
+         sim::H_vec[2]=u.at(2);
+         sim::applied_field_set_by_angle=false;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="demagnetisation-factor";
+      if(word==test){
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         vin::check_for_valid_three_vector(u, word, line, prefix, "input");
+         // Extra check for demagnetisation-factor Nx+Ny+Nz=1
+         double sum=u.at(0)+u.at(1)+u.at(2);
+         if(fabs(1.0-sum)>1.e-4){
+            terminaltextcolor(RED);
+            std::cerr << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
+            err::vexit();
+         }
+         sim::demag_factor[0]=u.at(0);
+         sim::demag_factor[1]=u.at(1);
+         sim::demag_factor[2]=u.at(2);
+         sim::ext_demag=true;
+         // force calculation of system magnetization
+         stats::calculate_system_magnetization=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="fmr-field-strength";
+      if(word==test){
+         double H=atof(value.c_str());
+         vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+         sim::fmr_field_strength=H;
+         sim::hamiltonian_simulation_flags[5]=1; // enable fmr fields
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="fmr-field-frequency";
+      if(word==test){
+         double w = atof(value.c_str());
+         vin::check_for_valid_value(w, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"input","0 - 10,000 GHz");
+         sim::fmr_field_frequency = w;
+         sim::hamiltonian_simulation_flags[5]=1; // enable fmr fields
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="fmr-field-unit-vector";
+      if(word==test){
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+         sim::fmr_field_unit_vector = u;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-rotation-update";
+      if(word==test){
+         sim::constraint_rotation=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_theta=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta-minimum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_theta_min=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta-maximum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_theta_max=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta-increment";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_theta_delta=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_phi=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi-minimum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_phi_min=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi-maximum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_phi_max=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi-increment";
+      if(word==test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+         sim::constraint_phi_delta=angle;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="save-checkpoint";
+      if(word==test){
+         test="end";
+         if(value==test){
+            sim::save_checkpoint_flag=true; // Save checkpoint
+            sim::save_checkpoint_continuous_flag=false; // do not save checkpoints during simulation
+            return true;
+         }
+         test="continuous";
+         if(value==test){
+            sim::save_checkpoint_flag=true; // Save checkpoint
+            sim::save_checkpoint_continuous_flag=true; // save checkpoints during simulation
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"end\"" << std::endl;
+            std::cerr << "\t\"continuous\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="save-checkpoint-rate";
+      if(word==test){
+         int scr=atoi(value.c_str());
+         vin::check_for_valid_int(scr, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
+         sim::save_checkpoint_rate=scr;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="load-checkpoint";
+      if(word==test){
+         test="restart";
+         if(value==test){
+            sim::load_checkpoint_flag=true; // Load spin configurations
+            sim::load_checkpoint_continue_flag=false; // Restart simulation with checkpoint configuration
+            return true;
+         }
+         test="continue";
+         if(value==test){
+            sim::load_checkpoint_flag=true; // Load spin configurations
+            sim::load_checkpoint_continue_flag=true; // Continue simulation from saved time with checkpoint configuration
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"restart\"" << std::endl;
+            std::cerr << "\t\"continue\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="load-checkpoint-if-exists";
+      if(word==test){
+         // determine checkpoint file name
+         std::stringstream chkfilenamess;
+         chkfilenamess << "vampire" << vmpi::my_rank << ".chk";
+         std::string chkfilename = chkfilenamess.str();
+
+         // open checkpoint file
+         std::ifstream chkfile(chkfilename.c_str());
+         bool exists=chkfile.good();
+         chkfile.close();
+         if(exists){
+            test="restart";
+            if(value==test){
+               sim::load_checkpoint_flag=true; // Load spin configurations
+               sim::load_checkpoint_continue_flag=false; // Restart simulation with checkpoint configuration
+               return true;
+            }
+            test="continue";
+            if(value==test){
+               sim::load_checkpoint_flag=true; // Load spin configurations
+               sim::load_checkpoint_continue_flag=true; // Continue simulation from saved time with checkpoint configuration
+               return true;
+            }
+            else{
+               terminaltextcolor(RED);
+               std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+               std::cerr << "\t\"restart\"" << std::endl;
+               std::cerr << "\t\"continue\"" << std::endl;
+               terminaltextcolor(WHITE);
+               err::vexit();
+            }
+         }
+         else{
+            return true; // No checkpoint file
+         }
+      }
+      //--------------------------------------------------------------------
+      test="integrator-random-seed";
+      if(word==test){
+         int is=atoi(value.c_str());
+         vin::check_for_valid_int(is, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         mtrandom::integration_seed=is;
+         return true;
+      }
+      //--------------------------------------------------------------------
       // input parameter not found here
       return false;
    }
@@ -445,6 +952,198 @@ namespace sim{
          vin::check_for_valid_value(c_l, word, line, prefix, unit, "energy", -1.0e-16, 1.0e-16,"material","-1.0e-16 - 1.0e-16");
          sim::internal::mp[super_index].lsf_sixth_order_coefficient.set(c_l);
          return true;
+      }
+      //--------------------------------------------------------------------
+      test="temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         // Test for valid range
+         if((T>=0.0) && (T<1.0E5)){
+            vin::read_material[super_index].temperature=T;
+            // set local temperature flag
+            sim::local_temperature=true;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="minimum-temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+         vin::read_material[super_index].minimum_temperature = T;
+         sim::local_temperature=true; // set local temperature flag
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="maximum-temperature";
+      if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+         vin::read_material[super_index].maximum_temperature = T;
+         sim::local_temperature=true; // set local temperature flag
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="use-phonon-temperature";
+      /*
+      logical use-phonon-temperature
+          This flag enables specific materials to couple to the phonon temperature
+          of the system for simulations using the two temperature model. The default
+          is for all materials to use the electron temperature. Valid values are true,
+          false or (blank) [same as true].
+      */
+      if(word==test){
+         // Test for sane input
+         //bool sanitised_bool=vin::check_for_valid_bool(value, word, line, prefix,"material");
+
+         // set flag
+         vin::read_material[super_index].couple_to_phonon_temperature=true; //sanitised_bool;
+
+         // enable local temperature flag
+         sim::local_temperature=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="applied-field-strength";
+      if(word==test){
+         double H=atof(value.c_str());
+         // test for unit
+         string unit_type="field";
+         // if no unit given, assume internal
+         if(unit.size() != 0){
+            units::convert(unit,H,unit_type);
+         }
+         string str="field";
+         if(unit_type==str){
+            // Test for valid range
+            if((H>=-1.0E5) && (H<1.0E5)){
+               vin::read_material[super_index].applied_field_strength=H;
+               // set local applied field flag
+               sim::local_applied_field=true;
+               return true;
+            }
+            else{
+               terminaltextcolor(RED);
+               std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range -1.0e5 - +1.0e5" << std::endl;
+               terminaltextcolor(WHITE);
+               err::vexit();
+            }
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="applied-field-unit-vector";
+      if(word==test){
+         // temporary storage container
+         std::vector<double> u(3);
+
+         // read values from string
+         u=vin::doubles_from_string(value);
+
+         // check size
+         if(u.size()!=3){
+            terminaltextcolor(RED);
+            std::cerr << "Error in input file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error in input file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
+            err::vexit();
+         }
+
+         // Normalise
+         double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+
+         // Check for correct length unit vector
+         if(ULength < 1.0e-9){
+            terminaltextcolor(RED);
+            std::cerr << "Error in input file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error in input file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+            err::vexit();
+         }
+         u.at(0)/=ULength;
+         u.at(1)/=ULength;
+         u.at(2)/=ULength;
+
+         // Copy applied field direction to material
+         vin::read_material[super_index].applied_field_unit_vector=u;
+
+         // set local applied field flag
+         sim::local_applied_field=true;
+
+         return true;
+
+      }
+      //--------------------------------------------------------------------
+      test="fmr-field-strength";
+      if(word==test){
+         double H = atof(value.c_str());
+         vin::check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e5,"material","0 - 10,000 T");
+         vin::read_material[super_index].fmr_field_strength=H;
+         // set local fmr flag
+         sim::local_fmr_field=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="fmr-field-frequency";
+      if( word == test ){
+         double f = atof(value.c_str());
+         vin::check_for_valid_value(f, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"material","0 - 10,000 GHz");
+         vin::read_material[super_index].fmr_field_frequency = f;
+         sim::local_fmr_field = true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="fmr-field-unit-vector";
+      if(word==test){
+         // temporary storage container
+         std::vector<double> u(3);
+
+         // read values from string
+         u=vin::doubles_from_string(value);
+
+         // check size
+         if(u.size()!=3){
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
+            err::vexit();
+         }
+
+         // Normalise
+         double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+
+         // Check for correct length unit vector
+         if(ULength < 1.0e-9){
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+            err::vexit();
+         }
+         u.at(0)/=ULength;
+         u.at(1)/=ULength;
+         u.at(2)/=ULength;
+
+         // Copy field direction to material
+         vin::read_material[super_index].fmr_field_unit_vector=u;
+
+         // set local applied field flag
+         sim::local_fmr_field=true;
+
+         return true;
+
       }
       //--------------------------------------------------------------------
       // keyword not found

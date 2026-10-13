@@ -209,7 +209,7 @@ void save_checkpoint();
 
 namespace vio{
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
-
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 }
 
 #endif /*VIO_H_*/

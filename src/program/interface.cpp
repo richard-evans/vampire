@@ -15,6 +15,7 @@
 
 // Vampire headers
 #include "program.hpp"
+#include "sim.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
 
@@ -276,6 +277,130 @@ namespace program{
          vin::check_for_valid_positive_value(pt, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
          // save sanitized value
          program::internal::field_pulse_time = pt;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-Ms";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "magnetisation", 0.0, 360.0,"input","0.0 - 360.0");
+         sim::track_Ms = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-file";
+      if(word==test){
+         sim::track_ms_file=true; // Save checkpoint
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-bit-size-x";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10,000,000.0");
+         sim::track_bit_size = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-bit-size-y";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10,000,000.0");
+         sim::track_bit_depth = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-bit-size-z";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10,000,000.0");
+         sim::track_bit_width = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-fly-height";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 36,000.0");
+         sim::track_fly_height = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-gap-between-bits";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 36,000.0");
+         sim::track_bit_gap = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="track-gap-between-tracks";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 36,000.0");
+         sim::track_track_gap = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="num-tracks";
+      if(word==test){
+         int n=atoi(value.c_str());
+         vin::check_for_valid_int(n, word, line, prefix, 0, 100,"input","0 - 100");
+         sim::track_num_tracks = n;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="num-bits-per-track";
+      if(word==test){
+         int n=atoi(value.c_str());
+         vin::check_for_valid_int(n, word, line, prefix, 0, 100,"input","0 - 100");
+         sim::track_num_bits_per_track = n;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="x-velocity";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0");
+         sim::cross_track_velocity = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="z-velocity";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0");
+         sim::down_track_velocity = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="initial-x-position";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","-100,000,000.0 - 10,000,000.0");
+         sim::initial_cross_track_position = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="initial-z-position";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","-100,000,000.0 - 10,000,000.0");
+         sim::initial_down_track_position = m;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="LFA";
+      if(word==test){
+         sim::LFA = true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="LFA-track-field-step";
+      if(word==test){
+         double m=atof(value.c_str());
+         vin::check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 36000.0,"input","0.0 - 36,000.0");
+         sim::LFA_scan_field_step = m;
          return true;
       }
       //--------------------------------------------------------------------

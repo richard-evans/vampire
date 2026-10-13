@@ -6,6 +6,7 @@
 mpi_objects =\
 data.o \
 decomposition.o \
+interface.o \
 LLGHeun-mpi.o \
 LLGMidpoint-mpi.o \
 mpi_generic.o \

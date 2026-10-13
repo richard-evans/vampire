@@ -14,6 +14,7 @@ initialize.o \
 interface.o \
 match.o \
 match_grain_list.o \
+match_output_list.o \
 nullify.o \
 outputfunctions.o \
 read.o \

@@ -24,50 +24,50 @@
 namespace vout{
 
    // funtion to process input parameters for grain output file
-   int match_vout_grain_list(std::string const word, std::string const value, int const line, std::vector<grain::output_t> & output_list){
+   bool match_vout_grain_list(std::string const word, std::string const value, int const line, std::vector<grain::output_t> & output_list){
 
       std::string prefix="grain:";
 
       std::string test="time-steps";
       if(word==test){
          grain::output_list.push_back(grain::time_steps);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="real-time";
       if(word==test){
          grain::output_list.push_back(grain::real_time);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="temperature";
       if(word==test){
          grain::output_list.push_back(grain::temperature);
-         return EXIT_SUCCESS;
+         return true;
       }
       //-------------------------------------------------------------------
       test="electron-temperature"; // identical to temperature
       if(word==test){
          grain::output_list.push_back(grain::temperature);
-         return EXIT_SUCCESS;
+         return true;
       }
       //-------------------------------------------------------------------
       test="phonon-temperature";
       if(word==test){
          grain::output_list.push_back(grain::phonon_temperature);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="applied-field-strength";
       if(word==test){
          grain::output_list.push_back(grain::applied_field);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="applied-field-unit-vector";
       if(word==test){
          grain::output_list.push_back(grain::applied_field_unit_vector);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="magnetisation";
@@ -75,7 +75,7 @@ namespace vout{
          // enable statistics collection for grains
          stats::calculate_grain_magnetization = true;
          grain::output_list.push_back(grain::magnetisation);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="mean-magnetisation-length";
@@ -83,7 +83,7 @@ namespace vout{
          // enable statistics collection for grains
          stats::calculate_grain_magnetization = true;
          grain::output_list.push_back(grain::mean_magnetisation_length);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="mean-susceptibility";
@@ -92,7 +92,7 @@ namespace vout{
          stats::calculate_grain_magnetization  = true;
          stats::calculate_grain_susceptibility = true;
          grain::output_list.push_back(grain::mean_susceptibility);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="mean-specific-heat";
@@ -101,7 +101,7 @@ namespace vout{
          stats::calculate_grain_energy        = true;
          stats::calculate_grain_specific_heat = true;
          grain::output_list.push_back(grain::mean_specific_heat);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="mean-torque";
@@ -109,7 +109,7 @@ namespace vout{
          // enable statistics collection for grains
          stats::calculate_grain_torque = true;
          grain::output_list.push_back(grain::mean_torque);
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="material-magnetisation";
@@ -117,7 +117,7 @@ namespace vout{
          // enable statistics collection for grains
          stats::calculate_material_grain_magnetization  = true;
          grain::output_list.push_back(grain::material_magnetisation);
-         return EXIT_SUCCESS;
+         return true;
       }
      
 
@@ -127,7 +127,7 @@ namespace vout{
          // enable statistics collection for grains
          stats::calculate_material_grain_height_magnetization  = true;
          grain::output_list.push_back(grain::material_height_magnetisation);
-         return EXIT_SUCCESS;
+         return true;
       }
       //-------------------------------------------------------------------
       test="output-rate";
@@ -135,19 +135,12 @@ namespace vout{
          int r=atoi(value.c_str());
          vin::check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
          vout::grain::output_rate = r;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
-      // keyword not found
+      // Keyword not found
       //--------------------------------------------------------------------
-      else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - Unknown control statement \'grain:" << word << "\' on line " << line << " of input file" << std::endl;
-         terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-
-      return EXIT_SUCCESS;
+      return false;
 
    }
 

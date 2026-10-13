@@ -27,10 +27,11 @@ namespace config{
    //---------------------------------------------------------------------------
    // Function to process input file parameters for config module
    //---------------------------------------------------------------------------
-   int match_input_parameter(std::string const word, std::string const value, std::string const unit, int const line){
-   //int match_config          (std::string const word, std::string const value, std::string const unit, int const line){
-      std::string prefix="config:";
-      //if(key!=prefix) return false;
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
+
+      // Check for valid key, if no match return false
+      std::string prefix="config";
+      if(key!=prefix) return false;
 
       // System output config variables
       std::string test="atoms";
@@ -40,21 +41,21 @@ namespace config{
               internal::output_atoms_config=true; // Save atomic configuration
               internal::output_atoms_config_continuous=false; // do not save atomic configurations during simulation
               internal::output_atoms_config_end=true; // save atomic configurations at the end of simulation
-              return EXIT_SUCCESS;
+              return true;
           }
           test="continuous";
           if(value==test){
               internal::output_atoms_config=true; // Save atomic configuration
               internal::output_atoms_config_continuous=true; // save atomic configurations during simulation
               internal::output_atoms_config_end=false; // do not save atomic configurations at the end of simulation
-              return EXIT_SUCCESS;
+              return true;
           }
           test="";
           if(value==test){
               internal::output_atoms_config=true; // Save atomic configuration
               internal::output_atoms_config_continuous=true; // save atomic configurations during simulation
               internal::output_atoms_config_end=false; // do not save atomic configurations at the end of simulation
-              return EXIT_SUCCESS;
+              return true;
           }
           else{
               terminaltextcolor(RED);
@@ -73,14 +74,14 @@ namespace config{
          vin::check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       //  vin::check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
          internal::output_atoms_config_rate=i;
-         return EXIT_SUCCESS;
+         return true;
       }
       //
       //-----------------------------------------
       test="sld";
       if(word==test){
          internal::sld_format = true;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="output-format";
@@ -88,12 +89,12 @@ namespace config{
          test="binary";
          if(value == test){
             config::internal::format = internal::binary;
-            return EXIT_SUCCESS;
+            return true;
          }
          test="text";
          if(value == test){
             config::internal::format = internal::text;
-            return EXIT_SUCCESS;
+            return true;
          }
          else{
             terminaltextcolor(RED);
@@ -110,22 +111,22 @@ namespace config{
          test="legacy";
          if(value == test){
             config::internal::mode = internal::legacy;
-            return EXIT_SUCCESS;
+            return true;
          }
          test="mpi-io";
          if(value == test){
             config::internal::mode = internal::mpi_io;
-            return EXIT_SUCCESS;
+            return true;
          }
          test="file-per-process";
          if(value == test){
             config::internal::mode = internal::fpprocess;
-            return EXIT_SUCCESS;
+            return true;
          }
          test="file-per-node";
          if(value == test){
             config::internal::mode = internal::fpnode;
-            return EXIT_SUCCESS;
+            return true;
          }
          else{
             terminaltextcolor(RED);
@@ -151,7 +152,7 @@ namespace config{
             x = vmpi::num_processors;
          }
          config::internal::num_io_groups = x;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="atoms-minimum-x";
@@ -159,7 +160,7 @@ namespace config{
          double x=atof(value.c_str());
          vin::check_for_valid_value(x, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
          internal::atoms_output_min[0]=x;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="atoms-minimum-y";
@@ -167,7 +168,7 @@ namespace config{
          double y=atof(value.c_str());
          vin::check_for_valid_value(y, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
          internal::atoms_output_min[1]=y;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="atoms-minimum-z";
@@ -175,7 +176,7 @@ namespace config{
          double z=atof(value.c_str());
          vin::check_for_valid_value(z, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
          internal::atoms_output_min[2]=z;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="atoms-maximum-x";
@@ -183,7 +184,7 @@ namespace config{
          double x=atof(value.c_str());
          vin::check_for_valid_value(x, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
          internal::atoms_output_max[0]=x;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="atoms-maximum-y";
@@ -191,7 +192,7 @@ namespace config{
          double y=atof(value.c_str());
          vin::check_for_valid_value(y, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
          internal::atoms_output_max[1]=y;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="atoms-maximum-z";
@@ -199,7 +200,7 @@ namespace config{
          double z=atof(value.c_str());
          vin::check_for_valid_value(z, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
          internal::atoms_output_max[2]=z;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       test="macro-cells";
@@ -209,21 +210,21 @@ namespace config{
               internal::output_cells_config=true; // Save atomic configuration
               internal::output_cells_config_continuous=false; // do not save atomic configuration at the end of simulation
               internal::output_cells_config_end=true; // save cells configurations at the end of simulation
-              return EXIT_SUCCESS;
+              return true;
           }
           test="continuous";
           if(value==test){
               internal::output_cells_config=true; // Save atomic configuration
               internal::output_cells_config_continuous=true; // save atomic configuration during simulation
               internal::output_cells_config_end=false; // do not save cells configurations at the end of simulation
-              return EXIT_SUCCESS;
+              return true;
           }
           test="";
           if(value==test){
               internal::output_cells_config=true; // Save atomic configuration
               internal::output_cells_config_continuous=true; // save atomic configuration during simulation
               internal::output_cells_config_end=false; // do not save cells configurations at the end of simulation
-              return EXIT_SUCCESS;
+              return true;
           }
           else{
               terminaltextcolor(RED);
@@ -241,13 +242,13 @@ namespace config{
          int i=atoi(value.c_str());
          vin::check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
          internal::output_cells_config_rate=i;
-         return EXIT_SUCCESS;
+         return true;
       }
       //-------------------------------------------------------------------
       test="identify-surface-atoms";
       if(word==test){
          config::internal::identify_surface_atoms = true;
-         return EXIT_SUCCESS;
+         return true;
       }
       //-----------------------------------------
       test="field-range-descending-minimum";
@@ -255,7 +256,7 @@ namespace config{
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
          internal::field_output_min_1=H;
-         return EXIT_SUCCESS;
+         return true;
       }
       //-----------------------------------------
       test="field-range-descending-maximum";
@@ -263,7 +264,7 @@ namespace config{
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
          internal::field_output_max_1=H;
-         return EXIT_SUCCESS;
+         return true;
       }
       //-----------------------------------------
       test="field-range-ascending-minimum";
@@ -271,7 +272,7 @@ namespace config{
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
          internal::field_output_min_2=H;
-         return EXIT_SUCCESS;
+         return true;
       }
       //-----------------------------------------
       test="field-range-ascending-maximum";
@@ -279,15 +280,13 @@ namespace config{
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
          internal::field_output_max_2=H;
-         return EXIT_SUCCESS;
+         return true;
       }
-      //-----------------------------------------
-      else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
-         terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
+      //--------------------------------------------------------------------
+      // Keyword not found
+      //--------------------------------------------------------------------
+      return false;
+
    }
 
    //---------------------------------------------------------------------------

@@ -94,6 +94,135 @@ namespace montecarlo{
       // add prefix string
       std::string prefix="material:";
 
+      std::string test="";
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=360.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_theta=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta-minimum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=360.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_theta_min=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta-maximum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=360.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_theta_max=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-theta-increment";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=360.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_theta_delta=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=180.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_phi=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi-minimum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=180.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_phi_min=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi-maximum";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=180.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_phi_max=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
+      test="constraint-angle-phi-increment";
+      if(word==test){
+         double angle=atof(value.c_str());
+         // Test for valid range
+         if((angle>=0.0) && (angle<=180.0)){
+            montecarlo::cmc::cmc_mat[super_index].constraint_phi_delta=angle;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

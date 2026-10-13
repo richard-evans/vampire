@@ -136,6 +136,11 @@ namespace vmpi{
    // function to seed random numbers in parallel
    uint32_t parallel_rng_seed(int seed);
 
+   //---------------------------------------------------------------------------
+   // Function to process input file parameters for mpi module
+   //---------------------------------------------------------------------------
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
 }
 
 #endif /*VMPI_H_*/

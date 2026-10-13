@@ -36,7 +36,7 @@ namespace config{
    //---------------------------------------------------------------------------
    // Function to process material parameters
    //---------------------------------------------------------------------------
-   int match_input_parameter(std::string const word, std::string const value, std::string const unit, int const line);
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
 } // end of config namespace
 

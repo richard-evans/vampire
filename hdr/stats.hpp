@@ -56,6 +56,16 @@ namespace stats
 	// Function to reset average statistics counters
    void reset();
 
+   //---------------------------------------------------------------------------
+   // Function to process input file parameters for statistics module
+   //---------------------------------------------------------------------------
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+   //---------------------------------------------------------------------------
+   // Function to process material parameters
+   //---------------------------------------------------------------------------
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+
 	// Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
 	extern bool calculate_system_energy;
 	extern bool calculate_grain_energy;
