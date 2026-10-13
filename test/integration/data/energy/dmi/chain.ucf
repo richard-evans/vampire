@@ -1,0 +1,19 @@
+# Unit cell size:
+6.0	3.0	3.0
+# Unit cell vectors:
+1.0 0.0 0.0
+0.0 1.0 0.0
+0.0 0.0 1.0
+# Atoms num, id cx cy cz mat lc hc
+2
+0	0.0	0.0	0.0	0	0	0
+1	0.5	0.0	0.0	1	1	0
+# Interactions n exctype, id i j dx dy dz Jxx Jxy Jxz Jyx Jyy Jyz Jzx Jzy Jzz
+# Each pair has antisymmetric (DMI) Jxy = -Jyx = D = 1e-21 J and a symmetric off-diagonal
+# K = 0.5e-21 J, with J(j->i) = J(i->j)^T. Spins of materials 1 and 2 are along x and y so that
+# E_exchange = -N (D + K) and E_dmi = -N D for N atoms.
+4	tensorial
+0	0	1	0	0	0	1e-21	1.5e-21	0.0	-0.5e-21	1e-21	0.0	0.0	0.0	1e-21
+1	0	1	-1	0	0	1e-21	1.5e-21	0.0	-0.5e-21	1e-21	0.0	0.0	0.0	1e-21
+2	1	0	0	0	0	1e-21	-0.5e-21	0.0	1.5e-21	1e-21	0.0	0.0	0.0	1e-21
+3	1	0	1	0	0	1e-21	-0.5e-21	0.0	1.5e-21	1e-21	0.0	0.0	0.0	1e-21

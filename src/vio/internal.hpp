@@ -162,6 +162,8 @@ namespace vout{
    void mean_total_applied_field_energy(std::ostream& stream,bool header);
    void total_magnetostatic_energy(std::ostream& stream,bool header);
    void mean_total_magnetostatic_energy(std::ostream& stream,bool header);
+   void total_dmi_energy(std::ostream& stream,bool header);
+   void mean_total_dmi_energy(std::ostream& stream,bool header);
    //void total_so_anisotropy_energy(std::ostream& stream,bool header);
    //void mean_total_so_anisotropy_energy(std::ostream& stream,bool header);
    void height_mvec(std::ostream& stream,bool header);
@@ -181,6 +183,8 @@ namespace vout{
    void mean_material_specific_heat(std::ostream& stream,bool header);
    void material_total_energy(std::ostream& stream,bool header);
    void material_mean_total_energy(std::ostream& stream,bool header);
+   void material_dmi_energy(std::ostream& stream,bool header);
+   void material_mean_dmi_energy(std::ostream& stream,bool header);
    void resistance(std::ostream& stream, bool header);
    void current(std::ostream& stream, bool header);
    void domain_wall_position(std::ostream& stream,bool header);

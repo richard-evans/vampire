@@ -365,6 +365,16 @@ namespace vout{
       stream << stats::system_energy.output_mean_energy(stats::magnetostatic,header);
 	}
 
+	// Output DMI energy - with Header
+	void total_dmi_energy(std::ostream& stream, bool header){
+      stream << stats::system_energy.output_energy(stats::dmi,header);
+	}
+
+	// Output mean DMI energy - with Header
+	void mean_total_dmi_energy(std::ostream& stream, bool header){
+      stream << stats::system_energy.output_mean_energy(stats::dmi,header);
+	}
+
 	// Output Function 41
 	/*void total_so_anisotropy_energy(std::ostream& stream,bool header){
 		stats::output_energy(stream, stats::second_order_anisotropy, stats::total);
@@ -454,6 +464,16 @@ namespace vout{
    // Output Function 64 - with Header
    void material_mean_total_energy(std::ostream& stream, bool header){
       stream << stats::material_energy.output_mean_energy(stats::total,header);
+   }
+
+   // Output material DMI energy - with Header
+   void material_dmi_energy(std::ostream& stream, bool header){
+      stream << stats::material_energy.output_energy(stats::dmi,header);
+   }
+
+   // Output material mean DMI energy - with Header
+   void material_mean_dmi_energy(std::ostream& stream, bool header){
+      stream << stats::material_energy.output_mean_energy(stats::dmi,header);
    }
 
    // Output Function 65

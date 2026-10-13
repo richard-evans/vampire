@@ -8,6 +8,7 @@ biquadratic_energy.o \
 biquadratic_fields.o \
 data.o \
 dmi.o \
+dmi_energy.o \
 energy.o \
 exchange_fields.o \
 fields.o \

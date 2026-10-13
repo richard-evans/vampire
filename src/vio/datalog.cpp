@@ -191,6 +191,12 @@ namespace vout{
       	case output_t::mean_magnetostatic_energy:
       		vout::mean_total_magnetostatic_energy(stream,header);
       		break;
+      	case output_t::dmi_energy:
+      		vout::total_dmi_energy(stream,header);
+      		break;
+      	case output_t::mean_dmi_energy:
+      		vout::mean_total_dmi_energy(stream,header);
+      		break;
       	case output_t::height_magnetisation_normalised:
       		vout::height_mvec(stream,header);
       		break;
@@ -235,6 +241,12 @@ namespace vout{
 				break;
 			case output_t::material_mean_total_energy:
 				vout::material_mean_total_energy(stream,header);
+				break;
+			case output_t::material_dmi_energy:
+				vout::material_dmi_energy(stream,header);
+				break;
+			case output_t::material_mean_dmi_energy:
+				vout::material_mean_dmi_energy(stream,header);
 				break;
 			case output_t::resistance:
 				vout::resistance(stream, header);

@@ -188,6 +188,10 @@ namespace vout{
       mean_applied_field_energy,
       magnetostatic_energy,
       mean_magnetostatic_energy,
+      dmi_energy,
+      mean_dmi_energy,
+      material_dmi_energy,
+      material_mean_dmi_energy,
 
       // spin temperature and spin length
       spin_temperature,

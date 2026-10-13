@@ -950,6 +950,18 @@ The statistic is taken over the range of values gathered during the \textit{loop
 
 {\zicf output:mean-magnetostatic-energy}\phantomsection\addcontentsline{toc}{subsection}{output:mean-magnetostatic-energy}
 
+{\zicf output:dmi-energy}\phantomsection\addcontentsline{toc}{subsection}{output:dmi-energy} Outputs the Dzyaloshinskii-Moriya energy of the system in Joules, defined as the antisymmetric part of the tensorial exchange
+\begin{equation*}
+E_{\mathrm{DMI}} = \frac{1}{2}\sum_{i,j} \mathbf{D}_{ij} \cdot \left(\mathbf{S}_i \times \mathbf{S}_j\right).
+\end{equation*}
+\noindent This includes the built-in DMI and any antisymmetric components of tensorial exchange interactions defined in the unit cell file. The DMI energy is a component of the exchange energy and is already included in {\zicf output:exchange-energy} and {\zicf output:total-energy}. The value is zero unless tensorial exchange is used.
+
+{\zicf output:mean-dmi-energy}\phantomsection\addcontentsline{toc}{subsection}{output:mean-dmi-energy} Outputs the mean Dzyaloshinskii-Moriya energy of the system in Joules.
+
+{\zicf output:material-dmi-energy}\phantomsection\addcontentsline{toc}{subsection}{output:material-dmi-energy} Outputs the Dzyaloshinskii-Moriya energy of each material in the system in Joules. The data is formatted as one column per material. Interactions between atoms of different materials are shared equally between the two materials.
+
+{\zicf output:material-mean-dmi-energy}\phantomsection\addcontentsline{toc}{subsection}{output:material-mean-dmi-energy} Outputs the mean Dzyaloshinskii-Moriya energy of each material in the system in Joules. The data is formatted as one column per material.
+
 {\zicf output:material-total-energy}\phantomsection\addcontentsline{toc}{subsection}{output:material-total-energy} Outputs the total energy of each material in the system.
 
 {\zicf output:material-mean-total-energy}\phantomsection\addcontentsline{toc}{subsection}{output:material-mean-total-energy} Outputs the mean total energy of each material in the system.

@@ -19,6 +19,7 @@ namespace stats{
    bool calculate_system_energy                 = false;
    bool calculate_grain_energy                  = false;
    bool calculate_material_energy               = false;
+   bool calculate_dmi_energy                    = false;
 
    bool calculate_system_sld_energy             = false;
    bool calculate_grain_sld_energy              = false;

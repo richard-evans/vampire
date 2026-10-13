@@ -45,6 +45,9 @@ int main(){
    // Anisotropy energy tests
    if( !energy_test("anisotropy/uniaxial", -1.0e-20, exe, "anisotropy" ) ) fail += 1;
 
+   // DMI energy tests
+   if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
+
    // Integrator tests
    if( !integrator_test("dynamics/heun",    -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
    if( !integrator_test("dynamics/midpoint",-0.103927, -0.338608, 0.935171, exe ) ) fail += 1;

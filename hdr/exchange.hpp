@@ -98,6 +98,11 @@ namespace exchange{
    double single_spin_biquadratic_energy(const int atom, const double sx, const double sy, const double sz);
    double single_spin_four_spin_energy(const int atom, const double sx, const double sy, const double sz);
 
+   //---------------------------------------------------------------------------
+   // Calculate DMI energy for single spin (antisymmetric part of exchange tensor)
+   //---------------------------------------------------------------------------
+   double single_spin_dmi_energy(const int atom, const double sx, const double sy, const double sz);
+
    //-----------------------------------------------------------------------------
    // Function to calculate exchange fields for spins between start and end index
    //-----------------------------------------------------------------------------

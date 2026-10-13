@@ -1,0 +1,47 @@
+#------------------------------------------
+# Test of DMI energy calculation for a
+# two sublattice chain with spins at 90
+# degrees. 2000 atoms with D = 1e-21 J give
+# E_dmi = -2e-18 J and E_exchange = -3e-18 J
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:system-size-x = 6.0 !nm
+dimensions:system-size-y = 3.0 !nm
+dimensions:system-size-z = 3.0 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=materials.mat
+material:unit-cell-file=chain.ucf
+
+#------------------------------------------
+# Simulation attributes (tiny time step so
+# spins remain fixed)
+#------------------------------------------
+sim:temperature=0.0
+sim:time-steps-increment = 1
+sim:total-time-steps = 1
+sim:time-step=1.0E-20
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-heun
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:dmi-energy
+output:exchange-energy
+output:material-dmi-energy

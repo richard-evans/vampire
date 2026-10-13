@@ -325,6 +325,22 @@ namespace vout{
             stats::calculate_system_energy = true;
             return true;
         }
+        //-------------------------------------------------------------------
+        test="dmi-energy";
+        if(word==test){
+            output_list.push_back(output_t::dmi_energy);
+            stats::calculate_system_energy = true;
+            stats::calculate_dmi_energy = true;
+            return true;
+        }
+        //-------------------------------------------------------------------
+        test="mean-dmi-energy";
+        if(word==test){
+            output_list.push_back(output_t::mean_dmi_energy);
+            stats::calculate_system_energy = true;
+            stats::calculate_dmi_energy = true;
+            return true;
+        }
         //--------------------------------------------------------------------
         test="height-magnetisation-normalised";
         if(word==test){
@@ -408,6 +424,22 @@ namespace vout{
         if(word==test){
            stats::calculate_material_energy = true;
            output_list.push_back(output_t::material_mean_total_energy);
+           return true;
+        }
+        //--------------------------------------------------------------------
+        test="material-dmi-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           stats::calculate_dmi_energy = true;
+           output_list.push_back(output_t::material_dmi_energy);
+           return true;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-dmi-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           stats::calculate_dmi_energy = true;
+           output_list.push_back(output_t::material_mean_dmi_energy);
            return true;
         }
         //--------------------------------------------------------------------
