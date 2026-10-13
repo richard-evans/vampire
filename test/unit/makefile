@@ -21,7 +21,9 @@ obj/utility/utility_test.o\
 obj/utility/spin_temperature_test.o \
 obj/utility/vmath_test.o \
 obj/create/create_tests.o \
-obj/create/voronoi_bimodal_seeds_test.o
+obj/create/voronoi_bimodal_seeds_test.o \
+obj/integrate/integrate_tests.o \
+obj/integrate/rotations_test.o
 
 
 VAMPIRE_OBJECTS= \

@@ -77,6 +77,9 @@ int main(int argc, char* argv[]){
       // Integrator tests
       if( !integrator_test("dynamics/heun",    -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
       if( !integrator_test("dynamics/midpoint",-0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( !integrator_test("dynamics/rkmk2",   -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( !integrator_test("dynamics/rkmk4",   -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( !integrator_test("dynamics/dm",      -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
 
       // Program tests
       // effective-damping: single spin rotated 120 degrees from z relaxing in 1T field along z

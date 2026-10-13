@@ -43,6 +43,9 @@ namespace integrate{
 
       }
 
+      // Check and log rotation based LLG integrators
+      internal::initialize_rotation_integrators();
+
       return;
 
    }

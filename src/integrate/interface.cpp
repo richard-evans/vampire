@@ -76,6 +76,25 @@ namespace integrate{
                integrate::integrator = integrator_t::llg_quantum;
                return true;
             }
+            //--------------------------------------------------------------------
+            test="llg-rkmk2";
+            if( value == test ){
+               integrate::integrator = integrator_t::llg_rkmk2;
+               return true;
+            }
+            //--------------------------------------------------------------------
+            test="llg-rkmk4";
+            if( value == test ){
+               integrate::integrator = integrator_t::llg_rkmk4;
+               return true;
+            }
+            //--------------------------------------------------------------------
+            test="llg-dm";
+            if( value == test ){
+               integrate::integrator = integrator_t::llg_dm;
+               return true;
+            }
+            //--------------------------------------------------------------------
             test="spin-lattice";
             if( value == test ){
                integrate::integrator = integrator_t::suzuki_trotter;
@@ -107,6 +126,9 @@ namespace integrate{
                   std::cerr << "\t\"llg-heun\"" << std::endl;
                   std::cerr << "\t\"llg-midpoint\"" << std::endl;
                   std::cerr << "\t\"llg-quantum\"" << std::endl;
+                  std::cerr << "\t\"llg-rkmk2\"" << std::endl;
+                  std::cerr << "\t\"llg-rkmk4\"" << std::endl;
+                  std::cerr << "\t\"llg-dm\"" << std::endl;
                   std::cerr << "\t\"monte-carlo\"" << std::endl;
                   std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
                   std::cerr << "\t\"lsf\"" << std::endl;

@@ -133,6 +133,37 @@ namespace LSF_RK4_arrays{
 
 } // end of LSF_RK4_arrays namespace
 
+namespace LLG_rotation_arrays{
+
+//==========================================================
+// Namespace to store persistant arrays for rotation based
+// LLG integrators (RKMK2, RKMK4, Depondt-Mertens)
+//==========================================================
+
+   extern std::vector<double> x_initial_spin_array;
+   extern std::vector<double> y_initial_spin_array;
+   extern std::vector<double> z_initial_spin_array;
+
+   extern std::vector<double> x_k1_array;
+   extern std::vector<double> y_k1_array;
+   extern std::vector<double> z_k1_array;
+
+   extern std::vector<double> x_k2_array;
+   extern std::vector<double> y_k2_array;
+   extern std::vector<double> z_k2_array;
+
+   extern std::vector<double> x_k3_array;
+   extern std::vector<double> y_k3_array;
+   extern std::vector<double> z_k3_array;
+
+   extern std::vector<double> x_spin_storage_array;
+   extern std::vector<double> y_spin_storage_array;
+   extern std::vector<double> z_spin_storage_array;
+
+   extern bool LLG_rotation_set;
+
+} // end of LLG_rotation_arrays namespace
+
 namespace integrate{
 
    namespace internal{
@@ -193,6 +224,31 @@ namespace integrate{
       // LLG integrator with quantum thermostat
       int LLGQinit();
       void llg_quantum_step();
+
+      // rotation based LLG integrators (ported from JAMS)
+      void initialize_rotation_integrators();
+      int LLG_rotation_init();
+      void llg_rotation_noise_half_step(const int start_index, const int end_index);
+      void llg_rotation_copy_storage_to_spins(const int start_index, const int end_index);
+      void llg_rotation_stage(void (*stage)(const int, const int), const bool calculate_external_fields);
+      void llg_rotation_stage_mpi(void (*stage)(const int, const int), const bool calculate_external_fields);
+
+      // Runge-Kutta-Munthe-Kaas integrators
+      void rkmk_stage_1(const int start_index, const int end_index);
+      void rkmk2_stage_2(const int start_index, const int end_index);
+      void rkmk4_stage_2(const int start_index, const int end_index);
+      void rkmk4_stage_3(const int start_index, const int end_index);
+      void rkmk4_stage_4(const int start_index, const int end_index);
+      void llg_rkmk2_step();
+      void llg_rkmk4_step();
+      void llg_rkmk2_mpi_step();
+      void llg_rkmk4_mpi_step();
+
+      // Depondt-Mertens integrator
+      void dm_predictor_stage(const int start_index, const int end_index);
+      void dm_corrector_stage(const int start_index, const int end_index);
+      void llg_dm_step();
+      void llg_dm_mpi_step();
 
       // longitudinal spin fluctuation integrators
       int LSFinit();

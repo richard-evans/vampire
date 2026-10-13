@@ -21,10 +21,12 @@ namespace ut{
    struct module_t {
       bool utility = false;
       bool create = false;
+      bool integrate = false;
    };
 
    // module level functions
    int utility_tests(const bool verbose);
    int create_tests(const bool verbose);
+   int integrate_tests(const bool verbose);
 
 }

@@ -188,6 +188,37 @@ void calculate_deterministic_external_fields(const int start_index,const int end
 	return;
 }
 
+void calculate_thermal_fields_only(const int start_index,const int end_index){
+	///======================================================
+	/// 	Subroutine to calculate only the thermal fields
+	///   (standard and localised temperature), for
+	///   integrators that apply the noise separately from
+	///   the deterministic fields.
+	///
+	///   Note: for the HAMR program the thermal field is
+	///   mixed into the external field inside hamr::fields()
+	///   and so is not supported here.
+	///======================================================
+
+	if(err::check==true){std::cout << "calculate_thermal_fields_only has been called" << std::endl;}
+
+	if(program::program==13){
+
+		// Local thermal Fields
+		ltmp::get_localised_thermal_fields(atoms::x_thermal_field_array,atoms::y_thermal_field_array,
+			atoms::z_thermal_field_array, start_index, end_index);
+
+	}
+	else{
+
+		// Thermal Fields
+		if(sim::hamiltonian_simulation_flags[3]==1) calculate_thermal_fields(start_index,end_index);
+
+	}
+
+	return;
+}
+
 void add_deterministic_external_fields(const int start_index,const int end_index){
 
 	// Applied Fields (included in hamr::fields() for HAMR program)

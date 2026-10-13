@@ -31,6 +31,9 @@ namespace integrate{
       llg_heun = 0,
       llg_midpoint = 2,
       llg_quantum = 5,
+      llg_rkmk2 = 10,
+      llg_rkmk4 = 11,
+      llg_dm = 12,
 
       // longitudinal spin fluctuations
       lsf = 6,

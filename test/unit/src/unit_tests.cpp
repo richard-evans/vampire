@@ -43,6 +43,7 @@ int main(int argc, char* argv[]){
 
    if( module.utility || all ) error_count += ut::utility_tests(verbose);
    if( module.create  || all ) error_count += ut::create_tests(verbose);
+   if( module.integrate || all ) error_count += ut::integrate_tests(verbose);
 
 
    // Summary

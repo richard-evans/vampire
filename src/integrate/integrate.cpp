@@ -155,6 +155,30 @@ void integrate_serial(uint64_t n_steps){
 			}
 			break;
 
+		case integrator_t::llg_rkmk2: // LLG Runge-Kutta-Munthe-Kaas 2nd order
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				internal::llg_rkmk2_step();
+				// increment time
+				internal::increment_time();
+			}
+			break;
+
+		case integrator_t::llg_rkmk4: // LLG Runge-Kutta-Munthe-Kaas 4th order
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				internal::llg_rkmk4_step();
+				// increment time
+				internal::increment_time();
+			}
+			break;
+
+		case integrator_t::llg_dm: // LLG Depondt-Mertens
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				internal::llg_dm_step();
+				// increment time
+				internal::increment_time();
+			}
+			break;
+
 		case integrator_t::lsf: // LSF
 			for(uint64_t ti=0;ti<n_steps;ti++){
 				internal::lsf_step();
@@ -281,6 +305,36 @@ int integrate_mpi(uint64_t n_steps){
 				#else
 					internal::LLG_Midpoint_mpi();
 				#endif
+			#endif
+				// increment time
+				internal::increment_time();
+			}
+			break;
+
+		case integrator_t::llg_rkmk2: // LLG Runge-Kutta-Munthe-Kaas 2nd order
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+				internal::llg_rkmk2_mpi_step();
+			#endif
+				// increment time
+				internal::increment_time();
+			}
+			break;
+
+		case integrator_t::llg_rkmk4: // LLG Runge-Kutta-Munthe-Kaas 4th order
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+				internal::llg_rkmk4_mpi_step();
+			#endif
+				// increment time
+				internal::increment_time();
+			}
+			break;
+
+		case integrator_t::llg_dm: // LLG Depondt-Mertens
+			for(uint64_t ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
+				internal::llg_dm_mpi_step();
 			#endif
 				// increment time
 				internal::increment_time();

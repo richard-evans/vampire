@@ -524,6 +524,9 @@ The following commands control the simulation, including the program, maximum te
   \item[] \texttt{llg-heun} (default): second-order Heun integration of the stochastic Landau-Lifshitz-Gilbert equation. Recommended for most dynamic simulations.
   \item[] \texttt{llg-midpoint}: implicit midpoint integration of the LLG equation. More accurate than Heun, especially for low Gilbert damping, but computationally more expensive per step.
   \item[] \texttt{llg-quantum}: LLG-Heun integration with quantum-corrected thermal fields based on Bose-Einstein statistics with time-correlated noise.
+  \item[] \texttt{llg-dm}: second-order Depondt-Mertens predictor-corrector integration of the LLG equation, where each step is a rotation of the spin so the spin length is preserved exactly. Thermal noise is applied by Strang splitting with half time step rotations before and after the deterministic step.
+  \item[] \texttt{llg-rkmk2}: second-order Runge-Kutta-Munthe-Kaas geometric integration of the LLG equation, with the same spin length preservation, noise treatment and restrictions as \texttt{llg-dm}.
+  \item[] \texttt{llg-rkmk4}: fourth-order Runge-Kutta-Munthe-Kaas geometric integration of the LLG equation. Requires four field evaluations per step but at zero temperature allows much larger time steps for a given accuracy. Same noise treatment and restrictions as \texttt{llg-dm}.
   \item[] \texttt{monte-carlo}: Metropolis Monte Carlo algorithm. Efficient for computing equilibrium thermodynamic properties such as the Curie temperature and magnetisation curves.
   \item[] \texttt{constrained-monte-carlo}: Monte Carlo integration with a global constraint on the magnetisation direction. Used for computing anisotropy energy surfaces and constrained equilibrium states.
   \item[] \texttt{hybrid-constrained-monte-carlo}: combines constrained Monte Carlo moves for the constrained material(s) with standard Monte Carlo for all other materials.

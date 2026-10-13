@@ -1,0 +1,52 @@
+#------------------------------------------
+# Integration test: LLG-RKMK2 (Runge-Kutta-Munthe-Kaas, 2nd order)
+# integrator
+#
+# A single isolated spin, initially along x,
+# precesses and relaxes in a 1T field along z
+# at T=0. The trajectory is compared against
+# the analytical solution (Eq. 21 of Evans et
+# al., J. Phys.: Condens. Matter 26, 103202
+# (2014), arXiv:1310.6143):
+#
+#   Sx = sech(a w t) cos(w t)
+#   Sy = sech(a w t) sin(w t)
+#   Sz = tanh(a w t),   w = gamma H / (1+a^2)
+#
+# At t = 9.74e-11 s this gives
+#   S = (-0.103927, -0.338608, 0.935171)
+#
+# A true single spin (no periodic images) is
+# used, as for the dynamics/midpoint test.
+#------------------------------------------
+
+#------------------------------------------
+# Creation: single spin
+#------------------------------------------
+create:single-spin
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:temperature=0.0
+sim:time-steps-increment = 100
+sim:total-time-steps = 100000
+sim:time-step=1.0E-15
+sim:applied-field-strength = 1.0 !T
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-rkmk2
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:real-time
+output:magnetisation

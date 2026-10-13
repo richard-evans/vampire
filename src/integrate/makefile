@@ -15,6 +15,11 @@ llg_heun_mpi.o \
 llg_midpoint.o \
 llg_midpoint_mpi.o \
 llg_quantum.o \
+llg_rotation.o \
+llg_rkmk.o \
+llg_rkmk_mpi.o \
+llg_dm.o \
+llg_dm_mpi.o \
 lsf.o \
 lsf_mpi.o \
 lsf_rk4.o \
