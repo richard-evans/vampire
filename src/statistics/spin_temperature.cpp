@@ -103,80 +103,66 @@ void spin_temp_statistic_t::get_mask(std::vector<int>& out_mask, std::vector<dou
 }
 
 //------------------------------------------------------------------------------------------------------
+// Function to calculate the spin temperature for each mask id using fields for the current spins
+//
+//    T_s = mu_s / 2 kB * sum |S x H|^2 / sum S.H
+//
+// Sums are reduced over all processors before taking the ratio.
 //------------------------------------------------------------------------------------------------------
 void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, // spin unit vector
-                                          const std::vector<double>& sy,
-                                          const std::vector<double>& sz,
-                                          const std::vector<double>& bxs, // spin fields (tesla)
-                                          const std::vector<double>& bys,
-                                          const std::vector<double>& bzs,
-                                          const std::vector<double>& bxe, // external fields (tesla)
-                                          const std::vector<double>& bye,
-                                          const std::vector<double>& bze,
-                                          const std::vector<double>& mm){
+                                                const std::vector<double>& sy,
+                                                const std::vector<double>& sz,
+                                                const std::vector<double>& bxs, // spin fields (tesla)
+                                                const std::vector<double>& bys,
+                                                const std::vector<double>& bzs,
+                                                const std::vector<double>& bxe, // external fields (tesla)
+                                                const std::vector<double>& bye,
+                                                const std::vector<double>& bze,
+                                                const std::vector<double>& mm){
 
-   //std::fill(spin_temp.begin(),spin_temp.end(),0.0);
-   //const int64_t num_atoms = sx.size();
-   //double SxH2=0.0;
-   //double SH=0.0;
+   // ensure fields are calculated for current spins (bxs, bxe refer to the global field arrays)
+   stats::update_fields();
 
-   // ASD version
-   //sim::calculate_spin_fields(0, num_atoms);
-
-   // SLD version
    std::fill(SxH2.begin(),SxH2.end(),0.0);
    std::fill(SH.begin(),SH.end(),0.0);
 
-   std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
-   std::fill(atoms::y_total_spin_field_array.begin(), atoms::y_total_spin_field_array.end(), 0.0);
-   std::fill(atoms::z_total_spin_field_array.begin(), atoms::z_total_spin_field_array.end(), 0.0);
-
-   sld::compute_fields(0, // first atom for exchange interactions to be calculated
-                     num_atoms, // last +1 atom to be calculated
-                     atoms::neighbour_list_start_index,
-                     atoms::neighbour_list_end_index,
-                     atoms::type_array, // type for atom
-                     atoms::neighbour_list_array, // list of interactions between atoms
-                     atoms::x_coord_array,
-                     atoms::y_coord_array,
-                     atoms::z_coord_array,
-                     atoms::x_spin_array,
-                     atoms::y_spin_array,
-                     atoms::z_spin_array,
-                     atoms::x_total_spin_forces_array,
-                     atoms::y_total_spin_forces_array,
-                     atoms::z_total_spin_forces_array,
-                     atoms::x_total_spin_field_array,
-                     atoms::y_total_spin_field_array,
-                     atoms::z_total_spin_field_array);
-
-   // calculate contributions of spins to each magetization category
+   // calculate contributions of spins to each mask id
    for(int atom=0; atom < num_atoms; ++atom){
 
       const int mask_id = mask[atom]; // get mask id
 
       // get atomic moment
-		const double mu = mm[atom];
+      const double mu = mm[atom];
 
-		// Store local spin in Sand local field in H
-		const double S[3] = {sx[atom],         sy[atom],         sz[atom]        };
-		const double B[3] = {bxs[atom], bys[atom], bzs[atom]};
+      // Store local spin in S and local field in H (SLD spin fields already include the applied field)
+      const double S[3] = {sx[atom], sy[atom], sz[atom]};
+      double H[3] = {bxs[atom], bys[atom], bzs[atom]};
+      if(!sld::enabled){
+         H[0] += bxe[atom];
+         H[1] += bye[atom];
+         H[2] += bze[atom];
+      }
 
-      double SxHx = S[1]*B[2]-S[2]*B[1];
-      double SxHy = S[2]*B[0]-S[0]*B[2];
-      double SxHz = S[0]*B[1]-S[1]*B[0];
-      SxH2[mask_id]  = SxH2[mask_id]+ mu*(SxHx*SxHx + SxHy*SxHy + SxHz*SxHz);
-      SH[mask_id]  = SH[mask_id] + S[0]*B[0] + S[1]*B[1] + S[2]*B[2];
-      spin_temp[mask_id]= SxH2[mask_id] / SH[mask_id];
+      const double SxHx = S[1]*H[2]-S[2]*H[1];
+      const double SxHy = S[2]*H[0]-S[0]*H[2];
+      const double SxHz = S[0]*H[1]-S[1]*H[0];
 
-	}
+      SxH2[mask_id] += mu*(SxHx*SxHx + SxHy*SxHy + SxHz*SxHz);
+      SH[mask_id]   += S[0]*H[0] + S[1]*H[1] + S[2]*H[2];
 
-   // Reduce on all CPUS
+   }
+
+   // Reduce sums on all CPUS
    #ifdef MPICF
-      MPI_Allreduce(MPI_IN_PLACE, &spin_temp[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &SxH2[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &SH[0],   mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
-   // Zero empty mask id's
+   // Calculate spin temperature (K), leaving empty mask id's (and zero field) as zero
+   const double prefactor = 0.5*constants::muB/constants::kB;
+   for(int mask_id=0; mask_id<mask_size; ++mask_id){
+      spin_temp[mask_id] = SH[mask_id] != 0.0 ? prefactor * SxH2[mask_id] / SH[mask_id] : 0.0;
+   }
    for(unsigned int id=0; id<zero_list.size(); ++id) spin_temp[zero_list[id]]=0.0;
 
    const int tsize = spin_temp.size();
@@ -243,7 +229,7 @@ std::string spin_temp_statistic_t::output_spin_temp(bool header){
          result << name + std::to_string(mask_id) + "_Ts";
       }
       else{
-         result << 0.5*constants::muB/constants::kB * spin_temp[mask_id ] / vmpi::num_processors;
+         result << spin_temp[mask_id];
       }
    }
 
@@ -265,8 +251,8 @@ std::string spin_temp_statistic_t::output_mean_spin_temp(bool header){
    }
    vout::fixed_width_output result(res,vout::fw_size);
 
-   // inverse number of data samples * muB
-   const double ic = constants::muB / mean_counter;
+   // inverse number of data samples
+   const double ic = 1.0 / mean_counter;
 
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){

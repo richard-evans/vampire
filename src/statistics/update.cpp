@@ -11,14 +11,87 @@
 //
 
 // C++ standard library headers
+#include <algorithm>
 
 // Vampire headers
 #include "atoms.hpp"
 #include "gpu.hpp"
 #include "sim.hpp"
+#include "sld.hpp"
 #include "stats.hpp"
+#include "vmpi.hpp"
 
 namespace stats{
+
+   //-----------------------------------------------------------------------------
+   // Flag indicating fields have been updated for the current statistics pass
+   //-----------------------------------------------------------------------------
+   namespace{
+      bool fields_updated = false;
+   }
+
+   //------------------------------------------------------------------------------------------------------
+   // Function to recalculate the effective field (tesla) acting on each spin for the current spin
+   // configuration and time, so that S and H are always consistent regardless of integrator (the field
+   // left over from the integrator is either at an intermediate step (LLG) or never calculated (MC)).
+   //
+   // Spin-only : spin dependent fields (exchange, anisotropy, ...) plus external fields (applied,
+   //             dipolar, ...) excluding thermal fields, which would consume random numbers.
+   // SLD       : spin fields from sld::compute_fields, which already include the applied field.
+   //
+   // Fields are written to the global atoms:: field arrays, which all integrators recalculate at the
+   // start of each time step. Fields are only calculated once per statistics pass.
+   //------------------------------------------------------------------------------------------------------
+   void update_fields(){
+
+      if(fields_updated) return;
+
+      // Update halo spins so that fields on boundary atoms are calculated from current spins
+      #ifdef MPICF
+         vmpi::mpi_init_halo_swap();
+         vmpi::mpi_complete_halo_swap();
+      #endif
+
+      if(sld::enabled){
+
+         std::fill(atoms::x_total_spin_field_array.begin(), atoms::x_total_spin_field_array.end(), 0.0);
+         std::fill(atoms::y_total_spin_field_array.begin(), atoms::y_total_spin_field_array.end(), 0.0);
+         std::fill(atoms::z_total_spin_field_array.begin(), atoms::z_total_spin_field_array.end(), 0.0);
+
+         std::fill(atoms::x_total_spin_forces_array.begin(), atoms::x_total_spin_forces_array.end(), 0.0);
+         std::fill(atoms::y_total_spin_forces_array.begin(), atoms::y_total_spin_forces_array.end(), 0.0);
+         std::fill(atoms::z_total_spin_forces_array.begin(), atoms::z_total_spin_forces_array.end(), 0.0);
+
+         sld::compute_fields(0, // first atom for exchange interactions to be calculated
+                             stats::num_atoms, // last +1 atom to be calculated
+                             atoms::neighbour_list_start_index,
+                             atoms::neighbour_list_end_index,
+                             atoms::type_array, // type for atom
+                             atoms::neighbour_list_array, // list of interactions between atoms
+                             atoms::x_coord_array,
+                             atoms::y_coord_array,
+                             atoms::z_coord_array,
+                             atoms::x_spin_array,
+                             atoms::y_spin_array,
+                             atoms::z_spin_array,
+                             atoms::x_total_spin_forces_array,
+                             atoms::y_total_spin_forces_array,
+                             atoms::z_total_spin_forces_array,
+                             atoms::x_total_spin_field_array,
+                             atoms::y_total_spin_field_array,
+                             atoms::z_total_spin_field_array);
+
+      }
+      else{
+         sim::calculate_spin_fields(0, stats::num_atoms);
+         sim::calculate_deterministic_external_fields(0, stats::num_atoms);
+      }
+
+      fields_updated = true;
+
+      return;
+
+   }
 
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation
@@ -41,6 +114,9 @@ namespace stats{
                   const std::vector<int>& mat,
                   const double temperature
                ){
+
+         // new statistics pass, so fields need recalculating for current spins if required
+         fields_updated = false;
 
          // Check for GPU acceleration and update statistics on device
          if(gpu::acceleration){

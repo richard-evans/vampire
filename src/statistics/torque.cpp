@@ -18,6 +18,7 @@
 #include "constants.hpp"
 #include "errors.hpp"
 #include "sim.hpp"
+#include "sld.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
@@ -119,12 +120,8 @@ void torque_statistic_t::calculate_torque(const std::vector<double>& sx, // spin
    // initialise torques to zero [.end() seems to be optimised away by the compiler...]
    std::fill(torque.begin(),torque.end(),0.0);
 
-   // check for Monte Carlo solvers and recalculate fields
-   if(sim::integrator == sim::monte_carlo || sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc){
-      const int64_t num_atoms = sx.size();
-      sim::calculate_spin_fields(0, num_atoms);
-      sim::calculate_external_fields(0, num_atoms);
-   }
+   // ensure fields are calculated for current spins (bxs, bxe refer to the global field arrays)
+   stats::update_fields();
 
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom < num_atoms; ++atom){
@@ -136,7 +133,13 @@ void torque_statistic_t::calculate_torque(const std::vector<double>& sx, // spin
 
 		// Store local spin in Sand local field in H
 		const double S[3] = {sx[atom]*mu,         sy[atom]*mu,         sz[atom]*mu        };
-		const double B[3] = {bxs[atom]+bxe[atom], bys[atom]+bye[atom], bzs[atom]+bze[atom]};
+		// (SLD spin fields already include the applied field)
+		double B[3] = {bxs[atom], bys[atom], bzs[atom]};
+		if(!sld::enabled){
+			B[0] += bxe[atom];
+			B[1] += bye[atom];
+			B[2] += bze[atom];
+		}
 
 		torque[3*mask_id + 0] += S[1]*B[2]-S[2]*B[1];
 		torque[3*mask_id + 1] += S[2]*B[0]-S[0]*B[2];

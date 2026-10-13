@@ -333,6 +333,9 @@ namespace stats
    //----------------------------------
   // Spin temperature class definition
   //----------------------------------
+  // Recalculates effective fields for current spins (spin-only or SLD), once per statistics pass
+  void update_fields();
+
   class spin_temp_statistic_t{
 
      public:

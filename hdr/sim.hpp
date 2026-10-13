@@ -215,6 +215,7 @@ namespace sim{
 
 	void calculate_spin_fields(const int start_index,const int end_index);
 	void calculate_external_fields(const int start_index,const int end_index);
+	void calculate_deterministic_external_fields(const int start_index,const int end_index); // external fields excluding thermal
 	//spin temperature
     extern double compute_spin_temperature(const int start_index, // first atom for exchange interactions to be calculated
                  const int end_index,

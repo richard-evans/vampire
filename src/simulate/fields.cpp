@@ -52,6 +52,9 @@ void calculate_full_spin_fields(const int start_index,const int end_index);
 
 namespace sim{
 
+// file-local helper to add non-thermal external fields
+void add_deterministic_external_fields(const int start_index,const int end_index);
+
 void calculate_spin_fields(const int start_index,const int end_index){
 
 	///======================================================
@@ -147,19 +150,48 @@ void calculate_external_fields(const int start_index,const int end_index){
       ltmp::get_localised_thermal_fields(atoms::x_thermal_field_array,atoms::y_thermal_field_array,
             atoms::z_thermal_field_array, start_index, end_index);
 
-      // Applied Fields
-      if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
-
    }
 	else{
 
 		// Thermal Fields
 		if(sim::hamiltonian_simulation_flags[3]==1) calculate_thermal_fields(start_index,end_index);
 
-		// Applied Fields
-		if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
-
 	}
+
+	// Add all non-thermal external fields
+	add_deterministic_external_fields(start_index,end_index);
+
+	return;
+}
+
+void calculate_deterministic_external_fields(const int start_index,const int end_index){
+	///======================================================
+	/// 	Subroutine to calculate external fields at the
+	///   current time excluding thermal fields. Does not
+	///   use random numbers, so can be called outside of
+	///   the integrator without changing the trajectory.
+	///
+	///   Note: for the HAMR program the applied field is
+	///   calculated together with the thermal field inside
+	///   hamr::fields() and so is not included here.
+	///======================================================
+
+	if(err::check==true){std::cout << "calculate_deterministic_external_fields has been called" << std::endl;}
+
+	// Initialise Total External Fields to zero
+	fill (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index,0.0);
+	fill (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index,0.0);
+	fill (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index,0.0);
+
+	add_deterministic_external_fields(start_index,end_index);
+
+	return;
+}
+
+void add_deterministic_external_fields(const int start_index,const int end_index){
+
+	// Applied Fields (included in hamr::fields() for HAMR program)
+	if(program::program!=7 && sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
 
    // Get updated spin torque fields
    st::get_spin_torque_fields(atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array, start_index, end_index);
