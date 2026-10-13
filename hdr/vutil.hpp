@@ -48,4 +48,8 @@ namespace vutil{
 
 } // end of namespace vutil
 
+// Checkpoint load/save functions
+void load_checkpoint();
+void save_checkpoint();
+
 #endif //VUTIL_H_

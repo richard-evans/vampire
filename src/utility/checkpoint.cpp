@@ -21,6 +21,7 @@
 #include "sld.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
+#include "vutil.hpp"
 #include "program.hpp"
 
 //-----------------------------------------------------------------------------

@@ -8,7 +8,6 @@ command.o \
 githash.o \
 initialise_variables.o \
 main.o \
-material.o \
 version.o
 
 # Append module objects to global tree

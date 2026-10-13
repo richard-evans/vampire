@@ -114,8 +114,6 @@ namespace vin{
    extern int str_to_int(std::string input_str);
    extern double str_to_double(std::string input_str);
 
-   extern std::vector<mp::materials_t> read_material;
-
 }
 
 namespace vout{
@@ -307,13 +305,8 @@ class fixed_width_output{
 
 }
 
-// Checkpoint load/save functions
-void load_checkpoint();
-void save_checkpoint();
-
 namespace vio{
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 }
 
 #endif /*VIO_H_*/

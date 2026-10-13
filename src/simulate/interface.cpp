@@ -959,7 +959,7 @@ namespace sim{
          double T=atof(value.c_str());
          // Test for valid range
          if((T>=0.0) && (T<1.0E5)){
-            vin::read_material[super_index].temperature=T;
+            mp::read_material[super_index].temperature=T;
             // set local temperature flag
             sim::local_temperature=true;
             return true;
@@ -976,7 +976,7 @@ namespace sim{
       if(word==test){
          double T=atof(value.c_str());
          vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
-         vin::read_material[super_index].minimum_temperature = T;
+         mp::read_material[super_index].minimum_temperature = T;
          sim::local_temperature=true; // set local temperature flag
          return true;
       }
@@ -985,7 +985,7 @@ namespace sim{
       if(word==test){
          double T=atof(value.c_str());
          vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
-         vin::read_material[super_index].maximum_temperature = T;
+         mp::read_material[super_index].maximum_temperature = T;
          sim::local_temperature=true; // set local temperature flag
          return true;
       }
@@ -1003,7 +1003,7 @@ namespace sim{
          //bool sanitised_bool=vin::check_for_valid_bool(value, word, line, prefix,"material");
 
          // set flag
-         vin::read_material[super_index].couple_to_phonon_temperature=true; //sanitised_bool;
+         mp::read_material[super_index].couple_to_phonon_temperature=true; //sanitised_bool;
 
          // enable local temperature flag
          sim::local_temperature=true;
@@ -1023,7 +1023,7 @@ namespace sim{
          if(unit_type==str){
             // Test for valid range
             if((H>=-1.0E5) && (H<1.0E5)){
-               vin::read_material[super_index].applied_field_strength=H;
+               mp::read_material[super_index].applied_field_strength=H;
                // set local applied field flag
                sim::local_applied_field=true;
                return true;
@@ -1076,7 +1076,7 @@ namespace sim{
          u.at(2)/=ULength;
 
          // Copy applied field direction to material
-         vin::read_material[super_index].applied_field_unit_vector=u;
+         mp::read_material[super_index].applied_field_unit_vector=u;
 
          // set local applied field flag
          sim::local_applied_field=true;
@@ -1089,7 +1089,7 @@ namespace sim{
       if(word==test){
          double H = atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e5,"material","0 - 10,000 T");
-         vin::read_material[super_index].fmr_field_strength=H;
+         mp::read_material[super_index].fmr_field_strength=H;
          // set local fmr flag
          sim::local_fmr_field=true;
          return true;
@@ -1099,7 +1099,7 @@ namespace sim{
       if( word == test ){
          double f = atof(value.c_str());
          vin::check_for_valid_value(f, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"material","0 - 10,000 GHz");
-         vin::read_material[super_index].fmr_field_frequency = f;
+         mp::read_material[super_index].fmr_field_frequency = f;
          sim::local_fmr_field = true;
          return true;
       }
@@ -1137,7 +1137,7 @@ namespace sim{
          u.at(2)/=ULength;
 
          // Copy field direction to material
-         vin::read_material[super_index].fmr_field_unit_vector=u;
+         mp::read_material[super_index].fmr_field_unit_vector=u;
 
          // set local applied field flag
          sim::local_fmr_field=true;

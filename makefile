@@ -132,6 +132,7 @@ include src/hamr/makefile
 include src/hierarchical/makefile
 include src/ltmp/makefile
 include src/main/makefile
+include src/material/makefile
 include src/montecarlo/makefile
 include src/micromagnetic/makefile
 include src/mpi/makefile

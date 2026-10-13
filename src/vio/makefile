@@ -10,7 +10,6 @@ datalog.o \
 get_string.o \
 globalio.o \
 grain.o \
-initialize.o \
 interface.o \
 match.o \
 match_grain_list.o \

@@ -22,6 +22,7 @@
 #include "sim.hpp"
 #include "sld.hpp"
 #include "vio.hpp"
+#include "vutil.hpp"
 #include "micromagnetic.hpp"
 
 // vio module headers

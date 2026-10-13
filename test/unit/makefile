@@ -27,7 +27,7 @@ obj/create/voronoi_bimodal_seeds_test.o
 VAMPIRE_OBJECTS= \
 ../../obj/main/githash.o \
 ../../obj/main/version.o \
-../../obj/main/material.o \
+../../obj/material/material.o \
 ../../obj/utility/errors.o \
 ../../obj/utility/units.o \
 ../../obj/utility/vmath.o \

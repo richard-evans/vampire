@@ -1024,7 +1024,7 @@ namespace create{
       if(word==test){
          double css=atof(value.c_str());
          vin::check_for_valid_positive_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-         vin::read_material[super_index].core_shell_size=css;
+         mp::read_material[super_index].core_shell_size=css;
          cs::core_shell_particles = true;
          return true;
       }
@@ -1033,7 +1033,7 @@ namespace create{
       if(word==test){
          double ir=atof(value.c_str());
          vin::check_for_valid_value(ir, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-         vin::read_material[super_index].interface_roughness=ir;
+         mp::read_material[super_index].interface_roughness=ir;
          return true;
       }
       //--------------------------------------------------------------------
@@ -1047,7 +1047,7 @@ namespace create{
             terminaltextcolor(WHITE);
             err::vexit();}
          else{
-            vin::read_material[super_index].intermixing[sub_index]=i;
+            mp::read_material[super_index].intermixing[sub_index]=i;
             return true;
          }
       }
@@ -1056,13 +1056,13 @@ namespace create{
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-         vin::read_material[super_index].density=d;
+         mp::read_material[super_index].density=d;
          return true;
       }
       //--------------------------------------------------------------------
       test="continuous";
       if(word==test){
-         vin::read_material[super_index].continuous=true;
+         mp::read_material[super_index].continuous=true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -1080,7 +1080,7 @@ namespace create{
          //bool sanitised_bool=vin::check_for_valid_bool(value, word, line, prefix,"material");
 
          // set flag
-         vin::read_material[super_index].fill=true; //sanitised_bool;
+         mp::read_material[super_index].fill=true; //sanitised_bool;
 
          return true;
       }

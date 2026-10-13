@@ -140,6 +140,9 @@ namespace mp
 
 	extern std::vector <materials_t> material;
 
+   // temporary array of materials for reading in material data
+   extern std::vector <materials_t> read_material;
+
 	extern double dt_SI;
 	extern double dt;
 	extern double half_dt;
@@ -160,6 +163,10 @@ namespace mp
 	extern int default_system();
 	extern int single_spin_system();
 	extern int set_derived_parameters();
+
+   // input and material file parameter matching functions
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
 }
 

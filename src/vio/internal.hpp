@@ -38,13 +38,11 @@ namespace vin{
    //----------------------------------------------------------------------------------
    int match(std::string const, std::string const, std::string const, std::string const, int const);
    int match(std::string const, std::string const, std::string const, std::string const, int const, int const, int const);
-   int match_material(std::string const, std::string const, std::string const, int const, int const, int const, std::string const, std::string const);
 
    //----------------------------------------------------------------------------------
    //Function protypes for functions inside: read.cpp
    //----------------------------------------------------------------------------------
    int read(std::string const filename);
-   int read_mat_file(std::string const, int const);
 
 }
 
