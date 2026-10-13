@@ -13,6 +13,7 @@
 //
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <vector>
 
 // Vampire headers
@@ -112,7 +113,7 @@ namespace anisotropy{
       //---------------------------------------------------------------------
       // Unroll inverse mu_S array for materials to convert Joules to Tesla
       //---------------------------------------------------------------------
-      const double mu_B = 9.27400915e-24; // Bohr magneton
+      const double mu_B = constants::muB; // Bohr magneton
       std::vector <double> inverse_mu_s(num_materials); // array storing inverse spin moment in J/T
       for(int m = 0; m < num_materials; m++) inverse_mu_s[m] = 1.0 / ( mu_s_array[m] * mu_B );
 

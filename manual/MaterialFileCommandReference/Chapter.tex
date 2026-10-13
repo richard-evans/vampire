@@ -85,7 +85,7 @@ E_{2,0} = -k_{2,0} (\sms_i \cdot \hat{\mathbf{c}}_z )^2
 E_{2,2} = - k_{2,2} ( ( \sms_i \cdot \hat{\mathbf{c}}_x )^2 - ( \sms_i \cdot \hat{\mathbf{c}}_y )^2 )
 \end{equation*}
 
-\noindent where \hat{\mathbf{c}}_x and \hat{\mathbf{c}}_y are the anisotropic $x$ and $y$ axes respectively.
+\noindent where $\hat{\mathbf{c}}_x$ and $\hat{\mathbf{c}}_y$ are the anisotropic $x$ and $y$ axes respectively.
 
 {\zicf material:2-2-order-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:2-2-order-anisotropy-constant} Has the same meaning.
 
@@ -101,11 +101,11 @@ E_{2,2} = - k_{2,2} ( ( \sms_i \cdot \hat{\mathbf{c}}_x )^2 - ( \sms_i \cdot \ha
 
 {\zicf material:fourth-order-theta-second-order-phi-anisotropy-constant = float [default 0.0\newline J/atom]}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-theta-second-order-phi-anisotropy-constant} Sets fourth order $\theta$ second order $\phi$ rotational anisotropy constant.
 
-{\zicf material:4-2-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addconstentsline{toc}{subsection}{material:4-2-order-anisotropy-constant} Has the same meaning.
+{\zicf material:4-2-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:4-2-order-anisotropy-constant} Has the same meaning.
 
 {\zicf material:fourth-order-theta-fourth-order-phi-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-theta-fourth-order-phi-anisotropy-constant} Sets fourth order $\theta$ fourth order $\phi$ fully rotational anisotropy constant for the tesseral harmonic formalism.
 
-{\zicf material:4-4-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addconstentsline{toc}{subsection}{material:4-4-order-anisotropy-constant} Has the same meaning.
+{\zicf material:4-4-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:4-4-order-anisotropy-constant} Has the same meaning.
 
 {\zicf material:fourth-order-rotational-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:fourth-order-rotational-anisotropy-constant} Has the same meaning.
 
@@ -113,7 +113,7 @@ E_{2,2} = - k_{2,2} ( ( \sms_i \cdot \hat{\mathbf{c}}_x )^2 - ( \sms_i \cdot \ha
 
 {\zicf material:6-0-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:6-0-order-anisotropy-constant} Has the same meaning.
 
-{\zicf material:sixth-order-theta-second-order-phi-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addconstentsline{toc}{subsection}{material:sixth-order-theta-second-order-phi-anisotropy-constant} Sets the sixth order $\theta$ second order $\phi$ rotational anisotropy constant for single ion anisotropy in the tesseral harmonic formalism.
+{\zicf material:sixth-order-theta-second-order-phi-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:sixth-order-theta-second-order-phi-anisotropy-constant} Sets the sixth order $\theta$ second order $\phi$ rotational anisotropy constant for single ion anisotropy in the tesseral harmonic formalism.
 
 {\zicf material:6-2-order-anisotropy-constant = float 0.0\newline J/atom}\phantomsection\addcontentsline{toc}{subsection}{material:6-2-order-anisotropy-constant} Has the same meaning.
 
@@ -246,11 +246,42 @@ Initialises the spin direction of each atom by interpolating a user-supplied vec
 
 {\zicf material:geometry-file string [default ""]}\phantomsection\addcontentsline{toc}{subsection}{material:geometry-file} Specifies a filename containing a series of connected points in space which is used to cut a specified shape from the material, in a process similar to lithography. The first line defines the total number of points, which must be in the range 3-100 (A minimum of three points is required to define a polygon). The points are normalised to the sample size, and so all points are defined as $x,y$ pairs in the range 0-1, with one point per line. The last point is automatically connected first, so need not be defined twice.
 
-{\zicf material:alloy-host flag [ default off ]}\phantomsection\addcontentsline{toc}{subsection}{material:alloy-host} Scans over all other materials to replace the desired fraction of host atoms with alloy atoms. This is primarily used to create random alloys of materials with different properties (such as FeCo, NiFe) or disordered ferrimagnets (such as GdFeCo).
+{\zicf material:alloy-host flag [ default off ]}\phantomsection\addcontentsline{toc}{subsection}{material:alloy-host} Designates this material as a host for alloying using a uniform random distribution. Note: this keyword is deprecated and may be removed in a future release. Please use \textit{material[n]:host-alloy} instead.
 
   %alloy-class // determines unit cell category id for ordered alloys
 
-{\zicf material:alloy-fraction[index] = float [ 0-1 : default 0.0 ]}\phantomsection\addcontentsline{toc}{subsection}{material:alloy-fraction} Defines the fractional number of atoms of the host material to be replaced by atoms of material $index$.
+{\zicf material:host-alloy = string [homogeneous, random, granular; default homogeneous]}\phantomsection\addcontentsline{toc}{subsection}{material:host-alloy} Designates this material as a host for alloying and specifies how the alloy concentration is distributed across the system. When set, the code scans the host material's atoms and probabilistically replaces a fraction of them with atoms of each alloyed material, according to the fractions defined by \textit{material[n]:alloy-fraction[m]}.
+
+Three distribution modes are available:
+\begin{itemize}
+  \item[] \texttt{homogeneous} (default): atoms are replaced with a uniform probability equal to the alloy fraction, giving a statistically uniform alloy with no spatial structure.
+  \item[] \texttt{random}: generates a smooth, spatially-varying concentration map across the $xy$-plane using Gaussian-weighted seed points. The spatial scale is set by \textit{material[n]:host-alloy-scale} and the sharpness of concentration boundaries is controlled by \textit{material[n]:host-alloy-smoothness}. This mode is suited to modelling segregation in thin films.
+  \item[] \texttt{granular}: as for \texttt{random}, but the seed points are correlated with the grain positions from the Voronoi structure, producing concentration variations that follow grain boundaries. This mode requires a Voronoi structure to be defined.
+\end{itemize}
+
+{\zicf material:host-alloy-scale = float [1.0--10,000.0 \AA; default 50.0 \AA]}\phantomsection\addcontentsline{toc}{subsection}{material:host-alloy-scale} Sets the characteristic length scale of the spatial concentration variations when \textit{material[n]:host-alloy} is set to \texttt{random} or \texttt{granular}. Larger values produce broad, slowly varying regions of high and low alloy concentration; smaller values produce fine-grained, rapidly varying concentration fluctuations. The default value of 50~\AA\ is appropriate for typical granular recording media.
+
+{\zicf material:host-alloy-smoothness = string/float [sharp, standard, smooth, 0.0--10.0; default standard (2.0)]}\phantomsection\addcontentsline{toc}{subsection}{material:host-alloy-smoothness} Controls the sharpness of transitions in the spatial concentration map when \textit{material[n]:host-alloy} is set to \texttt{random} or \texttt{granular}. Lower values produce sharper, more abrupt boundaries between concentration-rich and concentration-poor regions; higher values produce more gradual, diffuse transitions. The named options map to the following numeric values:
+\begin{itemize}
+  \item[] \texttt{sharp} = 1.0: abrupt transitions between regions
+  \item[] \texttt{standard} = 2.0 (default): moderate, realistic transitions
+  \item[] \texttt{smooth} = 5.0: highly diffuse transitions
+\end{itemize}
+A floating-point value in the range 0.0--10.0 may also be specified directly.
+
+{\zicf material:save-host-alloy-distribution = string [default alloy-distribution-n.txt]}\phantomsection\addcontentsline{toc}{subsection}{material:save-host-alloy-distribution} Saves the computed spatial alloy concentration map for this material to a plain-text file. The output is in three-column format ($x$-position in \AA, $y$-position in \AA, relative concentration in the range $-1$ to $+1$), suitable for plotting with gnuplot or similar tools. If no filename is given, the file is named \texttt{alloy-distribution-n.txt} where $n$ is the material index. This is useful for inspecting and verifying the generated alloy structure before running a full simulation.
+
+{\zicf material:alloy-fraction[index] = float [ 0-1 : default 0.0 ]}\phantomsection\addcontentsline{toc}{subsection}{material:alloy-fraction} Defines the fractional number of atoms of the host material to be replaced by atoms of alloyed material $index$.
+
+{\zicf material:alloy-distribution[index] = string [native, reciprocal, homogeneous; default native]}\phantomsection\addcontentsline{toc}{subsection}{material:alloy-distribution} Specifies how the spatial concentration of alloyed material $index$ varies relative to the host distribution when \textit{material[n]:host-alloy} is set to \texttt{random} or \texttt{granular}. Three modes are available:
+\begin{itemize}
+  \item[] \texttt{native} (default): the alloyed material concentration follows the same spatial pattern as the host distribution --- regions with high substitution probability in the host also have high probability for this alloyed material.
+  \item[] \texttt{reciprocal}: the alloyed material concentration is the inverse of the host distribution --- regions rich in the host distribution are poor in this alloyed material, and vice versa. This is useful for modelling anti-correlated segregation between two alloying species.
+  \item[] \texttt{homogeneous}: the alloyed material concentration is spatially uniform and equal to its alloy fraction, regardless of the host distribution.
+\end{itemize}
+The amplitude of spatial variation is set by \textit{material[n]:alloy-variance[index]}.
+
+{\zicf material:alloy-variance[index] = float [0.0--1.0; default 0.0]}\phantomsection\addcontentsline{toc}{subsection}{material:alloy-variance} Controls the amplitude of spatial concentration variations for alloyed material $index$ when the host uses a \texttt{random} or \texttt{granular} distribution. A value of 0.0 gives a spatially uniform concentration equal to \textit{material[n]:alloy-fraction[index]} everywhere; a value of 1.0 gives maximum spatial variation, with local concentrations deviating by up to the full alloy fraction above or below the mean. Intermediate values scale the variation proportionally. This parameter has no effect when the host distribution is \texttt{homogeneous}.
 
 {\zicf material:minimum-height = float [ 0-1 : default 0.0 ]}\phantomsection\addcontentsline{toc}{subsection}{material:minimum-height} Defines the minimum height of the material as a fraction of the total height $z$ of the system. By defining different minimum and maximum heights it is easy to define a multilayer system consisting of different materials, such as FM/AFM, or ECC recording media.
 

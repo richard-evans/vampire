@@ -1,0 +1,58 @@
+#------------------------------------------
+# Integration test: two-material multilayer structure
+#
+# Tests that a bilayer thin film is constructed with
+# the correct number of atoms in each material layer.
+#
+# Expected atom counts:
+#   Material 1 (Co, lower half, height 0.0-0.5): 1000 atoms
+#   Material 2 (Fe, upper half, height 0.5-1.0): 1000 atoms
+#
+# System: SC crystal, 10x10x20 unit cells = 2000 atoms total,
+# split equally between two layers along z.
+# Periodic boundaries in x and y only (open surface in z)
+# to create a film geometry.
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+# No periodic boundary in z to define film surfaces.
+#------------------------------------------
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 3.5 !nm
+dimensions:system-size-y = 3.5 !nm
+dimensions:system-size-z = 7.0 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=bilayer.mat
+
+#------------------------------------------
+# Simulation attributes:
+# Single step at T=0 - no dynamics needed,
+# just verify the structure is generated correctly.
+#------------------------------------------
+sim:temperature=0.0
+sim:time-steps-increment = 1
+sim:total-time-steps = 1
+sim:time-step=1.0E-15
+
+#------------------------------------------
+# Program and integrator details:
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-heun
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:magnetisation
+screen:magnetisation

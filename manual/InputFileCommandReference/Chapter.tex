@@ -251,7 +251,19 @@ Determines the macro cell size for calculation of the demagnetizing field and
 output of the magnetic configuration. Finer discretisation leads to more
 accurate results at the cost of significantly longer run times. The cell size
 should always be less than the system size, as highly asymmetric cells will lead
-to significant errors in the demagnetisation field calculation.
+to significant errors in the demagnetisation field calculation. Note: the preferred form for this parameter is \textit{cells:macro-cell-size} described below.
+
+\section*{Macro-cell size}
+\phantomsection\addcontentsline{toc}{section}{Macro-cell size}
+The following commands control the size of the macro-cells used for demagnetisation field calculations and configuration output. Smaller cells give higher spatial resolution at the cost of increased computation time. All cell sizes accept length units (e.g.\ \texttt{!nm}, \texttt{!A}).
+
+{\zicf cells:macro-cell-size = float [0.0--1.0$\times$10$^7$ \AA; default system dependent]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size} Sets the macro-cell size to the same value in all three directions. The cell size should always be smaller than the system dimensions; highly asymmetric cells can lead to significant errors in the demagnetisation field calculation.
+
+{\zicf cells:macro-cell-size-x = float [0.0--1.0$\times$10$^7$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size-x} Sets the macro-cell size along the $x$-direction independently. When set, this overrides the $x$ component of \textit{cells:macro-cell-size}.
+
+{\zicf cells:macro-cell-size-y = float [0.0--1.0$\times$10$^7$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size-y} Sets the macro-cell size along the $y$-direction independently.
+
+{\zicf cells:macro-cell-size-z = float [0.0--1.0$\times$10$^7$ \AA]}\phantomsection\addcontentsline{toc}{subsection}{cells:macro-cell-size-z} Sets the macro-cell size along the $z$-direction independently.
 
 \section*{Exchange calculation}\phantomsection\addcontentsline{toc}{section}{Exchange calculation}
 The following commands control the calculation of built-in exchange interactions
@@ -367,10 +379,17 @@ is exact if the magnetic moments in each cell are aligned.
 {\zicf dipole:solver = exclusive string [default tensor]}\phantomsection\addcontentsline{toc}{subsection}{dipole:solver}
 Declares the solver to be used for the dipole calculation. Available options are:
 \begin{itemize}
-  \item[] macrocell
-  \item[] tensor
-  \item[] atomistic
+  \item[] \texttt{macrocell}: computes the dipole field at the macro-cell level using a simple pairwise sum. Fast but less accurate than the tensor method.
+  \item[] \texttt{tensor} (default): computes a dipole-dipole interaction tensor at the macro-cell level. Exact for uniformly magnetised cells and recommended for most simulations.
+  \item[] \texttt{atomistic}: computes dipole interactions at the atomic level. Most accurate but computationally expensive; only practical for small systems.
+  %\item[] \texttt{fft}: FFT-accelerated macro-cell dipole calculation. Efficient for large periodic systems.
+  %\item[] \texttt{hierarchical}: hierarchical (Barnes-Hut style) macro-cell solver. Scales well for very large non-periodic systems.
+  %\item[] \texttt{atomistic-fft}: FFT-accelerated atomistic dipole calculation.
 \end{itemize}
+
+{\zicf dipole:field-update-rate = int [0--1,000,000; default 1000]}\phantomsection\addcontentsline{toc}{subsection}{dipole:field-update-rate} Sets the number of integration timesteps between recalculations of the dipole field. A value of 1 recalculates the field every step for maximum accuracy; larger values reduce computational cost at the expense of accuracy. For slowly varying magnetisation configurations (e.g.\ near equilibrium) values of 100--1000 are typically sufficient. This parameter supersedes \textit{sim:dipole-field-update-rate}.
+
+{\zicf dipole:cutoff-radius = float [1.0--1,000,000; default unlimited]}\phantomsection\addcontentsline{toc}{subsection}{dipole:cutoff-radius} Sets the spatial cutoff for the dipole interaction as a multiple of the macro-cell size. Cells separated by more than this number of macro-cell lengths are excluded from the dipole sum, reducing computation time for large systems. A value of 1 includes only immediately adjacent cells; larger values increase accuracy at higher computational cost. When not set, all cell pairs are included.
 
 \section*{HAMR calculation}
 {\zicf hamr:laser-FWHM-x = float [default $20.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:laser-FWHM-x}
@@ -435,7 +454,7 @@ Specifies the bit sequence to be simulated in the program \textit{hamr-simulatio
 Acceptable values are -1 (opposite to field direction), 0 (zero field) and 1 (along field direction) and by default the vector is empty.
 
 \section*{Spin-Lattice calculations}
-This includes phonons (lattice dynamics) and uses a Suzuki-Trotter decomposition for the integration. Hence it needs the following:
+This section covers parameters for the spin-lattice dynamics module, which couples spin and lattice degrees of freedom. The integration uses a Suzuki-Trotter decomposition, selected by setting \textit{sim:integrator = spin-lattice}. The following parameters control the behaviour of the module:
 sim:integrator=suzuki-trotter.
 
 {\zicf spin-lattice:potential-cutoff-range=float}\phantomsection\addcontentsline{toc}{subsubsection}{spin-lattice:potential-cutoff-range=float}
@@ -476,19 +495,19 @@ The amplitude of the force component applied in the y-direction. For a chiral pu
 The amplitude of the force component applied in the z-direction. Units are Newtons (N).
 
 {\zicf phonon:wave-lambda-x = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-lambda-x = float}
-The wavelength ($\lambda_x$) of the force wave in the x-direction. Used to calculate the final k-vector. Units are in Angstrom. 
+The wavelength ($\lambda_x$) of the force wave in the x-direction. Used to calculate the final k-vector. Units are in Angstrom.
 
 {\zicf phonon:wave-lambda-y = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-lambda-y = float}
 The wavelength ($\lambda_y$) of the force wave in the y-direction. Units are in Angstrom.
 
 {\zicf phonon:wave-lambda-z = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-lambda-z = float}
-The wavelength ($\lambda_z$) of the force wave in the z-direction. Units are in Angstrom. 
+The wavelength ($\lambda_z$) of the force wave in the z-direction. Units are in Angstrom.
 
-\{\zicf phonon:wave-direction-x = float\}\phantomsection\textbackslash{}addcontentsline\{toc\}{subsubsection\}{phonon:wave-direction-x = float\} The x-component of the unit vector that defines the direction of propagation for the force wave. 
+{\zicf phonon:wave-direction-x = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-direction-x = float} The x-component of the unit vector that defines the direction of propagation for the force wave.
 
-\{\zicf phonon:wave-direction-y = float\}\phantomsection\textbackslash{}addcontentsline\{toc\}{subsubsection\}{phonon:wave-direction-y = float\} The y-component of the unit vector that defines the direction of propagation. 
+{\zicf phonon:wave-direction-y = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-direction-y = float} The y-component of the unit vector that defines the direction of propagation.
 
-\{\zicf phonon:wave-direction-z = float\}\phantomsection\textbackslash{}addcontentsline\{toc\}{subsubsection\}{phonon:wave-direction-z = float\} The z-component of the unit vector that defines the direction of propagation. 
+{\zicf phonon:wave-direction-z = float}\phantomsection\addcontentsline{toc}{subsubsection}{phonon:wave-direction-z = float} The z-component of the unit vector that defines the direction of propagation.
 
 
 
@@ -502,12 +521,16 @@ The following commands control the simulation, including the program, maximum te
 
 {\zicf sim:integrator = exclusive string [default llg-heun]}\phantomsection\addcontentsline{toc}{subsection}{sim:integrator} Declares the integrator to be used for the simulation. Available options are:
 \begin{itemize}
-  \item[] llg-heun
-  \item[] monte-carlo
-  \item[] llg-midpoint
-  \item[] constrained-monte-carlo
-  \item[] hybrid-constrained-monte-carlo
-  \item[] suzuki-trotter
+  \item[] \texttt{llg-heun} (default): second-order Heun integration of the stochastic Landau-Lifshitz-Gilbert equation. Recommended for most dynamic simulations.
+  \item[] \texttt{llg-midpoint}: implicit midpoint integration of the LLG equation. More accurate than Heun, especially for low Gilbert damping, but computationally more expensive per step.
+  \item[] \texttt{llg-quantum}: LLG-Heun integration with quantum-corrected thermal fields based on Bose-Einstein statistics with time-correlated noise.
+  \item[] \texttt{monte-carlo}: Metropolis Monte Carlo algorithm. Efficient for computing equilibrium thermodynamic properties such as the Curie temperature and magnetisation curves.
+  \item[] \texttt{constrained-monte-carlo}: Monte Carlo integration with a global constraint on the magnetisation direction. Used for computing anisotropy energy surfaces and constrained equilibrium states.
+  \item[] \texttt{hybrid-constrained-monte-carlo}: combines constrained Monte Carlo moves for the constrained material(s) with standard Monte Carlo for all other materials.
+  \item[] \texttt{spin-lattice}: Suzuki-Trotter decomposition integrator for coupled spin-lattice dynamics. Requires the spin-lattice module parameters to be defined.
+  \item[] \texttt{lsf}: Heun integration of the longitudinal spin fluctuation (LSF) equations of motion, allowing the spin length to vary according to the Landau free-energy.
+  \item[] \texttt{lsf-mc}: Monte Carlo sampling for longitudinal spin fluctuations. Used for computing equilibrium properties with varying spin length.
+  \item[] \texttt{lsf-rk4}: fourth-order Runge-Kutta integration of the LSF equations of motion. More accurate than Heun.
 \end{itemize}
 
 {\zicf sim:program = exclusive string}\phantomsection\addcontentsline{toc}{subsection}{sim:program} Defines the simulation program to be used.
@@ -598,9 +621,6 @@ The margin between the edge of the system and the written tracks in cross-track 
 set the shift between the centre of application of the external field and temperature pulse.
 
 {\zicf sim:enable-fmr-field}\phantomsection\addcontentsline{toc}{subsection}{sim:enable-fmr-field}
-
-{\zicf sim:dipole-field-update-rate = integer [default 1000]}\phantomsection\addcontentsline{toc}{subsection}{sim:dipole-field-update-rate}
-Number of timesteps between recalculation of the demag field. Default value is suitable for slow calculations, fast dynamics will generally require much faster update rates.
 
 {\zicf sim:time-step}\phantomsection\addcontentsline{toc}{subsection}{sim:time-step} The timestep for the evolution of the system, determines how long a simulation will take.
 

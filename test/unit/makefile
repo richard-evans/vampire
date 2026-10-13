@@ -8,7 +8,7 @@
 GCC=g++
 
 # LIBS
-LIBS=-lstdc++
+LIBS= #-lstdc++
 
 # Flags
 GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/ -I../../src/

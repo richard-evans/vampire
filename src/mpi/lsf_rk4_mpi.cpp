@@ -89,7 +89,7 @@ int LSF_RK4_mpi(){
 	const int post_comm_ei = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 
 	double xyz[3];		/// Local Delta Spin Components
-   const double kB = 1.3806503e-23; // Boltzmann constant
+   const double kB = constants::kB;
 
 		//----------------------------------------
 		// Initiate halo swap

@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 //
 // Vampire headers
+#include "constants.hpp"
 #include "environment.hpp"
 
 // micromagnetic module headers
@@ -283,7 +284,7 @@ namespace environment{
           #endif
 
         int interaction_no = 0;
-           const double imuB = 1.0/9.27400915e-24;
+           const double imuB = constants::i_muB;
 
       //  std::cout << "calcualte demag env " <<std::endl;
 
@@ -322,9 +323,9 @@ namespace environment{
          }
         //std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
 
-        dipole_field_x[cell_i] = dipole_field_x[cell_i]*9.27400915e-01;
-        dipole_field_y[cell_i] = dipole_field_y[cell_i]*9.27400915e-01;
-        dipole_field_z[cell_i] = dipole_field_z[cell_i]*9.27400915e-01;
+        dipole_field_x[cell_i] = dipole_field_x[cell_i]*constants::dipole_prefactor;
+        dipole_field_y[cell_i] = dipole_field_y[cell_i]*constants::dipole_prefactor;
+        dipole_field_z[cell_i] = dipole_field_z[cell_i]*constants::dipole_prefactor;
     //   std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
       }
     // std::cout << interaction_no << '\t' << num_cells*num_cells << std::endl;
@@ -383,7 +384,7 @@ namespace environment{
 //       //   pfile.open("m.txt");
 //          //initialised the in components for the FT to the magnetisation of each cell
 //          int cell = 0;
-//          const double imuB = 1.0/9.27400915e-24;
+//          const double imuB = constants::i_muB;
 //
 //          for(unsigned int k = 0 ; k < num_cells_z ; k++){
 //             for(unsigned int j = 0 ; j < num_cells_y; j++){
@@ -440,15 +441,15 @@ namespace environment{
 //          fftw_execute(HyP);
 //          fftw_execute(HzP);
 //
-//          double constant = 9.27400915e-01/eight_num_cells;
+//          double constant = constants::dipole_prefactor/eight_num_cells;
 //
 //
 //          // for (int i = 0; i< num_cells; i++){
 //          //
 //          //    // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
-//          //    dipole_field_x[i]=0.0;//eightPI_three_cell_volume*(x_mag_array[i]/9.27400915e-24);
-//          //    dipole_field_y[i]=0.0;//eightPI_three_cell_volume*(y_mag_array[i]/9.27400915e-24);
-//          //    dipole_field_z[i]=0.0;//eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24);
+//          //    dipole_field_x[i]=0.0;//eightPI_three_cell_volume*(x_mag_array[i]/constants::muB);
+//          //    dipole_field_y[i]=0.0;//eightPI_three_cell_volume*(y_mag_array[i]/constants::muB);
+//          //    dipole_field_z[i]=0.0;//eightPI_three_cell_volume*(z_mag_array[i]/constants::muB);
 //          // }
 //
 //       //   std::ofstream ofile;

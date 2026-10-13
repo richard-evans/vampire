@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "constants.hpp"
 #include "atoms.hpp"
 #include "material.hpp"
 #include "random.hpp"
@@ -66,9 +67,9 @@ void monte_carlo_preconditioning(){
       double alpha = mp::material[m].temperature_rescaling_alpha;
       double Tc = mp::material[m].temperature_rescaling_Tc;
       double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
-      rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
+      rescaled_material_kBTBohr[m] = constants::muB/(rescaled_temperature*constants::kB);
       sigma_array[m] = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
-      moment_array[m] = mp::material[m].mu_s_SI/9.27400915e-24;
+      moment_array[m] = mp::material[m].mu_s_SI/constants::muB;
    }
 
 	for(int s = 0; s < sim::num_monte_carlo_preconditioning_steps; s++){

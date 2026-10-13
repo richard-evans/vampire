@@ -24,6 +24,7 @@
 //
 
 // Headers
+#include "constants.hpp"
 #include "errors.hpp"
 #include "dipole.hpp"
 #include "voronoi.hpp"
@@ -59,7 +60,7 @@ namespace mp{
 	//Input Integration parameters
 	//----------------------------------
 	double dt_SI;
-	double gamma_SI = 1.76E11;
+	double gamma_SI = constants::gamma_SI;
 
 	//----------------------------------
 	//Derived Integration parameters
@@ -174,7 +175,7 @@ int default_system(){
 	//-------------------------------------------------------
 	material[0].name="Co";
 	material[0].alpha=0.1;
-	material[0].mu_s_SI=1.5*9.27400915e-24;
+	material[0].mu_s_SI=1.5*constants::muB;
 	material[0].gamma_rel=1.0;
 	material[0].element="Ag ";
 	material[0].alpha_eq=0.1;
@@ -387,8 +388,8 @@ int set_derived_parameters(){
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
-		mp::material[mat].H_th_sigma			    = sqrt(2.0*mp::material[mat].alpha*1.3806503e-23 / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
-      mp::material[mat].H_th_sigma_eq         = sqrt(2.0*mp::material[mat].alpha_eq*1.3806503e-23 / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
+		mp::material[mat].H_th_sigma             = sqrt(2.0*mp::material[mat].alpha*constants::kB / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
+      mp::material[mat].H_th_sigma_eq         = sqrt(2.0*mp::material[mat].alpha_eq*constants::kB / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
 
       // Rename un-named materials with material id
       std::string defname="material#n";
@@ -402,7 +403,7 @@ int set_derived_parameters(){
 
       // Unroll material spin moment values for speed
       mp::mu_s_array.resize(mp::num_materials);
-      for(int mat=0;mat<mp::num_materials; mat++) mu_s_array.at(mat)=mp::material[mat].mu_s_SI/9.27400915e-24; // normalise to mu_B
+      for(int mat=0;mat<mp::num_materials; mat++) mu_s_array.at(mat)=mp::material[mat].mu_s_SI/constants::muB; // normalise to mu_B
 
 	return EXIT_SUCCESS;
 }

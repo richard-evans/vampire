@@ -29,11 +29,24 @@
 #include <vector>
 
 namespace units{
+
 	extern const double pi;
 
-	// conversion functions
-	extern int convert(std::string input_unit, double& value, std::string& type);
+	// Holds all the data for one unit.
+	// Keeping these three values in a struct means they always travel together —
+	// there is no risk of the name, type, and conversion factor getting out of
+	// step with each other (which was easy to do with the old parallel arrays).
+	struct unit_t {
+		std::string name;        // string the user writes in the input file, e.g. "nm"
+		std::string type;        // physical quantity this unit measures, e.g. "length"
+		double      conversion;  // multiply the user's value by this to get internal units
+	};
+
+	// conversion functions — public API is unchanged; all existing callers still compile
+	extern int  convert(std::string input_unit, double& value, std::string& type);
 	extern void convert(std::string input_unit, std::vector<double>& value, std::string& type);
+	extern int  revert (std::string output_unit, double& value, std::string& type);
+
 }
 
 

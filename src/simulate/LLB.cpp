@@ -33,6 +33,7 @@
 ///====================================================================================================
 /// \file LLG.cpp
 /// Contains LLG namespace and serial version of the integrator
+#include "constants.hpp"
 #include "atoms.hpp"
 #include "material.hpp"
 #include "sim.hpp"
@@ -130,8 +131,8 @@ int LLB_serial_heun(const int num_steps){
 	const double temperature = sim::temperature;
 	const double mu_s = 1.5E-24;
 	const double n_spins = 10000.0;
-	const double kB = 1.3806503e-23;
-	const double gamma = 1.76e11;
+	const double kB = constants::kB;
+	const double gamma = constants::gamma_SI;
 	const double dt_SI = 1.0E-15;
 	const double dt = dt_SI*gamma;
 	const double Hx=0.0;

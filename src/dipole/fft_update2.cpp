@@ -10,6 +10,7 @@
 //
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <cmath>
 #include <algorithm>
 #include <cstdlib>
@@ -392,7 +393,7 @@ void update_field_fft(){
 
   }
 
-   const double imuB = 1.0/9.27400915e-24;
+   const double imuB = constants::i_muB;
 
    for(int lc = 0; lc < cells::num_local_cells; lc++){
     // get cell index
@@ -451,9 +452,9 @@ void update_field_fft(){
      dipole::cells_field_array_y[id] += Hy_out[cell][0]/dp::eight_num_cells;
      dipole::cells_field_array_z[id] += Hz_out[cell][0]/dp::eight_num_cells;
 
-     dipole::cells_field_array_x[cell] *= 9.27400915e-01;
-     dipole::cells_field_array_y[cell] *= 9.27400915e-01;
-     dipole::cells_field_array_z[cell] *= 9.27400915e-01;
+     dipole::cells_field_array_x[cell] *= constants::dipole_prefactor;
+     dipole::cells_field_array_y[cell] *= constants::dipole_prefactor;
+     dipole::cells_field_array_z[cell] *= constants::dipole_prefactor;
 
     dp_fields <<cell << '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] <<std::endl;
     cell++;

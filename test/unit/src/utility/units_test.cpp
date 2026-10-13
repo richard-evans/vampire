@@ -75,14 +75,15 @@ int test_units(const bool verbose){
    //extern int convert(std::string input_unit, double& value, std::string& type);
 	//extern void convert(std::string input_unit, std::vector<double>& value, std::string& type);
 
-   // specify numerical precision required for all tests
-   const double precision = 0.00001;
-
+   // Precision tightened to 1e-8 now that units.cpp references constants.hpp
+   // directly — all values are guaranteed consistent with CODATA 2018.
+   const double precision = 1e-8;
 
    int ec = 0; // error counter
 
    //-----------------------------------------------------------------------------------------
    // Testing units::convert(std::string input_unit, double& value, std::string& type);
+   // Expected values are the CODATA 2018 / 2019 SI exact values.
    //-----------------------------------------------------------------------------------------
    ec += convert_test("meV", 1.0, 1.602176634e-22, "","energy",precision);
    ec += convert_test("T",   1.0, 1.0,             "","field",precision);

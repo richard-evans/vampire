@@ -10,6 +10,7 @@
 //
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <cstdlib>
 #include <iostream>
 
@@ -78,7 +79,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
    else {
 
       // inverse Bohr magneton
-      const double imuB = 1.0/9.27400915e-24;
+      const double imuB = constants::i_muB;
 
       // initialise locally integrated cells to cell magnetization values
       for (int lc = 0; lc < micromagnetic::number_of_micromagnetic_cells; lc++){

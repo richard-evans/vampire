@@ -8,7 +8,7 @@
 GCC=g++
 
 # LIBS
-LIBS=-lstdc++
+LIBS= #-lstdc++
 
 # Flags
 GCC_CFLAGS=-O3 -std=c++17
@@ -16,8 +16,9 @@ GCC_CFLAGS=-O3 -std=c++17
 # Objects
 OBJECTS= \
 obj/main.o \
-obj/exchange.o \
+obj/energy.o \
 obj/integrator.o \
+obj/montecarlo.o \
 obj/structure.o \
 obj/utilities.o
 

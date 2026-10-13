@@ -9,6 +9,7 @@
 //
 
 // C++ standard library headers
+#include "constants.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -151,7 +152,7 @@ namespace dipole{
                                          std::vector<double>& y_spin_array,
                                          std::vector<double>& z_spin_array){
 
-       const double prefactor = 0.9274009994; // mu_o_4pi * muB / Angstrom^3 = 1.0e-7 * 9.274009994e-24 / 1.0e-30 = 0.9274009994
+       const double prefactor = constants::dipole_prefactor; // mu_0*muB/(4*pi*Ang^3) — see constants::dipole_prefactor
        const double eight_pi_o_three = 8.0 * M_PI / 3.0;
 
        // cast number of local atoms to a local constant

@@ -90,7 +90,7 @@ int LSF_mpi(){
 
 	double xyz[3];		/// Local Delta Spin Components
 	double S_new[3];	/// New Local Spin Moment
-   const double kB = 1.3806503e-23; // Boltzmann constant
+   const double kB = constants::kB;
 
 		//----------------------------------------
 		// Initiate halo swap

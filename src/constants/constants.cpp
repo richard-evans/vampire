@@ -15,14 +15,24 @@
 
 //--------------------------------------------------------------------------------
 // Namespace for program constants
+//
+// All values are taken from CODATA 2018 / the 2019 SI redefinition.
+// eV, kB, and muB are now exact by definition under the 2019 SI.
+// This is the single source of truth for physical constants in vampire —
+// do not hard-code these values elsewhere in the codebase.
 //--------------------------------------------------------------------------------
 namespace constants{
 
-   // fundamental constants
-   const double muB = 9.27400999e-24; // Bohr Magneton (Joules / Tesla)
-   const double kB  = 1.3806503e-23;  // Boltzmann constant (Joules / Kelvin)
-   const double kB_eV  = 8.61733324e-5;  // Boltzmann constant (Joules / Kelvin)
+   // Fundamental constants (CODATA 2018)
+   const double muB      = 9.2740100783e-24; // Bohr magneton              (J/T)
+   const double kB       = 1.380649e-23;     // Boltzmann constant         (J/K)   exact
+   const double kB_eV    = 8.617333262e-5;   // Boltzmann constant         (eV/K)
+   const double eV       = 1.602176634e-19;  // 1 electron volt            (J)     exact
+   const double gamma_SI = 1.76085963023e11; // Electron gyromagnetic ratio (rad/s/T)
 
-   // derived constants
+   // Derived constants — computed here so the relationship to the fundamentals
+   // is explicit and the values stay consistent if the fundamentals are updated.
+   const double i_muB            = 1.0 / muB;               // (J/T)^-1
+   const double dipole_prefactor = 1.0e-7 * muB / 1.0e-30; // mu_0*muB/(4*pi*Ang^3) (T)
 
-} // end of exchange namespace
+} // end of constants namespace

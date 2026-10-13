@@ -166,9 +166,7 @@ namespace sim{
          // Local variables for system integration
          const int num_atoms = atoms::num_atoms;
          double xyz[3];   // Local delta spin components
-         const double kB = 1.3806503e-23;
-
-         // Calculate fields
+         const double kB = constants::kB;
          calculate_spin_fields(0, num_atoms);
          calculate_lsf_rk4_magnetic_field(0, num_atoms);
          calculate_external_fields(0, num_atoms);

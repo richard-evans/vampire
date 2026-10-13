@@ -1,0 +1,66 @@
+#------------------------------------------
+# Integration test: Monte Carlo equilibration
+#
+# Tests that the Monte Carlo integrator correctly
+# equilibrates a ferromagnet to full saturation
+# (magnetisation length = 1) starting from a
+# random spin configuration.
+#
+# At T = 0, every Monte Carlo trial move that
+# lowers the total exchange energy is accepted
+# and every move that raises it is rejected.
+# A ferromagnet therefore always converges to
+# the fully aligned ground state regardless of
+# the initial spin configuration, so the final
+# magnetisation length must be exactly 1.
+#
+# This test exercises the Monte Carlo code path
+# which is not covered by the LLG integrator tests.
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+
+#------------------------------------------
+# System Dimensions:
+# 5x5x5 SC unit cells = 125 atoms.
+# Small enough for fast convergence while
+# still being a meaningful many-body system.
+#------------------------------------------
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 1.75 !nm
+dimensions:system-size-y = 1.75 !nm
+dimensions:system-size-z = 1.75 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+# 10,000 MC steps is more than sufficient for a
+# 125-atom ferromagnet at T=0 to reach saturation
+# from any initial configuration.
+#------------------------------------------
+sim:temperature=0.0
+sim:time-steps-increment = 100
+sim:total-time-steps = 10000
+sim:time-step=1.0E-15
+
+#------------------------------------------
+# Program and integrator details:
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=monte-carlo
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:magnetisation-length
+screen:magnetisation-length

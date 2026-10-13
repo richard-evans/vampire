@@ -11,6 +11,7 @@
 //
 
 // Standard Libraries
+#include "constants.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -337,7 +338,7 @@ int cmc_mc_step(){
       double alpha = mp::material[m].temperature_rescaling_alpha;
       double Tc = mp::material[m].temperature_rescaling_Tc;
       double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
-      rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
+      rescaled_material_kBTBohr[m] = constants::muB/(rescaled_temperature*constants::kB);
       sigma_array[m] = pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
    }
 
@@ -387,7 +388,7 @@ int cmc_mc_step(){
 			Enew = sim::calculate_spin_energy(atom_number1);
 
 			// Calculate difference in Joules/mu_B
-			delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
+			delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*constants::i_muB; //1/constants::muB
 
 			// Check for lower energy state and accept unconditionally
 			if(delta_energy1<0){
@@ -442,7 +443,7 @@ int cmc_mc_step(){
 		Enew = sim::calculate_spin_energy(atom_number1);
 
 		// Calculate difference in Joules/mu_B
-		delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
+		delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*constants::i_muB; //1/constants::muB
 
 		// Compute second move
 
@@ -492,7 +493,7 @@ int cmc_mc_step(){
 			Enew = sim::calculate_spin_energy(atom_number2);
 
          // Calculate difference in Joules/mu_B
-			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24
+			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*constants::i_muB; //1/constants::muB
 
 			// Calculate Delta E for both spins
 			delta_energy21 = delta_energy1*rescaled_material_kBTBohr[imat1] +

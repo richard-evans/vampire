@@ -43,6 +43,7 @@
 ///
 
 // Standard Libraries
+#include "constants.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -146,8 +147,8 @@ namespace program{
       double maxPH = 0.0;
       double maxP  = 0.0;
       for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
          double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
          double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
          if((bin[b])>maxP) maxP=bin[b];
@@ -158,12 +159,12 @@ namespace program{
       std::ofstream ofile("boltzmann-distribution.txt");
 
       // Output data
-      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23) << std::endl;
-      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23) << std::endl;
-      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/9.274e-24 << "\t" << sim::temperature << std::endl;
+      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB) << std::endl;
+      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB) << std::endl;
+      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/constants::muB << "\t" << sim::temperature << std::endl;
       for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
          double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
          double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
          ofile << b << "\t" << bin[b]/maxP << "\t" << (bin[b]+bin[180-b])/(2.0*maxP) << "\t" << PK/maxPK << "\t" << PH/maxPH << std::endl;
@@ -216,8 +217,8 @@ namespace program{
       double maxPH = 0.0;
       double maxP  = 0.0;
       for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
          double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
          double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
          if((bin[b])>maxP) maxP=bin[b];
@@ -228,12 +229,12 @@ namespace program{
       std::ofstream ofile("boltzmann-distribution.txt");
 
       // Output data
-      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23) << std::endl;
-      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23) << std::endl;
-      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/9.274e-24 << "\t" << sim::temperature << std::endl;
+      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB) << std::endl;
+      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB) << std::endl;
+      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/constants::muB << "\t" << sim::temperature << std::endl;
       for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
          double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
          double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
          ofile << b << "\t" << bin[b]/maxP << "\t" << (bin[b]+bin[180-b])/(2.0*maxP) << "\t" << PK/maxPK << "\t" << PH/maxPH << std::endl;

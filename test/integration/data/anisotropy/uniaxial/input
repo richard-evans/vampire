@@ -1,0 +1,60 @@
+#------------------------------------------
+# Integration test: uniaxial anisotropy energy
+#
+# Tests that the uniaxial anisotropy energy is
+# computed correctly when all spins are aligned
+# along the easy axis.
+#
+# Analytic result:
+#   E = -K_u * sum_i (S_i . e_z)^2
+#     = -K_u * N_atoms         (all spins along e_z)
+#     = -1e-23 * 1000
+#     = -1e-20 J
+#
+# System: 10x10x10 SC unit cells = 1000 atoms.
+# Exchange is set to zero so that spin-spin coupling
+# cannot affect the result; only anisotropy contributes.
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 3.5 !nm
+dimensions:system-size-y = 3.5 !nm
+dimensions:system-size-z = 3.5 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+# Single step at T=0 - no dynamics needed,
+# just compute the ground-state energy.
+#------------------------------------------
+sim:temperature=0.0
+sim:time-steps-increment = 1
+sim:total-time-steps = 1
+sim:time-step=1.0E-15
+
+#------------------------------------------
+# Program and integrator details:
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-heun
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:anisotropy-energy
+screen:anisotropy-energy

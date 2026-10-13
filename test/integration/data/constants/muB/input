@@ -1,0 +1,69 @@
+#------------------------------------------
+# Integration test: Bohr magneton (muB)
+#
+# Tests the complete unit-conversion chain:
+#
+#   input "1.0 !muB"
+#     -> units::convert("muB", ...)    [uses constants::muB]
+#     -> mu_s_SI = constants::muB
+#     -> applied-field energy E = -N * mu_s_SI * H
+#
+# With all spins aligned along the applied field (z),
+# zero exchange, and zero anisotropy, the total
+# applied-field energy is:
+#
+#   E = -N * n_muB * muB * H
+#     = -125 * 1.0 * 9.2740100783e-24 * 1.0
+#     = -1.15925125979e-21 J
+#
+# System: 5x5x5 SC unit cells = 125 atoms.
+# A wrong muB value produces a proportionally wrong
+# energy -- the test catches any error in the constant
+# or in the muB unit conversion factor.
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 1.75 !nm
+dimensions:system-size-y = 1.75 !nm
+dimensions:system-size-z = 1.75 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+# Single step at T=0. Spins start aligned
+# along z (parallel to field) so there is
+# no torque and no dynamics -- the output
+# at t=0 is exactly the analytic value.
+#------------------------------------------
+sim:temperature=0.0
+sim:applied-field-strength = 1.0 !T
+sim:time-step = 1.0E-15
+sim:time-steps-increment = 1
+sim:total-time-steps = 1
+
+#------------------------------------------
+# Program and integrator:
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-heun
+
+#------------------------------------------
+# Data output:
+#------------------------------------------
+output:applied-field-energy
+screen:applied-field-energy

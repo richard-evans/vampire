@@ -11,6 +11,7 @@
 //
 
 // Vampire headers
+#include "constants.hpp"
 #include "micromagnetic.hpp"
 
 // micromagnetic module headers
@@ -89,8 +90,7 @@ namespace micromagnetic{
 //---------------------------------------------------------------------------
 // persistant file scope variables
 //---------------------------------------------------------------------------
-const double kB = 1.3806503e-23;
-//arrays to store the magnetisation and the field
+const double kB = constants::kB;
 std::vector<double> m(3,0.0);
 std::vector<double> spin_field(3,0.0);
 

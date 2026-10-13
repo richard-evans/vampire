@@ -362,3 +362,10 @@ install:
 uninstall:
 	rm -rf /opt/vampire
 	rm -f /etc/paths.d/vampire_path
+
+manual:
+	cd manual && xelatex vampire-manual.tex && xelatex vampire-manual.tex
+
+manual-clean:
+	cd manual && rm -f vampire-manual.aux vampire-manual.log vampire-manual.out \
+	    vampire-manual.toc vampire-manual.lof vampire-manual.lot vampire-manual.pdf

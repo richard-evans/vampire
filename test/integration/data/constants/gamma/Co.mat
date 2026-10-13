@@ -1,0 +1,22 @@
+#===================================================
+# Material file for gamma_SI precession test
+#
+# Near-zero damping (alpha = 0.001) keeps the spin
+# in the xy-plane so the test is dominated by
+# precession phase accumulation rather than relaxation.
+# Zero anisotropy and zero exchange ensure the only
+# torque comes from the applied field, giving a clean
+# analytical result: phi = gamma_SI * H * t.
+#===================================================
+
+material:num-materials=1
+
+material[1]:material-name=Co
+material[1]:damping-constant=0.001
+material[1]:exchange-matrix[1]=0.0
+material[1]:atomic-spin-moment=1.0 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Co
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
+material[1]:initial-spin-direction=1,0,0

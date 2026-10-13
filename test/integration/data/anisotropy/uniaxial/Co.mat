@@ -1,0 +1,22 @@
+#===================================================
+# Material file for uniaxial anisotropy energy test
+#
+# Uniaxial easy axis is along z by default.
+# Exchange is set to zero to isolate the anisotropy
+# contribution to the total energy.
+# Spins are initialised along z (the easy axis) so
+# that (S . e_z)^2 = 1 for every atom, giving the
+# maximum (ground-state) anisotropy energy.
+#===================================================
+
+material:num-materials=1
+
+material[1]:material-name=Co
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=0.0
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:uniaxial-anisotropy-constant=1.0e-23
+material[1]:material-element=Co
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
+material[1]:initial-spin-direction=0,0,1
