@@ -20,13 +20,13 @@ echo "-----------------------------------------------"
 RSYNC_RSH="ssh -q" rsync -rcih * $USER@$SERV:$VDIR/
 
 # compile the code on the headnode
-echo "-----------------------------------------------"
-echo " Compiling on $SERV"
-echo "-----------------------------------------------"
-ssh -qt $USER@$SERV $CMD /bin/bash -l $VDIR/util/cudarun/vcompile.sh -d $VDIR
+#echo "-----------------------------------------------"
+#echo " Compiling on $SERV"
+#echo "-----------------------------------------------"
+#ssh -qt $USER@$SERV $CMD /bin/bash -l $VDIR/developers/tools/cudarun/vcompile.sh -d $VDIR
 
-#echo "-----------------------------------------------"
-#echo " Executing on $NODE"
-#echo "-----------------------------------------------"
+echo "-----------------------------------------------"
+echo " Executing on $NODE"
+echo "-----------------------------------------------"
 # run the code on the compute node -l login shell -q quiet mode to supress login message -t for terminal
-#ssh -qt $USER@$SERV /bin/bash -l $VDIR/util/cudarun/vrun.sh -u $USER -d $VDIR -n $NODE
+ssh -qt $USER@$SERV /bin/bash -l $VDIR/developers/tools/cudarun/vrun.sh -u $USER -d $VDIR -n $NODE

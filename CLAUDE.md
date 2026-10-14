@@ -139,4 +139,4 @@ Material parameters are in the `mp` namespace (`hdr/material.hpp`), loaded from 
 
 ### Adding a New Module
 
-Use `util/initialise_new_vampire_module.cpp` as a template. Each module needs: `src/<name>/`, `hdr/<name>.hpp`, `src/<name>/internal.hpp`, `src/<name>/makefile`, and an entry in the root makefile's `include` list.
+Use `developers/tools/initialise_new_vampire_module.cpp` as a template. Each module needs: `src/<name>/`, `hdr/<name>.hpp`, `src/<name>/internal.hpp`, `src/<name>/makefile`, and an entry in the root makefile's `include` list.

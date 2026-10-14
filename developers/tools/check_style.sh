@@ -16,13 +16,13 @@
 #      - CRLF line endings
 #      - missing newline at the end of the file
 #      - missing licence header (the standard block produced by
-#        util/initialise_new_vampire_module.cpp, Free BSD or GNU GPL v2)
+#        developers/tools/initialise_new_vampire_module.cpp, Free BSD or GNU GPL v2)
 #      - includes of another module's internal.hpp ("../<module>/internal.hpp")
 #
 #   Cross-module internal.hpp includes are reported as warnings unless
 #   --strict is given, until the remaining ones have been removed.
 #
-#   Usage: util/scripts/check_style.sh [--strict] [file...]
+#   Usage: developers/tools/check_style.sh [--strict] [file...]
 #
 #   With no files, all tracked sources are checked. The exit status is 1 if
 #   any error is found.

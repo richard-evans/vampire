@@ -84,10 +84,7 @@ developers/test/unit/unit_tests
 #----------------------------------------------
 # Obsolete
 #----------------------------------------------
-cfg2povray
-cfg2rasmol
 log.*
-run/unit-cell-creator
 
 #----------------------------------------------
 # Eclipse project files and folders

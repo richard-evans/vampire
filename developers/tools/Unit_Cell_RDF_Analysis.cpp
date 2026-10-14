@@ -6,8 +6,8 @@
 #include<vector>
 #include<iomanip>
 
-// Make sure to use correct file path to include unitcell.hpp
-#include"/Users/jbc525/Documents/vampire/hdr/unitcell.hpp"
+// unitcell.hpp from the vampire hdr/ directory, relative to this file
+#include "../../hdr/unitcell.hpp"
 
 // Note: includes code modified from interactions.cpp
 

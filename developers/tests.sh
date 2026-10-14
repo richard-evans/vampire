@@ -64,7 +64,7 @@ status=0
 
 if [ "$style" = true ]; then
    # print errors and the summary; warnings are listed by running the script directly
-   style_output="$("$root/util/scripts/check_style.sh")" || status=1
+   style_output="$("$root/developers/tools/check_style.sh")" || status=1
    echo "$style_output" | grep -v ": warning: "
 fi
 

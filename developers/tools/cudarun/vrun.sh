@@ -10,4 +10,4 @@ esac
 done
 
 # log into compute node and execute code
-ssh -t -q $USER@$NODE /bin/bash -l $VDIR/util/cudarun/vexecute.sh -d $VDIR
+ssh -t -q $USER@$NODE /bin/bash -l $VDIR/developers/tools/cudarun/vexecute.sh -d $VDIR
