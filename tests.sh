@@ -5,8 +5,8 @@
 #------------------------------------------------------
 
 usage(){
-   echo "Usage: $0 [-a] [-i] [-e] [-u] [-r] [-m [N]] [-b] [-c] [-h]"
-   echo "   -a   run all tests, including extended integration tests and regression tests"
+   echo "Usage: $0 [-a] [-i] [-e] [-u] [-r] [-m [N]] [-b] [-c] [-s] [-h]"
+   echo "   -a   run all tests, including extended integration tests, regression tests and the style check"
    echo "   -i   run standard integration tests"
    echo "   -e   run extended (long running) integration tests"
    echo "   -u   run unit tests"
@@ -14,6 +14,7 @@ usage(){
    echo "   -m   run regression tests with vampire-parallel on N processes (default 2)"
    echo "   -b   build matrix: clean build of every build variant in a temporary copy"
    echo "   -c   coverage report from a debug build in a temporary copy (needs gcovr)"
+   echo "   -s   check source code style (tabs, trailing whitespace, licence headers)"
    echo "   -h   show this help"
    echo "With no option, the standard integration and unit tests are run."
 }
@@ -25,11 +26,12 @@ regression=false
 mpi_processes=0
 build=false
 coverage=false
+style=false
 
-while getopts "aieurmbch" flag
+while getopts "aieurmbcsh" flag
 do
    case "${flag}" in
-      a) integration=true; extended=true; unit=true; regression=true;;
+      a) integration=true; extended=true; unit=true; regression=true; style=true;;
       i) integration=true;;
       e) extended=true;;
       u) unit=true;;
@@ -42,6 +44,7 @@ do
          fi;;
       b) build=true;;
       c) coverage=true;;
+      s) style=true;;
       h) usage; exit 0;;
       *) usage; exit 1;;
    esac
@@ -49,7 +52,7 @@ done
 
 # run standard integration and unit tests if no test type is specified
 if [ "$integration" = false ] && [ "$extended" = false ] && [ "$unit" = false ] && [ "$regression" = false ] &&
-   [ "$mpi_processes" -eq 0 ] && [ "$build" = false ] && [ "$coverage" = false ]; then
+   [ "$mpi_processes" -eq 0 ] && [ "$build" = false ] && [ "$coverage" = false ] && [ "$style" = false ]; then
    integration=true
    unit=true
 fi
@@ -58,6 +61,12 @@ fi
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 status=0
+
+if [ "$style" = true ]; then
+   # print errors and the summary; warnings are listed by running the script directly
+   style_output="$("$root/util/scripts/check_style.sh")" || status=1
+   echo "$style_output" | grep -v ": warning: "
+fi
 
 #------------------------------------------------------
 # copy the working tree (tracked and untracked files,
