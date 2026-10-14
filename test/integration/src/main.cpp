@@ -126,6 +126,12 @@ int main(int argc, char* argv[]){
                                                                {"E[111]", 2, 3.703703703703706e-23, 1.0e-10, 1.0e-30},
                                                                {"E(d4)", 3, 1.529974755416535e-23, 1.0e-10, 1.0e-30},
                                                                {"E(d5)", 4, 1.311953352769679e-23, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
+      // cubic-fourth-order-rotated: E = -K/2 sum_i (S.e_i)^4, e1 = [110], e2 = [-110], e3 = e1 x e2, for 100 spins along each direction
+      if( !final_values_test("anisotropy/cubic-fourth-order-rotated", { {"E[001]", 0, -4.999999999999996e-22, 1.0e-10, 1.0e-30},
+                                                                        {"E[100]", 1, -2.499999999999999e-22, 1.0e-10, 1.0e-30},
+                                                                        {"E[111]", 2, -2.777777777777778e-22, 1.0e-10, 1.0e-30},
+                                                                        {"E(d4)", 3, -2.667638483965012e-22, 1.0e-10, 1.0e-30},
+                                                                        {"E(d5)", 4, -2.142857142857142e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
 
       // DMI energy tests
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
