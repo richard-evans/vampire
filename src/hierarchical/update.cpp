@@ -62,7 +62,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    }
 
    // Compute dipole fields for all cells with atoms (local cells)
-	for(int lc = 0; lc < dipole::cells_num_local_cells; lc++){
+   for(int lc = 0; lc < dipole::cells_num_local_cells; lc++){
 
       // get global cell ID from local cell list
       int cell_i = cells::cell_id_array[lc];
