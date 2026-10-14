@@ -1,0 +1,31 @@
+# Whitespace-only commits (tabs to spaces, trailing whitespace), October 2026.
+# Use with: git config blame.ignoreRevsFile .git-blame-ignore-revs
+14290d43e56bd5bb375e9a51684372bf4f289a1b # public headers (hdr/)
+f9c10a1bc48b89d42dbe18f6010618b4520a5d60 # anisotropy module
+4fbd8db0b9efa85d2077539c324aceaa2f8fee97 # create module
+a64d53521bb87115df520db0789be80d0bb0ae65 # cuda module
+385fd40575a8b29e8f4b036561d37ff4c5fbd527 # data module
+7bf41bed5a3d335c10216034a6e111e85e22d3c9 # dipole module
+b3b8c70d9e0e899c79c62184621d35489ee1a416 # environment module
+a86647075308b51a94c8f2fb26533ed859bdda1a # exchange module
+0010f9b8a422c8a2573933ccfd327059f2adbee0 # grains module
+2bc5dfb32e406f4ba2bb4853b63b83d04c40d406 # hamr module
+fd09266ff16afd6a19f9eb54232e6ae580f9a435 # hierarchical module
+1e60712ad870601c89bf666029cceba6ce3a68fa # integrate module
+c43ac53d3beb9bd36fc26f7ef3481ad53d43c874 # ltmp module
+583b123f98ff1f3b06301a4e245f0101e8a19084 # main module
+c9a855371168ad6ffb410d21837a892c80701513 # material module
+08a0cbea5ed74f0217c997ebaf9671de9e459a1d # micromagnetic module
+937d206539de853508fb70ef02f1fe1198224ec7 # montecarlo module
+525c7f05d91f8bfb2570397b8b8845edc9726d3a # mpi module
+c33ab118794497e0cfbb5a750359253d720191a7 # neighbours module
+8aaa77ec5f03ac6deb0d1115ee2bd911cfdb56b3 # program module
+df67095cc252c31184f48054b00b16867650dbe0 # random module
+9b6b7d75459152c687e28263ffd01081e309eb1a # simulate module
+7536eb77a8dfe88e32a272570896c589ea355eed # spinlattice module
+d814be4b52dc9f5bd4070d6b9e40a22164c9bc28 # spintorque module
+0b7819c7dfd1056fd7f544161e7561975cb2e99c # spinwaves module
+f60a5f16bca7aeab9a3e0801354b66284efd6f9b # statistics module
+311a9306ec1d94d4aab26706c9f323cd73465a29 # unitcell module
+892234f64d2cac63fb11ba07f3d0047a81ecd83a # utility module
+f50afc59666956accb82a17e22519dfba98fb7a4 # vio module
