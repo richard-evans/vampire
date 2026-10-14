@@ -18,6 +18,7 @@
 # |obtained - expected| <= abs + rel*|expected|, other fields must be equal.
 # Lines starting with # are ignored. Exit code 0 on pass, 1 on fail.
 #
+import math
 import sys
 
 def data_lines(filename):
@@ -59,6 +60,12 @@ def main():
             if e != o:
                num_fail += 1
                if worst is None: worst = (float("inf"), line, col, e, o)
+            continue
+         # nan and inf only match themselves
+         if not (math.isfinite(ev) and math.isfinite(ov)):
+            if not (ev == ov or (math.isnan(ev) and math.isnan(ov))):
+               num_fail += 1
+               if worst is None or worst[0] != float("inf"): worst = (float("inf"), line, col, e, o)
             continue
          diff = abs(ov - ev)
          bound = tol + rel*abs(ev)
