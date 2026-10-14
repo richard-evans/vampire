@@ -120,7 +120,7 @@ namespace dipole{
             if( cells_num_atoms_in_cell[celli] > 0 ){
             //std::cout << i << '\t' << "interaction" << "\t"  << cells_num_cells << "\t" << cells_num_atoms_in_cell[i] <<  std::endl;
 
-            	// Loop over all other cells to calculate contribution to local cell
+               // Loop over all other cells to calculate contribution to local cell
                for( int cellj = 0; cellj < cells_num_cells; cellj++ ){
 
                   //--------------------------------------------------------------
@@ -129,7 +129,7 @@ namespace dipole{
                   if ( cells_num_atoms_in_cell_global[cellj] > 0 ){ // only calculate interaction if there are atoms in remote cell
 
                      // check if cell is not the same
-                	   if( celli != cellj ){
+                     if( celli != cellj ){
                         // calculate inter term of dipolar tensor
                         compute_inter_tensor(celli,
                                              cellj,
@@ -168,8 +168,8 @@ namespace dipole{
                //   std::cout << i<< '\t' <<j << '\t' <<   dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_yz[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
                }
                }
-   			}
-   		}
+            }
+         }
 
          // hold parallel calculation until all processors have completed the dipole calculation
          vmpi::barrier();

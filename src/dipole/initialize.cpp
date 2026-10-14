@@ -54,18 +54,18 @@ namespace dipole{
                   std::vector<double>& atom_moments, // atomic magnetic moments
                   std::vector<bool>& magnetic, // bool for magnetic atoms
                   int num_atoms
-				){
+            ){
 
-	   //-------------------------------------------------------------------------------------
+      //-------------------------------------------------------------------------------------
       // Check for dipole calculation enabled, if not do nothing
       //-------------------------------------------------------------------------------------
       if(!dipole::activated) return;
 
-		// check for prior initialisation
-		if(dipole::internal::initialised){
-      	zlog << zTs() << "Warning: Dipole field calculation already initialised. Continuing." << std::endl;
-      	return;
-		}
+      // check for prior initialisation
+      if(dipole::internal::initialised){
+         zlog << zTs() << "Warning: Dipole field calculation already initialised. Continuing." << std::endl;
+         return;
+      }
 
       //-------------------------------------------------------------------------------------
       // Set const for functions
@@ -101,7 +101,7 @@ namespace dipole{
 
          case dipole::internal::macrocell:
             std::cout     << "Initialising dipole field calculation using macrocell solver" << std::endl;
-   		   zlog << zTs() << "Initialising dipole field calculation using macrocell solver" << std::endl;
+            zlog << zTs() << "Initialising dipole field calculation using macrocell solver" << std::endl;
             internal::output_dipole_solver_mem_info(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
             dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
             dipole::internal::initialize_macrocell_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
@@ -411,12 +411,12 @@ namespace dipole{
       // // Clear memory
       // N_tensor_array.clear();
 
-	   //--------------------------------------------------/
+      //--------------------------------------------------/
       // End of output dipolar tensor
-	   //--------------------------------------------------/
+      //--------------------------------------------------/
 
       }
 
-    	return;
+      return;
    }
 } // end of dipole namespace

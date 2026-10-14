@@ -47,7 +47,7 @@ namespace dipole{
             break;
       }
       for(int64_t lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(size_t j=0; j<in[lc].size(); j++){ out.push_back( in[lc][j] ); }
+         for(size_t j=0; j<in[lc].size(); j++){ out.push_back( in[lc][j] ); }
       }
       return out;
    }
@@ -77,7 +77,7 @@ namespace dipole{
             break;
       }
       for(int64_t lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(size_t j=0; j<in[lc].size(); j++){ out.push_back( in[lc][j] ); }
+         for(size_t j=0; j<in[lc].size(); j++){ out.push_back( in[lc][j] ); }
       }
       return out;
    }

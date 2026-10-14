@@ -166,36 +166,36 @@ namespace dipole{
             // check that the cell constains at least one atom
             if(cells_num_atoms_in_cell[i]>0){
 
-            	// Loop over all other cells to calculate contribution to local cell
+               // Loop over all other cells to calculate contribution to local cell
                for(int j=0;j<cells_num_cells;j++){
 
                   /*==========================================================*/
                   /* Calculation of inter part of dipolar tensor              */
                   /*==========================================================*/
-                	if(i!=j && cells_num_atoms_in_cell[j]>0){
+                  if(i!=j && cells_num_atoms_in_cell[j]>0){
 
                      // Calculate distance vectors between cells
                      double rx = cells_pos_and_mom_array[4*j+0] - cells_pos_and_mom_array[4*i+0];
                      double ry = cells_pos_and_mom_array[4*j+1] - cells_pos_and_mom_array[4*i+1];
                      double rz = cells_pos_and_mom_array[4*j+2] - cells_pos_and_mom_array[4*i+2];
 
-                    	double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
+                     double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
 
                      // define unitarian distance vectors
-                  	const double ex = rx*rij;
-                  	const double ey = ry*rij;
-                  	const double ez = rz*rij;
+                     const double ex = rx*rij;
+                     const double ey = ry*rij;
+                     const double ez = rz*rij;
 
-                  	const double rij3 = (rij*rij*rij); // Angstroms
+                     const double rij3 = (rij*rij*rij); // Angstroms
 
                      // calculate dipolar matrix for 6 entries because of symmetry
-                  	dipole::internal::rij_tensor_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
-                  	dipole::internal::rij_tensor_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
-                  	dipole::internal::rij_tensor_xz[lc][j] = ( 3.0*ex*ez      )*rij3 ;
+                     dipole::internal::rij_tensor_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
+                     dipole::internal::rij_tensor_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
+                     dipole::internal::rij_tensor_xz[lc][j] = ( 3.0*ex*ez      )*rij3 ;
 
-                  	dipole::internal::rij_tensor_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
-                  	dipole::internal::rij_tensor_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
-                  	dipole::internal::rij_tensor_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
+                     dipole::internal::rij_tensor_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
+                     dipole::internal::rij_tensor_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
+                     dipole::internal::rij_tensor_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
                   //   std::cout << dipole::internal::rij_tensor_xx[lc][j] << std::endl;
                   }
 
@@ -289,8 +289,8 @@ namespace dipole{
 
                   } // End of Intra part
                }
-   			}
-   		}
+            }
+         }
          //std::cin.get();
          // hold parallel calculation until all processors have completed the dipole calculation
          vmpi::barrier();

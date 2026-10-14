@@ -36,15 +36,15 @@ namespace dipole{
    //-----------------------------------------------------------------------------
 
 
-	void dipole::internal::update_field(){
+   void dipole::internal::update_field(){
 
       if(!dipole::activated) return;
 
-		if(err::check==true){
-			terminaltextcolor(RED);
-			std::cerr << "dipole::update has been called " << vmpi::my_rank << std::endl;
-			terminaltextcolor(WHITE);
-		}
+      if(err::check==true){
+         terminaltextcolor(RED);
+         std::cerr << "dipole::update has been called " << vmpi::my_rank << std::endl;
+         terminaltextcolor(WHITE);
+      }
 
       // Define constant imuB = 1/muB to normalise to unitarian values the cell magnetisation
       const double imuB = constants::i_muB;
@@ -55,11 +55,11 @@ namespace dipole{
          dipole::cells_field_array_z[i] = -100000.0;
        }
 
-		// loop over local cells
-    	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
+      // loop over local cells
+      for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
          int i = cells::cell_id_array[lc];
-        	if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+         if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
             // Self demagnetisation factor multiplying m(i)
             const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
@@ -81,38 +81,38 @@ namespace dipole{
 
             // Loop over all other cells to calculate contribution to local cell
             for(int j=0;j<dipole::internal::cells_num_cells;j++){
-         	   if(dipole::internal::cells_num_atoms_in_cell[j]>0){
+               if(dipole::internal::cells_num_atoms_in_cell[j]>0){
 
                   // Normalise the cell magnetisation by the Bohr magneton
-         		   const double mx = cells::mag_array_x[j]*imuB;
-         		   const double my = cells::mag_array_y[j]*imuB;
-         		   const double mz = cells::mag_array_z[j]*imuB;
-					//	if (i == 0)std::cout<< i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
+                  const double mx = cells::mag_array_x[j]*imuB;
+                  const double my = cells::mag_array_y[j]*imuB;
+                  const double mz = cells::mag_array_z[j]*imuB;
+               // if (i == 0)std::cout<< i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
 
-             		dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
-             		dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
-             		dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
+                  dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
+                  dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
+                  dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
                   // Demag field
-					//	std::cout << "DEMAG\t" << cells::mag_array_x[j] << '\t' << imuB << '\t' <<  mx << '\t' << my << '\t' << mz << '\t' << internal::rij_tensor_xx[lc][j] << '\t' << dipole::cells_field_array_x[i] << std::endl;
+               // std::cout << "DEMAG\t" << cells::mag_array_x[j] << '\t' << imuB << '\t' <<  mx << '\t' << my << '\t' << mz << '\t' << internal::rij_tensor_xx[lc][j] << '\t' << dipole::cells_field_array_x[i] << std::endl;
                   dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
                   dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
                   dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
-         	   }
+               }
             }
             // Multiply the cells B-field by mu_B * mu_0/(4*pi) /1e-30  <-- (constants::muB * 1e-7 / 1e30)
             // where the last term accounts for the fact that the volume was calculated in Angstrom
             dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * constants::dipole_prefactor;
             dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * constants::dipole_prefactor;
             dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * constants::dipole_prefactor;
-			 	//dp_fields << sim::time << '\t' << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
-				//dp_fields <<sim::time << "\t" <<  dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i]  << "\t" << cells::pos_and_mom_array[4*i+0] << '\t' << cells_pos_and_mom_array[4*i+1] << '\t' << cells_pos_and_mom_array[4*i+2] << std::endl;
-				// Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
+            //dp_fields << sim::time << '\t' << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
+            //dp_fields <<sim::time << "\t" <<  dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i]  << "\t" << cells::pos_and_mom_array[4*i+0] << '\t' << cells_pos_and_mom_array[4*i+1] << '\t' << cells_pos_and_mom_array[4*i+2] << std::endl;
+            // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
             // of magnetisation and volume in angstrom
             dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * constants::dipole_prefactor;
             dipole::cells_mu0Hd_field_array_y[i] = dipole::cells_mu0Hd_field_array_y[i] * constants::dipole_prefactor;
             dipole::cells_mu0Hd_field_array_z[i] = dipole::cells_mu0Hd_field_array_z[i] * constants::dipole_prefactor;
-     		}
-    	}
+         }
+      }
 
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
@@ -127,7 +127,7 @@ namespace dipole{
        //  std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
        }
 
-		dipole::output_dipole_fields();
+      dipole::output_dipole_fields();
 
-	} // end of dipole::internal::update_field() function
+   } // end of dipole::internal::update_field() function
 } // end of dipole namespace

@@ -54,7 +54,7 @@ namespace dipole{
    //-----------------------------------------------------------------------------
    // Function for updating atomic B-field and Hd-field
    //-----------------------------------------------------------------------------
-	void calculate_field(const uint64_t sim_time,
+   void calculate_field(const uint64_t sim_time,
                         std::vector <double>& x_spin_array, // atomic spin directions
                         std::vector <double>& y_spin_array,
                         std::vector <double>& z_spin_array,
@@ -64,14 +64,14 @@ namespace dipole{
       // return if dipole field not enabled
       if(!dipole::activated) return;
 
-		// prevent double calculation for split integration (MPI)
-		if(dipole::internal::update_time != static_cast<int>(sim_time)){
+      // prevent double calculation for split integration (MPI)
+      if(dipole::internal::update_time != static_cast<int>(sim_time)){
 
-			// Check if update required
-		   if(sim_time%dipole::update_rate == 0){
+         // Check if update required
+         if(sim_time%dipole::update_rate == 0){
 
-			   //if updated record last time at update
-			   dipole::internal::update_time = sim_time;
+            //if updated record last time at update
+            dipole::internal::update_time = sim_time;
 
             // // for gpu acceleration, transfer spin positions now (does nothing for serial)
             // gpu::transfer_spin_positions_from_gpu_to_cpu();
@@ -92,7 +92,7 @@ namespace dipole{
 
                case dipole::internal::tensor:
                   #ifdef CUDA
-               	   gpu::update_dipolar_fields();
+                     gpu::update_dipolar_fields();
                   #else
                      dipole::internal::calculate_macrocell_dipole_field();
                   #endif
@@ -136,8 +136,8 @@ namespace dipole{
                     << " update_time_s=" << dipole_scaling_max_time << std::endl;
             }
 
-		   } // End of check for update rate
-		} // end of check for update time
+         } // End of check for update rate
+      } // end of check for update time
 
       return;
 
