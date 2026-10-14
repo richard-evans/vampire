@@ -36,7 +36,7 @@ export OMPI_CXX=g++
 
 ICC=icc $(CXXSTD) -DCOMP='"Intel C++ Compiler"'
 GCC=g++ $(CXXSTD) -DCOMP='"GNU C++ Compiler"'
-LLVM=g++ $(CXXSTD) -DCOMP='"LLVM C++ Compiler"'
+LLVM=clang++ $(CXXSTD) -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx $(CXXSTD) -DMPICF
