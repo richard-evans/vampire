@@ -1,0 +1,16 @@
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:system-size-x = 6.0 !nm
+dimensions:system-size-y = 3.0 !nm
+dimensions:system-size-z = 3.0 !nm
+material:file=materials.mat
+material:unit-cell-file=chain.ucf
+sim:temperature=0.0
+sim:time-steps-increment=1
+sim:total-time-steps=0
+sim:time-step=1.0E-16
+sim:program=benchmark
+sim:integrator=llg-heun
+output:precision=16
+output:exchange-energy
