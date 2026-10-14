@@ -29,3 +29,28 @@ f60a5f16bca7aeab9a3e0801354b66284efd6f9b # statistics module
 311a9306ec1d94d4aab26706c9f323cd73465a29 # unitcell module
 892234f64d2cac63fb11ba07f3d0047a81ecd83a # utility module
 f50afc59666956accb82a17e22519dfba98fb7a4 # vio module
+
+# Licence header standardisation (comment-only), October 2026.
+7b529073fbd5a63e0f38b7ef611d17ae937011a1 # licence: public headers (hdr/)
+f6d1b12a8fcb68b57276aabd7ea8ba52030d2405 # licence: anisotropy module
+7572c8f921c3aa4a9e3f4443d0dfa5434c611621 # licence: config module
+b89e6e0c231ee054c70ffe688ef274d79695c6d6 # licence: create module
+4a69396d18b7a0b4aef8d0739497e0aed5f6426d # licence: cuda module
+f6d60c715ac3e6c6de0fcf4dd19ee95fb893860a # licence: data module
+ae2031015debaaa7dad6cca1a98ab84c29b307dd # licence: dipole module
+3d6c6bfe3991dcfdefa61c7af4b6ef6dd4f0763f # licence: gpu module
+b5fdf568f26082466414b6fd7f90ed035df81854 # licence: hamr module
+4db39fada0e22138b47929443fb0eb412ec43dd6 # licence: integrate module
+a9b39a344345fe105546c777d6e7f8af590354c7 # licence: ltmp module
+85dd70eac18723f3e11e5eb44c646b87b05bfef2 # licence: main module
+78cd08dad9af5faf2e2869867d5ed60f60f2f940 # licence: mpi module
+aa6656b02ba7468cba81c64c7c34fe202385b877 # licence: program module
+abda69527a4eaa93208d3c426b164b6ad57bb541 # licence: random module
+dc610c05f8887b1c3b1ab0040dbb47215d720bb8 # licence: simulate module
+eabd6570238a1d32bdcc511f4c7d3ce44d482e97 # licence: spinlattice module
+f97e8d39e05bea3eb376729007407439f0c3b0df # licence: spintorque module
+b1e72a6e0489458d03a23e074d66bd834b3bc98f # licence: spinwaves module
+31c39bd67169dc7bebd5225900e78136b05e2e5d # licence: statistics module
+cb21772acbeb6e0cf7ce23031b6a8a3bdfd17d83 # licence: utility module
+af0c87cd9969d9a7dba1437defdb5623198ea4b8 # licence: vio module
+e717b9e05be694e14a05dc765126c2af76d0277b # licence: module generator (util/)
