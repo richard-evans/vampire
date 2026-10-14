@@ -20,8 +20,11 @@
 #    tolerance                    optional, "rel <r> abs <a>" (default rel 1e-12 abs 1e-14)
 #    files                        optional, other output files to compare, one per line; their
 #                                 golden files are expected-serial.<file> and expected-mpi-np<N>.<file>
+#    expected-error               for input that must be rejected: vampire must exit with an error and
+#                                 its terminal output must contain each line of this file (all modes)
 #
 # A case is only run in a mode for which it has a golden file, unless --bless is given.
+# Each run is stopped after TIME_LIMIT seconds (default 300), so a hang is reported as a failure.
 #
 #------------------------------------------------------------------------------
 
@@ -80,6 +83,8 @@ if [ ! -x "$executable" ]; then
    exit 1
 fi
 
+time_limit="${TIME_LIMIT:-300}"
+
 work="$(mktemp -d "${TMPDIR:-/tmp}/vampire-regression.XXXXXX")"
 
 pass=0
@@ -97,7 +102,7 @@ for name in $pattern; do
    [ -f "$name/input" ] || continue
 
    # skip cases without a golden file for this mode
-   if [ "$bless" = false ] && [ ! -f "$name/$golden" ]; then
+   if [ "$bless" = false ] && [ ! -f "$name/$golden" ] && [ ! -f "$name/expected-error" ]; then
       skip=$((skip+1))
       continue
    fi
@@ -115,9 +120,35 @@ for name in $pattern; do
    done
 
    start=$SECONDS
-   ( cd "$dir" && $run > stdout 2>&1 )
+   ( cd "$dir" && perl -e 'alarm shift; exec @ARGV' "$time_limit" $run > stdout 2>&1 ) 2> /dev/null
    status=$?
    elapsed=$((SECONDS-start))
+
+   if [ $status -eq 142 ]; then
+      echo "FAIL (timed out after $time_limit s, see $dir/stdout)"
+      fail=$((fail+1))
+      continue
+   fi
+
+   # input that must be rejected with an error message
+   if [ -f "$name/expected-error" ]; then
+      missing=""
+      while IFS= read -r text; do
+         [ -n "$text" ] && ! grep -qF -- "$text" "$dir/stdout" && missing="$missing \"$text\""
+      done < "$name/expected-error"
+      if [ $status -eq 0 ]; then
+         echo "FAIL (vampire accepted the input, see $dir/stdout)"
+         fail=$((fail+1))
+      elif [ -n "$missing" ]; then
+         echo "FAIL (error message missing$missing, see $dir/stdout)"
+         fail=$((fail+1))
+      else
+         echo "OK (rejected, ${elapsed} s)"
+         pass=$((pass+1))
+         [ "$keep" = true ] || rm -rf "$dir"
+      fi
+      continue
+   fi
 
    if [ $status -ne 0 ]; then
       echo "FAIL (vampire exited with status $status, see $dir/stdout)"

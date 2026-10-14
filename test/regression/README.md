@@ -22,8 +22,9 @@ Each case is a directory `cases/<module>/<case>/` containing:
 | `expected-mpi-np<N>.dat` | golden `output` file from `vampire-parallel` on N processes |
 | `tolerance` | optional, `rel <r> abs <a>`; the default is `rel 1e-12 abs 1e-14` |
 | `files` | optional, other output files to compare, one per line, with goldens `expected-serial.<file>` and `expected-mpi-np<N>.<file>` |
+| `expected-error` | for input that must be rejected: vampire must fail and its terminal output must contain each line of this file; runs in every mode |
 
-A missing `output` file (some programs never write one) is compared as an empty file.
+Each run is stopped after `TIME_LIMIT` seconds (default 300), so a hang counts as a failure. A missing `output` file (some programs never write one) is compared as an empty file.
 A case runs only in the modes for which it has a golden file. Numeric fields pass if
 `|obtained - expected| <= abs + rel*|expected|`.
 
