@@ -11,6 +11,7 @@
 // C++ standard library headers
 //#include <cmath>
 #include <iostream>
+#include <vector>
 
 // Vampire headers
 #include "cells.hpp"
@@ -40,6 +41,12 @@ void output_dipole_fields(){
    // inform user that dipole fields are being outputted
    zlog << zTs() << "Outputting dipole fields to file" << std::endl;
 
+   // Calculate total num atoms in cell (across the whole system)
+   std::vector<int> num_atoms_out = cells::num_atoms_in_cell;
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &num_atoms_out[0], dipole::cells_num_cells, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   #endif
+
    // if rank = 0 open output file
    if(vmpi::my_rank == 0){
 
@@ -47,7 +54,7 @@ void output_dipole_fields(){
 
       for (int i = 0 ; i < dipole::cells_num_cells; i ++){
          dp_fields << i << "\t" <<  // cell ID
-         cells::num_atoms_in_cell[i] << "\t" << // num atoms in cell
+         num_atoms_out[i] << "\t" << // num atoms in cell (globally summed, see comment above)
          cells::pos_and_mom_array[4*i+0] << "\t" << // x
          cells::pos_and_mom_array[4*i+1] << "\t" << // y
          cells::pos_and_mom_array[4*i+2] << "\t" << // z

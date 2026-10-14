@@ -27,7 +27,6 @@
 #include "constants.hpp"
 #include "errors.hpp"
 #include "dipole.hpp"
-#include "voronoi.hpp"
 #include "material.hpp"
 #include "program.hpp"
 #include "sim.hpp"
@@ -148,10 +147,6 @@ int default_system(){
 
    cs::particle_creation_parity=0;
    uc::set_crystal_structure_to_simple_cubic();
-
-	// Voronoi Variables
-	create_voronoi::voronoi_sd=0.1;
-	create_voronoi::parity=0;
 
 	// Setup Hamiltonian Flags
 	sim::hamiltonian_simulation_flags[0] = 1;	/// Exchange

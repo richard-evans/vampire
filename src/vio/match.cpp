@@ -25,6 +25,7 @@
 #include "errors.hpp"
 #include "exchange.hpp"
 #include "gpu.hpp"
+#include "grains.hpp"
 #include "hamr.hpp"
 #include "hierarchical.hpp"
 #include "integrate.hpp"
@@ -64,6 +65,7 @@ namespace vin{
       else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(config::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+      else if(grains::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;

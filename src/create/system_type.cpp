@@ -106,7 +106,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			break;
 
 		case 3: // Voronoi Granular Film
-			voronoi_film(catom_array);
+			grains::voronoi_film(catom_array);
 			break;
 
 		case 4: // Grain Growth Method
@@ -125,8 +125,10 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 
-   // Check for voronoi construction and apply before csg operations
-   if(create::internal::generate_voronoi_substructure) create::internal::voronoi_substructure(catom_array);
+   // Apply an optional grain substructure before csg operations; a no-op
+   // unless create:voronoi-grain-substructure was set (see
+   // grains::voronoi_substructure()).
+   grains::voronoi_substructure(catom_array);
 
 	// call fill function to fill in void
 	fill(catom_array);

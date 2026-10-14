@@ -15,7 +15,6 @@
 
 // include header for test functions
 #include "create_tests.hpp"
-#include "voronoi_bimodal_seeds_test.hpp"
 
 namespace ut{
 //------------------------------------------------------------------------------
@@ -26,8 +25,6 @@ int create_tests(const bool verbose){
    if(verbose) std::cout << "Testing create module" << std::endl;
 
    int error_count = 0;
-
-   error_count += ut::create::test_voronoi_bimodal_seeds(verbose);
 
    if(verbose) std::cout <<          "================================" << std::endl;
    if(error_count == 0) std::cout << " create               : PASS " << std::endl;

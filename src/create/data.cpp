@@ -31,7 +31,7 @@ namespace create{
          MTRand grnd; // general random number generator for create functions
 
          int alloy_seed  = 683614233;  // random seed to control alloying of atoms
-         int grain_seed  = 1527349271; // random seed to control grain structure generation
+         int grain_seed  = 1527349271; // create:grain-random-seed - seeds granular alloying (alloy.cpp), not the grain tessellation (see internal.hpp)
          int dilute_seed = 465865253;  // random seed to control dilution of atoms
          int mixing_seed = 100181363;  // random seed to control intermixing of atoms
          int spin_init_seed = 123456;  // random seed to control ranomised spin directions
@@ -44,18 +44,8 @@ namespace create{
          double bubble_radius = 0.3333;
          double bubble_nucleation_height = 0.0;
 
-         bool generate_voronoi_substructure = false;
-         double voronoi_grain_substructure_size = 50.0;    // mean grain size of the substructure within a particle
-         double voronoi_grain_substructure_spacing = 10.0; // spacing between substructure grains
-         double voronoi_grain_substructure_crystallization_radius = 1.2;
-         double voronoi_grain_substructure_overlap_factor = 1.0;
-
-         double voronoi_elliptical_rounding = 0.0;        // 0.0 = vertical grain walls (default), 1.0 = ellipsoidal grains
-         double voronoi_elliptical_rounding_height = 0.5; // centre height of system
-
          bool select_material_by_geometry = false;	// Toggle override of input material type by geometry
          bool select_material_by_z_height = false;	// Toggle overwriting of material id by z-height
-         bool output_gv_file = true; // toggle output of grain positions to file
 
       } // end of internal namespace
 

@@ -21,6 +21,7 @@
 #include "dipole.hpp"
 #include "environment.hpp"
 #include "exchange.hpp"
+#include "grains.hpp"
 #include "hierarchical.hpp"
 #include "integrate.hpp"
 #include "material.hpp"
@@ -66,6 +67,7 @@ namespace internal{
       else if(cells::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(config::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+      else if(grains::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(hierarchical::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;

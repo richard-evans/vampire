@@ -99,6 +99,9 @@ int create(){
    // initialise create module parameters
    create::initialize();
 
+   // initialise grains module parameters
+   grains::initialize();
+
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array;
 

@@ -98,6 +98,42 @@ int test_vmath(const bool verbose){
       ec++;
    }
 
+   //-----------------------------------------------------------------------------------------
+   // uniform scaling on a ROTATED hexagon (an axis-aligned square passes under a f^2 shear
+   // too, since polyX[j]==polyX[i] on every edge, so it proves nothing - point_in_polygon_factor()
+   // shears rotated/irregular polygons; see voronoi_refactor.md Stage 3.2). A true uniform
+   // scaling of the polygon by f must place a point at (f*x, f*y) inside the scaled polygon
+   // exactly when (x,y) was inside the unscaled one.
+   //-----------------------------------------------------------------------------------------
+   {
+      const int nsides = 6;
+      double hexX[nsides];
+      double hexY[nsides];
+      const double theta0 = 0.37; // arbitrary rotation, radians
+      const double radius  = 10.0;
+      for(int i=0; i<nsides; i++){
+         const double theta = theta0 + i*2.0*M_PI/nsides;
+         hexX[i] = radius*std::cos(theta);
+         hexY[i] = radius*std::sin(theta);
+      }
+
+      // a spread of test points, some inside the unit hexagon, some outside
+      const double px[] = { 0.0, 3.0, -4.0, 6.0, -6.0, 8.0, 0.0, 5.0, -2.0 };
+      const double py[] = { 0.0, 2.0,  5.0, -3.0, 4.0, 0.0, 9.0, -8.0, -9.0 };
+      const double f = 0.6;
+
+      for(int i=0; i<9; i++){
+         const bool base_inside   = vmath::point_in_polygon(px[i], py[i], hexX, hexY, nsides);
+         const bool scaled_inside = vmath::point_in_polygon_scaled(f*px[i], f*py[i], f, hexX, hexY, nsides);
+         if(base_inside != scaled_inside){
+            std::cout << "FAIL: point_in_polygon_scaled(factor=" << f << ") on a rotated hexagon disagrees "
+                       << "with the unscaled polygon at scaled test point (" << f*px[i] << "," << f*py[i]
+                       << ") - shape was distorted by scaling, not just resized" << std::endl;
+            ec++;
+         }
+      }
+   }
+
    if(verbose && ec == 0) std::cout << "   vmath tests passed" << std::endl;
 
    return ec;

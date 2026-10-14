@@ -11,6 +11,7 @@
 
 // System headers
 #include <chrono>
+#include <sys/resource.h>
 
 // Program headers
 
@@ -18,6 +19,24 @@
 // Namespace including assorted utility functions
 //---------------------------------------------------------------------
 namespace vutil{
+
+   // Current peak resident set size of this process, in kB (Linux/HPC
+   // convention). Used to measure the memory footprint of a phase of the
+   // code by sampling before and after and taking the difference -- avoids
+   // having to hand-enumerate every large array a solver allocates.
+   inline double peak_memory_usage_kb(){
+
+      struct rusage usage;
+      getrusage(RUSAGE_SELF, &usage);
+
+      #ifdef __APPLE__
+         // macOS reports ru_maxrss in bytes, not kB
+         return double(usage.ru_maxrss) / 1024.0;
+      #else
+         return double(usage.ru_maxrss);
+      #endif
+
+   }
 
    // simple class for performing code timing
    class vtimer_t{
