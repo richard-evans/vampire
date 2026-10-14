@@ -97,11 +97,11 @@ OBJECTS=
 
 # Include supplementary makefiles
 include src/anisotropy/makefile
+include src/atoms/makefile
 include src/cells/makefile
 include src/config/makefile
 include src/constants/makefile
 include src/create/makefile
-include src/data/makefile
 include src/dipole/makefile
 include src/environment/makefile
 include src/exchange/makefile

@@ -1,10 +1,10 @@
 #--------------------------------------------------------------
-#          Makefile for data module
+#          Makefile for atoms module
 #--------------------------------------------------------------
 
 # List module object filenames
-data_objects =\
-atoms.o
+atoms_objects =\
+data.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/data/,$(data_objects))
+OBJECTS+=$(addprefix obj/atoms/,$(atoms_objects))
