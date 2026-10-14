@@ -132,6 +132,12 @@ int main(int argc, char* argv[]){
                                                                         {"E[111]", 2, -2.777777777777778e-22, 1.0e-10, 1.0e-30},
                                                                         {"E(d4)", 3, -2.667638483965012e-22, 1.0e-10, 1.0e-30},
                                                                         {"E(d5)", 4, -2.142857142857142e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
+      // biaxial-fourth-order: E = -K/2 [(S.u1)^4 + (S.u2)^4], u1 = [110], u2 = [1-10], for 100 spins along each direction
+      if( !final_values_test("anisotropy/biaxial-fourth-order", { {"E[001]", 0, 0.0, 1.0e-10, 1.0e-30},
+                                                                  {"E[100]", 1, -2.499999999999999e-22, 1.0e-10, 1.0e-30},
+                                                                  {"E[111]", 2, -2.222222222222222e-22, 1.0e-10, 1.0e-30},
+                                                                  {"E(d4)", 3, -5.351936693044559e-23, 1.0e-10, 1.0e-30},
+                                                                  {"E(d5)", 4, -1.734693877551020e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
 
       // DMI energy tests
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
