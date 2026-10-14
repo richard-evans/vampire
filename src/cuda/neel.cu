@@ -1,10 +1,12 @@
 //------------------------------------------------------------------------------
 //
-// This source file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) O Arbelaez Echeverri, M A Ellis & R F L Evans 2015. All rights reserved.
-// Reviewed: Andrea Meo 2022
+//   (c) O Arbelaez Echeverri, M A Ellis & R F L Evans 2015.
+//   All rights reserved.
+//
+//   Reviewed: Andrea Meo 2022
 //
 //------------------------------------------------------------------------------
 

@@ -1,5 +1,13 @@
 #ifndef CUDA_STATISTICS_HPP_
 #define CUDA_STATISTICS_HPP_
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
+//
+//   (c) O Arbelaez Echeverri 2015. All rights reserved.
+//
+//------------------------------------------------------------------------------
 
 #include "cuda.hpp"
 #include "internal.hpp"

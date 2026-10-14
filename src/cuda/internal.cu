@@ -1,3 +1,12 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
+//
+//   (c) O Arbelaez Echeverri 2015. All rights reserved.
+//
+//------------------------------------------------------------------------------
+
 /**
  * @brief this file provides definitions for the off-topic internal function
  *        definitions.

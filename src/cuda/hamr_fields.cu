@@ -1,9 +1,9 @@
 //------------------------------------------------------------------------------
 //
-// This source file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) Andrea Meo 2022. All rights reserved.
+//   (c) Andrea Meo 2022. All rights reserved.
 //
 //------------------------------------------------------------------------------
 

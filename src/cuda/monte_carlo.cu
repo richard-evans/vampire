@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
+//
+//   (c) M A Ellis 2021. All rights reserved.
+//
+//------------------------------------------------------------------------------
 
 #include "atoms.hpp"
 #include "exchange.hpp"

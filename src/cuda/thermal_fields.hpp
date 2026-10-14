@@ -1,5 +1,13 @@
 #ifndef __THERMAL_FIELDS_CUDA_HPP__
 #define __THERMAL_FIELDS_CUDA_HPP__
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
+//
+//   (c) Andrea Meo 2022. All rights reserved.
+//
+//------------------------------------------------------------------------------
 
 // Local cuda headers
 #include "cuda_utils.hpp"
