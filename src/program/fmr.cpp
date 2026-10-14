@@ -1,20 +1,18 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2015 R.F.L.Evans
+//   (c) R F L Evans 2009-2015. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-// ----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 ///
 /// @file
 /// @brief Contains the Time Series program
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
 ///
 /// @section info File Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
@@ -45,9 +43,6 @@ namespace program{
 
 /// @brief Function to calculate magnetisation over a time series
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk

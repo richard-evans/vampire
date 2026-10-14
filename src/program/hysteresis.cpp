@@ -30,9 +30,6 @@ namespace program{
 /// @details Consists of a sequence of sub-calculations of fixed temperature. The system is initialised
 /// ordered. After initialisation a whole hysteresis loop of the system and coercivity are calculated.
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Weijia Fan, wf507@york.ac.uk
