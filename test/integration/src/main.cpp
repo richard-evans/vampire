@@ -180,6 +180,7 @@ int main(int argc, char* argv[]){
       if( serial_only("dynamics/convergence-llg-midpoint") && !convergence_test("dynamics/convergence-llg-midpoint", 0.1, 1.0, 2.0, 0.15, exe ) ) fail += 1;
       if( serial_only("dynamics/convergence-llg-dm") && !convergence_test("dynamics/convergence-llg-dm", 0.1, 1.0, 2.0, 0.15, exe ) ) fail += 1;
       if( serial_only("dynamics/convergence-llg-rkmk2") && !convergence_test("dynamics/convergence-llg-rkmk2", 0.1, 1.0, 2.0, 0.15, exe ) ) fail += 1;
+      if( serial_only("dynamics/convergence-llg-rkmk4") && !convergence_test("dynamics/convergence-llg-rkmk4", 0.1, 1.0, 4.0, 0.15, exe ) ) fail += 1;
 
       // Program tests
       // effective-damping: single spin rotated 120 degrees from z relaxing in 1T field along z
