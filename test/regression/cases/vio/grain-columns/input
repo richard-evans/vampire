@@ -1,0 +1,36 @@
+create:crystal-structure=fcc
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 5.0 !nm
+dimensions:system-size-y = 5.0 !nm
+dimensions:system-size-z = 0.7 !nm
+dimensions:particle-size = 1.5 !nm
+dimensions:particle-spacing = 0.2 !nm
+create:voronoi-film
+create:voronoi-random-seed=1234
+material:file=Fe.mat
+output:precision=16
+sim:program=time-series
+sim:integrator=llg-heun
+sim:temperature=300.0
+sim:applied-field-strength=0.5 !T
+sim:applied-field-unit-vector=0,0,1
+sim:equilibration-time-steps=100
+sim:time-steps-increment=50
+sim:total-time-steps=500
+sim:time-step=1.0E-16
+sim:integrator-random-seed=12345
+output:time-steps
+output:magnetisation
+grain:time-steps
+grain:temperature
+grain:electron-temperature
+grain:phonon-temperature
+grain:applied-field-strength
+grain:applied-field-unit-vector
+grain:magnetisation
+grain:mean-magnetisation-length
+grain:mean-susceptibility
+grain:mean-specific-heat
+grain:mean-torque
+grain:material-magnetisation
+grain:material-height-magnetisation
