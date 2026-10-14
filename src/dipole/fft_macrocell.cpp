@@ -304,7 +304,7 @@ namespace dipole{
 #ifdef FFT
             if(!FFT_initialised) {
                 std::cout << "FFT dipole has been called but not initialised." << std::endl;
-                exit(-1);
+                err::vexit();
             }
 
             // instantiate timer
