@@ -19,7 +19,6 @@
 //#include <string>
 
 // Vampire headers
-#include "anisotropy.hpp"
 #include "create.hpp"
 
 //--------------------------------------------------------------------------------

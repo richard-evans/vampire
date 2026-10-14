@@ -18,7 +18,6 @@
 
 // Vampire headers
 #include "create.hpp"
-#include "exchange.hpp"
 #include "exchange_types.hpp"
 
 class zval_t{

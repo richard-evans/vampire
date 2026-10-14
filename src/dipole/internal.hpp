@@ -25,9 +25,6 @@
 #ifdef FFT
 #include <fftw3.h>
 #endif
-// dipole module headers
-#include "internal.hpp"
-
 namespace dipole{
 
    namespace internal{

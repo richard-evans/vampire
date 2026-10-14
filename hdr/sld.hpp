@@ -17,7 +17,6 @@
 #include <string>
 
 // Vampire headers
-#include "sld.hpp"
 #include <vector>
 
 

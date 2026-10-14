@@ -17,7 +17,6 @@
 #include "hamr.hpp"
 
 // hamr headers
-#include "internal.hpp"
 
 namespace hamr{
 

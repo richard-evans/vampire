@@ -17,7 +17,6 @@
 #include <string>
 
 // Vampire headers
-#include "micromagnetic.hpp"
 #include "material.hpp"
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for micromagnetic module

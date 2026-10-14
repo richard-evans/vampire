@@ -19,7 +19,6 @@
 
 // Vampire headers
 #include "exchange_types.hpp" // needed for exchange interaction type definition
-#include "unitcell.hpp"
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for unitcell module

@@ -18,7 +18,6 @@
 #include <vector>
 
 // Vampire headers
-#include "environment.hpp"
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for environment module

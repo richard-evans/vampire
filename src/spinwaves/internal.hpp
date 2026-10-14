@@ -26,7 +26,6 @@
 #include "spinwaves.hpp"
 
 // sw module headers
-#include "internal.hpp"
 #ifdef FFT
 #include <fftw3.h>
 #endif

@@ -25,7 +25,6 @@
 #include "hierarchical.hpp"
 
 // hierarchical module headers
-#include "internal.hpp"
 #include "vector"
 
 namespace hierarchical{

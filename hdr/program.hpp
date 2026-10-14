@@ -16,7 +16,6 @@
 #include <string>
 
 // Vampire headers
-#include "program.hpp"
 
 //==========================================================
 // Namespace program

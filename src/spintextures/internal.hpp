@@ -25,9 +25,6 @@
 // Vampire headers
 #include "spintextures.hpp"
 
-// spintextures module headers
-#include "internal.hpp"
-
 namespace spintextures{
 
    namespace internal{

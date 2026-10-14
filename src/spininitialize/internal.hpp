@@ -27,9 +27,6 @@
 #include "spininitialize.hpp"
 #include "random.hpp"
 
-// spininitialize module headers
-#include "internal.hpp"
-
 namespace spininitialize{
 
    namespace internal{

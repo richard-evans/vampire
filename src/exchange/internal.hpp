@@ -26,9 +26,6 @@
 #include "errors.hpp"
 #include "vio.hpp"
 
-// exchange module headers
-#include "internal.hpp"
-
 namespace exchange{
 
    namespace internal{

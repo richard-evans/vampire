@@ -24,9 +24,6 @@
 // Vampire headers
 #include "spintransport.hpp"
 
-// spintransport module headers
-#include "internal.hpp"
-
 namespace spin_transport{
 
    namespace internal{

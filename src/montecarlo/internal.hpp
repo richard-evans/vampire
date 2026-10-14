@@ -25,9 +25,6 @@
 // Vampire headers
 #include "montecarlo.hpp"
 
-// montecarlo module headers
-#include "internal.hpp"
-
 namespace montecarlo{
 
    //-------------------------------------------------------------------------

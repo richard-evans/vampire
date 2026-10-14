@@ -18,7 +18,6 @@
 #include <vector> // jrh
 
 // Vampire headers
-#include "spinwaves.hpp"
 #include "unitcell.hpp" // jrh
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for spinwaves module

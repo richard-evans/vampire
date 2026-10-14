@@ -25,9 +25,6 @@
 // Vampire headers
 #include "program.hpp"
 
-// program module headers
-#include "internal.hpp"
-
 namespace program{
 
    namespace internal{

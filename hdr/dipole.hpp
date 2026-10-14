@@ -21,7 +21,6 @@ using std::uint64_t;
 using std::int64_t;
 
 // Vampire headers
-#include "dipole.hpp"
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for dipole module

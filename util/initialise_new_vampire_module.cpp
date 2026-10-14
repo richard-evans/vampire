@@ -275,7 +275,8 @@ void create_data(const std::string& file_header, const std::string& nn){
 
    // Write header
    ofile << file_header << std::endl;
-   ofile << "// C++ standard library headers\n" << std::endl;
+   ofile << "// C++ standard library headers" << std::endl;
+   ofile << "#include <vector>\n" << std::endl;
    ofile << "// Vampire headers" << std::endl;
    // Include module header
    ofile << "#include \"" << nn << ".hpp\"\n" << std::endl;
@@ -435,11 +436,10 @@ void create_internal(const std::string& file_header, const std::string& nn){
    ofile << "// variables should not be accessed outside of this module." << std::endl;
    ofile << "//---------------------------------------------------------------------\n" << std::endl;
 
-   ofile << "// C++ standard library headers\n" << std::endl;
+   ofile << "// C++ standard library headers" << std::endl;
+   ofile << "#include <vector>\n" << std::endl;
    ofile << "// Vampire headers" << std::endl;
    ofile << "#include \"" << nn << ".hpp\"\n" << std::endl;
-   ofile << "// " << nn << " module headers" << std::endl;
-   ofile << "#include \"internal.hpp\"\n" << std::endl;
 
    // Namespaces
    ofile << "namespace " << nn << "{\n" << std::endl;
@@ -516,8 +516,7 @@ void create_module(const std::string& file_header, const std::string& nn){
 
    ofile << "// C++ standard library headers" << std::endl;
    ofile << "#include <string>\n" << std::endl;
-   ofile << "// Vampire headers" << std::endl;
-   ofile << "#include \"" << nn << ".hpp\"\n" << std::endl;
+   ofile << "// Vampire headers\n" << std::endl;
 
    ofile << "//--------------------------------------------------------------------------------" << std::endl;
    ofile << "// Namespace for variables and functions for " << nn << " module" << std::endl;

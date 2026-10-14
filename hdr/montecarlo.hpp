@@ -18,7 +18,6 @@
 #include <vector>
 
 // Vampire headers
-#include "montecarlo.hpp"
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for montecarlo module

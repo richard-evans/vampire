@@ -20,7 +20,6 @@
 
 // Vampire headers
 #include "create.hpp"
-#include "spintransport.hpp"
 
 // Load standard forms of fixed-width types (needed for some compilers)
 using std::uint64_t;

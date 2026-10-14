@@ -18,7 +18,6 @@
 #include <vector>
 
 // Vampire headers
-#include "hierarchical.hpp"
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for hierarchical module

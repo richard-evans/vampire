@@ -30,9 +30,6 @@
 // Vampire headers
 #include "environment.hpp"
 
-// environment module headers
-#include "internal.hpp"
-
 using namespace std;
 
 namespace environment{

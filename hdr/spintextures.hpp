@@ -17,7 +17,6 @@
 #include <string>
 
 // Vampire headers
-#include "spintextures.hpp"
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for spintextures module

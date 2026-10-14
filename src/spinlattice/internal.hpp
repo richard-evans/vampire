@@ -25,9 +25,6 @@
 // Vampire headers
 #include "sld.hpp"
 
-// sld module headers
-#include "internal.hpp"
-
 
 namespace sld{
 

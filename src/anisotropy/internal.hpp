@@ -27,9 +27,6 @@
 #include "material.hpp"
 #include "anisotropy.hpp"
 
-// anisotropy module headers
-#include "internal.hpp"
-
 namespace anisotropy{
 
    namespace internal{

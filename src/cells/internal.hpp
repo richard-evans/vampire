@@ -28,9 +28,6 @@
 #include "cells.hpp"
 #include "material.hpp"
 
-// cells module headers
-#include "internal.hpp"
-
 namespace cells{
 
    namespace internal{

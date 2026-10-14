@@ -25,9 +25,6 @@
 // Vampire headers
 #include "unitcell.hpp"
 
-// unitcell module headers
-#include "internal.hpp"
-
 namespace unitcell{
 
    namespace internal{

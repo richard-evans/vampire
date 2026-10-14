@@ -27,7 +27,6 @@
 #include "vmpi.hpp"
 
 // micromagnetic module headers
-#include "internal.hpp"
 #include <iostream>
 #include <fstream>
 
