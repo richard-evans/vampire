@@ -5,6 +5,49 @@ By Richard Evans
 
 Vampire is a high performance general purpose code for the atomistic simulation of magnetic materials. Using a variety of common simulation methods it can calculate the equilibrium and dynamic magnetic properties of a wide variety of magnetic materials and phenomena, including ferro, ferri and antiferromagnets, core-shell nanoparticles, ultrafast spin dynamics, magnetic recording media, heat assisted magnetic recording, exchange bias, magnetic multilayer films and complete devices.
 
+Getting started
+---------------
+Vampire needs a C++17 compiler; MPI is only needed for the parallel version.
+
+**Build**
+```bash
+make serial          # vampire-serial, using g++
+make serial-llvm     # vampire-serial, using clang++ (recommended on macOS, where g++ is clang)
+make parallel        # vampire-parallel, using mpicxx (needs MPI)
+make vdc             # vdc, the vampire data converter for visualisation
+```
+`make` on its own builds all of serial, parallel and vdc. Add `-j 8` to compile in parallel.
+
+**Check the build**
+
+The `input` and `Co.mat` files in this folder run a short benchmark (a few seconds):
+```bash
+./vampire-serial
+```
+It prints the magnetisation as it runs and writes the results to `output` and a `log` file.
+The parallel version runs the same way under MPI, e.g. `mpirun -np 4 ./vampire-parallel`.
+
+**Run the samples**
+
+The `samples` folder has example simulations with a readme for each: spin textures, geometry,
+granular films, custom unit cells, laser and spin-transfer torque pulses and spin-lattice dynamics.
+Start with `samples/readme.md`.
+
+**Visualise**
+
+With `config:atoms` set in the input file, vampire writes the spin configurations, which `vdc`
+converts for POV-Ray, VTK (ParaView) and structure viewers, e.g. `vdc/vdc --povray`.
+
+**Documentation**
+
+The full documentation, including every input and material file keyword, is on the vampire website
+https://vampire.york.ac.uk and in the LaTeX manual in `manual/`.
+
+**Developers**
+
+Tests, developer tools and notes for working on the code are in `developers/`. Run the test
+suite with `developers/tests.sh`.
+
 Capabilities
 ---------------
 Vampire is designed to be highly flexible to deal with a wide variety of problems using a diverse set of simulation tools and methods. The capabilities of the code can be summarised broadly in terms of the simulation methods, standard problems, structural properties and features of the code, all of which can be combined to tackle almost any problem.
