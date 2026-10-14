@@ -120,14 +120,14 @@ namespace micromagnetic{
       }
 
       // get cell level spin transfer torque parameters
-  		const double strj  = mm::stt_rj[cell];
-  		const double stpj  = mm::stt_pj[cell];
+      const double strj  = mm::stt_rj[cell];
+      const double stpj  = mm::stt_pj[cell];
       const double alpha = alpha_perp[cell]; // get local cell alpha
 
       // calculate field
-		double hsttx = (strj-alpha*stpj)*(my*mm::sttpz - mz*mm::sttpy) + (stpj+alpha*strj)*mm::sttpx;
-		double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
-		double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
+      double hsttx = (strj-alpha*stpj)*(my*mm::sttpz - mz*mm::sttpy) + (stpj+alpha*strj)*mm::sttpx;
+      double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
+      double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
       spin_field[0] = pf*m[0] + ext_field[0] + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0] + hsttx;// + dipole::cells_field_array_x[cell];
@@ -137,7 +137,7 @@ namespace micromagnetic{
     //  std::cin.get();
       // if (cell_material_array[cell] == 2)    std::cout << pf << '\t' << m[0] << '\t' << m[1] << '\t' << m[2] << "\t" << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << '\t' << exchange_field[0] << '\t' << exchange_field[1] << '\t' << exchange_field[2] << "\t" << ext_field[0] << '\t' << ext_field[1] << '\t' << ext_field[2] <<std::endl;
    //if (cell_material_array[cell] == 2)  std::cout << ku_x[cell] << '\t' << one_o_chi_perp[cell] << '\t' << ku_y[cell] << '\t' << ku_z[cell] << std::endl;
-        //if (cell ==0)		std::cout  << "inside\t" <<   dipole::cells_field_array_x[0] << '\t' << dipole::cells_field_array_y[0] << '\t' << dipole::cells_field_array_z[0] <<std::endl;
+        //if (cell ==0)    std::cout  << "inside\t" <<   dipole::cells_field_array_x[0] << '\t' << dipole::cells_field_array_y[0] << '\t' << dipole::cells_field_array_z[0] <<std::endl;
  //       std::cin.get();
 // //  }
      if (dipole::activated){

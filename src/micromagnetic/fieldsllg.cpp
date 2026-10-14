@@ -116,14 +116,14 @@ void mm::calculate_llg_spin_fields(const double temperature,
       } // end of check for neighbouring cells
 
       // get cell level spin transfer torque parameters
-  		const double strj  = mm::stt_rj[cell];
-  		const double stpj  = mm::stt_pj[cell];
+      const double strj  = mm::stt_rj[cell];
+      const double stpj  = mm::stt_pj[cell];
       const double alpha = alpha_perp[cell]; // get local cell alpha
 
       // calculate field (temperature?)
-		const double hsttx = (strj-alpha*stpj)*(my*mm::sttpz - mz*mm::sttpy) + (stpj+alpha*strj)*mm::sttpx;
-		const double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
-		const double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
+      const double hsttx = (strj-alpha*stpj)*(my*mm::sttpz - mz*mm::sttpy) + (stpj+alpha*strj)*mm::sttpx;
+      const double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
+      const double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
 
       x_total_spin_field_array[cell] = exchange_field[0] - one_o_chi_perp[cell]*mx*me*ku_x[cell] + hsttx;
       y_total_spin_field_array[cell] = exchange_field[1] - one_o_chi_perp[cell]*my*me*ku_y[cell] + hstty;

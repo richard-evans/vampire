@@ -314,12 +314,12 @@ namespace micromagnetic{
 
       // Reduce unit vectors and moments to all processors
       #ifdef MPICF
-      	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      	MPI_Allreduce(MPI_IN_PLACE, &x_array[0],            num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      	MPI_Allreduce(MPI_IN_PLACE, &y_array[0],            num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      	MPI_Allreduce(MPI_IN_PLACE, &z_array[0],            num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &x_array[0],            num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &y_array[0],            num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &z_array[0],            num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       #endif
 
      // updates atom magnetisations

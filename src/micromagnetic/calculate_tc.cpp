@@ -56,7 +56,7 @@ std::vector<double> calculate_tc(int num_local_cells,
 
    switch(exchange_type){
 
- 		case 0: // isotropic
+      case 0: // isotropic
          for (int atom = 0; atom < num_atoms; atom++){
             const int cell  = cell_array[atom];
             const int start = atoms::neighbour_list_start_index[atom];

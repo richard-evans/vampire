@@ -93,9 +93,9 @@ namespace micromagnetic{
 
       // Local variables for system integration
       //const int num_atoms=atoms::num_atoms;
-      double xyz[3];		// Local Delta Spin Components
-      double S_new[3];	// New Local Spin Moment
-      double mod_S;		// magnitude of spin moment
+      double xyz[3];    // Local Delta Spin Components
+      double S_new[3];  // New Local Spin Moment
+      double mod_S;     // magnitude of spin moment
 
       // Store initial spin positions
       for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
@@ -111,10 +111,10 @@ namespace micromagnetic{
 
       //caclualtes the spin fields and external fields for each section.
       for (int i = 0; i < num_calculations; i ++){
-         int begin = mm::fields_neighbouring_atoms_begin[i];		//the start and end atom index for each section.
+         int begin = mm::fields_neighbouring_atoms_begin[i];      //the start and end atom index for each section.
          int end = mm::fields_neighbouring_atoms_end[i];
-         sim::calculate_spin_fields(begin,end);								//calls the function from the usual atomsitic vampire
-         sim::calculate_external_fields(begin,end);						//external fields on each atom from the atomistic vampire.
+         sim::calculate_spin_fields(begin,end);                      //calls the function from the usual atomsitic vampire
+         sim::calculate_external_fields(begin,end);                  //external fields on each atom from the atomistic vampire.
       }
 
 //std::cin.get();
@@ -167,10 +167,10 @@ namespace micromagnetic{
          for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
             //calcualtes the atom if from the atom list
             int atom = list_of_atomistic_atoms[atom_list];
-       		atoms::x_spin_array[atom]=x_spin_storage_array[atom];
-       		atoms::y_spin_array[atom]=y_spin_storage_array[atom];
-       		atoms::z_spin_array[atom]=z_spin_storage_array[atom];
-       	}
+            atoms::x_spin_array[atom]=x_spin_storage_array[atom];
+            atoms::y_spin_array[atom]=y_spin_storage_array[atom];
+            atoms::z_spin_array[atom]=z_spin_storage_array[atom];
+         }
 
 
 
