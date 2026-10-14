@@ -1,0 +1,13 @@
+material:num-materials=2
+material[1]:material-name=A
+material[1]:damping-constant=0.1
+material[1]:exchange-matrix[1]=5.0e-21
+material[1]:exchange-matrix[2]=2.0e-21
+material[1]:atomic-spin-moment=2.2 !muB
+material[2]:material-name=B
+material[2]:damping-constant=0.1
+material[2]:exchange-matrix[1]=2.0e-21
+material[2]:exchange-matrix[2]=4.0e-21
+material[2]:atomic-spin-moment=1.5 !muB
+material[1]:core-shell-size=0.6
+material[2]:core-shell-size=1.0
