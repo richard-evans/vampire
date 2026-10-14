@@ -177,6 +177,7 @@ int main(int argc, char* argv[]){
 
       // Integrator convergence order: error at t = 20 ps for dt = 100 fs and 50 fs vs the exact damped precession
       if( serial_only("dynamics/convergence-llg-heun") && !convergence_test("dynamics/convergence-llg-heun", 0.1, 1.0, 2.0, 0.15, exe ) ) fail += 1;
+      if( serial_only("dynamics/convergence-llg-midpoint") && !convergence_test("dynamics/convergence-llg-midpoint", 0.1, 1.0, 2.0, 0.15, exe ) ) fail += 1;
 
       // Program tests
       // effective-damping: single spin rotated 120 degrees from z relaxing in 1T field along z
