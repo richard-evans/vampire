@@ -150,7 +150,7 @@ public:
   MTRand53(const uint32_t* seed, int size) : MTRand_int32(seed, size) {}
   ~MTRand53() {}
   double operator()() {
-    return (static_cast<double>(rand_int32() >> 5) * 67108864. + 
+    return (static_cast<double>(rand_int32() >> 5) * 67108864. +
       static_cast<double>(rand_int32() >> 6)) * (1. / 9007199254740992.); }
 private:
   MTRand53(const MTRand53&); // copy constructor not defined

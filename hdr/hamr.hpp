@@ -36,16 +36,16 @@ namespace hamr{
    //-----------------------------------------------------------------------------
    // Function to check local temperature pulse is enabled
    //-----------------------------------------------------------------------------
-	void fields(const int start_index,
-					const int end_index,
-					double H_applied,
-					const double temperature,
-					const double Hvecx,
-					const double Hvecy,
-					const double Hvecz,
-					std::vector<double>& x_total_external_field_array,
-					std::vector<double>& y_total_external_field_array,
-					std::vector<double>& z_total_external_field_array);
+   void fields(const int start_index,
+               const int end_index,
+               double H_applied,
+               const double temperature,
+               const double Hvecx,
+               const double Hvecy,
+               const double Hvecz,
+               std::vector<double>& x_total_external_field_array,
+               std::vector<double>& y_total_external_field_array,
+               std::vector<double>& z_total_external_field_array);
 
    //-----------------------------------------------------------------------------
    // Function to run hamr continuous simulation

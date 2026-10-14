@@ -26,40 +26,40 @@
 
 namespace cat{
 
-	class category_t {
-	public:
+   class category_t {
+   public:
 
-		// list of atoms in each category
-		std::vector <int> category_atoms;
+      // list of atoms in each category
+      std::vector <int> category_atoms;
 
-		// magnetisation variables
-		double magm;
-		double mean_magm;
-		double mx;
-		double my;
-		double mz;
+      // magnetisation variables
+      double magm;
+      double mean_magm;
+      double mx;
+      double my;
+      double mz;
 
-		// energy and torque variables
-		double torque;
-		double mean_torque;
-		double energy;
+      // energy and torque variables
+      double torque;
+      double mean_torque;
+      double energy;
 
-		// constraint variables
-		double theta;
-		double phi;
+      // constraint variables
+      double theta;
+      double phi;
 
-		// spin temperature variables
-		double spin_temp;
-		double mean_spin_temp;
-		double SxH2;
-		double SH;
+      // spin temperature variables
+      double spin_temp;
+      double mean_spin_temp;
+      double SxH2;
+      double SH;
 
-		// member functions
-		category_t(); /// constructor
+      // member functions
+      category_t(); /// constructor
 
-	};
+   };
 
-	extern std::vector <category_t> category;
+   extern std::vector <category_t> category;
 
 
 } // End of namespace cat

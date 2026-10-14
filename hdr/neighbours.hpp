@@ -31,16 +31,16 @@ namespace neighbours{
    // Simple class of neighbour type to store information about the neighbour
    //-----------------------------------------------------------------------------
    class neighbour_t {
-	public:
+   public:
 
-		int nn; // atom id of neighbour
-		int i; // interaction type of neighbour
+      int nn; // atom id of neighbour
+      int i; // interaction type of neighbour
 
       double vx; // real coordinate vector between atoms i->j
       double vy;
       double vz;
 
-	};
+   };
 
    //-----------------------------------------------------------------------------
    // Simple class of neighbour list definining a set of interactions

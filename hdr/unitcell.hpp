@@ -32,7 +32,7 @@ namespace unitcell{
    extern std::string sw_crystal_structure; // JRH externally visible crystal structure for spinwaves path
 
    class atom_t {
-	public:
+   public:
       double x; /// atom x-coordinate
       double y; /// atom y-coordinate
       double z; /// atom z-coordinate
@@ -55,13 +55,13 @@ namespace unitcell{
       {
       };
 
-	};
+   };
 
    //---------------------------------------------------------------------------
    // Unit cell interaction class definition
    //---------------------------------------------------------------------------
-	class interaction_t {
-	public:
+   class interaction_t {
+   public:
       unsigned int i; /// atom unit cell id
       unsigned int j; /// neighbour atom unit cell id
       unsigned int mat_i; /// atom material category
@@ -72,7 +72,7 @@ namespace unitcell{
       int dz; /// delta z in unit cells
       double rij; // interaction range (unit cells)
       double Jij[3][3]; /// Exchange tensor
-	};
+   };
 
    //------------------------------------------------------------------------
    // Class to hold exchange function parameters
@@ -142,26 +142,26 @@ namespace unitcell{
    //---------------------------------------------------------------------------
    // Unit cell class definition
    //---------------------------------------------------------------------------
-	class unit_cell_t {
-	public:
+   class unit_cell_t {
+   public:
 
-		double dimensions[3];
-		double shape[3][3];
+      double dimensions[3];
+      double shape[3][3];
       double cutoff_radius; // nearest neighbours
       unsigned int interaction_range; /// maximum range in unit cells
 
-		unsigned int lcsize; /// number of local categories
-		unsigned int hcsize; /// number of height categories
-		unsigned int surface_threshold; /// threshold for surface atoms
+      unsigned int lcsize; /// number of local categories
+      unsigned int hcsize; /// number of height categories
+      unsigned int surface_threshold; /// threshold for surface atoms
 
-		// list of atoms in each unit cell
-		std::vector <unitcell::atom_t> atom;
+      // list of atoms in each unit cell
+      std::vector <unitcell::atom_t> atom;
 
       unitcell::exchange_template_t bilinear;
       unitcell::exchange_template_t biquadratic;
       //exchange_template_t fourspin_interaction; // tbc
 
-	};
+   };
 
    //-----------------------------------------------------------------------------
    // Function to initialise unitcell module

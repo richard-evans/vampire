@@ -24,11 +24,11 @@
 //
 //====================================================================================================
 //
-//       				                    		Demag.h
+//                                           Demag.h
 //
-//  			 					Namespace header file for demag routines
+//                         Namespace header file for demag routines
 //
-//											Version 1.0 R Evans 18/09/2009
+//                               Version 1.0 R Evans 18/09/2009
 //
 //====================================================================================================
 #include <vector>

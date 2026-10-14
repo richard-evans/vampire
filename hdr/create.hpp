@@ -43,8 +43,8 @@
 /// @version 1.0
 /// @date    05/03/2010
 /// @internal
-///	Created:		05/03/2010
-///	Revision:	  ---
+///   Created:    05/03/2010
+///   Revision:     ---
 ///=====================================================================================
 ///
 #include <list>
@@ -66,59 +66,59 @@
 
 namespace cs{
 
-	// System Dimensions
-	extern double system_dimensions[3];
-	extern bool pbc[3];
-	extern bool SelectMaterialByGeometry;
-	extern unsigned int total_num_unit_cells[3];
-	extern unsigned int local_num_unit_cells[3];
+   // System Dimensions
+   extern double system_dimensions[3];
+   extern bool pbc[3];
+   extern bool SelectMaterialByGeometry;
+   extern unsigned int total_num_unit_cells[3];
+   extern unsigned int local_num_unit_cells[3];
 
-	// System Parameters
-	extern int particle_creation_parity;
-	extern double particle_scale;
-	extern double particle_spacing;
-	extern double particle_array_offset_x; /// Offset particle array along x-direction;
-	extern double particle_array_offset_y; /// Offset particle array along y-direction;
+   // System Parameters
+   extern int particle_creation_parity;
+   extern double particle_scale;
+   extern double particle_spacing;
+   extern double particle_array_offset_x; /// Offset particle array along x-direction;
+   extern double particle_array_offset_y; /// Offset particle array along y-direction;
    extern double particle_shape_factor_x; /// Normalised particle shape
    extern double particle_shape_factor_y; /// Normalised particle shape
    extern double particle_shape_factor_z; /// Normalised particle shape
 
-	// Other directives and flags
-	extern bool single_spin;
-	extern int system_creation_flags[10];
-	extern bool fill_core_shell;
+   // Other directives and flags
+   extern bool single_spin;
+   extern int system_creation_flags[10];
+   extern bool fill_core_shell;
    extern bool core_shell_particles;
 
-	// Variables for interfacial roughness control
-	extern bool interfacial_roughness;
-	extern bool interfacial_roughness_local_height_field;
-	extern int interfacial_roughness_type; /// Sets peaks (1), troughs (-1) or both (0)
-	extern unsigned int interfacial_roughness_random_seed;
-	extern unsigned int interfacial_roughness_seed_count; /// Number of seeds
-	extern double interfacial_roughness_height_field_resolution; // Angstroms
-	extern double interfacial_roughness_mean_seed_radius; // Angstroms
-	extern double interfacial_roughness_seed_radius_variance; // Variance as fraction of mean radius
-	extern double interfacial_roughness_mean_seed_height; // Angstroms
-	extern double interfacial_roughness_seed_height_max; // Angstroms
+   // Variables for interfacial roughness control
+   extern bool interfacial_roughness;
+   extern bool interfacial_roughness_local_height_field;
+   extern int interfacial_roughness_type; /// Sets peaks (1), troughs (-1) or both (0)
+   extern unsigned int interfacial_roughness_random_seed;
+   extern unsigned int interfacial_roughness_seed_count; /// Number of seeds
+   extern double interfacial_roughness_height_field_resolution; // Angstroms
+   extern double interfacial_roughness_mean_seed_radius; // Angstroms
+   extern double interfacial_roughness_seed_radius_variance; // Variance as fraction of mean radius
+   extern double interfacial_roughness_mean_seed_height; // Angstroms
+   extern double interfacial_roughness_seed_height_max; // Angstroms
 
    // Variables for multilayer system
    extern bool multilayers;
    extern int num_multilayers;
    extern bool multilayer_height_category; // enable height categorization by multilayer number
 
-	class neighbour_t {
-	public:
+   class neighbour_t {
+   public:
 
-		int nn; // atom id of neighbour
-		int i; // interaction type of neighbour
+      int nn; // atom id of neighbour
+      int i; // interaction type of neighbour
 
       double vx; // vector between atoms i->j
       double vy;
       double vz;
 
-	};
+   };
 
-	extern uc::unit_cell_t unit_cell;
+   extern uc::unit_cell_t unit_cell;
 
    // Structure for storing non-magnetic atom data
    struct nm_atom_t{
@@ -150,8 +150,8 @@ namespace cs{
 /// @return variable returned from the function
 ///
 /// @internal
-///	Created:		05/03/2010
-///	Revision:	  ---
+///   Created:    05/03/2010
+///   Revision:     ---
 ///=====================================================================================
 ///
 int create();
@@ -173,8 +173,8 @@ int create();
 /// @return variable returned from the function
 ///
 /// @internal
-///	Created:		05/03/2010
-///	Revision:	  ---
+///   Created:    05/03/2010
+///   Revision:     ---
 ///=====================================================================================
 ///
 int create_crystal_structure(std::vector<cs::catom_t> &);
@@ -190,36 +190,36 @@ void generate_multilayers(std::vector<cs::catom_t> & catom_array);
 //------------------------------------------------------------------------------
 namespace create{
 
-	// Variable for total number of atoms that are not filler
-	extern int num_total_atoms_non_filler;
+   // Variable for total number of atoms that are not filler
+   extern int num_total_atoms_non_filler;
 
 
-	// Functions
+   // Functions
    void initialize();
    int create_system_type(std::vector<cs::catom_t> &);
-	bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
-	double get_material_height_min(const int material);
-	double get_material_height_max(const int material);
-	bool get_material_sub_fill(const int material);
-	int get_material_unit_cell_category(const int material);
-	double get_material_substructure_nucleation_height(const int material);
+   double get_material_height_min(const int material);
+   double get_material_height_max(const int material);
+   bool get_material_sub_fill(const int material);
+   int get_material_unit_cell_category(const int material);
+   double get_material_substructure_nucleation_height(const int material);
 
-	// A material's core-shell radius (mp::material[mat].core_shell_size) and
-	// the materials list ordered by that radius, largest first, so that
-	// iterating in order and overwriting on each match paints the smallest,
-	// innermost core last, on top of the larger shells enclosing it. Used by
-	// any driver (particle shapes, granular films) that supports core-shell
-	// materials.
-	struct core_radius_t{ int mat; double radius; };
-	bool compare_radius(core_radius_t first, core_radius_t second);
-	std::list<core_radius_t> sorted_core_shell_materials();
+   // A material's core-shell radius (mp::material[mat].core_shell_size) and
+   // the materials list ordered by that radius, largest first, so that
+   // iterating in order and overwriting on each match paints the smallest,
+   // innermost core last, on top of the larger shells enclosing it. Used by
+   // any driver (particle shapes, granular films) that supports core-shell
+   // materials.
+   struct core_radius_t{ int mat; double radius; };
+   bool compare_radius(core_radius_t first, core_radius_t second);
+   std::list<core_radius_t> sorted_core_shell_materials();
 
-	// Sorts catom_array in place by grain number, for improved cache
-	// locality of later per-grain processing. Used by every system-creation
-	// path that assigns atoms to grains (particle arrays, the nanoparticle
-	// agglomerate, granular films).
-	void sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array);
+   // Sorts catom_array in place by grain number, for improved cache
+   // locality of later per-grain processing. Used by every system-creation
+   // path that assigns atoms to grains (particle arrays, the nanoparticle
+   // agglomerate, granular films).
+   void sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array);
 
 } // end of namespace create
 

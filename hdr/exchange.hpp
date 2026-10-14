@@ -22,48 +22,48 @@
 #include "exchange_types.hpp"
 
 class zval_t{
-	public:
-	double Jij;
+   public:
+   double Jij;
 
-	// constructor
-	zval_t():
-		Jij(0.0)
-	{
-	};
+   // constructor
+   zval_t():
+      Jij(0.0)
+   {
+   };
 };
 
 class zvec_t{
-	public:
-	double Jij[3];
+   public:
+   double Jij[3];
 
-	// constructor
-	zvec_t()
-	{
-		Jij[0] = 0.0;
-		Jij[1] = 0.0;
-		Jij[2] = 0.0;
-	};
+   // constructor
+   zvec_t()
+   {
+      Jij[0] = 0.0;
+      Jij[1] = 0.0;
+      Jij[2] = 0.0;
+   };
 };
 
 class zten_t{
-	public:
-	double Jij[3][3];
+   public:
+   double Jij[3][3];
 
-	// constructor
-	zten_t()
-	{
-		Jij[0][0] = 0.0;
-		Jij[0][1] = 0.0;
-		Jij[0][2] = 0.0;
+   // constructor
+   zten_t()
+   {
+      Jij[0][0] = 0.0;
+      Jij[0][1] = 0.0;
+      Jij[0][2] = 0.0;
 
-		Jij[1][0] = 0.0;
-		Jij[1][1] = 0.0;
-		Jij[1][2] = 0.0;
+      Jij[1][0] = 0.0;
+      Jij[1][1] = 0.0;
+      Jij[1][2] = 0.0;
 
-		Jij[2][0] = 0.0;
-		Jij[2][1] = 0.0;
-		Jij[2][2] = 0.0;
-	};
+      Jij[2][0] = 0.0;
+      Jij[2][1] = 0.0;
+      Jij[2][2] = 0.0;
+   };
 };
 
 //--------------------------------------------------------------------------------

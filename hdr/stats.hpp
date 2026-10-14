@@ -21,10 +21,10 @@ namespace stats
 // Namespace statistics
 //==========================================================
 {
-	extern int num_atoms;				//Number of atoms for statistic purposes
+   extern int num_atoms;            //Number of atoms for statistic purposes
 
-	// Member Functions
-	extern double max_torque();
+   // Member Functions
+   extern double max_torque();
 
    /// Statistics energy types
    enum energy_t { total = 0, exchange = 1, anisotropy = 2, applied_field = 3, magnetostatic = 4, dmi = 5};
@@ -50,10 +50,10 @@ namespace stats
                    const std::vector<bool>& non_magnetic_materials_array);
 
 
-	// Function to update statistics
-	void update();
+   // Function to update statistics
+   void update();
 
-	// Function to reset average statistics counters
+   // Function to reset average statistics counters
    void reset();
 
    //---------------------------------------------------------------------------
@@ -66,63 +66,63 @@ namespace stats
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
-	// Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
-	extern bool calculate_system_energy;
-	extern bool calculate_grain_energy;
-	extern bool calculate_material_energy;
-	extern bool calculate_dmi_energy; // flag to calculate dmi component of exchange energy
+   // Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
+   extern bool calculate_system_energy;
+   extern bool calculate_grain_energy;
+   extern bool calculate_material_energy;
+   extern bool calculate_dmi_energy; // flag to calculate dmi component of exchange energy
 
-	extern bool calculate_system_sld_energy;
-	extern bool calculate_grain_sld_energy;
-	extern bool calculate_material_sld_energy;
+   extern bool calculate_system_sld_energy;
+   extern bool calculate_grain_sld_energy;
+   extern bool calculate_material_sld_energy;
 
-	extern bool calculate_system_magnetization;
-	extern bool calculate_grain_magnetization;
-	extern bool calculate_material_magnetization;
-	extern bool calculate_material_grain_magnetization;
-	extern bool calculate_height_magnetization;
-	extern bool calculate_material_height_magnetization;
-	extern bool calculate_material_grain_height_magnetization;
+   extern bool calculate_system_magnetization;
+   extern bool calculate_grain_magnetization;
+   extern bool calculate_material_magnetization;
+   extern bool calculate_material_grain_magnetization;
+   extern bool calculate_height_magnetization;
+   extern bool calculate_material_height_magnetization;
+   extern bool calculate_material_grain_height_magnetization;
 
-	extern bool calculate_system_torque;
-	extern bool calculate_grain_torque;
-	extern bool calculate_material_torque;
+   extern bool calculate_system_torque;
+   extern bool calculate_grain_torque;
+   extern bool calculate_material_torque;
 
-	extern bool calculate_system_spin_temp;
-	extern bool calculate_grain_spin_temp;
-	extern bool calculate_material_spin_temp;
+   extern bool calculate_system_spin_temp;
+   extern bool calculate_grain_spin_temp;
+   extern bool calculate_material_spin_temp;
 
    extern bool calculate_system_lattice_temp;
    extern bool calculate_grain_lattice_temp;
    extern bool calculate_material_lattice_temp;
 
-	extern bool calculate_system_spin_temp;
-	extern bool calculate_grain_spin_temp;
-	extern bool calculate_material_spin_temp;
+   extern bool calculate_system_spin_temp;
+   extern bool calculate_grain_spin_temp;
+   extern bool calculate_material_spin_temp;
 
-	extern bool calculate_system_specific_heat;
-	extern bool calculate_grain_specific_heat;
-	extern bool calculate_material_specific_heat;
+   extern bool calculate_system_specific_heat;
+   extern bool calculate_grain_specific_heat;
+   extern bool calculate_material_specific_heat;
 
-	extern bool calculate_material_standard_deviation;
+   extern bool calculate_material_standard_deviation;
 
-	extern bool calculate_system_susceptibility;
-	extern bool calculate_grain_susceptibility;
-	extern bool calculate_material_susceptibility;
+   extern bool calculate_system_susceptibility;
+   extern bool calculate_grain_susceptibility;
+   extern bool calculate_material_susceptibility;
 
    extern bool calculate_system_spin_length;
    extern bool calculate_material_spin_length;
    extern bool calculate_height_spin_length;
 
-	extern bool calculate_system_binder_cumulant;
-	extern bool calculate_material_binder_cumulant;
+   extern bool calculate_system_binder_cumulant;
+   extern bool calculate_material_binder_cumulant;
 
-	// forward declaration of friend classes
-	class susceptibility_statistic_t;
-	class specific_heat_statistic_t;
+   // forward declaration of friend classes
+   class susceptibility_statistic_t;
+   class specific_heat_statistic_t;
         class binder_cumulant_statistic_t;
 
-	class standard_deviation_statistic_t;
+   class standard_deviation_statistic_t;
    //----------------------------------
    // Energy class definition
    //----------------------------------
@@ -298,7 +298,7 @@ namespace stats
 
    };
 
-	//----------------------------------
+   //----------------------------------
    // Torque class definition
    //----------------------------------
    class torque_statistic_t{
@@ -311,14 +311,14 @@ namespace stats
          void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
          void get_mask(std::vector<int>& out_mask);
          void calculate_torque(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
-										 const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
-										 const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
-										 const std::vector<double>& mm);
+                               const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
+                               const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
+                               const std::vector<double>& mm);
          void set_torque(std::vector<double>& torque, std::vector<double>& mean_torque, long counter);
          void reset_torque_averages();
          const std::vector<double>& get_torque();
          std::string output_torque(bool header);
-			std::string output_mean_torque(bool header);
+         std::string output_mean_torque(bool header);
 
       private:
          bool initialized;
@@ -326,7 +326,7 @@ namespace stats
          int mask_size;
          double mean_counter;
          std::vector<int> mask;
-			std::vector<int> num_atoms_in_mask;
+         std::vector<int> num_atoms_in_mask;
          std::vector<double> torque;
          std::vector<double> mean_torque;
          std::vector<int> zero_list;
@@ -350,14 +350,14 @@ namespace stats
         void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
         void get_mask(std::vector<int>& out_mask, std::vector<double>& out_normalisation);
         void calculate_spin_temp(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz,
-									 const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
-									 const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
-									 const std::vector<double>& mm);
+                            const std::vector<double>& bxs, const std::vector<double>& bys, const std::vector<double>& bzs,
+                            const std::vector<double>& bxe, const std::vector<double>& bye, const std::vector<double>& bze,
+                            const std::vector<double>& mm);
         void set_spin_temp(std::vector<double>& spin_temp, std::vector<double>& mean_spin_temp, long counter);
         void reset_spin_temp_averages();
         const std::vector<double>& get_spin_temp();
         std::string output_spin_temp(bool header);
-		std::string output_mean_spin_temp(bool header);
+      std::string output_mean_spin_temp(bool header);
 
      private:
         bool initialized;
@@ -365,7 +365,7 @@ namespace stats
         int mask_size;
         double mean_counter;
         std::vector<int> mask;
-		std::vector<int> num_atoms_in_mask;
+      std::vector<int> num_atoms_in_mask;
         std::vector<double> spin_temp;
         std::vector<double> mean_spin_temp;
         std::vector<double> SxH2;
@@ -395,7 +395,7 @@ namespace stats
           void reset_lattice_temp_averages();
           const std::vector<double>& get_lattice_temp();
           std::string output_lattice_temp(bool header);
-  		std::string output_mean_lattice_temp(bool header);
+      std::string output_mean_lattice_temp(bool header);
 
        private:
           bool initialized;
@@ -403,7 +403,7 @@ namespace stats
           int mask_size;
           double mean_counter;
           std::vector<int> mask;
-  		std::vector<int> num_atoms_in_mask;
+      std::vector<int> num_atoms_in_mask;
           std::vector<double> lattice_temp;
           std::vector<double> mean_lattice_temp;
           std::vector<int> zero_list;
@@ -412,21 +412,21 @@ namespace stats
 
     };
 
-	//----------------------------------
+   //----------------------------------
    // Specific Heat Class definition
    //----------------------------------
    class specific_heat_statistic_t{
 
       public:
-			specific_heat_statistic_t (std::string n):initialized(false){
-				name = n;
-			};
-			void initialize(energy_statistic_t& energy_statistic);
-			void calculate(const std::vector<double>& energy);
-			void save_checkpoint(std::ofstream& chkfile);
-			void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
-			void reset_averages();
-			std::string output_mean_specific_heat(const double temperature,bool header);
+         specific_heat_statistic_t (std::string n):initialized(false){
+            name = n;
+         };
+         void initialize(energy_statistic_t& energy_statistic);
+         void calculate(const std::vector<double>& energy);
+         void save_checkpoint(std::ofstream& chkfile);
+         void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+         void reset_averages();
+         std::string output_mean_specific_heat(const double temperature,bool header);
 
 
       private:
@@ -450,12 +450,12 @@ namespace stats
          susceptibility_statistic_t (std::string n):initialized(false){
            name = n;
          };
-			void initialize(magnetization_statistic_t& mag_stat);
-			void calculate(const std::vector<double>& magnetization);
-			void save_checkpoint(std::ofstream& chkfile);
-			void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
-			void reset_averages();
-			std::string output_mean_susceptibility(const double temperature,bool header);
+         void initialize(magnetization_statistic_t& mag_stat);
+         void calculate(const std::vector<double>& magnetization);
+         void save_checkpoint(std::ofstream& chkfile);
+         void load_checkpoint(std::ifstream& chkfile, bool chk_continue);
+         void reset_averages();
+         std::string output_mean_susceptibility(const double temperature,bool header);
          //std::string output_mean_absolute_susceptibility();
 
       private:
@@ -552,25 +552,25 @@ namespace stats
    };
 
    //----------------------------------
-	// Statistics class instantiations
+   // Statistics class instantiations
    //----------------------------------
-	extern energy_statistic_t system_energy;
-	extern energy_statistic_t grain_energy;
-	extern energy_statistic_t material_energy;
+   extern energy_statistic_t system_energy;
+   extern energy_statistic_t grain_energy;
+   extern energy_statistic_t material_energy;
 
    extern magnetization_statistic_t system_magnetization;
-	extern magnetization_statistic_t grain_magnetization;
-	extern magnetization_statistic_t material_magnetization;
-	extern magnetization_statistic_t material_grain_magnetization;
-	extern magnetization_statistic_t height_magnetization;
-	extern magnetization_statistic_t material_height_magnetization;
-	extern magnetization_statistic_t material_grain_height_magnetization;
+   extern magnetization_statistic_t grain_magnetization;
+   extern magnetization_statistic_t material_magnetization;
+   extern magnetization_statistic_t material_grain_magnetization;
+   extern magnetization_statistic_t height_magnetization;
+   extern magnetization_statistic_t material_height_magnetization;
+   extern magnetization_statistic_t material_grain_height_magnetization;
 
-	extern torque_statistic_t system_torque;
-	extern torque_statistic_t grain_torque;
-	extern torque_statistic_t material_torque;
+   extern torque_statistic_t system_torque;
+   extern torque_statistic_t grain_torque;
+   extern torque_statistic_t material_torque;
 
-	extern spin_temp_statistic_t system_spin_temp;
+   extern spin_temp_statistic_t system_spin_temp;
     extern spin_temp_statistic_t grain_spin_temp;
     extern spin_temp_statistic_t material_spin_temp;
 
@@ -578,17 +578,17 @@ namespace stats
     extern lattice_temp_statistic_t grain_lattice_temp;
     extern lattice_temp_statistic_t material_lattice_temp;
 
-	extern spin_temp_statistic_t system_spin_temp;
-	extern spin_temp_statistic_t grain_spin_temp;
-	extern spin_temp_statistic_t material_spin_temp;
+   extern spin_temp_statistic_t system_spin_temp;
+   extern spin_temp_statistic_t grain_spin_temp;
+   extern spin_temp_statistic_t material_spin_temp;
 
-	extern specific_heat_statistic_t system_specific_heat;
-	extern specific_heat_statistic_t grain_specific_heat;
-	extern specific_heat_statistic_t material_specific_heat;
+   extern specific_heat_statistic_t system_specific_heat;
+   extern specific_heat_statistic_t grain_specific_heat;
+   extern specific_heat_statistic_t material_specific_heat;
 
-	extern susceptibility_statistic_t system_susceptibility;
-	extern susceptibility_statistic_t grain_susceptibility;
-	extern susceptibility_statistic_t material_susceptibility;
+   extern susceptibility_statistic_t system_susceptibility;
+   extern susceptibility_statistic_t grain_susceptibility;
+   extern susceptibility_statistic_t material_susceptibility;
 
     extern standard_deviation_statistic_t material_standard_deviation;
 

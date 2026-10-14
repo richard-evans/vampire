@@ -31,9 +31,9 @@
 //==========================================================
 namespace err
 {
-	extern bool check;
-	extern void vexit();
-	extern void zexit(std::string);
+   extern bool check;
+   extern void vexit();
+   extern void zexit(std::string);
    extern void v_parallel_all_exit(std::string message = "");
 }
 

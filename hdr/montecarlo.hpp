@@ -64,9 +64,9 @@ namespace montecarlo{
                              double min_dim[3], double max_dim[3]);
 
    void initialise_masked_cmc_mc(const int num_sets,                       // number of sets of constrained and unconstrained atoms
-										   const std::vector<int>& mask,             // unique ID for N sets of atoms with different constraints
-										   const std::vector<bool>& constrained,     // flag to indicate if atom set with mask index is constrained
-										   const std::vector<double>& constraints);  // list of 2N vectors listing constraint angles theta and phi
+                                 const std::vector<int>& mask,             // unique ID for N sets of atoms with different constraints
+                                 const std::vector<bool>& constrained,     // flag to indicate if atom set with mask index is constrained
+                                 const std::vector<double>& constraints);  // list of 2N vectors listing constraint angles theta and phi
 
    extern bool mc_parallel_initialized;
    extern bool lsf_mc_parallel_initialized;
@@ -89,69 +89,69 @@ namespace montecarlo{
 
    namespace cmc{
 
-   	class cmc_material_t {
-   	public:
+      class cmc_material_t {
+      public:
 
          bool constrained; // flag indicating if atoms are constrained
 
-   		double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
-   		double constraint_phi_min; /// loop angle min [degrees]
-   		double constraint_phi_max; /// loop angle max [degrees]
-   		double constraint_phi_delta; /// loop angle delta [degrees]
+         double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
+         double constraint_phi_min; /// loop angle min [degrees]
+         double constraint_phi_max; /// loop angle max [degrees]
+         double constraint_phi_delta; /// loop angle delta [degrees]
 
-   		double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
-   		double constraint_theta_min; /// loop angle min [degrees]
-   		double constraint_theta_max; /// loop angle max [degrees]
-   		double constraint_theta_delta; /// loop angle delta [degrees]
+         double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
+         double constraint_theta_min; /// loop angle min [degrees]
+         double constraint_theta_max; /// loop angle max [degrees]
+         double constraint_theta_delta; /// loop angle delta [degrees]
 
-   		// performance optimised rotational matrices
-   		double ppolar_vector[3];
-   		double ppolar_matrix[3][3];
-   		double ppolar_matrix_tp[3][3];
+         // performance optimised rotational matrices
+         double ppolar_vector[3];
+         double ppolar_matrix[3][3];
+         double ppolar_matrix_tp[3][3];
 
-   		// vector magnetisation
-   		double M_other[3];
+         // vector magnetisation
+         double M_other[3];
 
          double sx; // derived direction based on angle
          double sy;
          double sz;
 
-      	cmc_material_t():
+         cmc_material_t():
             constrained(false),
-      		constraint_phi(0.0),
-      		constraint_phi_min(0.0),
-      		constraint_phi_max(0.0),
-      		constraint_phi_delta(5.0),
-      		constraint_theta(0.0),
-      		constraint_theta_min(0.0),
-      		constraint_theta_max(0.0),
-      		constraint_theta_delta(5.0),
+            constraint_phi(0.0),
+            constraint_phi_min(0.0),
+            constraint_phi_max(0.0),
+            constraint_phi_delta(5.0),
+            constraint_theta(0.0),
+            constraint_theta_min(0.0),
+            constraint_theta_max(0.0),
+            constraint_theta_delta(5.0),
             sx(0.0),
             sy(0.0),
             sz(1.0)
-      	{
+         {
 
-      	//for(int i=0;i<100;i++){
-      	//	geometry_coords[i][0]=0.0;
-      	//	geometry_coords[i][1]=0.0;
-      	//}
+         //for(int i=0;i<100;i++){
+         // geometry_coords[i][0]=0.0;
+         // geometry_coords[i][1]=0.0;
+         //}
       }
 
-   	};
+      };
 
-   	extern std::vector<cmc_material_t> cmc_mat;
+      extern std::vector<cmc_material_t> cmc_mat;
 
-   	extern bool is_initialised;
+      extern bool is_initialised;
       extern bool masked_cmc;         // determine if generic masked constraint is required
       extern bool constrain_by_grain; // constrains by grain rather than globally
 
-   	extern int active_material; /// material in current hybrid loop
+      extern int active_material; /// material in current hybrid loop
 
-   	extern std::vector<std::vector< int > > atom_list;
-   	extern double mc_success;
-   	extern double mc_total;
-   	extern double sphere_reject;
-   	extern double energy_reject;
+      extern std::vector<std::vector< int > > atom_list;
+      extern double mc_success;
+      extern double mc_total;
+      extern double sphere_reject;
+      extern double energy_reject;
 
    } //end of cmc namespace
 

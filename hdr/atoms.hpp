@@ -71,62 +71,62 @@ class uvec_t{
 //======================================================================
 namespace atoms
 {
-	//--------------------------
-	// Single Variables
-	//--------------------------
-	extern int num_atoms;			/// Number of atoms in simulation
-	extern int num_neighbours;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
-	extern int total_num_neighbours;/// Total number of neighbours for system
+   //--------------------------
+   // Single Variables
+   //--------------------------
+   extern int num_atoms;         /// Number of atoms in simulation
+   extern int num_neighbours;       /// Maximum number of neighbours for Hamiltonian/Lattice
+   extern int total_num_neighbours;/// Total number of neighbours for system
    extern uint64_t num_non_magnetic_atoms; // Number of non-magnetic atoms not to be simulated
 
-	//--------------------------
-	// Array Variables
-	//--------------------------
+   //--------------------------
+   // Array Variables
+   //--------------------------
 
-	extern std::vector <double> x_coord_array;
-	extern std::vector <double> y_coord_array;
-	extern std::vector <double> z_coord_array;
-	extern std::vector <int> neighbour_list_array;
-	extern std::vector <int> neighbour_interaction_type_array;
-	extern std::vector <int> neighbour_list_start_index;
-	extern std::vector <int> neighbour_list_end_index;
-	extern std::vector <int> type_array;
-	extern std::vector <int> category_array;
-	extern std::vector <int> grain_array;
-	extern std::vector <int> cell_array;
+   extern std::vector <double> x_coord_array;
+   extern std::vector <double> y_coord_array;
+   extern std::vector <double> z_coord_array;
+   extern std::vector <int> neighbour_list_array;
+   extern std::vector <int> neighbour_interaction_type_array;
+   extern std::vector <int> neighbour_list_start_index;
+   extern std::vector <int> neighbour_list_end_index;
+   extern std::vector <int> type_array;
+   extern std::vector <int> category_array;
+   extern std::vector <int> grain_array;
+   extern std::vector <int> cell_array;
 
-	extern std::vector <double> x_spin_array;
-	extern std::vector <double> y_spin_array;
-	extern std::vector <double> z_spin_array;
+   extern std::vector <double> x_spin_array;
+   extern std::vector <double> y_spin_array;
+   extern std::vector <double> z_spin_array;
    extern std::vector <double> m_spin_array; /// Array of atomic spin moments
    extern std::vector <double> mass_spin_array; /// Array of mass of atoms
 
-	extern std::vector <double> x_total_spin_field_array;		/// Total spin dependent fields
-	extern std::vector <double> y_total_spin_field_array;		/// Total spin dependent fields
-	extern std::vector <double> z_total_spin_field_array;		/// Total spin dependent fields
-	extern std::vector <double> x_total_external_field_array;	/// Total external fields
-	extern std::vector <double> y_total_external_field_array;	/// Total external fields
-	extern std::vector <double> z_total_external_field_array;	/// Total external fields
-	extern std::vector <double> x_thermal_field_array;	/// Total external fields
-	extern std::vector <double> y_thermal_field_array;	/// Total external fields
-	extern std::vector <double> z_thermal_field_array;	/// Total external fields
+   extern std::vector <double> x_total_spin_field_array;    /// Total spin dependent fields
+   extern std::vector <double> y_total_spin_field_array;    /// Total spin dependent fields
+   extern std::vector <double> z_total_spin_field_array;    /// Total spin dependent fields
+   extern std::vector <double> x_total_external_field_array;   /// Total external fields
+   extern std::vector <double> y_total_external_field_array;   /// Total external fields
+   extern std::vector <double> z_total_external_field_array;   /// Total external fields
+   extern std::vector <double> x_thermal_field_array; /// Total external fields
+   extern std::vector <double> y_thermal_field_array; /// Total external fields
+   extern std::vector <double> z_thermal_field_array; /// Total external fields
 
-	extern std::vector <zval_t> i_exchange_list;
-	extern std::vector <zvec_t> v_exchange_list;
-	extern std::vector <zten_t> t_exchange_list;
+   extern std::vector <zval_t> i_exchange_list;
+   extern std::vector <zvec_t> v_exchange_list;
+   extern std::vector <zten_t> t_exchange_list;
 
    extern std::vector <bool> surface_array; // flag to identify atom as surface
    extern std::vector <bool> magnetic; // flag to identify atom as being magnetic
 
    extern std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 
-	extern std::vector <double> x_total_spin_forces_array;		/// Total spin dependent fields
-	extern std::vector <double> y_total_spin_forces_array;		/// Total spin dependent fields
-	extern std::vector <double> z_total_spin_forces_array;		/// Total spin dependent fields
+   extern std::vector <double> x_total_spin_forces_array;      /// Total spin dependent fields
+   extern std::vector <double> y_total_spin_forces_array;      /// Total spin dependent fields
+   extern std::vector <double> z_total_spin_forces_array;      /// Total spin dependent fields
 
-	extern std::vector <double> x_velo_array;		/// Total spin dependent fields
-	extern std::vector <double> y_velo_array;		/// Total spin dependent fields
-	extern std::vector <double> z_velo_array;		/// Total spin dependent fields
+   extern std::vector <double> x_velo_array;    /// Total spin dependent fields
+   extern std::vector <double> y_velo_array;    /// Total spin dependent fields
+   extern std::vector <double> z_velo_array;    /// Total spin dependent fields
 
 }
 

@@ -100,8 +100,8 @@ namespace vin{
    extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                       const std::vector<double>& range_min, const std::vector<double>& range_max, std::string input_file_type, std::string range_text);
 
-	extern void check_for_valid_bitsequence(std::vector<int>& u, std::string word, int line, std::string prefix, const int range_min,
-													const int range_max, std::string input_file_type, std::string range_text);
+   extern void check_for_valid_bitsequence(std::vector<int>& u, std::string word, int line, std::string prefix, const int range_min,
+                                       const int range_max, std::string input_file_type, std::string range_text);
 
    extern std::vector<double> doubles_from_string(std::string value);
    extern std::vector<int> integers_from_string(std::string value);
@@ -231,26 +231,26 @@ namespace vout{
    extern unsigned int precision; // variable to control output precision (digits)
    extern bool fixed; // fixed precision output
    extern bool header_option; // column headers
-	extern std::vector<output_t> file_output_list;
-	extern std::vector<output_t> screen_output_list;
+   extern std::vector<output_t> file_output_list;
+   extern std::vector<output_t> screen_output_list;
 
    extern int output_rate;
 
    extern bool gnuplot_array_format;
 
-	//extern bool output_povray;
-	//extern int output_povray_rate;
+   //extern bool output_povray;
+   //extern int output_povray_rate;
 
-	//extern bool output_povray_cells;
-	//extern int output_povray_cells_rate;
+   //extern bool output_povray_cells;
+   //extern int output_povray_cells_rate;
 
-	extern void data();
-	extern void zLogTsInit(std::string);
+   extern void data();
+   extern void zLogTsInit(std::string);
     extern void write_out(std::ostream&,std::vector<output_t>&);
-	//extern int pov_file();
+   //extern int pov_file();
 
-	void redirect(std::ostream& strm, std::string filename);
-	void nullify(std::ostream& strm);
+   void redirect(std::ostream& strm, std::string filename);
+   void nullify(std::ostream& strm);
 
     extern int fw_size;
     extern int fw_size_int;
