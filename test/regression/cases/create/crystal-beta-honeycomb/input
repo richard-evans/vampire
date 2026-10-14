@@ -1,0 +1,13 @@
+create:crystal-structure=beta-honeycomb
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 1.2 !nm
+dimensions:system-size-y = 1.2 !nm
+dimensions:system-size-z = 1.2 !nm
+material:file=Fe.mat
+sim:program=benchmark
+sim:integrator=llg-heun
+sim:total-time-steps=0
+config:atoms
+config:output-format=text
+output:precision=16
+output:time-steps
