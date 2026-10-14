@@ -24,7 +24,6 @@
 #include "vmpi.hpp"
 #include "vutil.hpp"
 #include "grains.hpp"
-using namespace std;
 
 namespace program{
 
@@ -122,14 +121,14 @@ namespace program{
             }
             l++;
          }
-         if (Local_Sub[l-1] !=0 ) cerr << Largest_Sublattice[j] <<endl;
+         if (Local_Sub[l-1] !=0 ) std::cerr << Largest_Sublattice[j] <<std::endl;
       }
       int j = 0;
 
 
       for (int i = 0; i < grains::num_grains*4; i= i +4){
          if (Local_Sub[i] != 0){
-            cerr <<"number in each sublattice for grain" << j << ";" <<  Local_Sub[i] << "\t" << Local_Sub[i +1] << "\t" << Local_Sub[i+2] << "\t" << Local_Sub[i+3] << "\t" << std::endl;
+            std::cerr <<"number in each sublattice for grain" << j << ";" <<  Local_Sub[i] << "\t" << Local_Sub[i +1] << "\t" << Local_Sub[i+2] << "\t" << Local_Sub[i+3] << "\t" << std::endl;
             zlog << zTs() <<"number in each sublattice for grain" << j << ";" <<  Local_Sub[i] << "\t" << Local_Sub[i +1] << "\t" << Local_Sub[i+2] << "\t" << Local_Sub[i+3] << "\t" << std::endl;
             j++;
          }
