@@ -1,0 +1,12 @@
+dimensions:system-size-x = 3.0 !nm
+dimensions:system-size-y = 1.5 !nm
+dimensions:system-size-z = 1.5 !nm
+material:file=materials.mat
+material:unit-cell-file=chain.ucf
+sim:program=benchmark
+sim:integrator=llg-heun
+sim:total-time-steps=0
+config:atoms
+config:output-format=text
+output:precision=16
+output:time-steps
