@@ -35,10 +35,10 @@ namespace vmpi{
    // timing variables
    double start_time;
    double end_time;
-   double ComputeTime;			/// Temporary for storing time
-   double WaitTime;				/// Temporary for storing time
-   double TotalComputeTime;	/// Total time spent in computation
-   double TotalWaitTime;		/// Total time spent waiting
+   double ComputeTime;        /// Temporary for storing time
+   double WaitTime;           /// Temporary for storing time
+   double TotalComputeTime;   /// Total time spent in computation
+   double TotalWaitTime;      /// Total time spent waiting
    double AverageComputeTime;
    double AverageWaitTime;
    double MaximumComputeTime;

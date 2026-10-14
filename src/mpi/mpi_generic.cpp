@@ -24,11 +24,11 @@
 //
 //====================================================================================
 //
-//														mpi_generic
+//                                        mpi_generic
 //
-//									Functions for basic mpi functionality
+//                         Functions for basic mpi functionality
 //
-//										Version 1.0 R Evans 07/08/2009
+//                            Version 1.0 R Evans 07/08/2009
 //
 //====================================================================================
 
@@ -40,41 +40,41 @@
 namespace vmpi{
 
 void initialise(int argc, char *argv[]){
-	//====================================================================================
-	//
-	///												initialise_mpi
-	//
-	///									Startup MPI and Output host information
-	//
-	///										Version 1.0 R Evans 16/07/2009
-	//
-	//====================================================================================
-	//
-	//		Locally allocated variables:
-	//
-	//====================================================================================
-	// C++ MPI Binding Reference:
-	// https://computing.llnl.gov/tutorials/mpi/
-	//====================================================================================
+   //====================================================================================
+   //
+   ///                                    initialise_mpi
+   //
+   ///                           Startup MPI and Output host information
+   //
+   ///                              Version 1.0 R Evans 16/07/2009
+   //
+   //====================================================================================
+   //
+   //    Locally allocated variables:
+   //
+   //====================================================================================
+   // C++ MPI Binding Reference:
+   // https://computing.llnl.gov/tutorials/mpi/
+   //====================================================================================
 
 #ifdef MPICF
-	int resultlen;
-	char name[512];
-	// Initialise MPI
-	MPI_Init(&argc, &argv);
+   int resultlen;
+   char name[512];
+   // Initialise MPI
+   MPI_Init(&argc, &argv);
 
-	// Get number of processors and rank
- 	MPI_Comm_rank(MPI_COMM_WORLD, &vmpi::my_rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &vmpi::num_processors);
+   // Get number of processors and rank
+   MPI_Comm_rank(MPI_COMM_WORLD, &vmpi::my_rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &vmpi::num_processors);
 
    // set master flag on master (root) process
    if(vmpi::my_rank == 0) vmpi::master = true;
 
-	MPI_Get_processor_name(name, &resultlen);
-	//IOCommunicator(num_io_processors);
-	// Start MPI Timer
-	vmpi::start_time = MPI_Wtime();
-	hostname = name;
+   MPI_Get_processor_name(name, &resultlen);
+   //IOCommunicator(num_io_processors);
+   // Start MPI Timer
+   vmpi::start_time = MPI_Wtime();
+   hostname = name;
 #else
 
    // set master flag on master (root) process (serial)
@@ -82,128 +82,128 @@ void initialise(int argc, char *argv[]){
 
 #endif
 
-	return;
+   return;
 
 }
 
 int hosts(){
-	//====================================================================================
-	//
-	///													mpi_hosts
-	//
-	///										Print MPI hostnames to screen
-	//
-	///										Version 1.0 R Evans 07/08/2009
-	//
-	//====================================================================================
+   //====================================================================================
+   //
+   ///                                       mpi_hosts
+   //
+   ///                              Print MPI hostnames to screen
+   //
+   ///                              Version 1.0 R Evans 07/08/2009
+   //
+   //====================================================================================
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "mpi_hosts has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "mpi_hosts has been called" << std::endl;}
 
-	// Wait for all processors
-	//MPI::COMM_WORLD.Barrier();
+   // Wait for all processors
+   //MPI::COMM_WORLD.Barrier();
 
    //for(int i=0;i<vmpi::num_processors;i++){
-   //	if(vmpi::my_rank==i){
-	if(vmpi::num_processors<=512){
-			// Output rank, num_procs, hostname to screen
-			std::cout << "Processor " << vmpi::my_rank+1 << " of " << vmpi::num_processors;
-			std::cout << " online on host " << vmpi::hostname << std::endl;
-			//	}
-			//MPI::COMM_WORLD.Barrier();
-	   //}
-	}
-	// Wait for all processors
-			//MPI::COMM_WORLD.Barrier();
+   // if(vmpi::my_rank==i){
+   if(vmpi::num_processors<=512){
+         // Output rank, num_procs, hostname to screen
+         std::cout << "Processor " << vmpi::my_rank+1 << " of " << vmpi::num_processors;
+         std::cout << " online on host " << vmpi::hostname << std::endl;
+         // }
+         //MPI::COMM_WORLD.Barrier();
+      //}
+   }
+   // Wait for all processors
+         //MPI::COMM_WORLD.Barrier();
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 int finalise(){
-	//====================================================================================
-	//
-	///												finalise_mpi
-	//
-	///									Finalise MPI and output wall time
-	//
-	///										Version 1.0 R Evans 07/08/2009
-	//
-	//====================================================================================
+   //====================================================================================
+   //
+   ///                                    finalise_mpi
+   //
+   ///                           Finalise MPI and output wall time
+   //
+   ///                              Version 1.0 R Evans 07/08/2009
+   //
+   //====================================================================================
 
 #ifdef MPICF
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "finalise_mpi has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "finalise_mpi has been called" << std::endl;}
 
-	// Wait for all processors
+   // Wait for all processors
    MPI_Barrier(MPI_COMM_WORLD);
 
 
-	// Output MPI Timings to disk
-	// Get sizes of arrays
-	//std::vector<int> sizes(vmpi::num_processors);
-	//int MPITimingDataSize = ComputeTimeArray.size();
+   // Output MPI Timings to disk
+   // Get sizes of arrays
+   //std::vector<int> sizes(vmpi::num_processors);
+   //int MPITimingDataSize = ComputeTimeArray.size();
 
-	// MPI_Gather (&sendbuf,sendcnt,sendtype,&recvbuf, recvcount,recvtype,root,comm)
-	//MPI_Gather(&MPITimingDataSize,1,MPI_INT,&sizes[0],1,MPI_INT,0,MPI_COMM_WORLD);
-	//for(int p=0; p<vmpi::num_processors;p++){
-	//	std::cout << "node01:" << p << " " << sizes.at(p) << std::endl;
-	//}
+   // MPI_Gather (&sendbuf,sendcnt,sendtype,&recvbuf, recvcount,recvtype,root,comm)
+   //MPI_Gather(&MPITimingDataSize,1,MPI_INT,&sizes[0],1,MPI_INT,0,MPI_COMM_WORLD);
+   //for(int p=0; p<vmpi::num_processors;p++){
+   // std::cout << "node01:" << p << " " << sizes.at(p) << std::endl;
+   //}
 
-	// Gather timings
-	if(DetailedMPITiming){
-		std::vector<double> AllTimes(0);
-		if(my_rank==0) AllTimes.resize(num_processors*WaitTimeArray.size());
+   // Gather timings
+   if(DetailedMPITiming){
+      std::vector<double> AllTimes(0);
+      if(my_rank==0) AllTimes.resize(num_processors*WaitTimeArray.size());
 
-		MPI_Gather(&WaitTimeArray[0],WaitTimeArray.size(),MPI_DOUBLE,&AllTimes[0],WaitTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD);
+      MPI_Gather(&WaitTimeArray[0],WaitTimeArray.size(),MPI_DOUBLE,&AllTimes[0],WaitTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD);
 
-		if(my_rank==0){
-			std::ofstream WaitTimesOFS;
-			WaitTimesOFS.open("MPI-wait-times");
+      if(my_rank==0){
+         std::ofstream WaitTimesOFS;
+         WaitTimesOFS.open("MPI-wait-times");
 
-			// Column Row format
-			const int wta_size = WaitTimeArray.size();
-			for(int idx=0;idx<wta_size;idx++){
-				WaitTimesOFS << idx << "\t";
-				for(int p=0;p<vmpi::num_processors;p++){
-					WaitTimesOFS << AllTimes.at(idx+p*wta_size) << "\t";
-				}
-				WaitTimesOFS << std::endl;
-			}
-			WaitTimesOFS.close();
-		}
+         // Column Row format
+         const int wta_size = WaitTimeArray.size();
+         for(int idx=0;idx<wta_size;idx++){
+            WaitTimesOFS << idx << "\t";
+            for(int p=0;p<vmpi::num_processors;p++){
+               WaitTimesOFS << AllTimes.at(idx+p*wta_size) << "\t";
+            }
+            WaitTimesOFS << std::endl;
+         }
+         WaitTimesOFS.close();
+      }
 
-		MPI_Gather(&ComputeTimeArray[0],ComputeTimeArray.size(),MPI_DOUBLE,&AllTimes[0],ComputeTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD);
+      MPI_Gather(&ComputeTimeArray[0],ComputeTimeArray.size(),MPI_DOUBLE,&AllTimes[0],ComputeTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD);
 
-		if(my_rank==0){
-			std::ofstream ComputeTimesOFS;
-			ComputeTimesOFS.open("MPI-compute-times");
+      if(my_rank==0){
+         std::ofstream ComputeTimesOFS;
+         ComputeTimesOFS.open("MPI-compute-times");
 
-			const int cta_size = ComputeTimeArray.size();
-			// Column Row format
-			for(int idx=0;idx<cta_size;idx++){
-				ComputeTimesOFS << idx << "\t";
-				for(int p=0;p<vmpi::num_processors;p++){
-					ComputeTimesOFS << AllTimes.at(idx+p*cta_size) << "\t";
-				}
-				ComputeTimesOFS << std::endl;
-			}
-			ComputeTimesOFS.close();
-		}
-	}
+         const int cta_size = ComputeTimeArray.size();
+         // Column Row format
+         for(int idx=0;idx<cta_size;idx++){
+            ComputeTimesOFS << idx << "\t";
+            for(int p=0;p<vmpi::num_processors;p++){
+               ComputeTimesOFS << AllTimes.at(idx+p*cta_size) << "\t";
+            }
+            ComputeTimesOFS << std::endl;
+         }
+         ComputeTimesOFS.close();
+      }
+   }
 
-	// Stop MPI Timer and output to screen
-	//vmpi::end_time=MPI_Wtime();
-	//if(vmpi::my_rank==0){
-	//	std::cout << "MPI Simulation Time: " << vmpi::end_time-vmpi::start_time << std::endl;
-	//}
+   // Stop MPI Timer and output to screen
+   //vmpi::end_time=MPI_Wtime();
+   //if(vmpi::my_rank==0){
+   // std::cout << "MPI Simulation Time: " << vmpi::end_time-vmpi::start_time << std::endl;
+   //}
 
-	// Finalise MPI
-	MPI_Finalize();
+   // Finalise MPI
+   MPI_Finalize();
 
 #endif
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 #ifdef MPICF
@@ -235,14 +235,14 @@ int finalise(){
 //
 double SwapTimer(double OldTimer, double& NewTimer){
 
-	// get current time
-	double time = MPI_Wtime();
+   // get current time
+   double time = MPI_Wtime();
 
-	// set start time for NewTimer
-	NewTimer=time;
+   // set start time for NewTimer
+   NewTimer=time;
 
-	// Calculate time elapsed since last call for OldTimer
-	return time-OldTimer;
+   // Calculate time elapsed since last call for OldTimer
+   return time-OldTimer;
 
 }
 
