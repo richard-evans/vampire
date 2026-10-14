@@ -1,0 +1,23 @@
+#===================================================
+# Material file for LLG integrator tests
+#
+# Identical for dynamics/heun and dynamics/midpoint.
+# Low damping (alpha=0.1) means the spin precesses
+# many times before aligning with the field, so the
+# exact trajectory is sensitive to integrator accuracy.
+# Zero anisotropy and zero exchange ensure only the
+# applied field drives the dynamics, giving a clean
+# single-spin precession with an analytical solution.
+#===================================================
+
+material:num-materials=1
+
+material[1]:material-name=Co
+material[1]:damping-constant=0.1
+material[1]:exchange-matrix[1]=0.0
+material[1]:atomic-spin-moment=1.0 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Co
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
+material[1]:initial-spin-direction = 1,0,0
