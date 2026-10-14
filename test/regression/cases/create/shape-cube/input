@@ -1,0 +1,15 @@
+create:crystal-structure=fcc
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+dimensions:particle-size = 1.8 !nm
+material:file=Fe.mat
+sim:program=benchmark
+sim:integrator=llg-heun
+sim:total-time-steps=0
+config:atoms
+config:output-format=text
+output:precision=16
+output:time-steps
+create:cube
