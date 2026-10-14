@@ -116,7 +116,7 @@ void mc_step(std::vector<double> &x_spin_array,
          const double factor = 0.5 / last_rejection_rate;
          montecarlo::internal::adaptive_sigma *= factor;
          // check for excessive range (too small angle takes too long to grow, too large does not improve performance) and truncate
-      	if (montecarlo::internal::adaptive_sigma > 60.0 || montecarlo::internal::adaptive_sigma < 1e-5) montecarlo::internal::adaptive_sigma = 60.0;
+         if (montecarlo::internal::adaptive_sigma > 60.0 || montecarlo::internal::adaptive_sigma < 1e-5) montecarlo::internal::adaptive_sigma = 60.0;
       }
 
       // Save statistics to sim namespace variable
