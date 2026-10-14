@@ -1292,10 +1292,9 @@ namespace anisotropy{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'"<< std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'";
+            err::fatal(message.str());
          }
       }*/
       //------------------------------------------------------------
@@ -1325,10 +1324,9 @@ namespace anisotropy{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'"<< std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'";
+            err::fatal(message.str());
          }
       }*/
       //--------------------------------------------------------------------

@@ -130,9 +130,9 @@ void anisotropy::internal::lattice_anis_t::add_point(double temperature, double 
 
    // check for valid temperature value
    if( temperature < 0.0 || temperature > 10000.0 ){
-      std::cerr << "Error: Temperature value " << temperature << " in lattice anisotropy file is invalid. Temperature values must be in the range 0 - 10000 K. Exiting." << std::endl;
-      zlog << zTs() << "Error: Temperature value " << temperature << " in lattice anisotropy file is invalid. Temperature values must be in the range 0 - 10000 K. Exiting." << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "Error: Temperature value " << temperature << " in lattice anisotropy file is invalid. Temperature values must be in the range 0 - 10000 K. Exiting.";
+      err::fatal(message.str());
    }
 
    // add values to list
@@ -161,9 +161,9 @@ void anisotropy::internal::lattice_anis_t::set_interpolation_table(){
    // check T(i+1) > T(i)
    for(unsigned int i=1; i<T.size(); i++){
       if(T[i]<T[i-1]){
-         std::cerr << "Error: temperature value "<< T[i] <<" on line " << i+2 << " is less than the previous value " << T[i-1] << " and must be given in ascending order. Exiting" << std::endl;
-         zlog << zTs() << "Error: temperature value "<< T[i] <<" on line " << i+2 << " is less than the previous value " << T[i-1] << " and must be given in ascending order. Exiting" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Error: temperature value " << T[i] << " on line " << i+2 << " is less than the previous value " << T[i-1] << " and must be given in ascending order. Exiting";
+         err::fatal(message.str());
       }
    }
 
@@ -238,9 +238,9 @@ void anisotropy::internal::lattice_anis_t::set_interpolation_table(){
 
       // check for value not in range
       if(found_mc==false){
-         std::cerr << "Code error: Temperature value " << Ti << " in interpolation function is not within range specified in lattice-anisotropy-file. Exiting" << std::endl;
-         zlog << zTs() << "Code error: Temperature value " << Ti << " in interpolation function is not within range specified in lattice-anisotropy-file. Exiting" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Code error: Temperature value " << Ti << " in interpolation function is not within range specified in lattice-anisotropy-file. Exiting";
+         err::fatal(message.str());
       }
 
    }
