@@ -60,12 +60,12 @@ int main(int argc, char* argv[]){
       std::cout << std::endl;
       std::cout << "             Git commit: " << vinfo::githash() << std::endl;
       std::cout << std::endl;
-      std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
+      std::cout << "  Licensed under the GNU Public License(v2). See licence-gpl for details." << std::endl;
       std::cout << std::endl;
       std::cout << "      Main Developers: Richard F L Evans, Sarah Jenkins, Andrea Meo, " << std::endl;
       std::cout << "                       Matthew Ellis, Mara Strungaru, Sergiu Ruta" << std::endl;
       std::cout << " " << std::endl;
-      std::cout << "                       See developers.txt for details" << std::endl;
+      std::cout << "                       See developers/authors.txt for details" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                       Compiled with:  " << COMP << std::endl;

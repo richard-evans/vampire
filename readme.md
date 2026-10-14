@@ -62,5 +62,8 @@ Vampire is designed to be highly flexible to deal with a wide variety of problem
 
 License
 ---------------
-See the license file.
+Vampire as a whole is distributed under the GNU GPL version 2 (see `licence-gpl`).
+Most source files are individually available under the Free BSD licence (see `licence-bsd`);
+the header of each file states which licence applies to it. Files derived from JAMS
+(https://github.com/stonerlab/jams) also carry the original MIT licence notice in their header.
 
