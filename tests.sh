@@ -150,7 +150,12 @@ fi
 #------------------------------------------------------
 if [ "$coverage" = true ]; then
 
-   if ! command -v gcovr > /dev/null; then
+   # gcovr may be installed as a python module only (pip install --user gcovr)
+   if command -v gcovr > /dev/null; then
+      gcovr="gcovr"
+   elif python3 -m gcovr --version > /dev/null 2>&1; then
+      gcovr="python3 -m gcovr"
+   else
       echo "Error: coverage needs gcovr (for example 'sudo port install py-gcovr' or 'pip install gcovr')"
       exit 1
    fi
@@ -166,7 +171,7 @@ if [ "$coverage" = true ]; then
    "$dir/test/regression/run_regression.sh" --serial
 
    mkdir -p "$dir/coverage"
-   ( cd "$dir" && gcovr --root . --filter src/ --exclude src/qvoronoi/ --object-directory obj \
+   ( cd "$dir" && $gcovr --root . --filter src/ --exclude src/qvoronoi/ --object-directory obj \
         --html-details coverage/index.html --txt coverage/summary.txt ) || exit 1
    cat "$dir/coverage/summary.txt"
    echo "Coverage report: $dir/coverage/index.html"
