@@ -17,6 +17,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 // Vampire Header files
 #include "atoms.hpp"
@@ -60,8 +61,9 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
 
    if (widthx<=sld::internal::r_cut_fields ||widthy<=sld::internal::r_cut_fields || widthy<=sld::internal::r_cut_fields ){
      std::cerr << "Error: System size needs to be increased so octants won't interact" << std::endl;
-     std::cerr<<"Width of octants is "<<widthx<<"\t"<<widthy<<"\t"<<widthz<< " While interaction cutoff is "<<sld::internal::r_cut_fields<<std::endl;
-     err::vexit();
+     std::ostringstream message;
+     message << "Width of octants is " << widthx << "\t" << widthy << "\t" << widthz << " While interaction cutoff is " << sld::internal::r_cut_fields;
+     err::fatal(message.str());
      }
 
    int octant_num = 0; //Count which octant loop is in
@@ -117,8 +119,7 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
    for(int i=0; i< 8; i++) {num_atoms_in_octants += internal::c_octants[i].size();}
 
    if(num_atoms_in_octants != catoms){
-      std::cerr << "Programmer error: missing atoms in core octants in suzuki-trotter initialisation" << std::endl;
-      err::vexit();
+      err::fatal("Programmer error: missing atoms in core octants in suzuki-trotter initialisation");
    }
    // boundary atoms
    num_atoms_in_octants = 0;
@@ -127,8 +128,7 @@ void suzuki_trotter_parallel_init(std::vector<double> &x, // atomic coordinates
 
    if(num_atoms_in_octants != batoms){
       std::cout<< "num_atoms "<<num_atoms_in_octants<<"\t"<<batoms<<std::endl;
-      std::cerr << "Programmer error: missing atoms in boundary octants in suzuki-trotter initialisation" << std::endl;
-      err::vexit();
+      err::fatal("Programmer error: missing atoms in boundary octants in suzuki-trotter initialisation");
    }
 
 
