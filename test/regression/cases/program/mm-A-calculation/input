@@ -1,0 +1,20 @@
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+sim:time-step=1.0E-16
+sim:integrator-random-seed=12345
+output:precision=16
+sim:program=mm-A-calculation
+sim:integrator=llg-heun
+output:time-steps
+output:temperature
+output:applied-field-strength
+output:magnetisation
+output:mean-magnetisation-length
+output:total-energy
