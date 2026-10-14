@@ -22,6 +22,11 @@ namespace err
    extern void vexit();
    extern void zexit(std::string);
    extern void v_parallel_all_exit(std::string message = "");
+
+   // print message (red) to screen and log, then exit via vexit
+   extern void fatal(std::string const message);
+   // print message (yellow) to screen on rank 0 and to the log on every rank
+   extern void warning(std::string const message);
 }
 
 #endif /*ERRORS_H_*/

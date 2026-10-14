@@ -139,4 +139,34 @@ namespace err
       exit(EXIT_FAILURE);
    }
 
+   //-----------------------------------------------------------------------------------------
+   // Fatal error: print message in red to screen and to the log, then exit via vexit.
+   // The message is printed as given (callers include "Error - ..." themselves).
+   //-----------------------------------------------------------------------------------------
+   void fatal(std::string const message){
+
+      terminaltextcolor(RED);
+      std::cerr << message << std::endl;
+      terminaltextcolor(WHITE);
+      zlog << zTs() << message << std::endl;
+
+      err::vexit();
+
+   }
+
+   //-----------------------------------------------------------------------------------------
+   // Warning: print message in yellow to screen (rank 0 only) and to the log (every rank),
+   // then continue. The message is printed as given (callers include "Warning - ..." themselves).
+   //-----------------------------------------------------------------------------------------
+   void warning(std::string const message){
+
+      if(vmpi::my_rank == 0){
+         terminaltextcolor(YELLOW);
+         std::cerr << message << std::endl;
+         terminaltextcolor(WHITE);
+      }
+      zlog << zTs() << message << std::endl;
+
+   }
+
 } // end of namespace err
