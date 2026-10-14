@@ -228,7 +228,7 @@ int main(){
     ucf_file << unit_cell.at(atom).hc << std::endl;
   }
   ucf_file << "#Interactions n exctype, id i j dx dy   dz        Jij"<< std::endl;
-  ucf_file << nn_list.size() << "\t" << 0 << std::endl;
+  ucf_file << nn_list.size() << "\t" << "isotropic" << std::endl;
   // loop over all interactions
   for(unsigned int nn=0; nn < nn_list.size(); nn++){
     ucf_file << nn << "\t";
@@ -261,6 +261,8 @@ int main(){
     mat_file << "# Material " << m+1 << " (" << materials.at(m).name << ")" << std::endl;
     mat_file << "#------------------------------------------------" << std::endl;
     mat_file << "material[" << m+1 << "]:material-name=" << materials.at(m).name << std::endl;
+    // atoms in the unit cell file with material m belong to this material
+    mat_file << "material[" << m+1 << "]:unit-cell-category=" << m+1 << std::endl;
     mat_file << "material[" << m+1 << "]:damping-constant=" << materials.at(m).alpha << std::endl;
     mat_file << "material[" << m+1 << "]:atomic-spin-moment="<< materials.at(m).mu_s << " !muB" << std::endl;
     mat_file << "material[" << m+1 << "]:uniaxial-anisotropy-constant=" << materials.at(m).Ku << std::endl;

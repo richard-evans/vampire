@@ -1,7 +1,11 @@
 #------------------------------------------
-# Sample vampire input file to perform
-# benchmark calculation for v4.0
+# Sample vampire input file for spin-lattice
+# dynamics (SLD)
 #
+# A small bcc Fe cube is simulated with
+# coupled spin and lattice dynamics at
+# 300 K, outputting the magnetisation and
+# the spin and lattice temperatures.
 #------------------------------------------
 create:crystal-structure=bcc
 #create:periodic-boundaries-x
@@ -33,8 +37,10 @@ sim:total-time-steps = 2000
 sim:time-step = 0.5 !fs
 sim:equilibration-temperature=300.0
 sim:equilibration-time-steps=0
+# to continue from an earlier run, save a checkpoint at the end of
+# that run and load it in the next one
 #sim:save-checkpoint=end
-sim:load-checkpoint=continue
+#sim:load-checkpoint=continue
 
 #------------------------------------------
 # Program and integrator details

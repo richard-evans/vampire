@@ -1,0 +1,46 @@
+#----------------------------------------------------------
+# Sample vampire input file using a custom unit cell
+#
+# Run unit-cell-creator.py (or unit-cell-creator.cpp) first
+# to generate UC.ucf and MAT.mat. This runs a short spin
+# dynamics simulation of the resulting rare earth -
+# transition metal ferrimagnet at 300 K and outputs the
+# magnetisation of each sublattice.
+#----------------------------------------------------------
+
+#----------------------------------------------------------
+# Creation attributes
+#----------------------------------------------------------
+dimensions:system-size-x = 5 !nm
+dimensions:system-size-y = 5 !nm
+dimensions:system-size-z = 5 !nm
+
+#----------------------------------------------------------
+# Unit cell and material files
+#----------------------------------------------------------
+material:unit-cell-file = UC.ucf
+material:file = MAT.mat
+
+#----------------------------------------------------------
+# Simulation attributes
+#----------------------------------------------------------
+sim:temperature = 300.0
+sim:time-step = 1 !fs
+sim:total-time-steps = 10000
+sim:time-steps-increment = 500
+
+#----------------------------------------------------------
+# Program and integrator details
+#----------------------------------------------------------
+sim:program = time-series
+sim:integrator = llg-heun
+
+#----------------------------------------------------------
+# Data output
+#----------------------------------------------------------
+output:real-time
+output:temperature
+output:material-magnetisation
+
+screen:time-steps
+screen:material-magnetisation

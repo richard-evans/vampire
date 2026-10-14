@@ -1,3 +1,0 @@
-The mat (short for material) directory includes various material files for vampire simulations. 
-Simply copy the desired file into the running directory and reference in the input file.
-

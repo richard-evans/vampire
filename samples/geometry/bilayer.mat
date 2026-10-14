@@ -1,0 +1,36 @@
+#----------------------------------------------------------
+# Sample vampire material file for the geometry example
+#
+# Two cobalt-like layers, each cut to the 2D shape given
+# in its geometry file. Points in the geometry files are
+# fractions (0-1) of the system size in x and y.
+#----------------------------------------------------------
+material:num-materials = 2
+
+#----------------------------------------------------------
+# Material 1: lower layer, cut to a triangle
+#----------------------------------------------------------
+material[1]:material-name = Co-triangle
+material[1]:damping-constant = 0.1
+material[1]:exchange-matrix[1] = 11.2e-21
+material[1]:exchange-matrix[2] = 11.2e-21
+material[1]:atomic-spin-moment = 1.72 !muB
+material[1]:second-order-uniaxial-anisotropy-constant = 1.0e-24
+material[1]:minimum-height = 0.0
+material[1]:maximum-height = 0.5
+material[1]:geometry-file = triangle.geo
+material[1]:material-element = Co
+
+#----------------------------------------------------------
+# Material 2: upper layer, cut to a rectangle
+#----------------------------------------------------------
+material[2]:material-name = Co-rectangle
+material[2]:damping-constant = 0.1
+material[2]:exchange-matrix[1] = 11.2e-21
+material[2]:exchange-matrix[2] = 11.2e-21
+material[2]:atomic-spin-moment = 1.72 !muB
+material[2]:second-order-uniaxial-anisotropy-constant = 1.0e-24
+material[2]:minimum-height = 0.5
+material[2]:maximum-height = 1.0
+material[2]:geometry-file = rectangle.geo
+material[2]:material-element = Fe
