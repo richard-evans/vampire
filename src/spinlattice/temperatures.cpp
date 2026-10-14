@@ -8,6 +8,7 @@
 //   Email: mara.strungaru@york.ac.uk
 //
 //   implementation based on the paper Phys. Rev. B 103, 024429, (2021) M.Strungaru, M.O.A. Ellis et al
+//
 //------------------------------------------------------------------------------
 //
 
