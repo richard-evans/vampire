@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -61,10 +62,7 @@ void command_line_args(int argc, char* argv[]){
             vmain::internal::input_file_name = std::string(argv[arg]);
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error - no file specified for \'--input-file\' command line option" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            err::fatal("Error - no file specified for \'--input-file\' command line option");
             return;
          }
       }
@@ -79,19 +77,15 @@ void command_line_args(int argc, char* argv[]){
             vout::output_file_name = std::string(argv[arg]);
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error - no file specified for \'--output-file\' command line option" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            err::fatal("Error - no file specified for \'--output-file\' command line option");
             return;
          }
       }
 
       else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         std::ostringstream message;
+         message << "Error - unknown command line parameter \'" << sw << "\'";
+         err::fatal(message.str());
          return;
       }
    }

@@ -91,10 +91,9 @@ int initialise(std::string const infile){
    // Read values from input files
    int iostat = vin::read(infile);
    if(iostat==EXIT_FAILURE){
-      terminaltextcolor(RED);
-      std::cerr << "Error - input file \'" << infile << "\' not found, exiting" << std::endl;
-      terminaltextcolor(WHITE);
-      err::vexit();
+      std::ostringstream message;
+      message << "Error - input file \'" << infile << "\' not found, exiting";
+      err::fatal(message.str());
    }
 
    // Print out material properties
