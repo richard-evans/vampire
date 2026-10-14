@@ -186,6 +186,9 @@ int main(int argc, char* argv[]){
       // Monte Carlo equilibration test
       if( !final_value_test("montecarlo/equilibrium", 1.0, 1.0e-4, exe ) ) fail += 1;
 
+      // Checkpoint tests: a run saved part way and continued must match an uninterrupted run exactly
+      if( !checkpoint_test("checkpoint/llg-heun", exe ) ) fail += 1;
+
       // Constants tests
       // gamma_SI: single spin precession — spin trajectory at t=9.74e-11 s with alpha=0.001
       if( serial_only("constants/gamma") && !integrator_test("constants/gamma", 9.74e-11, -0.127636, -0.991673, 0.0171491, exe ) ) fail += 1;
