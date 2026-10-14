@@ -37,8 +37,8 @@
 /// @version 1.0
 /// @date    30/03/2011
 /// @internal
-///	Created:		30/03/2011
-///	Revision:	--
+///   Created:    30/03/2011
+///   Revision:   --
 ///=====================================================================================
 ///
 
@@ -71,37 +71,37 @@ namespace program{
 /// @date    30/03/2011
 ///
 /// @internal
-///	Created:		30/03/2011
-///	Revision:	--
+///   Created:    30/03/2011
+///   Revision:   --
 ///=====================================================================================
 ///
 void field_cool(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "program::field_cool has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "program::field_cool has been called" << std::endl;}
 
-	// Perform several runs if desired
-	for(int run=0;run<sim::runs; run++){
+   // Perform several runs if desired
+   for(int run=0;run<sim::runs; run++){
 
-		// Set equilibration temperature and field
-		sim::temperature=sim::Teq;
+      // Set equilibration temperature and field
+      sim::temperature=sim::Teq;
 
-		// Equilibrate system
-		while(sim::time<sim::equilibration_time){
+      // Equilibrate system
+      while(sim::time<sim::equilibration_time){
 
-			sim::integrate(sim::partial_time);
+         sim::integrate(sim::partial_time);
 
-			// Calculate magnetisation statistics
-			stats::update();
+         // Calculate magnetisation statistics
+         stats::update();
 
-			// Output data
-			vout::data();
-		}
+         // Output data
+         vout::data();
+      }
 
-		uint64_t start_time = sim::time;
+      uint64_t start_time = sim::time;
 
-		// Perform Field Cooling
-		while(sim::time<sim::total_time+start_time){
+      // Perform Field Cooling
+      while(sim::time<sim::total_time+start_time){
 
          // loop over partial time
          for(uint64_t tt=0; tt < sim::partial_time; tt++){
@@ -135,15 +135,15 @@ void field_cool(){
             sim::integrate(1);
          }
 
-			// Calculate magnetisation statistics
-			stats::update();
+         // Calculate magnetisation statistics
+         stats::update();
 
-			// Output data
-			vout::data();
+         // Output data
+         vout::data();
 
-		}
+      }
 
-	} // end of run loop
+   } // end of run loop
 
 } // end of field_cool()
 

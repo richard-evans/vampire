@@ -21,8 +21,8 @@
 /// @version 1.0
 /// @date    30/03/2011
 /// @internal
-///	Created:		30/03/2011
-///	Revision:	--
+///   Created:    30/03/2011
+///   Revision:   --
 ///=====================================================================================
 ///
 
@@ -55,61 +55,61 @@ namespace program{
 /// @date    30/03/2011
 ///
 /// @internal
-///	Created:		30/03/2011
-///	Revision:	--
+///   Created:    30/03/2011
+///   Revision:   --
 ///=====================================================================================
 ///
 void fmr(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true) std::cout << "program::time_series has been called" << std::endl;
+   // check calling of routine if error checking is activated
+   if(err::check==true) std::cout << "program::time_series has been called" << std::endl;
 
-	double temp=sim::temperature;
+   double temp=sim::temperature;
 
-	// disable fmr fields for equilibration
-	sim::enable_fmr = false;
+   // disable fmr fields for equilibration
+   sim::enable_fmr = false;
 
    // Set equilibration temperature only if continue checkpoint not loaded
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
    else{
-	   sim::temperature=sim::Teq;
+      sim::temperature=sim::Teq;
    }
 
-	// Equilibrate system
-	while(sim::time<sim::equilibration_time){
+   // Equilibrate system
+   while(sim::time<sim::equilibration_time){
 
-		sim::integrate(sim::partial_time);
+      sim::integrate(sim::partial_time);
 
-		// Calculate magnetisation statistics
-		stats::update();
+      // Calculate magnetisation statistics
+      stats::update();
 
-		// Output data
-		vout::data();
-	}
+      // Output data
+      vout::data();
+   }
 
    // Set temperature and reset stats only if continue checkpoint not loaded
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
    else{
 
       // set simulation temperature
-	   sim::temperature=temp;
+      sim::temperature=temp;
 
       // Reset mean magnetisation counters
       stats::reset();
 
    }
 
-	// enable fmr fields
-	sim::enable_fmr = true;
+   // enable fmr fields
+   sim::enable_fmr = true;
 
-	// Initialize direction along z if not already set
-	if(sim::fmr_field_unit_vector.size() != 3){
-		sim::fmr_field_unit_vector.resize(3,0.0);
-		sim::fmr_field_unit_vector[2] = 1.0;
-	}
+   // Initialize direction along z if not already set
+   if(sim::fmr_field_unit_vector.size() != 3){
+      sim::fmr_field_unit_vector.resize(3,0.0);
+      sim::fmr_field_unit_vector[2] = 1.0;
+   }
 
-	// Perform Time Series
-	while(sim::time<sim::equilibration_time+sim::total_time){
+   // Perform Time Series
+   while(sim::time<sim::equilibration_time+sim::total_time){
 
       // Integrate system
       sim::integrate(sim::partial_time);
@@ -120,7 +120,7 @@ void fmr(){
       // Output data
       vout::data();
 
-	}
+   }
 
 }
 

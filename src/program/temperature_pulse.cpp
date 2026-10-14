@@ -58,27 +58,27 @@ double double_pump_square_temperature_function(double ftime);
 /// Selects appropriate temperature pulse function according to user input
 double temperature_pulse_function(double function_time){
 
-	switch(sim::pump_function){
+   switch(sim::pump_function){
 
-		case(square):
-			return square_temperature_function(function_time);
-			break;
+      case(square):
+         return square_temperature_function(function_time);
+         break;
 
-		case(two_temperature):
-			return two_temperature_function(function_time);
-			break;
+      case(two_temperature):
+         return two_temperature_function(function_time);
+         break;
 
-		case(double_pump_two_temperature):
-			return double_pump_two_temperature_function(function_time);
-			break;
+      case(double_pump_two_temperature):
+         return double_pump_two_temperature_function(function_time);
+         break;
 
-		case(double_pump_square):
-			return double_pump_square_temperature_function(function_time);
-			break;
+      case(double_pump_square):
+         return double_pump_square_temperature_function(function_time);
+         break;
 
-		default:
-			return 0.0;
-	}
+      default:
+         return 0.0;
+   }
 }
 
 ///-----------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ double two_temperature_function(double ftime){
    // 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
    const double two_delta_sqrt_pi_ln_2 = 9394372.787;
    const double pump=sim::pump_power*two_delta_sqrt_pi_ln_2*
-   						exp(-four_ln_2*reduced_time*reduced_time)*i_pump_time;
+                     exp(-four_ln_2*reduced_time*reduced_time)*i_pump_time;
 
    const double Te = sim::TTTe;
    const double Tp = sim::TTTp;
@@ -127,10 +127,10 @@ double two_temperature_function(double ftime){
    const double Cl = sim::TTCl;
    const double dt = mp::dt_SI;
 
-	// integrate two temperature model (floor in free elecron approximation (c prop to T) for low temperatures)
-	if(Te>1.0) sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
-	else sim::TTTe =       (-G*(Te-Tp)+pump)*dt/Ce + Te;
-	sim::TTTp =            ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
+   // integrate two temperature model (floor in free elecron approximation (c prop to T) for low temperatures)
+   if(Te>1.0) sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
+   else sim::TTTe =       (-G*(Te-Tp)+pump)*dt/Ce + Te;
+   sim::TTTp =            ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
    // Optionally set material specific temperatures
    if(sim::local_temperature==true){
@@ -147,31 +147,31 @@ double two_temperature_function(double ftime){
 /// Calculates temperature for double Gaussian pulses using the two-temperature model
 double double_pump_two_temperature_function(double ftime){
 
-	const double four_ln_2 = 2.77258872224; // 4 ln 2
-	// 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
-	const double two_delta_sqrt_pi_ln_2 = 9394372.787;
+   const double four_ln_2 = 2.77258872224; // 4 ln 2
+   // 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
+   const double two_delta_sqrt_pi_ln_2 = 9394372.787;
 
-	const double i_pump_time1 = 1.0/sim::pump_time;
-	const double reduced_time1 = (ftime-3.*sim::pump_time)*i_pump_time1;
-	const double pump1=sim::pump_power*two_delta_sqrt_pi_ln_2*
-							exp(-four_ln_2*reduced_time1*reduced_time1)*i_pump_time1;
+   const double i_pump_time1 = 1.0/sim::pump_time;
+   const double reduced_time1 = (ftime-3.*sim::pump_time)*i_pump_time1;
+   const double pump1=sim::pump_power*two_delta_sqrt_pi_ln_2*
+                     exp(-four_ln_2*reduced_time1*reduced_time1)*i_pump_time1;
 
-	const double i_pump_time2 = 1.0/sim::double_pump_time;
-	const double reduced_time2 = (ftime-sim::double_pump_delay-3.*sim::double_pump_time)*i_pump_time2;
-	const double pump2=sim::double_pump_power*two_delta_sqrt_pi_ln_2*
-							exp(-four_ln_2*reduced_time2*reduced_time2)*i_pump_time2;
+   const double i_pump_time2 = 1.0/sim::double_pump_time;
+   const double reduced_time2 = (ftime-sim::double_pump_delay-3.*sim::double_pump_time)*i_pump_time2;
+   const double pump2=sim::double_pump_power*two_delta_sqrt_pi_ln_2*
+                     exp(-four_ln_2*reduced_time2*reduced_time2)*i_pump_time2;
 
-		const double Te = sim::TTTe;
-		const double Tp = sim::TTTp;
-		const double G  = sim::TTG;
-		const double Ce = sim::TTCe;
-		const double Cl = sim::TTCl;
-		const double dt = mp::dt_SI;
+      const double Te = sim::TTTe;
+      const double Tp = sim::TTTp;
+      const double G  = sim::TTG;
+      const double Ce = sim::TTCe;
+      const double Cl = sim::TTCl;
+      const double dt = mp::dt_SI;
 
-		// integrate two temperature model (floor in free elecron approximation (c prop to T) for low temperatures)
-		if(Te>1.0) sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/(Ce*Te) + Te;
-		else sim::TTTe =       (-G*(Te-Tp)+pump1+pump2)*dt/Ce + Te;
-		sim::TTTp =            ( G*(Te-Tp)            )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
+      // integrate two temperature model (floor in free elecron approximation (c prop to T) for low temperatures)
+      if(Te>1.0) sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/(Ce*Te) + Te;
+      else sim::TTTe =       (-G*(Te-Tp)+pump1+pump2)*dt/Ce + Te;
+      sim::TTTp =            ( G*(Te-Tp)            )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
       // Optionally set material specific temperatures
       if(sim::local_temperature==true){
@@ -181,48 +181,48 @@ double double_pump_two_temperature_function(double ftime){
          }
       }
 
-		return sim::TTTe;
+      return sim::TTTe;
 }
 
 /// Calculates temperature for single square pulse
 double square_temperature_function(double ftime){
 
-	//
-	///
-	///
-	///            Tmax   |---------------|
-	///                   |               |
-	///                   |               |
-	/// ------------------|               |--------------- Teq
-	///                    <- pump time ->
-	//
+   //
+   ///
+   ///
+   ///            Tmax   |---------------|
+   ///                   |               |
+   ///                   |               |
+   /// ------------------|               |--------------- Teq
+   ///                    <- pump time ->
+   //
 
-	if(ftime <= sim::pump_time) return sim::Tmax;
-	else return sim::Teq;
+   if(ftime <= sim::pump_time) return sim::Tmax;
+   else return sim::Teq;
 
 }
 
 /// Calculates temperature for double square pulse
 double double_pump_square_temperature_function(double ftime){
 
-	///
-	///          0               t1                t2              t3
-	///
-	///   Tmax   |---------------|
-	///          |               |                 |---------------| double_pump_Tmax
-	///          |               |                 |               |
-	/// ---------|  -  -  -  -   |-----------------|   -   -   -   |------------ Teq
-	///
-	///           <- pump time -> <- dpump_delay -> <- pump time2 ->
-	///
+   ///
+   ///          0               t1                t2              t3
+   ///
+   ///   Tmax   |---------------|
+   ///          |               |                 |---------------| double_pump_Tmax
+   ///          |               |                 |               |
+   /// ---------|  -  -  -  -   |-----------------|   -   -   -   |------------ Teq
+   ///
+   ///           <- pump time -> <- dpump_delay -> <- pump time2 ->
+   ///
 
-	const double t1 = sim::pump_time;
-	const double t2 = t1+sim::double_pump_delay;
-	const double t3 = t2+sim::double_pump_time;
+   const double t1 = sim::pump_time;
+   const double t2 = t1+sim::double_pump_delay;
+   const double t3 = t2+sim::double_pump_time;
 
-	if(ftime <= t1) return sim::Tmax;
-	else if( (ftime > t2) && (ftime <=t3) ) return sim::double_pump_Tmax;
-	else return sim::Teq;
+   if(ftime <= t1) return sim::Tmax;
+   else if( (ftime > t2) && (ftime <=t3) ) return sim::double_pump_Tmax;
+   else return sim::Teq;
 
 }
 
@@ -239,21 +239,21 @@ namespace program{
 /// @date    06/04/2011
 ///
 /// @internal
-///	Created:		10/03/2010
-///	Revision:	06/04/2011
+///   Created:    10/03/2010
+///   Revision:   06/04/2011
 ///=====================================================================================
 ///
 void temperature_pulse(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "program::two_temperature_pulse has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "program::two_temperature_pulse has been called" << std::endl;}
 
-	// Set equilibration temperature and field
-	sim::temperature=sim::Teq;
+   // Set equilibration temperature and field
+   sim::temperature=sim::Teq;
 
-	// Initialise electron and phonon temperature
-	sim::TTTe=sim::temperature;
-	sim::TTTp=sim::temperature;
+   // Initialise electron and phonon temperature
+   sim::TTTe=sim::temperature;
+   sim::TTTp=sim::temperature;
 
    // If local temperature is set then also initalise local temperatures
    if(sim::local_temperature==true){
@@ -264,49 +264,49 @@ void temperature_pulse(){
    }
 
    // Equilibrate system
-	while(sim::time<sim::equilibration_time){
+   while(sim::time<sim::equilibration_time){
 
-		sim::integrate(sim::partial_time);
+      sim::integrate(sim::partial_time);
 
-		// Calculate magnetisation statistics
-		stats::update();
+      // Calculate magnetisation statistics
+      stats::update();
 
-		// Output data
-		vout::data();
-	}
+      // Output data
+      vout::data();
+   }
 
-	//loop sim::runs times
-	for(int r=0; r<sim::runs;r++){
+   //loop sim::runs times
+   for(int r=0; r<sim::runs;r++){
 
-	// record starting time after equiibration/last pulse
-	uint64_t start_time = sim::time;
+   // record starting time after equiibration/last pulse
+   uint64_t start_time = sim::time;
 
-	// Simulate temperature pulse
-	while(sim::time<sim::total_time+start_time){
+   // Simulate temperature pulse
+   while(sim::time<sim::total_time+start_time){
 
-		// loop over partial_time to update temperature every time
-		for(uint64_t tt=0; tt < sim::partial_time; tt++){
+      // loop over partial_time to update temperature every time
+      for(uint64_t tt=0; tt < sim::partial_time; tt++){
 
-			// Calculate time from pulse
-			double time_from_start=mp::dt_SI*double(sim::time-start_time);
+         // Calculate time from pulse
+         double time_from_start=mp::dt_SI*double(sim::time-start_time);
 
-			// Calculate temperature
-			sim::temperature=temperature_pulse_function(time_from_start);
+         // Calculate temperature
+         sim::temperature=temperature_pulse_function(time_from_start);
 
-			// Integrate system
-			sim::integrate(1);
+         // Integrate system
+         sim::integrate(1);
 
-		}
+      }
 
-		// Calculate magnetisation statistics
-		stats::update();
+      // Calculate magnetisation statistics
+      stats::update();
 
-		// Output data
-		vout::data();
+      // Output data
+      vout::data();
 
-	}
+   }
 
-	}
+   }
 
 } // end of temperature pulse
 

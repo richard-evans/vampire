@@ -34,8 +34,8 @@ namespace program{
 //------------------------------------------------------------------------------
 void mm_A_calculation(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true) std::cout << "program::A_calcultion has been called" << std::endl;
+   // check calling of routine if error checking is activated
+   if(err::check==true) std::cout << "program::A_calcultion has been called" << std::endl;
 
    double Jx,Jy,Jz;
    const double atomic_volume =  1e-30*unitcell::internal::unit_cell_size_x*unitcell::internal::unit_cell_size_x*unitcell::internal::unit_cell_size_x/cs::unit_cell.atom.size();

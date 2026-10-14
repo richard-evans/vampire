@@ -31,58 +31,58 @@ namespace program{
 //------------------------------------------------------------------------------
 void time_series(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true) std::cout << "program::time_series has been called" << std::endl;
+   // check calling of routine if error checking is activated
+   if(err::check==true) std::cout << "program::time_series has been called" << std::endl;
 
-	double temp=sim::temperature;
+   double temp=sim::temperature;
 
    // Set equilibration temperature only if continue checkpoint not loaded
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
    else{
-	   // Set equilibration temperature
-	   sim::temperature=sim::Teq;
+      // Set equilibration temperature
+      sim::temperature=sim::Teq;
    }
 
-	// Output data
-	vout::data();
+   // Output data
+   vout::data();
 
-	// Equilibrate system
-	while(sim::time<sim::equilibration_time){
+   // Equilibrate system
+   while(sim::time<sim::equilibration_time){
 
-		sim::integrate(sim::partial_time);
+      sim::integrate(sim::partial_time);
 
-		// Calculate magnetisation statistics
-		stats::update();
+      // Calculate magnetisation statistics
+      stats::update();
 
-		// Output data
-		vout::data();
-	}
+      // Output data
+      vout::data();
+   }
 
    // Set temperature and reset stats only if continue checkpoint not loaded
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
    else{
 
       // set simulation temperature
-	   sim::temperature = temp;
+      sim::temperature = temp;
 
       // Reset mean magnetisation counters
       stats::reset();
 
    }
 
-	// Perform Time Series
-	while(sim::time<sim::equilibration_time+sim::total_time){
+   // Perform Time Series
+   while(sim::time<sim::equilibration_time+sim::total_time){
 
-		// Integrate system
-		sim::integrate(sim::partial_time);
+      // Integrate system
+      sim::integrate(sim::partial_time);
 
-		// Calculate magnetisation statistics
-		stats::update();
+      // Calculate magnetisation statistics
+      stats::update();
 
-		// Output data
-		vout::data();
+      // Output data
+      vout::data();
 
-	}
+   }
 
 }
 

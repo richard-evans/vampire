@@ -37,8 +37,8 @@
 /// @version 1.1
 /// @date    09/03/2011
 /// @internal
-///	Created:		05/02/2011
-///	Revision:	09/03/2011
+///   Created:    05/02/2011
+///   Revision:   09/03/2011
 ///=====================================================================================
 ///
 
@@ -84,17 +84,17 @@ namespace program{
 /// @return EXIT_SUCCESS
 ///
 /// @internal
-///	Created:		11/01/2010
-///	Revision:	09/03/2011
+///   Created:    11/01/2010
+///   Revision:   09/03/2011
 ///=====================================================================================
 ///
 
 int curie_temperature(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "program::curie_temperature has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "program::curie_temperature has been called" << std::endl;}
 
-	// Set starting temperature
+   // Set starting temperature
    // Initialise sim::temperature
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
       sim::temperature+=sim::delta_temperature;
@@ -103,38 +103,38 @@ int curie_temperature(){
       sim::temperature=sim::Tmin;
    }
 
-	// Perform Temperature Loop
-	while(sim::temperature<=sim::Tmax){
+   // Perform Temperature Loop
+   while(sim::temperature<=sim::Tmax){
 
-		// Equilibrate system
-		sim::integrate(sim::equilibration_time);
+      // Equilibrate system
+      sim::integrate(sim::equilibration_time);
 
-		// Reset mean magnetisation counters
-		stats::reset();
+      // Reset mean magnetisation counters
+      stats::reset();
 
-		// Reset start time
-		int start_time=sim::time;
+      // Reset start time
+      int start_time=sim::time;
 
-		// Simulate system
-		while(sim::time<sim::loop_time+start_time){
+      // Simulate system
+      while(sim::time<sim::loop_time+start_time){
 
-			// Integrate system
-			sim::integrate(sim::partial_time);
+         // Integrate system
+         sim::integrate(sim::partial_time);
 
-			// Calculate magnetisation statistics
-			stats::update();
+         // Calculate magnetisation statistics
+         stats::update();
 
-		}
+      }
 
-		// Output data
-		vout::data();
+      // Output data
+      vout::data();
 
-		// Increment temperature
-		sim::temperature+=sim::delta_temperature;
+      // Increment temperature
+      sim::temperature+=sim::delta_temperature;
 
-	} // End of temperature loop
+   } // End of temperature loop
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 }//end of namespace program

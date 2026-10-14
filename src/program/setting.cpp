@@ -165,7 +165,7 @@ namespace program{
 
 
       for (int i = 0; i <atoms::num_atoms; i++){
-         //	std::cout << atoms::type_array[i] << "\t" << atoms::z_spin_array[i] <<std::endl;
+         // std::cout << atoms::type_array[i] << "\t" << atoms::z_spin_array[i] <<std::endl;
          if(atoms::type_array[i] > 3){
             atoms::x_spin_array[i] = sim::H_vec[0];
             atoms::y_spin_array[i] = sim::H_vec[1];

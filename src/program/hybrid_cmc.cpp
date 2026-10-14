@@ -37,8 +37,8 @@
 /// @version 1.1
 /// @date    09/03/2011
 /// @internal
-///	Created:		05/02/2011
-///	Revision:	09/03/2011
+///   Created:    05/02/2011
+///   Revision:   09/03/2011
 ///=====================================================================================
 ///
 
@@ -82,99 +82,99 @@ namespace program{
 /// @return void
 ///
 /// @internal
-///	Created:		02/11/2011
-///	Revision:	--/--/----
+///   Created:    02/11/2011
+///   Revision:   --/--/----
 ///=====================================================================================
 ///
 void hybrid_cmc(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "program::hybrid_cmc has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "program::hybrid_cmc has been called" << std::endl;}
 
-	// Check integrator is CMC, if not then exit disgracefully
-	if(integrate::integrator != integrate::integrator_t::hybrid_cmc){
-		terminaltextcolor(RED);
-		std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl;
-		terminaltextcolor(WHITE);
-		err::vexit();
-	}
+   // Check integrator is CMC, if not then exit disgracefully
+   if(integrate::integrator != integrate::integrator_t::hybrid_cmc){
+      terminaltextcolor(RED);
+      std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl;
+      terminaltextcolor(WHITE);
+      err::vexit();
+   }
 
-	// resize cmc array to include correct number of materials
-	montecarlo::cmc::cmc_mat.resize(mp::num_materials);
+   // resize cmc array to include correct number of materials
+   montecarlo::cmc::cmc_mat.resize(mp::num_materials);
 
-	// loop over all materials
-	for (int mat=0;mat<mp::num_materials;mat++){
+   // loop over all materials
+   for (int mat=0;mat<mp::num_materials;mat++){
 
-	// Set active material (used for calculating rotational update of spin directions)
-	montecarlo::cmc::active_material=mat;
+   // Set active material (used for calculating rotational update of spin directions)
+   montecarlo::cmc::active_material=mat;
 
-	// Output informative message to log file
+   // Output informative message to log file
    zlog << zTs() << "Starting Hybrid CMC loop for material " << mat << std::endl;
 
-	// set minimum rotational angle
-	montecarlo::cmc::cmc_mat[mat].constraint_theta=montecarlo::cmc::cmc_mat[mat].constraint_theta_min;
+   // set minimum rotational angle
+   montecarlo::cmc::cmc_mat[mat].constraint_theta=montecarlo::cmc::cmc_mat[mat].constraint_theta_min;
 
-	// perform rotational angle sweep
-	while(montecarlo::cmc::cmc_mat[mat].constraint_theta<=montecarlo::cmc::cmc_mat[mat].constraint_theta_max){
+   // perform rotational angle sweep
+   while(montecarlo::cmc::cmc_mat[mat].constraint_theta<=montecarlo::cmc::cmc_mat[mat].constraint_theta_max){
 
-		// set minimum azimuthal angle
-		montecarlo::cmc::cmc_mat[mat].constraint_phi=montecarlo::cmc::cmc_mat[mat].constraint_phi_min;
+      // set minimum azimuthal angle
+      montecarlo::cmc::cmc_mat[mat].constraint_phi=montecarlo::cmc::cmc_mat[mat].constraint_phi_min;
 
-		// perform azimuthal angle sweep
-		while(montecarlo::cmc::cmc_mat[mat].constraint_phi<=montecarlo::cmc::cmc_mat[mat].constraint_phi_max){
+      // perform azimuthal angle sweep
+      while(montecarlo::cmc::cmc_mat[mat].constraint_phi<=montecarlo::cmc::cmc_mat[mat].constraint_phi_max){
 
-			// Re-initialise spin moments for CMC
-			montecarlo::CMCMCinit();
+         // Re-initialise spin moments for CMC
+         montecarlo::CMCMCinit();
 
-			// Set starting temperature
-			sim::temperature=sim::Tmin;
+         // Set starting temperature
+         sim::temperature=sim::Tmin;
 
-			// Perform Temperature Loop
-			while(sim::temperature<=sim::Tmax){
+         // Perform Temperature Loop
+         while(sim::temperature<=sim::Tmax){
 
-				// Equilibrate system
-				sim::integrate(sim::equilibration_time);
+            // Equilibrate system
+            sim::integrate(sim::equilibration_time);
 
-				// Reset mean magnetisation counters
-				stats::reset();
+            // Reset mean magnetisation counters
+            stats::reset();
 
-				// Reset start time
-				int start_time=sim::time;
+            // Reset start time
+            int start_time=sim::time;
 
-				// Simulate system
-				while(sim::time<sim::loop_time+start_time){
+            // Simulate system
+            while(sim::time<sim::loop_time+start_time){
 
-					// Integrate system
-					sim::integrate(sim::partial_time);
+               // Integrate system
+               sim::integrate(sim::partial_time);
 
-					// Calculate magnetisation statistics
-					stats::update();
+               // Calculate magnetisation statistics
+               stats::update();
 
-				}
+            }
 
-				// Output data
-				vout::data();
+            // Output data
+            vout::data();
 
-				// Increment temperature
-				sim::temperature+=sim::delta_temperature;
+            // Increment temperature
+            sim::temperature+=sim::delta_temperature;
 
-			} // End of temperature loop
+         } // End of temperature loop
 
-			// Increment azimuthal angle
-			if(montecarlo::cmc::cmc_mat[mat].constraint_phi+montecarlo::cmc::cmc_mat[mat].constraint_phi_delta>montecarlo::cmc::cmc_mat[mat].constraint_phi_max) break;
-			montecarlo::cmc::cmc_mat[mat].constraint_phi+=montecarlo::cmc::cmc_mat[mat].constraint_phi_delta;
-			sim::constraint_phi_changed=true;
-		} // End of azimuthal angle sweep
-		if(vout::gnuplot_array_format) zmag << std::endl;
+         // Increment azimuthal angle
+         if(montecarlo::cmc::cmc_mat[mat].constraint_phi+montecarlo::cmc::cmc_mat[mat].constraint_phi_delta>montecarlo::cmc::cmc_mat[mat].constraint_phi_max) break;
+         montecarlo::cmc::cmc_mat[mat].constraint_phi+=montecarlo::cmc::cmc_mat[mat].constraint_phi_delta;
+         sim::constraint_phi_changed=true;
+      } // End of azimuthal angle sweep
+      if(vout::gnuplot_array_format) zmag << std::endl;
 
-		// Increment rotational angle
-		if(montecarlo::cmc::cmc_mat[mat].constraint_theta+montecarlo::cmc::cmc_mat[mat].constraint_theta_delta>montecarlo::cmc::cmc_mat[mat].constraint_theta_max) break;
-		montecarlo::cmc::cmc_mat[mat].constraint_theta+=montecarlo::cmc::cmc_mat[mat].constraint_theta_delta;
-		sim::constraint_theta_changed=true;
-	} // End of rotational angle sweep
+      // Increment rotational angle
+      if(montecarlo::cmc::cmc_mat[mat].constraint_theta+montecarlo::cmc::cmc_mat[mat].constraint_theta_delta>montecarlo::cmc::cmc_mat[mat].constraint_theta_max) break;
+      montecarlo::cmc::cmc_mat[mat].constraint_theta+=montecarlo::cmc::cmc_mat[mat].constraint_theta_delta;
+      sim::constraint_theta_changed=true;
+   } // End of rotational angle sweep
 
-	} // end of material loop
-	return;
+   } // end of material loop
+   return;
 }
 
 /// @brief Function to calculate the temperature dependence of the anisotropy and magnetisation
@@ -210,9 +210,9 @@ void reverse_hybrid_cmc(){
 
    // Check integrator is CMC, if not then exit disgracefully
    if(integrate::integrator != integrate::integrator_t::hybrid_cmc){
-	  terminaltextcolor(RED);
+     terminaltextcolor(RED);
       std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl;
-	  terminaltextcolor(WHITE);
+     terminaltextcolor(WHITE);
       err::vexit();
    }
 

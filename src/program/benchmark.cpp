@@ -37,8 +37,8 @@
 /// @version 1.1
 /// @date    09/03/2011
 /// @internal
-///	Created:		05/02/2011
-///	Revision:	09/03/2011
+///   Created:    05/02/2011
+///   Revision:   09/03/2011
 ///=====================================================================================
 ///
 
@@ -57,27 +57,27 @@
 namespace program{
 
 int bmark(){
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
 
-	// Calculate magnetisation statistics
-	stats::update();
-	
-	// Output data
-	vout::data();
+   // Calculate magnetisation statistics
+   stats::update();
 
-	// Simulate system
-	while(sim::time<sim::total_time){
-		sim::integrate(sim::partial_time);
+   // Output data
+   vout::data();
 
-		// Calculate mag_m, mag after sim::partial_time steps
-		stats::update();
+   // Simulate system
+   while(sim::time<sim::total_time){
+      sim::integrate(sim::partial_time);
 
-		vout::data();
+      // Calculate mag_m, mag after sim::partial_time steps
+      stats::update();
 
-	} // end of time loop
+      vout::data();
 
-	return EXIT_SUCCESS;
+   } // end of time loop
+
+   return EXIT_SUCCESS;
 }
 
 }//end of namespace program

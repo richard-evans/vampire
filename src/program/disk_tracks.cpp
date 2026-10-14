@@ -35,8 +35,8 @@
 /// @version 1.0
 /// @date    30/03/2011
 /// @internal
-///	Created:		30/03/2011
-///	Revision:	--
+///   Created:    30/03/2011
+///   Revision:   --
 ///=====================================================================================
 ///
 
@@ -107,8 +107,8 @@ namespace tp{
 // }
 
 double sign(double a){
-		if(a<0.0) return -1.0;
-		else return 1.0;
+      if(a<0.0) return -1.0;
+      else return 1.0;
 }
 
 
@@ -391,7 +391,7 @@ void tracks(){
     vout::data();
 
 
-	}
+   }
  }
 
 
@@ -470,7 +470,7 @@ else {
 
           sim::Ms = sim::Ms - sim::LFA_scan_field_step;
 
-	       }
+          }
        }
 
        else {
@@ -517,7 +517,7 @@ else {
 
          sim::Ms = sim::Ms + sim::LFA_scan_field_step;
 
-	      }
+         }
       }
 
     }

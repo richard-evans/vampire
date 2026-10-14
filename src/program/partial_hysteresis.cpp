@@ -48,8 +48,8 @@ namespace program{
 /// @return EXIT_SUCCESS
 ///
 /// @internal
-///	Created:		02/12/2013
-///	Revision:	  ---
+///   Created:    02/12/2013
+///   Revision:     ---
 ///=====================================================================================
 ///
 void partial_hysteresis_loop(){
