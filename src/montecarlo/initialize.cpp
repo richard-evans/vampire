@@ -59,8 +59,8 @@ namespace montecarlo{
          // standard mode with global constraint (integrator = cmc)
          if(integrate::integrator == integrate::integrator_t::cmc){
             // these should be refactored into the mc module
-            const double constraint_phi   = sim::constraint_phi;
-            const double constraint_theta = sim::constraint_theta;
+            const double constraint_phi   = montecarlo::constraint_phi;
+            const double constraint_theta = montecarlo::constraint_theta;
 
             // deep copy the grain numbers to mask
             std::vector<int> constraint_mask = grain_array;

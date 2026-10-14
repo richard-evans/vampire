@@ -22,6 +22,7 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vutil.hpp"
+#include "montecarlo.hpp"
 #include "program.hpp"
 
 //-----------------------------------------------------------------------------
@@ -39,10 +40,10 @@ void save_checkpoint(){
    int64_t output_atoms_file_counter64 = int64_t(sim::output_atoms_file_counter);
    int64_t output_cells_file_counter64 = int64_t(sim::output_cells_file_counter);
    int64_t output_rate_counter64 = int64_t(sim::output_rate_counter);
-   double constr_theta = sim::constraint_theta;
-   double constr_phi   = sim::constraint_phi;
-   bool flag_constraint_theta_changed = sim::constraint_theta_changed;
-   bool flag_constraint_phi_changed   = sim::constraint_phi_changed;
+   double constr_theta = montecarlo::constraint_theta;
+   double constr_phi   = montecarlo::constraint_phi;
+   bool flag_constraint_theta_changed = montecarlo::constraint_theta_changed;
+   bool flag_constraint_phi_changed   = montecarlo::constraint_phi_changed;
 
    // determine checkpoint file name
    std::stringstream chkfilenamess;
@@ -215,10 +216,10 @@ void load_checkpoint(){
       sim::output_atoms_file_counter = output_atoms_file_counter64;
       sim::output_cells_file_counter = output_cells_file_counter64;
       sim::output_rate_counter = output_rate_counter64;
-      sim::constraint_theta = constr_theta;
-      sim::constraint_phi = constr_phi;
-      sim::constraint_theta_changed = flag_constraint_theta_changed;
-      sim::constraint_phi_changed   = flag_constraint_phi_changed  ;
+      montecarlo::constraint_theta = constr_theta;
+      montecarlo::constraint_phi = constr_phi;
+      montecarlo::constraint_theta_changed = flag_constraint_theta_changed;
+      montecarlo::constraint_phi_changed   = flag_constraint_phi_changed  ;
    }
 
    // Load spin positions

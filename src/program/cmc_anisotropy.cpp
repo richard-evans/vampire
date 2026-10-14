@@ -79,24 +79,24 @@ void cmc_anisotropy(){
    // set minimum rotational angle
    // if checkpoint is loaded, then update minimum values of temperature and constrained angles
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::checkpoint_loaded_flag==true){
-      zlog << zTs() << "Constrained angles theta loaded from checkpoint " << sim::constraint_theta <<  std::endl;
+      zlog << zTs() << "Constrained angles theta loaded from checkpoint " << montecarlo::constraint_theta <<  std::endl;
    }
    else{
-      sim::constraint_theta=sim::constraint_theta_min;
+      montecarlo::constraint_theta=montecarlo::constraint_theta_min;
    }
 
    // perform rotational angle sweep
-   while(sim::constraint_theta<=sim::constraint_theta_max){
+   while(montecarlo::constraint_theta<=montecarlo::constraint_theta_max){
 
       // set minimum azimuthal angle
       // if checkpoint is loaded, then update minimum values of temperature and constrained angles
       if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::checkpoint_loaded_flag==true){
-         zlog << zTs() << "Constrained angle phi loaded from checkpoint: " << sim::constraint_phi << std::endl;
+         zlog << zTs() << "Constrained angle phi loaded from checkpoint: " << montecarlo::constraint_phi << std::endl;
       }
-      else sim::constraint_phi=sim::constraint_phi_min;
+      else montecarlo::constraint_phi=montecarlo::constraint_phi_min;
 
       // perform azimuthal angle sweep
-      while(sim::constraint_phi<=sim::constraint_phi_max){
+      while(montecarlo::constraint_phi<=montecarlo::constraint_phi_max){
 
          // Re-initialise spin moments for CMC
          montecarlo::CMCinit();
@@ -144,15 +144,15 @@ void cmc_anisotropy(){
          } // End of temperature loop
 
          // Increment azimuthal angle
-         sim::constraint_phi+=sim::constraint_phi_delta;
-         sim::constraint_phi_changed=true;
+         montecarlo::constraint_phi+=montecarlo::constraint_phi_delta;
+         montecarlo::constraint_phi_changed=true;
 
       } // End of azimuthal angle sweep
       if(vout::gnuplot_array_format) zmag << std::endl;
 
       // Increment rotational angle
-      sim::constraint_theta+=sim::constraint_theta_delta;
-      sim::constraint_theta_changed=true;
+      montecarlo::constraint_theta+=montecarlo::constraint_theta_delta;
+      montecarlo::constraint_theta_changed=true;
 
    } // End of rotational angle sweep
 

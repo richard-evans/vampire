@@ -17,6 +17,7 @@
 // Vampire headers
 #include "errors.hpp"
 #include "integrate.hpp"
+#include "montecarlo.hpp"
 #include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -513,7 +514,7 @@ namespace sim{
       //--------------------------------------------------------------------
       test="constraint-rotation-update";
       if(word==test){
-         sim::constraint_rotation=true;
+         montecarlo::constraint_rotation=true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -521,7 +522,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_theta=angle;
+         montecarlo::constraint_theta=angle;
          return true;
       }
       //--------------------------------------------------------------------
@@ -529,7 +530,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_theta_min=angle;
+         montecarlo::constraint_theta_min=angle;
          return true;
       }
       //--------------------------------------------------------------------
@@ -537,7 +538,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_theta_max=angle;
+         montecarlo::constraint_theta_max=angle;
          return true;
       }
       //--------------------------------------------------------------------
@@ -545,7 +546,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_theta_delta=angle;
+         montecarlo::constraint_theta_delta=angle;
          return true;
       }
       //--------------------------------------------------------------------
@@ -553,7 +554,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_phi=angle;
+         montecarlo::constraint_phi=angle;
          return true;
       }
       //--------------------------------------------------------------------
@@ -561,7 +562,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_phi_min=angle;
+         montecarlo::constraint_phi_min=angle;
          return true;
       }
       //--------------------------------------------------------------------
@@ -569,7 +570,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_phi_max=angle;
+         montecarlo::constraint_phi_max=angle;
          return true;
       }
       //--------------------------------------------------------------------
@@ -577,7 +578,7 @@ namespace sim{
       if(word==test){
          double angle=atof(value.c_str());
          vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
-         sim::constraint_phi_delta=angle;
+         montecarlo::constraint_phi_delta=angle;
          return true;
       }
       //--------------------------------------------------------------------

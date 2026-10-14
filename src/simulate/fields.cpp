@@ -25,6 +25,7 @@
 #include "dipole.hpp"
 #include "hamr.hpp"
 #include "ltmp.hpp"
+#include "montecarlo.hpp"
 #include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -475,9 +476,9 @@ void calculate_lagrange_fields(const int start_index,const int end_index){
    const double lz=program::lagrange_lambda_z;
 
    // Constraint vector
-   const double nu_x=cos(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
-   const double nu_y=sin(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
-   const double nu_z=cos(sim::constraint_phi*M_PI/180.0);
+   const double nu_x=cos(montecarlo::constraint_theta*M_PI/180.0)*sin(montecarlo::constraint_phi*M_PI/180.0);
+   const double nu_y=sin(montecarlo::constraint_theta*M_PI/180.0)*sin(montecarlo::constraint_phi*M_PI/180.0);
+   const double nu_z=cos(montecarlo::constraint_phi*M_PI/180.0);
 
    // Magnetisation
    const double imm=1.0/program::lagrange_m;

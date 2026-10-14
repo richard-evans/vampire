@@ -210,18 +210,18 @@ void CMCinit(){
    if(err::check==true) std::cout << "montecarlo::CMCinit has been called" << std::endl;
 
    // Create rotational matrices for cmc
-   cmc::polar_rot_matrix(sim::constraint_phi,sim::constraint_theta, cmc::polar_matrix, cmc::polar_matrix_tp, cmc::polar_vector);
+   cmc::polar_rot_matrix(montecarlo::constraint_phi,montecarlo::constraint_theta, cmc::polar_matrix, cmc::polar_matrix_tp, cmc::polar_vector);
 
    // Check for rotational update
-   if((sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)) && sim::checkpoint_loaded_flag==false){
+   if((montecarlo::constraint_rotation==false || (montecarlo::constraint_theta_changed==false && montecarlo::constraint_phi_changed==false)) && sim::checkpoint_loaded_flag==false){
 
       // Output message showing constraint direction re-initialisation
-      zlog << zTs() << "Initialising spins to new constraint direction (phi, theta) " <<  sim::constraint_phi << " , " << sim::constraint_theta << std::endl;
+      zlog << zTs() << "Initialising spins to new constraint direction (phi, theta) " <<  montecarlo::constraint_phi << " , " << montecarlo::constraint_theta << std::endl;
 
       // Initialise all spins along the constraint direction.
-      double sx=sin(sim::constraint_phi*M_PI/180.0)*cos(sim::constraint_theta*M_PI/180.0);
-      double sy=sin(sim::constraint_phi*M_PI/180.0)*sin(sim::constraint_theta*M_PI/180.0);
-      double sz=cos(sim::constraint_phi*M_PI/180.0);
+      double sx=sin(montecarlo::constraint_phi*M_PI/180.0)*cos(montecarlo::constraint_theta*M_PI/180.0);
+      double sy=sin(montecarlo::constraint_phi*M_PI/180.0)*sin(montecarlo::constraint_theta*M_PI/180.0);
+      double sz=cos(montecarlo::constraint_phi*M_PI/180.0);
 
       for(int atom =0;atom<atoms::num_atoms;atom++){
          atoms::x_spin_array[atom]=sx;
@@ -237,20 +237,20 @@ void CMCinit(){
 
       // Output message showing constraint direction re-initialisation
       zlog << zTs() << "Initialising spins by rotation from last constraint direction to new constraint direction (phi, theta) "
-      <<  sim::constraint_phi << " , " << sim::constraint_theta << std::endl;
+      <<  montecarlo::constraint_phi << " , " << montecarlo::constraint_theta << std::endl;
 
       // Rotate spins from old to new constraint direction
 
       // Determine angles to rotate spins by
-      double theta_old = sim::constraint_theta;
-      double theta_new = sim::constraint_theta;
+      double theta_old = montecarlo::constraint_theta;
+      double theta_new = montecarlo::constraint_theta;
 
-      double phi_old = sim::constraint_phi;
-      double phi_new = sim::constraint_phi;
+      double phi_old = montecarlo::constraint_phi;
+      double phi_new = montecarlo::constraint_phi;
 
-      // note - sim::constraint_phi, sim::constraint_theta are already at new angle
-      if(sim::constraint_theta_changed) theta_old = sim::constraint_theta - sim::constraint_theta_delta;
-      if(sim::constraint_phi_changed) phi_old     = sim::constraint_phi   - sim::constraint_phi_delta;
+      // note - montecarlo::constraint_phi, montecarlo::constraint_theta are already at new angle
+      if(montecarlo::constraint_theta_changed) theta_old = montecarlo::constraint_theta - montecarlo::constraint_theta_delta;
+      if(montecarlo::constraint_phi_changed) phi_old     = montecarlo::constraint_phi   - montecarlo::constraint_phi_delta;
 
       // Rotate all spins from theta_old to theta = 0 (reference direction along x)
       cmc::rotate_spins_around_z_axis(-theta_old);
@@ -262,8 +262,8 @@ void CMCinit(){
       cmc::rotate_spins_around_z_axis(theta_new);
 
       // reset rotation flags
-      sim::constraint_theta_changed = false;
-      sim::constraint_phi_changed   = false;
+      montecarlo::constraint_theta_changed = false;
+      montecarlo::constraint_phi_changed   = false;
 
    }
 

@@ -260,8 +260,8 @@ void exchange_stiffness(){
       montecarlo::initialise_masked_cmc_mc(constraint_mask.size(), constraint_mask, constrained, phi_theta_constraints);
 
       // set global constrained angle variables for data output (not used)
-      sim::constraint_phi = phi_theta_constraints[2];
-      sim::constraint_theta = phi_theta_constraints[3];
+      montecarlo::constraint_phi = phi_theta_constraints[2];
+      montecarlo::constraint_theta = phi_theta_constraints[3];
 
       // initialise temperature
       sim::temperature=sim::Tmin;

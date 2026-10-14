@@ -68,6 +68,23 @@ namespace montecarlo{
                                  const std::vector<double>& constraints);  // list of 2N vectors listing constraint angles theta and phi
 
    extern bool mc_parallel_initialized;
+
+   // constraint angles for constrained Monte Carlo (sim:constraint-angle-* keywords)
+   extern double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
+   extern double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
+
+   extern bool constraint_rotation; /// enables rotation of spins to new constraint direction
+   extern bool constraint_phi_changed; /// flag to note change in phi
+   extern bool constraint_theta_changed; /// flag to note change in theta
+
+   extern double constraint_phi_min; /// loop angle min [degrees]
+   extern double constraint_phi_max; /// loop angle max [degrees]
+   extern double constraint_phi_delta; /// loop angle delta [degrees]
+
+   extern double constraint_theta_min; /// loop angle min [degrees]
+   extern double constraint_theta_max; /// loop angle max [degrees]
+   extern double constraint_theta_delta; /// loop angle delta [degrees]
+
    extern bool lsf_mc_parallel_initialized;
 
    //---------------------------------------------------------------------------

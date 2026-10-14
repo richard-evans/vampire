@@ -222,7 +222,7 @@ void CMCMCinit(){
    }
 
       // Check for rotational update
-   if(sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)){
+   if(montecarlo::constraint_rotation==false || (montecarlo::constraint_theta_changed==false && montecarlo::constraint_phi_changed==false)){
 
       // Output message showing constraint direction re-initialisation
       zlog << zTs() << "Initialising spins in all materials to new constraint directions." << std::endl;
@@ -256,9 +256,9 @@ void CMCMCinit(){
       double phi_old = cmc::cmc_mat[cmc::active_material].constraint_phi;
       double phi_new = cmc::cmc_mat[cmc::active_material].constraint_phi;
 
-      // note - sim::constraint_phi, sim::constraint_theta are already at new angle
-      if(sim::constraint_theta_changed) theta_old = cmc::cmc_mat[cmc::active_material].constraint_theta - cmc::cmc_mat[cmc::active_material].constraint_theta_delta;
-      if(sim::constraint_phi_changed) phi_old     = cmc::cmc_mat[cmc::active_material].constraint_phi - cmc::cmc_mat[cmc::active_material].constraint_phi_delta;
+      // note - montecarlo::constraint_phi, montecarlo::constraint_theta are already at new angle
+      if(montecarlo::constraint_theta_changed) theta_old = cmc::cmc_mat[cmc::active_material].constraint_theta - cmc::cmc_mat[cmc::active_material].constraint_theta_delta;
+      if(montecarlo::constraint_phi_changed) phi_old     = cmc::cmc_mat[cmc::active_material].constraint_phi - cmc::cmc_mat[cmc::active_material].constraint_phi_delta;
 
       // Rotate all spins in active material from theta_old to theta = 0 (reference direction along x)
       cmc::rotate_material_spins_around_z_axis(-theta_old, cmc::active_material);
@@ -270,8 +270,8 @@ void CMCMCinit(){
       cmc::rotate_material_spins_around_z_axis(theta_new, cmc::active_material);
 
       // reset rotation flags
-      sim::constraint_theta_changed = false;
-      sim::constraint_phi_changed   = false;
+      montecarlo::constraint_theta_changed = false;
+      montecarlo::constraint_phi_changed   = false;
 
    }
 

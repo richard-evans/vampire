@@ -60,21 +60,6 @@ namespace sim{
 
    extern double demag_factor[3];
 
-   extern double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
-   extern double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
-
-   extern bool constraint_rotation; /// enables rotation of spins to new constraint direction
-   extern bool constraint_phi_changed; /// flag to note change in phi
-   extern bool constraint_theta_changed; /// flag to note change in theta
-
-   extern double constraint_phi_min; /// loop angle min [degrees]
-   extern double constraint_phi_max; /// loop angle max [degrees]
-   extern double constraint_phi_delta; /// loop angle delta [degrees]
-
-   extern double constraint_theta_min; /// loop angle min [degrees]
-   extern double constraint_theta_max; /// loop angle max [degrees]
-   extern double constraint_theta_delta; /// loop angle delta [degrees]
-
    // Monte Carlo variables
    extern int num_monte_carlo_preconditioning_steps;
 

@@ -17,6 +17,7 @@
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -49,9 +50,9 @@ void update_lagrange_lambda(){
    program::lagrange_m = mm[3];
 
    // Constraint vector
-   const double nu_x=cos(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
-   const double nu_y=sin(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
-   const double nu_z=cos(sim::constraint_phi*M_PI/180.0);
+   const double nu_x=cos(montecarlo::constraint_theta*M_PI/180.0)*sin(montecarlo::constraint_phi*M_PI/180.0);
+   const double nu_y=sin(montecarlo::constraint_theta*M_PI/180.0)*sin(montecarlo::constraint_phi*M_PI/180.0);
+   const double nu_z=cos(montecarlo::constraint_phi*M_PI/180.0);
 
    double lx = -program::lagrange_N*(mx-nu_x);
    double ly = -program::lagrange_N*(my-nu_y);
@@ -95,18 +96,18 @@ void lagrange_multiplier(){
    sim::thermal_field_enabled = false;
 
    // set minimum rotational angle
-   sim::constraint_theta=sim::constraint_theta_min;
+   montecarlo::constraint_theta=montecarlo::constraint_theta_min;
 
    // perform rotational angle sweep
-   while(sim::constraint_theta<=sim::constraint_theta_max){
+   while(montecarlo::constraint_theta<=montecarlo::constraint_theta_max){
 
       // set minimum azimuthal angle
-      sim::constraint_phi=sim::constraint_phi_min;
+      montecarlo::constraint_phi=montecarlo::constraint_phi_min;
 
       // perform azimuthal angle sweep
-      while(sim::constraint_phi<=sim::constraint_phi_max){
+      while(montecarlo::constraint_phi<=montecarlo::constraint_phi_max){
 
-         zlog << zTs() << "Constraint of theta =  " << sim::constraint_theta << ", phi = " << sim::constraint_phi << std::endl;
+         zlog << zTs() << "Constraint of theta =  " << montecarlo::constraint_theta << ", phi = " << montecarlo::constraint_phi << std::endl;
 
          // Reset start time
          int start_time=sim::time;
@@ -135,15 +136,15 @@ void lagrange_multiplier(){
          vout::data();
 
          // Increment azimuthal angle
-         sim::constraint_phi+=sim::constraint_phi_delta;
-         sim::constraint_phi_changed=true;
+         montecarlo::constraint_phi+=montecarlo::constraint_phi_delta;
+         montecarlo::constraint_phi_changed=true;
 
       } // End of azimuthal angle sweep
       if(vout::gnuplot_array_format) zmag << std::endl;
 
       // Increment rotational angle
-      sim::constraint_theta+=sim::constraint_theta_delta;
-      sim::constraint_theta_changed=true;
+      montecarlo::constraint_theta+=montecarlo::constraint_theta_delta;
+      montecarlo::constraint_theta_changed=true;
 
    } // End of rotational angle sweep
 

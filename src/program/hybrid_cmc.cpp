@@ -141,14 +141,14 @@ void hybrid_cmc(){
          // Increment azimuthal angle
          if(montecarlo::cmc::cmc_mat[mat].constraint_phi+montecarlo::cmc::cmc_mat[mat].constraint_phi_delta>montecarlo::cmc::cmc_mat[mat].constraint_phi_max) break;
          montecarlo::cmc::cmc_mat[mat].constraint_phi+=montecarlo::cmc::cmc_mat[mat].constraint_phi_delta;
-         sim::constraint_phi_changed=true;
+         montecarlo::constraint_phi_changed=true;
       } // End of azimuthal angle sweep
       if(vout::gnuplot_array_format) zmag << std::endl;
 
       // Increment rotational angle
       if(montecarlo::cmc::cmc_mat[mat].constraint_theta+montecarlo::cmc::cmc_mat[mat].constraint_theta_delta>montecarlo::cmc::cmc_mat[mat].constraint_theta_max) break;
       montecarlo::cmc::cmc_mat[mat].constraint_theta+=montecarlo::cmc::cmc_mat[mat].constraint_theta_delta;
-      sim::constraint_theta_changed=true;
+      montecarlo::constraint_theta_changed=true;
    } // End of rotational angle sweep
 
    } // end of material loop
@@ -252,14 +252,14 @@ void reverse_hybrid_cmc(){
          // Increment rotational angle
          if(montecarlo::cmc::cmc_mat[mat].constraint_theta+montecarlo::cmc::cmc_mat[mat].constraint_theta_delta>montecarlo::cmc::cmc_mat[mat].constraint_theta_max) break;
          montecarlo::cmc::cmc_mat[mat].constraint_theta+=montecarlo::cmc::cmc_mat[mat].constraint_theta_delta;
-         sim::constraint_theta_changed=true;
+         montecarlo::constraint_theta_changed=true;
       } // End of rotational angle sweep
       if(vout::gnuplot_array_format) zmag << std::endl;
 
       // Increment azimuthal angle
       if(montecarlo::cmc::cmc_mat[mat].constraint_phi+montecarlo::cmc::cmc_mat[mat].constraint_phi_delta>montecarlo::cmc::cmc_mat[mat].constraint_phi_max) break;
       montecarlo::cmc::cmc_mat[mat].constraint_phi+=montecarlo::cmc::cmc_mat[mat].constraint_phi_delta;
-      sim::constraint_phi_changed=true;
+      montecarlo::constraint_phi_changed=true;
    } // End of azimuthal angle sweep
 
    } // end of material loop

@@ -174,12 +174,12 @@ namespace vout{
 
    // Output Function 16 - with Header
    void constraint_phi(std::ostream& stream, bool header){
-      stream << generic_output_double("Con_phi",sim::constraint_phi,header);
+      stream << generic_output_double("Con_phi",montecarlo::constraint_phi,header);
    }
 
    // Output Function 17 - with Header
    void constraint_theta(std::ostream& stream, bool header){
-      stream << generic_output_double("Con_theta",sim::constraint_theta,header);
+      stream << generic_output_double("Con_theta",montecarlo::constraint_theta,header);
    }
 
    // Output Function 18 - with Header
