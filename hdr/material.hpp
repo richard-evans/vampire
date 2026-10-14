@@ -9,8 +9,8 @@
 //
 //------------------------------------------------------------------------------
 
-#ifndef MATERIAL_HPP_
-#define MATERIAL_HPP_
+#ifndef MATERIAL_H_
+#define MATERIAL_H_
 
 #include <iostream>
 #include <string>
@@ -160,4 +160,4 @@ namespace mp
 /// Alias deprecated material_parameters to mp namespace
 namespace material_parameters=mp;
 
-#endif // MATERIAL_HPP_
+#endif // MATERIAL_H_

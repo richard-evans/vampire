@@ -7,8 +7,8 @@
 //   All rights reserved.
 //
 //------------------------------------------------------------------------------
-#ifndef CUDA_DATA_HPP_
-#define CUDA_DATA_HPP_
+#ifndef CUDA_DATA_H_
+#define CUDA_DATA_H_
 
 #include "typedefs.hpp"
 /*

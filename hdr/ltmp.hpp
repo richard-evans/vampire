@@ -45,8 +45,8 @@
 
 // Program headers
 
-#ifndef LOCALTEMPERATURE_H_
-#define LOCALTEMPERATURE_H_
+#ifndef LTMP_H_
+#define LTMP_H_
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions to calculate localised temperature pulse
@@ -135,4 +135,4 @@ namespace ltmp{
 
 } // end of ltmp namespace
 
-#endif // LOCALTEMPERATURE_H_
+#endif // LTMP_H_

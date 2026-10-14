@@ -1,5 +1,5 @@
-#ifndef __THERMAL_FIELDS_CUDA_HPP__
-#define __THERMAL_FIELDS_CUDA_HPP__
+#ifndef CUDA_THERMAL_FIELDS_H_
+#define CUDA_THERMAL_FIELDS_H_
 //------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the
@@ -27,4 +27,4 @@ namespace vcuda{
 }
 
 
-#endif  // __THERMAL_FIELDS_CUDA_HPP__
+#endif  // CUDA_THERMAL_FIELDS_H_

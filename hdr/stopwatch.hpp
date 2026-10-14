@@ -1,5 +1,5 @@
-#ifndef __STOPWATCH_H__
-#define __STOPWATCH_H__
+#ifndef STOPWATCH_H_
+#define STOPWATCH_H_
 //------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the

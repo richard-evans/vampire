@@ -7,8 +7,8 @@
 //   All rights reserved.
 //
 //------------------------------------------------------------------------------
-#ifndef CUDA_TYPEDEF_HPP_
-#define CUDA_TYPEDEF_HPP_
+#ifndef CUDA_TYPEDEFS_H_
+#define CUDA_TYPEDEFS_H_
 
 // C++ standard library headers
 

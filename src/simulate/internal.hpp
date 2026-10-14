@@ -1,5 +1,5 @@
-#ifndef SIM_INTERNAL_H_
-#define SIM_INTERNAL_H_
+#ifndef SIMULATE_INTERNAL_H_
+#define SIMULATE_INTERNAL_H_
 //------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the
@@ -76,4 +76,4 @@ namespace sim{
    } // end of internal namespace
 } // end of sim namespace
 
-#endif //SIM_INTERNAL_H_
+#endif //SIMULATE_INTERNAL_H_

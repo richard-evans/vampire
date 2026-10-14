@@ -7,8 +7,8 @@
 //   All rights reserved.
 //
 //------------------------------------------------------------------------------
-#ifndef CUDA_LLG_HEUN_HPP_
-#define CUDA_LLG_HEUN_HPP_
+#ifndef CUDA_LLG_HEUN_H_
+#define CUDA_LLG_HEUN_H_
 
 #include "cuda.hpp"
 #include "data.hpp"

@@ -10,6 +10,9 @@
 //------------------------------------------------------------------------------
 //
 
+#ifndef VMATH_H_
+#define VMATH_H_
+
 #include <vector>
 #include <cmath>
 #include <cstdint>
@@ -76,3 +79,5 @@ namespace vmath{
    extern void regression(std::vector<double>& x, std::vector<double>& y, double& m, double& c);
 
 }
+
+#endif //VMATH_H_

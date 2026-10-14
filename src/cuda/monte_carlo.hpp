@@ -7,8 +7,8 @@
 //   All rights reserved.
 //
 //------------------------------------------------------------------------------
-#ifndef CUDA_MONTE_CARLO_HPP_
-#define CUDA_MONTE_CARLO_HPP_
+#ifndef CUDA_MONTE_CARLO_H_
+#define CUDA_MONTE_CARLO_H_
 
 #include "cuda.hpp"
 #include "data.hpp"

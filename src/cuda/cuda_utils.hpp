@@ -15,8 +15,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef __CUDA_UTILS_HPP__
-#define __CUDA_UTILS_HPP__
+#ifndef CUDA_UTILS_H_
+#define CUDA_UTILS_H_
 
 #include <stdio.h>
 

@@ -10,8 +10,8 @@
 //------------------------------------------------------------------------------
 //
 
-#ifndef SW_INTERNAL_H_
-#define SW_INTERNAL_H_
+#ifndef SPINWAVES_INTERNAL_H_
+#define SPINWAVES_INTERNAL_H_
 //
 //---------------------------------------------------------------------
 // This header file defines shared internal data structures and
@@ -144,4 +144,4 @@ namespace spinwaves{
 
 } // end of sw namespace
 
-#endif //SW_INTERNAL_H_
+#endif //SPINWAVES_INTERNAL_H_

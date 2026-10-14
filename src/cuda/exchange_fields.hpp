@@ -1,5 +1,5 @@
-#ifndef __CUDA_EXCHANGE_HPP__
-#define __CUDA_EXCHANGE_HPP__
+#ifndef CUDA_EXCHANGE_FIELDS_H_
+#define CUDA_EXCHANGE_FIELDS_H_
 //------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the

@@ -10,8 +10,8 @@
 //------------------------------------------------------------------------------
 //
 
-#ifndef SLD_INTERNAL_H_
-#define SLD_INTERNAL_H_
+#ifndef SPINLATTICE_INTERNAL_H_
+#define SPINLATTICE_INTERNAL_H_
 //
 //---------------------------------------------------------------------
 // This header file defines shared internal data structures and
@@ -354,4 +354,4 @@ namespace sld{
 } // end of sld namespace
 
 
-#endif //SLD_INTERNAL_H_
+#endif //SPINLATTICE_INTERNAL_H_

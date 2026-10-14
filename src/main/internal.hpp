@@ -10,8 +10,8 @@
 //------------------------------------------------------------------------------
 //
 
-#ifndef VMAIN_INTERNAL_H_
-#define VMAIN_INTERNAL_H_
+#ifndef MAIN_INTERNAL_H_
+#define MAIN_INTERNAL_H_
 //
 //---------------------------------------------------------------------
 // This header file defines shared internal data structures and
@@ -42,4 +42,4 @@ namespace internal{
 
 } // end of main namespace
 
-#endif //VMAIN_INTERNAL_H_
+#endif //MAIN_INTERNAL_H_

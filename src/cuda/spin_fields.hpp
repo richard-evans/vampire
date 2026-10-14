@@ -1,5 +1,5 @@
-#ifndef __SPIN_FIELDS_HPP__
-#define __SPIN_FIELDS_HPP__
+#ifndef CUDA_SPIN_FIELDS_H_
+#define CUDA_SPIN_FIELDS_H_
 //------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the

@@ -1,5 +1,5 @@
-#ifndef CUDA_STATISTICS_HPP_
-#define CUDA_STATISTICS_HPP_
+#ifndef CUDA_STATISTICS_H_
+#define CUDA_STATISTICS_H_
 //------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the

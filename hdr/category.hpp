@@ -9,6 +9,10 @@
 //
 //------------------------------------------------------------------------------
 //
+
+#ifndef CATEGORY_H_
+#define CATEGORY_H_
+
 #include <vector>
 
 namespace cat{
@@ -50,3 +54,5 @@ namespace cat{
 
 
 } // End of namespace cat
+
+#endif //CATEGORY_H_
