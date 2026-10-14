@@ -16,6 +16,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 
 namespace units {
 
@@ -192,11 +193,9 @@ void convert(std::string input_unit, std::vector<double>& value, std::string& ty
       }
    }
 
-   terminaltextcolor(RED);
-   std::cerr << "Error during unit conversion - unit '" << input_unit << "' not found" << std::endl;
-   terminaltextcolor(WHITE);
-   zlog << zTs() << "Error during unit conversion - unit '" << input_unit << "' not found" << std::endl;
-   err::vexit();
+   std::ostringstream message;
+   message << "Error during unit conversion - unit '" << input_unit << "' not found";
+   err::fatal(message.str());
 }
 
 //-----------------------------------------------------------------------------
@@ -215,10 +214,9 @@ int revert(std::string output_unit, double& value, std::string& type){
       }
    }
 
-   terminaltextcolor(RED);
-   std::cerr << "Error during unit reversion - unit '" << output_unit << "' not found" << std::endl;
-   terminaltextcolor(WHITE);
-   err::vexit();
+   std::ostringstream message;
+   message << "Error during unit reversion - unit '" << output_unit << "' not found";
+   err::fatal(message.str());
 
    return EXIT_SUCCESS;
 }

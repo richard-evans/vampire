@@ -55,11 +55,9 @@ void save_checkpoint(){
 
    // check for open file
    if(!chkfile.is_open()){
-      terminaltextcolor(RED);
-      std::cerr << "Error: Unable to open checkpoint file " << chkfilename << " for writing. Exiting." << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Error: Unable to open checkpoint file " << chkfilename << " for writing. Exiting." << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "Error: Unable to open checkpoint file " << chkfilename << " for writing. Exiting.";
+      err::fatal(message.str());
    }
 
    // get state of random number generator
@@ -202,11 +200,9 @@ void load_checkpoint(){
 
    // check for rational number of atoms
    if(static_cast<uint64_t>(atoms::num_atoms-vmpi::num_halo_atoms) != natoms64){
-      terminaltextcolor(RED);
-      std::cerr << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting.";
+      err::fatal(message.str());
    }
 
    // Load saved parameters if simulation continuing

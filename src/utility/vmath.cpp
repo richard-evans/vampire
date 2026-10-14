@@ -163,10 +163,7 @@ std::vector<std::vector<double> > matmul(
 
    // Check for valid multiplication
    if(A_num_cols!=B_num_rows){
-      terminaltextcolor(RED);
-      std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
-      terminaltextcolor(WHITE);
-      err::vexit();
+      err::fatal("Error in matrix multiplication - matrices do not produce a valid product!");
    }
 
    // Set number of internal products
@@ -228,10 +225,7 @@ std::vector<double> matmul(
 
    // Check for valid multiplication
    if(V_num_cols!=M_num_rows){
-      terminaltextcolor(RED);
-      std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
-      terminaltextcolor(WHITE);
-      err::vexit();
+      err::fatal("Error in matrix multiplication - matrices do not produce a valid product!");
    }
 
    // Set sizes of result matrix C
@@ -324,10 +318,7 @@ std::vector<std::vector<double> > set_matrix(
 {
 
    if(nums.size()!=rows*cols){
-      terminaltextcolor(RED);
-      std::cerr << "Error in matrix initialisation, incorrect number of elements for matrix!" << std::endl;
-      terminaltextcolor(WHITE);
-      err::vexit();
+      err::fatal("Error in matrix initialisation, incorrect number of elements for matrix!");
    }
 
    // Declare result matrix
@@ -520,8 +511,7 @@ void regression(std::vector<double>& x, std::vector<double>& y, double& m, doubl
 
    // check sizes of x and y arrays are the same
    if( x.size() != y.size() ){
-      std::cerr << "Error in linear regression: x and y array sizes are not the same!" << std::endl;
-      err::vexit();
+      err::fatal("Error in linear regression: x and y array sizes are not the same!");
    }
 
    // calculate number of points in data set
