@@ -11,9 +11,9 @@
 //
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
-#include <sstream>
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"

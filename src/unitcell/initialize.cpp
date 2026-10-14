@@ -11,9 +11,9 @@
 //
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
-#include <sstream>
 #include "errors.hpp"
 #include "unitcell.hpp"
 #include "vio.hpp"

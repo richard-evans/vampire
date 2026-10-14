@@ -8,9 +8,9 @@
 //------------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
-#include <sstream>
 #include "errors.hpp"
 #include "create.hpp"
 #include "spininitialize.hpp"

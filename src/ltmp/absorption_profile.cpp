@@ -8,9 +8,9 @@
 //------------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
-#include <sstream>
 #include "ltmp.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
