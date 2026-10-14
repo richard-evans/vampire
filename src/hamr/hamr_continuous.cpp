@@ -10,6 +10,7 @@
 // C++ standard library headers
 #include <iostream>
 #include <math.h>   // for round() function
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -76,11 +77,9 @@ namespace hamr{
       std::cout << " Time per bit: " << bit_time*mp::dt_SI << " s" << std::endl;
       // Check that field ramp time < bit time
       if(rise_time+fall_time >= bit_time){
-         terminaltextcolor(RED);
-         std::cerr << "Error - value for \'hamr:field-rise-time\' " << rise_time*mp::dt_SI << " s or \'hamr:field-fall-time\' " << fall_time*mp::dt_SI << " s is too large. Make sure is less than half time per bit: " << bit_time*mp::dt_SI << " s." << std::endl;
-         terminaltextcolor(WHITE);
-         zlog << zTs() << "Error - value for \'hamr:field-rise-time\' " << rise_time*mp::dt_SI << " s or \'hamr:field-fall-time\' " << fall_time*mp::dt_SI << " s is too large. Make sure is less than half time per bit: " << bit_time*mp::dt_SI << " s." << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Error - value for \'hamr:field-rise-time\' " << rise_time*mp::dt_SI << " s or \'hamr:field-fall-time\' " << fall_time*mp::dt_SI << " s is too large. Make sure is less than half time per bit: " << bit_time*mp::dt_SI << " s.";
+         err::fatal(message.str());
       }
       std::cout << " Time per track: " << total_track_time*mp::dt_SI << " s" << std::endl;
       std::cout << " New total simulation time: " << (total_time + final_time)*mp::dt_SI << " s" << std::endl;
