@@ -1,11 +1,11 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This source file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) A J Naden and R F L Evans 2019. All rights reserved.
+//   (c) A J Naden and R F L Evans 2019. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Implementing Welford's algorithm for calculating standard deviation
 // Calculates the standard deviation in each component of the magnetisation
 // vector  - implemented by Andrew Naden 05/2019
