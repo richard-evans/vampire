@@ -13,6 +13,7 @@
 #include "errors.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
@@ -33,8 +34,8 @@ namespace program{
    sim::temperature=sim::Teq;
 
    // Initialise electron and phonon temperature
-   sim::TTTe=sim::temperature;
-   sim::TTTp=sim::temperature;
+   program::TTTe=sim::temperature;
+   program::TTTp=sim::temperature;
 
    // Equilibrate system
    while(sim::time<sim::equilibration_time){

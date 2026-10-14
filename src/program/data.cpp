@@ -50,6 +50,23 @@ namespace program{
    std::vector < double > track_field_y;
    std::vector < double > track_field_z;
 
+   // laser pulse programs (pump and two-temperature model parameters)
+   double cooling_time=100.0e-12; ///seconds
+   int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
+   pump_functions_t pump_function=two_temperature;
+   double pump_power=20.0; // mJ/cm^2;
+   double pump_time=50.0e-15;
+   double double_pump_power=20.0; // mJ/cm^2;
+   double double_pump_Tmax=500.0;
+   double double_pump_time=50.0e-15;
+   double double_pump_delay=10.0e-12;
+   double HeatSinkCouplingConstant=0.0; ///1.1e12 ~ sensible value
+   double TTCe = 222.0; ///electron specific heat (gamma)
+   double TTCl = 2.3E06; ///phonon specific heat
+   double TTG = 6.6E17 ;///electron coupling constant
+   double TTTe = 0.0; /// electron temperature
+   double TTTp = 0.0; /// phonon temperature
+
    double track_Ms = 0.1;
    double track_bit_width = 800;
    double track_bit_size = 1000;

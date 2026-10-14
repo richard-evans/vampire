@@ -20,6 +20,7 @@
 #include "hamr.hpp"
 #include "spinwaves.hpp" // jrh
 #include "ltmp.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
 #include "spintransport.hpp"
@@ -97,11 +98,11 @@ void initialize_modules(){
                   atoms::type_array,
                   num_local_atoms,
                   sim::Teq,
-                  sim::pump_power,
-                  sim::pump_time,
-                  sim::TTG,
-                  sim::TTCe,
-                  sim::TTCl,
+                  program::pump_power,
+                  program::pump_time,
+                  program::TTG,
+                  program::TTCe,
+                  program::TTCl,
                   mp::dt_SI,
                   sim::Tmin,
                   sim::Tmax);

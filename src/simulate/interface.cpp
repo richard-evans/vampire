@@ -243,7 +243,7 @@ namespace sim{
       if(word==test){
          double T=atof(value.c_str());
          vin::check_for_valid_value(T, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
-         sim::cooling_time=T;
+         program::cooling_time=T;
          return true;
       }
       //--------------------------------------------------------------------
@@ -251,22 +251,22 @@ namespace sim{
       if(word==test){
          test="exponential";
          if(value==test){
-            sim::cooling_function_flag=0;
+            program::cooling_function_flag=0;
             return true;
          }
          test="gaussian";
          if(value==test){
-            sim::cooling_function_flag=1;
+            program::cooling_function_flag=1;
             return true;
          }
          test="double-gaussian";
          if(value==test){
-            sim::cooling_function_flag=2;
+            program::cooling_function_flag=2;
             return true;
          }
          test="linear";
          if(value==test){
-            sim::cooling_function_flag=3;
+            program::cooling_function_flag=3;
             return true;
          }
          else{
@@ -285,22 +285,22 @@ namespace sim{
       if(word==test){
          test="square";
          if(value==test){
-            sim::pump_function=square;
+            program::pump_function=program::square;
             return true;
          }
          test="two-temperature";
          if(value==test){
-            sim::pump_function=two_temperature;
+            program::pump_function=program::two_temperature;
             return true;
          }
          test="double-pulse-two-temperature";
          if(value==test){
-            sim::pump_function=double_pump_two_temperature;
+            program::pump_function=program::double_pump_two_temperature;
             return true;
          }
          test="double-pulse-square";
          if(value==test){
-            sim::pump_function=double_pump_square;
+            program::pump_function=program::double_pump_square;
             return true;
          }
          else{
@@ -319,7 +319,7 @@ namespace sim{
       if(word==test){
          double pt=atof(value.c_str());
          vin::check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
-         sim::pump_time=pt;
+         program::pump_time=pt;
          return true;
       }
       //--------------------------------------------------------------------
@@ -327,7 +327,7 @@ namespace sim{
       if(word==test){
          double pp=atof(value.c_str());
          vin::check_for_valid_value(pp, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
-         sim::pump_power=pp;
+         program::pump_power=pp;
          return true;
       }
       //--------------------------------------------------------------------
@@ -335,7 +335,7 @@ namespace sim{
       if(word==test){
          double pt=atof(value.c_str());
          vin::check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
-         sim::double_pump_time=pt;
+         program::double_pump_time=pt;
          return true;
       }
       //--------------------------------------------------------------------
@@ -343,7 +343,7 @@ namespace sim{
       if(word==test){
          double pp=atof(value.c_str());
          vin::check_for_valid_value(pp, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
-         sim::double_pump_power=pp;
+         program::double_pump_power=pp;
          return true;
       }
       //--------------------------------------------------------------------
@@ -351,7 +351,7 @@ namespace sim{
       if(word==test){
          double T=atof(value.c_str());
          vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
-         sim::double_pump_Tmax=T;
+         program::double_pump_Tmax=T;
          return true;
       }
       //--------------------------------------------------------------------
@@ -359,7 +359,7 @@ namespace sim{
       if(word==test){
          double pd=atof(value.c_str());
          vin::check_for_valid_value(pd, word, line, prefix, unit, "time", 0.0, 1.0,"input","0 - 1 s");
-         sim::double_pump_delay=pd;
+         program::double_pump_delay=pd;
          return true;
       }
       //--------------------------------------------------------------------
@@ -367,7 +367,7 @@ namespace sim{
       if(word==test){
          double hscc=atof(value.c_str());
          vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
-         sim::HeatSinkCouplingConstant=hscc;
+         program::HeatSinkCouplingConstant=hscc;
          return true;
       }
       //--------------------------------------------------------------------
@@ -375,7 +375,7 @@ namespace sim{
       if(word==test){
          double hscc=atof(value.c_str());
          vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
-         sim::TTCe=hscc;
+         program::TTCe=hscc;
          return true;
       }
       //--------------------------------------------------------------------
@@ -383,7 +383,7 @@ namespace sim{
       if(word==test){
          double hscc=atof(value.c_str());
          vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
-         sim::TTCl=hscc;
+         program::TTCl=hscc;
          return true;
       }
       //--------------------------------------------------------------------
@@ -391,7 +391,7 @@ namespace sim{
       if(word==test){
          double hscc=atof(value.c_str());
          vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
-         sim::TTG=hscc;
+         program::TTG=hscc;
          return true;
       }
       //--------------------------------------------------------------------

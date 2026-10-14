@@ -237,7 +237,7 @@ namespace vout{
    }
    // Output Function 22
    void phonon_temperature(std::ostream& stream, bool header){
-     stream << generic_output_double("Phonon_temp",sim::TTTp,header);
+     stream << generic_output_double("Phonon_temp",program::TTTp,header);
    }
 
    // Output Function 23 - with Header

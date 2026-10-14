@@ -63,23 +63,23 @@ void local_field_cool(){
             double time_from_start=mp::dt_SI*double(sim::time-start_time);
             double normalised_temperature = 0.0;
 
-            switch(sim::cooling_function_flag){
+            switch(program::cooling_function_flag){
                case 0:{ // exponential
-                  normalised_temperature = 0.0 + exp(-time_from_start/sim::cooling_time);
+                  normalised_temperature = 0.0 + exp(-time_from_start/program::cooling_time);
                }
                break;
                case 1:{ // gaussian
-                  normalised_temperature = 0.0 + exp(-(time_from_start)*(time_from_start)/((sim::cooling_time)*(sim::cooling_time)));
+                  normalised_temperature = 0.0 + exp(-(time_from_start)*(time_from_start)/((program::cooling_time)*(program::cooling_time)));
                }
                break;
                case 2:{ // double-gaussian
-                  double centre_time = 3.0*sim::cooling_time;
+                  double centre_time = 3.0*program::cooling_time;
                   double time_from_centre=mp::dt_SI*double(sim::time-start_time)-centre_time;
-                  normalised_temperature = 0.0 + exp(-(time_from_centre)*(time_from_centre)/((sim::cooling_time)*(sim::cooling_time)));
+                  normalised_temperature = 0.0 + exp(-(time_from_centre)*(time_from_centre)/((program::cooling_time)*(program::cooling_time)));
                }
                break;
                case 3:{ // linear
-                  double Tlinear = 1.0-(time_from_start/sim::cooling_time);
+                  double Tlinear = 1.0-(time_from_start/program::cooling_time);
                   if(Tlinear >= 0.0) normalised_temperature = Tlinear;
                   else normalised_temperature = 0.0;
                }

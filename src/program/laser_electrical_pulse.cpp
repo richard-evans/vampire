@@ -63,15 +63,15 @@ void laser_electrical_pulse(){
 
    // Initialise TTM temperatures at equilibrium and zero the electrical field
    sim::temperature = sim::Teq;
-   sim::TTTe        = sim::Teq;
-   sim::TTTp        = sim::Teq;
+   program::TTTe        = sim::Teq;
+   program::TTTp        = sim::Teq;
    pg::fractional_electric_field_strength = 0.0;
 
    // Initialise per-material temperatures when local temperature mode is active
    if(sim::local_temperature){
       for(unsigned int mat = 0; mat < mp::material.size(); mat++){
-         if(mp::material[mat].couple_to_phonon_temperature) mp::material[mat].temperature = sim::TTTp;
-         else                                               mp::material[mat].temperature = sim::TTTe;
+         if(mp::material[mat].couple_to_phonon_temperature) mp::material[mat].temperature = program::TTTp;
+         else                                               mp::material[mat].temperature = program::TTTe;
       }
    }
 

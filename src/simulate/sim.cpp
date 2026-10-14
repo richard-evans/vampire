@@ -114,21 +114,6 @@ namespace sim{
    double constraint_theta_max=0.0; // loop angle max [degrees]
    double constraint_theta_delta=5.0; /// loop angle delta [degrees]
 
-   double cooling_time=100.0e-12; ///seconds
-   int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
-   pump_functions_t pump_function=two_temperature;
-   double pump_power=20.0; // mJ/cm^2;
-   double pump_time=50.0e-15;
-   double double_pump_power=20.0; // mJ/cm^2;
-   double double_pump_Tmax=500.0;
-   double double_pump_time=50.0e-15;
-   double double_pump_delay=10.0e-12;
-   double HeatSinkCouplingConstant=0.0; ///1.1e12 ~ sensible value
-   double TTCe = 222.0; ///electron specific heat (gamma)
-   double TTCl = 2.3E06; ///phonon specific heat
-   double TTG = 6.6E17 ;///electron coupling constant
-   double TTTe = 0.0; /// electron temperature
-   double TTTp = 0.0; /// phonon temperature
 
    bool applied_field_enabled = true; // include the applied field in the spin field
    bool thermal_field_enabled = true; // include the thermal field in the spin field
