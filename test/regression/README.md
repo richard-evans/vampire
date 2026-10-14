@@ -23,6 +23,7 @@ Each case is a directory `cases/<module>/<case>/` containing:
 | `tolerance` | optional, `rel <r> abs <a>`; the default is `rel 1e-12 abs 1e-14` |
 | `files` | optional, other output files to compare, one per line, with goldens `expected-serial.<file>` and `expected-mpi-np<N>.<file>` |
 
+A missing `output` file (some programs never write one) is compared as an empty file.
 A case runs only in the modes for which it has a golden file. Numeric fields pass if
 `|obtained - expected| <= abs + rel*|expected|`.
 

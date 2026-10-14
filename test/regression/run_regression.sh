@@ -119,11 +119,14 @@ for name in $pattern; do
    status=$?
    elapsed=$((SECONDS-start))
 
-   if [ $status -ne 0 ] || [ ! -f "$dir/output" ]; then
+   if [ $status -ne 0 ]; then
       echo "FAIL (vampire exited with status $status, see $dir/stdout)"
       fail=$((fail+1))
       continue
    fi
+
+   # some programs never write the output file, so treat a missing one as empty
+   [ -f "$dir/output" ] || : > "$dir/output"
    # output files to compare, as pairs of obtained file and golden file
    compare_list=("output" "$name/$golden")
    if [ -f "$name/files" ]; then
