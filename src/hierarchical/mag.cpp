@@ -26,7 +26,6 @@
 
 // alias internal hierarchical namespace for brevity
 namespace ha = hierarchical::internal;
-using namespace std;
 
 namespace hierarchical{
 namespace internal{

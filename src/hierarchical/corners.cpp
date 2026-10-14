@@ -19,8 +19,6 @@
 // hierarchical module headers
 #include "internal.hpp"
 
-using namespace std;
-
 namespace hierarchical{
 namespace internal{
 
