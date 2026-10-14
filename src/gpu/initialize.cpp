@@ -15,7 +15,6 @@
 #include "cuda.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
-#include "vopencl.hpp"
 
 namespace gpu{
 

@@ -12,7 +12,6 @@
 // Vampire headers
 #include "gpu.hpp"
 #include "cuda.hpp"
-#include "vopencl.hpp"
 
 namespace gpu{
 

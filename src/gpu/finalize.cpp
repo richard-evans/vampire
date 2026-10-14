@@ -13,7 +13,6 @@
 #include "gpu.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
-#include "vopencl.hpp"
 
 namespace gpu{
 

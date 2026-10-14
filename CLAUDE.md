@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Vampire is a C++ atomistic simulation code for magnetic materials. It solves the stochastic Landau-Lifshitz-Gilbert (LLG) equation and Monte Carlo methods to calculate equilibrium and dynamic magnetic properties. It supports MPI parallelism and CUDA acceleration. The OpenCL code is deprecated.
+Vampire is a C++ atomistic simulation code for magnetic materials. It solves the stochastic Landau-Lifshitz-Gilbert (LLG) equation and Monte Carlo methods to calculate equilibrium and dynamic magnetic properties. It supports MPI parallelism and CUDA acceleration.
 
 ## Build Commands
 
@@ -104,7 +104,8 @@ Key modules:
 | `spintorque` | Spin transfer torque |
 | `spinwaves` | Spin wave dispersion (requires FFTW: uncomment in makefile) |
 | `micromagnetic` | Micromagnetic hybrid mode |
-| `cuda` / `opencl` | GPU acceleration backends (compiled with `CUDA`/`OPENCL` defines) |
+| `gpu` | Backend-independent wrapper that dispatches to a GPU acceleration backend (currently `cuda`) |
+| `cuda` | CUDA GPU acceleration backend (compiled with the `CUDA` define) |
 | `qvoronoi` | Embedded qhull library for Voronoi tessellation |
 
 ### Global Data
@@ -131,7 +132,6 @@ Material parameters are in the `mp` namespace (`hdr/material.hpp`), loaded from 
 |--------|--------|
 | `MPICF` | Enable MPI parallel code paths |
 | `CUDA` | Enable CUDA GPU backend |
-| `OPENCL` | Enable OpenCL GPU backend |
 | `FFT` | Enable FFTW for spin waves and FFT dipole |
 | `COMP` | Compiler identification string printed at startup |
 

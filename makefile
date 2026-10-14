@@ -148,7 +148,6 @@ include src/vio/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
-include src/opencl/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
@@ -172,7 +171,6 @@ MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_par.o)
 MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_par.o)
 MPI_ARCHER_OBJECTS=$(OBJECTS:.o=_archer_par.o)
 
-CLEXECUTABLE=vampire-opencl
 CUDAEXECUTABLE=vampire-cuda
 EXECUTABLE=vampire-serial
 PEXECUTABLE=vampire-parallel
