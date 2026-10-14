@@ -53,9 +53,7 @@ namespace montecarlo{
          // first check for hybrid cmc
          if(integrate::integrator == integrate::integrator_t::hybrid_cmc){
             // implementation not yet done - give message to user
-            std::cerr << "Error - grain constraints with materials are not yet supported with cmc. Please use sim:integrator = contrained-monte-carlo. Exiting" << std::endl;
-            zlog << zTs() << "Error - grain constraints with materials are not yet supported with cmc. Please use sim:integrator = contrained-monte-carlo. Exiting" << std::endl;
-            err::vexit();
+            err::fatal("Error - grain constraints with materials are not yet supported with cmc. Please use sim:integrator = contrained-monte-carlo. Exiting");
          }
 
          // standard mode with global constraint (integrator = cmc)

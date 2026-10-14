@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <sstream>
 
 // Vampire headers
 #include "montecarlo.hpp"
@@ -105,10 +106,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 360.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -121,10 +121,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 360.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -137,10 +136,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 360.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -153,10 +151,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 360.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -169,10 +166,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 180.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -185,10 +181,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 180.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -201,10 +196,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 180.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -217,10 +211,9 @@ namespace montecarlo{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 180.0";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------

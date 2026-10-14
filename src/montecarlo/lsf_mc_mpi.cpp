@@ -103,15 +103,13 @@ void lsf_mc_parallel_init(std::vector<double> &x, // atomic coordinates
    int num_atoms_in_octants = 0;
    for(int i=0; i< 8; i++) num_atoms_in_octants += internal::c_octants[i].size();
    if(num_atoms_in_octants != catoms){
-      std::cerr << "Programmer error: missing atoms in core octants in parallel monte carlo - LSF initialisation" << std::endl;
-      err::vexit();
+      err::fatal("Programmer error: missing atoms in core octants in parallel monte carlo - LSF initialisation");
    }
    // boundary atoms
    num_atoms_in_octants = 0;
    for(int i=0; i< 8; i++) num_atoms_in_octants += internal::b_octants[i].size();
    if(num_atoms_in_octants != batoms){
-      std::cerr << "Programmer error: missing atoms in boundary octants in parallel monte carlo - LSF initialisation" << std::endl;
-      err::vexit();
+      err::fatal("Programmer error: missing atoms in boundary octants in parallel monte carlo - LSF initialisation");
    }
 
    // set flag to indicate that parallel LSF-MC has been initialised
