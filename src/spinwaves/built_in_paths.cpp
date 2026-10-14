@@ -6,7 +6,8 @@
 //
 //   (c) Sergiu Ruta 2022. All rights reserved.
 //
-//   Email: sergiu.ruta@york.ac.uk j.r.hirst@shu.ac.uk
+//   Email: sergiu.ruta@york.ac.uk
+//          j.r.hirst@shu.ac.uk
 //
 //------------------------------------------------------------------------------
 //
