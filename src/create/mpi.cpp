@@ -449,9 +449,6 @@ namespace create{
    ///
    /// @details Sets atom CPU ID for replicated data decomposition
    ///
-   /// @section License
-   /// Use of this code, either in source or compiled form, is subject to license from the authors.
-   /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
    ///
    /// @section Information
    /// @author  Richard Evans, richard.evans@york.ac.uk
@@ -523,9 +520,6 @@ namespace create{
    ///          Non-interacting halo atoms (catom_array[atom].mpi_type=3) are marked for
    ///          deletion and removed after sorting atoms to core | boundary | halo
    ///
-   /// @section License
-   /// Use of this code, either in source or compiled form, is subject to license from the authors.
-   /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
    ///
    /// @section Information
    /// @author  Richard Evans, richard.evans@york.ac.uk
