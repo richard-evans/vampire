@@ -9,6 +9,7 @@
 
 // C++ standard library headers
 #include <iostream>
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -165,8 +166,9 @@ void collate(std::vector<double>& input, std::vector<double>& output){
       const int op_size = output.size();
       if( op_size != disp ){
          std::cerr << "Programmer error in vmpi::collate() due to output array being the wrong size." << std::endl;
-         std::cerr << "\t Function call requires " << disp << " elements in output buffer which only has " << output.size() << " elements on master process" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "\t Function call requires " << disp << " elements in output buffer which only has " << output.size() << " elements on master process";
+         err::fatal(message.str());
       }
    }
 
@@ -185,8 +187,9 @@ void collate(std::vector<double>& input, std::vector<double>& output){
    // Check input and output are the same size
    if( output.size() != input.size() ){
       std::cerr << "Programmer error in serial vmpi::collate() due to output array being the wrong size." << std::endl;
-      std::cerr << "\t Function call requires " << input.size() << " elements in output buffer which only has " << output.size() << " elements on master process" << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "\t Function call requires " << input.size() << " elements in output buffer which only has " << output.size() << " elements on master process";
+      err::fatal(message.str());
    }
 
    // Now hard copy array elements
@@ -232,8 +235,9 @@ void counts_and_displacements(std::vector<double>& input, std::vector<double>& o
       const int op_size = output.size();
       if( op_size != disp ){
          std::cerr << "Programmer error in vmpi::collate() due to output array being the wrong size." << std::endl;
-         std::cerr << "\t Function call requires " << disp << " elements in output buffer which only has " << output.size() << " elements on master process" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "\t Function call requires " << disp << " elements in output buffer which only has " << output.size() << " elements on master process";
+         err::fatal(message.str());
       }
    }
 
@@ -269,8 +273,9 @@ void fast_collate(std::vector<double>& input, std::vector<double>& output, std::
    // Check input and output are the same size
    if( output.size() != input.size() ){
       std::cerr << "Programmer error in serial vmpi::collate() due to output array being the wrong size." << std::endl;
-      std::cerr << "\t Function call requires " << input.size() << " elements in output buffer which only has " << output.size() << " elements on master process" << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "\t Function call requires " << input.size() << " elements in output buffer which only has " << output.size() << " elements on master process";
+      err::fatal(message.str());
    }
 
    // Now hard copy array elements
