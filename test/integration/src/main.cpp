@@ -175,6 +175,9 @@ int main(int argc, char* argv[]){
       if( serial_only("dynamics/rkmk4") && !integrator_test("dynamics/rkmk4",   9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
       if( serial_only("dynamics/dm") && !integrator_test("dynamics/dm",      9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
 
+      // Integrator convergence order: error at t = 20 ps for dt = 100 fs and 50 fs vs the exact damped precession
+      if( serial_only("dynamics/convergence-llg-heun") && !convergence_test("dynamics/convergence-llg-heun", 0.1, 1.0, 2.0, 0.15, exe ) ) fail += 1;
+
       // Program tests
       // effective-damping: single spin rotated 120 degrees from z relaxing in 1T field along z
       if( serial_only("dynamics/effective-damping") && !integrator_test("dynamics/effective-damping", 9.75e-11, -0.552854, 0.159192, 0.817931, exe ) ) fail += 1;
