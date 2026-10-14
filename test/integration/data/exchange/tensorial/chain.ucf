@@ -1,0 +1,17 @@
+# Unit cell size:
+6.0	3.0	3.0
+# Unit cell vectors:
+1.0 0.0 0.0
+0.0 1.0 0.0
+0.0 0.0 1.0
+# Atoms num, id cx cy cz mat lc hc
+2
+0	0.0	0.0	0.0	0	0	0
+1	0.5	0.0	0.0	1	1	0
+# Interactions n exctype, id i j dx dy dz J..
+# Chain of alternating A and B spins, two bonds per atom, so that E = -N S_A^T J S_B for a general 3x3 J (with J^T for B->A bonds)
+4	tensorial
+0	0	1	0	0	0	1e-21	1.5e-21	2e-22	-5e-22	1e-21	3e-22	1e-22	-4e-22	2e-21
+1	0	1	-1	0	0	1e-21	1.5e-21	2e-22	-5e-22	1e-21	3e-22	1e-22	-4e-22	2e-21
+2	1	0	0	0	0	1e-21	-5e-22	1e-22	1.5e-21	1e-21	-4e-22	2e-22	3e-22	2e-21
+3	1	0	1	0	0	1e-21	-5e-22	1e-22	1.5e-21	1e-21	-4e-22	2e-22	3e-22	2e-21
