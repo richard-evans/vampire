@@ -67,9 +67,6 @@ namespace internal{
 ///
 /// @details Calls serial integrators based on integrate::integrator
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
@@ -227,9 +224,6 @@ void integrate_serial(uint64_t n_steps){
 ///
 /// @details Calls parallel integrators based on integrate::integrator
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
