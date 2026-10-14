@@ -93,6 +93,16 @@ int main(int argc, char* argv[]){
       // Anisotropy energy tests
       if( !energy_test("anisotropy/uniaxial", -1.0e-20, exe, "anisotropy" ) ) fail += 1;
 
+      // Anisotropy energy tests for each anisotropy term: five non-interacting layers of
+      // 100 atoms with spins along [001], [100], [111], d4 = (0.3,-0.5,0.8) and d5 = (-0.6,0.2,0.4)
+      // (normalised); output:material-total-energy gives the energy of each layer
+      // uniaxial-second-order: E = -K (S.e)^2, e = [111], for 100 spins along each direction
+      if( !final_values_test("anisotropy/uniaxial-second-order", { {"E[001]", 0, -3.333333333333334e-22, 1.0e-10, 1.0e-30},
+                                                                   {"E[100]", 1, -3.333333333333334e-22, 1.0e-10, 1.0e-30},
+                                                                   {"E[111]", 2, -1.000000000000000e-21, 1.0e-10, 1.0e-30},
+                                                                   {"E(d4)", 3, -1.224489795918368e-22, 1.0e-10, 1.0e-30},
+                                                                   {"E(d5)", 4, 0.0, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
+
       // DMI energy tests
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
 
