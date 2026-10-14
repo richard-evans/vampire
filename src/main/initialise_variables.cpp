@@ -42,33 +42,33 @@
 // Namespace material_parameters
 //==========================================================
 namespace mp{
-	//----------------------------------
-	// Material Container
-	//----------------------------------
+   //----------------------------------
+   // Material Container
+   //----------------------------------
 
-	//const int max_materials=100;
+   //const int max_materials=100;
 
-	int num_materials=1;
-
-
-	std::vector <materials_t> material(1);
+   int num_materials=1;
 
 
+   std::vector <materials_t> material(1);
 
-	//----------------------------------
-	//Input Integration parameters
-	//----------------------------------
-	double dt_SI;
-	double gamma_SI = constants::gamma_SI;
 
-	//----------------------------------
-	//Derived Integration parameters
-	//----------------------------------
-	double dt;
-	double half_dt;
 
-	// Unrolled material parameters for speed
-	std::vector <double> mu_s_array;
+   //----------------------------------
+   //Input Integration parameters
+   //----------------------------------
+   double dt_SI;
+   double gamma_SI = constants::gamma_SI;
+
+   //----------------------------------
+   //Derived Integration parameters
+   //----------------------------------
+   double dt;
+   double half_dt;
+
+   // Unrolled material parameters for speed
+   std::vector <double> mu_s_array;
 
 ///
 /// @brief Function to initialise program variables prior to system creation.
@@ -86,131 +86,131 @@ namespace mp{
 /// @return EXIT_SUCCESS
 ///
 /// @internal
-///	Created:		19/01/2010
-///	Revision:	  ---
+///   Created:    19/01/2010
+///   Revision:     ---
 ///=====================================================================================
 ///
 int initialise(std::string const infile){
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "initialise_variables has been called" << std::endl;}
+   //----------------------------------------------------------
+   // check calling of routine if error checking is activated
+   //----------------------------------------------------------
+   if(err::check==true){std::cout << "initialise_variables has been called" << std::endl;}
 
-	if(vmpi::my_rank==0){
-		std::cout << "================================================================================" << std::endl;
-		std::cout << "Initialising system variables" << std::endl;
-	}
+   if(vmpi::my_rank==0){
+      std::cout << "================================================================================" << std::endl;
+      std::cout << "Initialising system variables" << std::endl;
+   }
 
-	// Setup default system settings
-	mp::default_system();
+   // Setup default system settings
+   mp::default_system();
 
-	// Read values from input files
-	int iostat = vin::read(infile);
-	if(iostat==EXIT_FAILURE){
-		terminaltextcolor(RED);
-		std::cerr << "Error - input file \'" << infile << "\' not found, exiting" << std::endl;
-		terminaltextcolor(WHITE);
-		err::vexit();
-	}
+   // Read values from input files
+   int iostat = vin::read(infile);
+   if(iostat==EXIT_FAILURE){
+      terminaltextcolor(RED);
+      std::cerr << "Error - input file \'" << infile << "\' not found, exiting" << std::endl;
+      terminaltextcolor(WHITE);
+      err::vexit();
+   }
 
-	// Print out material properties
-	//mp::material[0].print();
+   // Print out material properties
+   //mp::material[0].print();
 
-	// Check for keyword parameter overide
-	if(cs::single_spin==true){
-		mp::single_spin_system();
-	}
+   // Check for keyword parameter overide
+   if(cs::single_spin==true){
+      mp::single_spin_system();
+   }
 
-	// Set derived system parameters
-	mp::set_derived_parameters();
+   // Set derived system parameters
+   mp::set_derived_parameters();
 
-	// Return
-	return EXIT_SUCCESS;
+   // Return
+   return EXIT_SUCCESS;
 }
 
 int default_system(){
 
-	// Initialise system creation flags to zero
-	for (int i=0;i<10;i++){
-		cs::system_creation_flags[i] = 0;
-		sim::hamiltonian_simulation_flags[i] = 0;
-	}
+   // Initialise system creation flags to zero
+   for (int i=0;i<10;i++){
+      cs::system_creation_flags[i] = 0;
+      sim::hamiltonian_simulation_flags[i] = 0;
+   }
 
-	// Set system dimensions !Angstroms
+   // Set system dimensions !Angstroms
 
-	cs::system_dimensions[0] = 100.0;
-	cs::system_dimensions[1] = 100.0;
-	cs::system_dimensions[2] = 100.0;
+   cs::system_dimensions[0] = 100.0;
+   cs::system_dimensions[1] = 100.0;
+   cs::system_dimensions[2] = 100.0;
 
-	cs::particle_scale   = 50.0;
-	cs::particle_spacing = 10.0;
+   cs::particle_scale   = 50.0;
+   cs::particle_spacing = 10.0;
 
    cs::particle_creation_parity=0;
    uc::set_crystal_structure_to_simple_cubic();
 
-	// Setup Hamiltonian Flags
-	sim::hamiltonian_simulation_flags[0] = 1;	/// Exchange
-	sim::hamiltonian_simulation_flags[1] = 1;	/// Anisotropy
-	sim::hamiltonian_simulation_flags[2] = 1;	/// Applied
-	sim::hamiltonian_simulation_flags[3] = 1;	/// Thermal
+   // Setup Hamiltonian Flags
+   sim::hamiltonian_simulation_flags[0] = 1; /// Exchange
+   sim::hamiltonian_simulation_flags[1] = 1; /// Anisotropy
+   sim::hamiltonian_simulation_flags[2] = 1; /// Applied
+   sim::hamiltonian_simulation_flags[3] = 1; /// Thermal
 
-	//Integration parameters
-	dt_SI = 1.0e-15;	// seconds
-	dt = dt_SI*mp::gamma_SI; // Must be set before Hth
-	half_dt = 0.5*dt;
+   //Integration parameters
+   dt_SI = 1.0e-15;  // seconds
+   dt = dt_SI*mp::gamma_SI; // Must be set before Hth
+   half_dt = 0.5*dt;
 
-	//------------------------------------------------------------------------------
-	// Material Definitions
-	//------------------------------------------------------------------------------
-	num_materials=1;
-	material.resize(num_materials);
+   //------------------------------------------------------------------------------
+   // Material Definitions
+   //------------------------------------------------------------------------------
+   num_materials=1;
+   material.resize(num_materials);
 
-	//-------------------------------------------------------
-	// Material 0
-	//-------------------------------------------------------
-	material[0].name="Co";
-	material[0].alpha=0.1;
-	material[0].mu_s_SI=1.5*constants::muB;
-	material[0].gamma_rel=1.0;
-	material[0].element="Ag ";
-	material[0].alpha_eq=0.1;
-	// Disable Error Checking
-	err::check=false;
+   //-------------------------------------------------------
+   // Material 0
+   //-------------------------------------------------------
+   material[0].name="Co";
+   material[0].alpha=0.1;
+   material[0].mu_s_SI=1.5*constants::muB;
+   material[0].gamma_rel=1.0;
+   material[0].element="Ag ";
+   material[0].alpha_eq=0.1;
+   // Disable Error Checking
+   err::check=false;
 
-	// Initialise random number generator
-	mtrandom::grnd.seed(2106975519);
+   // Initialise random number generator
+   mtrandom::grnd.seed(2106975519);
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 int single_spin_system(){
 
-	// Reset system creation flags to zero
-	for (int i=0;i<10;i++){
-		cs::system_creation_flags[i] = 0;
-	}
+   // Reset system creation flags to zero
+   for (int i=0;i<10;i++){
+      cs::system_creation_flags[i] = 0;
+   }
 
-	// Set system dimensions !Angstroms
+   // Set system dimensions !Angstroms
 
-	cs::system_dimensions[0] = 2.0;
-	cs::system_dimensions[1] = 2.0;
-	cs::system_dimensions[2] = 2.0;
+   cs::system_dimensions[0] = 2.0;
+   cs::system_dimensions[1] = 2.0;
+   cs::system_dimensions[2] = 2.0;
 
-	cs::particle_scale   = 50.0;
-	cs::particle_spacing = 10.0;
+   cs::particle_scale   = 50.0;
+   cs::particle_spacing = 10.0;
 
-	cs::particle_creation_parity=0;
-	uc::set_crystal_structure_to_simple_cubic();
+   cs::particle_creation_parity=0;
+   uc::set_crystal_structure_to_simple_cubic();
 
-	// Turn off multi-spin Flags
-	sim::hamiltonian_simulation_flags[0] = 0;	/// Exchange
+   // Turn off multi-spin Flags
+   sim::hamiltonian_simulation_flags[0] = 0; /// Exchange
 
-	// MPI Mode (Homogeneous execution)
-	//vmpi::mpi_mode=0;
-	//mpi_create_variables::mpi_interaction_range=2; // Unit cells
-	//mpi_create_variables::mpi_comms_identify=false;
+   // MPI Mode (Homogeneous execution)
+   //vmpi::mpi_mode=0;
+   //mpi_create_variables::mpi_interaction_range=2; // Unit cells
+   //mpi_create_variables::mpi_comms_identify=false;
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 
@@ -228,13 +228,13 @@ void check_hysteresis_loop_parameters(){
    if(min>=0 && max>=0 && inc>0){
       if(max<min){
          if(vmpi::my_rank==0){
-			terminaltextcolor(RED);
+         terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both positive, but minimum > maximum with a positive increment, causing an infinite loop. Exiting." << std::endl;
-			terminaltextcolor(WHITE);
+         terminaltextcolor(WHITE);
             zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
@@ -248,14 +248,14 @@ void check_hysteresis_loop_parameters(){
    else if(min>=0 && max>=0 && inc<0){
       if(max>min){
          if(vmpi::my_rank==0){
-			terminaltextcolor(RED);
+         terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both positive, but maximum > minimum with a negative increment, causing an infinite loop. Exiting." << std::endl;
             terminaltextcolor(WHITE);
-			zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+         zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -267,14 +267,14 @@ void check_hysteresis_loop_parameters(){
    // + - +
    else if(min>=0 && max<0 && inc>0){
       if(vmpi::my_rank==0){
-		 terminaltextcolor(RED);
+       terminaltextcolor(RED);
          std::cout << "Error in hysteresis-loop parameters:" << std::endl;
          std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
          std::cout << "Minimum field is positive and maximum field is negative with a positive increment, causing an infinite loop. Exiting." << std::endl;
          terminaltextcolor(WHITE);
-		 zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+       zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
          zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -285,14 +285,14 @@ void check_hysteresis_loop_parameters(){
    // - + -
    else if(min<0 && max>=0 && inc<0){
       if(vmpi::my_rank==0){
-		 terminaltextcolor(RED);
+       terminaltextcolor(RED);
          std::cout << "Error in hysteresis-loop parameters:" << std::endl;
          std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
          std::cout << "Minimum field is negative and maximum field is positive with a negative increment, causing an infinite loop. Exiting." << std::endl;
          terminaltextcolor(WHITE);
-		 zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+       zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
          zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -304,14 +304,14 @@ void check_hysteresis_loop_parameters(){
    else if(min<0 && max<0 && inc<0){
       if(max>min){
          if(vmpi::my_rank==0){
-			terminaltextcolor(RED);
+         terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both negative, but minimum < maximum with a negative increment, causing an infinite loop. Exiting." << std::endl;
             terminaltextcolor(WHITE);
-			zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+         zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -324,14 +324,14 @@ void check_hysteresis_loop_parameters(){
    else if(min<0 && max<0 && inc>0){
       if(max<min){
          if(vmpi::my_rank==0){
-			terminaltextcolor(RED);
+         terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both negative, but maximum < minimum with a positive increment, causing an infinite loop. Exiting." << std::endl;
             terminaltextcolor(WHITE);
-			zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+         zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -346,44 +346,44 @@ void check_hysteresis_loop_parameters(){
 
 int set_derived_parameters(){
 
-	// Set integration constants
-	mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
-	mp::half_dt = 0.5*mp::dt;
+   // Set integration constants
+   mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
+   mp::half_dt = 0.5*mp::dt;
 
-	// Check to see if field direction is set by angle
-	if(sim::applied_field_set_by_angle){
-		sim::H_vec[0]=sin(sim::applied_field_angle_phi*M_PI/180.0)*cos(sim::applied_field_angle_theta*M_PI/180.0);
-		sim::H_vec[1]=sin(sim::applied_field_angle_phi*M_PI/180.0)*sin(sim::applied_field_angle_theta*M_PI/180.0);
-		sim::H_vec[2]=cos(sim::applied_field_angle_phi*M_PI/180.0);
-	}
+   // Check to see if field direction is set by angle
+   if(sim::applied_field_set_by_angle){
+      sim::H_vec[0]=sin(sim::applied_field_angle_phi*M_PI/180.0)*cos(sim::applied_field_angle_theta*M_PI/180.0);
+      sim::H_vec[1]=sin(sim::applied_field_angle_phi*M_PI/180.0)*sin(sim::applied_field_angle_theta*M_PI/180.0);
+      sim::H_vec[2]=cos(sim::applied_field_angle_phi*M_PI/180.0);
+   }
 
-	// Check for valid particle array offsets
-	if(cs::particle_array_offset_x >= cs::system_dimensions[0]){
-		terminaltextcolor(RED);
-		std::cerr << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl;
-		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
-		terminaltextcolor(WHITE);
-		zlog << zTs() << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl;
-		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
-	}
-	if(cs::particle_array_offset_y >= cs::system_dimensions[1]){
-		terminaltextcolor(RED);
-		std::cerr << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl;
-		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
-		terminaltextcolor(WHITE);
-		zlog << zTs() << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl;
-		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
-	}
+   // Check for valid particle array offsets
+   if(cs::particle_array_offset_x >= cs::system_dimensions[0]){
+      terminaltextcolor(RED);
+      std::cerr << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl;
+      std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
+      terminaltextcolor(WHITE);
+      zlog << zTs() << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl;
+      zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
+   }
+   if(cs::particle_array_offset_y >= cs::system_dimensions[1]){
+      terminaltextcolor(RED);
+      std::cerr << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl;
+      std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
+      terminaltextcolor(WHITE);
+      zlog << zTs() << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl;
+      zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
+   }
 
-	check_hysteresis_loop_parameters();
+   check_hysteresis_loop_parameters();
 
-	const string blank="";
+   const string blank="";
 
-	// Set derived material parameters
-	for(int mat=0;mat<mp::num_materials;mat++){
-		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
-		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
-		mp::material[mat].H_th_sigma             = sqrt(2.0*mp::material[mat].alpha*constants::kB / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
+   // Set derived material parameters
+   for(int mat=0;mat<mp::num_materials;mat++){
+      mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
+      mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
+      mp::material[mat].H_th_sigma             = sqrt(2.0*mp::material[mat].alpha*constants::kB / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
       mp::material[mat].H_th_sigma_eq         = sqrt(2.0*mp::material[mat].alpha_eq*constants::kB / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
 
       // Rename un-named materials with material id
@@ -394,13 +394,13 @@ int set_derived_parameters(){
          mp::material[mat].name=newname.str();
       }
 
-	}
+   }
 
       // Unroll material spin moment values for speed
       mp::mu_s_array.resize(mp::num_materials);
       for(int mat=0;mat<mp::num_materials; mat++) mu_s_array.at(mat)=mp::material[mat].mu_s_SI/constants::muB; // normalise to mu_B
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 } // end of namespace mp

@@ -23,7 +23,7 @@ namespace vinfo{
 
    // wrapper function to return vampire version
    std::string version(){
-   	return vampire_version;
+      return vampire_version;
    }
 
 } // end of vinfo namespace

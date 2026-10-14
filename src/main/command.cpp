@@ -44,7 +44,7 @@ void command_line_args(int argc, char* argv[]){
          }
          #ifdef MPICF
             vmpi::barrier();
-         	MPI_Finalize();
+            MPI_Finalize();
          #endif
          // exit program
          exit(EXIT_SUCCESS);

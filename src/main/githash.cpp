@@ -22,7 +22,7 @@ namespace vinfo{
 
 // function to return git commit of unique code version at HEAD of repository
 std::string githash(){
-	return GITHASH;
+   return GITHASH;
 }
 
 } // end of vinfo namespace
