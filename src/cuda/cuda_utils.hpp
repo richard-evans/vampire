@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 
+#include "errors.hpp"
+
 //-----------------------------------------------------------------------------
 // Wrapper function to test for errors in kernels if the debug flag is set
 // Usage: check_cuda_errors( __FILE__, __LINE__)
@@ -34,7 +36,7 @@ inline void check_cuda_errors(const char *filename, const int line_number)
    if(error != cudaSuccess)
    {
       printf("CUDA error at %s:%i: %s\n", filename, line_number, cudaGetErrorString(error));
-      exit(-1);
+      ::err::vexit();
    }
 #endif
 }
