@@ -1,13 +1,13 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) / Free BSD licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-// (c) R F L Evans 2009-2026. All rights reserved.
+//   (c) R F L Evans 2009-2026. All rights reserved.
 //
-// Email: richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 #ifndef GRAINS_H_
 #define GRAINS_H_

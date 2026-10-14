@@ -1,13 +1,13 @@
 #ifndef CUDA_H_
 #define CUDA_H_
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This header file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-// (c) R F L Evans 2015. All rights reserved.
+//   (c) R F L Evans 2015. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 namespace vcuda{
 

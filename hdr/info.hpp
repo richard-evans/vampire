@@ -1,13 +1,13 @@
 #ifndef INFO_H_
 #define INFO_H_
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This header is part of the VAMPIRE open source package under the
-// Free BSD licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-// (c) R F L Evans 2018. All rights reserved.
+//   (c) R F L Evans 2018. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 // Functions to provide code version and revision information for vampire

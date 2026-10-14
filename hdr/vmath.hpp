@@ -28,9 +28,6 @@ namespace vmath{
 
    /// @brief Function to determine if point is within a polygon.
    ///
-   /// @section License
-   /// Use of this code, either in source or compiled form, is subject to license from the authors.
-   /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
    ///
    /// @section Information
    /// @author  Richard Evans, rfle500@york.ac.uk
