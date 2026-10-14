@@ -188,6 +188,14 @@ int main(int argc, char* argv[]){
       if( serial_only("constants/gamma") && !integrator_test("constants/gamma", 9.74e-11, -0.127636, -0.991673, 0.0171491, exe ) ) fail += 1;
       // muB: Zeeman energy for 125 spins of 1 muB in 1T field = -125*muB = -1.15925125979e-21 J
       if( !energy_test("constants/muB", -1.15925125979e-21, exe, "muB" ) ) fail += 1;
+
+      // Zeeman energy: E = -mu_s B (S.h), mu_s = 2 muB, B = 1.5 T, h = (1,2,2)/3, for 100 spins along
+      // [001], [100], [111], d4 = (0.3,-0.5,0.8) and d5 = (-0.6,0.2,0.4) (normalised)
+      if( !final_values_test("energy/zeeman", { {"E[001]", 0, -1.854802015660000e-21, 1.0e-10, 1.0e-30},
+                                                {"E[100]", 1, -9.274010078300000e-22, 1.0e-10, 1.0e-30},
+                                                {"E[111]", 2, -2.677176107586904e-21, 1.0e-10, 1.0e-30},
+                                                {"E(d4)", 3, -8.431348390917834e-22, 1.0e-10, 1.0e-30},
+                                                {"E(d5)", 4, -7.435750353104395e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
       // kB: single spin MC with fixed seed; final spin direction is deterministic and depends on kB
       if( serial_only("constants/kB") && !integrator_test("constants/kB", 9.74e-11, 0.411154, -0.829297, 0.378442, exe ) ) fail += 1;
 
