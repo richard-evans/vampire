@@ -21,7 +21,7 @@ Each case is a directory `cases/<module>/<case>/` containing:
 | `expected-serial.dat` | golden `output` file from `vampire-serial` (comment lines removed) |
 | `expected-mpi-np<N>.dat` | golden `output` file from `vampire-parallel` on N processes |
 | `tolerance` | optional, `rel <r> abs <a>`; the default is `rel 1e-12 abs 1e-14` |
-| `files` | optional, other output files to compare, one per line, with goldens `expected-serial.<file>` and `expected-mpi-np<N>.<file>` |
+| `files` | optional, other output files to compare, one per line (glob patterns allowed, as serial and MPI runs can write different files), with goldens `expected-serial.<file>` and `expected-mpi-np<N>.<file>`; binary files are compared byte for byte |
 | `expected-error` | for input that must be rejected: vampire must fail and its terminal output must contain each line of this file; runs in every mode |
 
 Each run is stopped after `TIME_LIMIT` seconds (default 300), so a hang counts as a failure. A missing `output` file (some programs never write one) is compared as an empty file.

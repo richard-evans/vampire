@@ -18,8 +18,9 @@
 #    expected-serial.dat          golden output (comment lines stripped)
 #    expected-mpi-np<N>.dat       golden output for vampire-parallel on N processes
 #    tolerance                    optional, "rel <r> abs <a>" (default rel 1e-12 abs 1e-14)
-#    files                        optional, other output files to compare, one per line; their
-#                                 golden files are expected-serial.<file> and expected-mpi-np<N>.<file>
+#    files                        optional, other output files to compare, one per line (glob patterns
+#                                 allowed); their golden files are expected-serial.<file> and
+#                                 expected-mpi-np<N>.<file>. Binary files are compared byte for byte.
 #    expected-error               for input that must be rejected: vampire must exit with an error and
 #                                 its terminal output must contain each line of this file (all modes)
 #
@@ -158,15 +159,36 @@ for name in $pattern; do
 
    # some programs never write the output file, so treat a missing one as empty
    [ -f "$dir/output" ] || : > "$dir/output"
-   # output files to compare, as pairs of obtained file and golden file
+   # output files to compare, as pairs of obtained file and golden file. Entries in the files list may be
+   # glob patterns, since the files written can differ between serial and mpi runs.
+   result=""
+   prefix="$name/${golden%.dat}"
    compare_list=("output" "$name/$golden")
    if [ -f "$name/files" ]; then
-      while read -r f; do
-         [ -n "$f" ] && compare_list+=("$f" "$name/${golden%.dat}.$f")
+      while read -r pattern_f; do
+         [ -n "$pattern_f" ] || continue
+         matches="$(cd "$dir" && ls -1d $pattern_f 2> /dev/null)"
+         [ -n "$matches" ] || result="$result $pattern_f: not written;"
+         for f in $matches; do
+            compare_list+=("$f" "$prefix.$f")
+         done
       done < "$name/files"
    fi
 
-   result=""
+   if [ "$bless" = true ]; then
+      # remove goldens of this mode from earlier blessings before writing new ones
+      for g in "$prefix".*; do
+         [ "$g" = "$name/$golden" ] || rm -f "$g"
+      done
+   else
+      # every golden file of this mode must have been written again
+      for g in "$prefix".*; do
+         [ -f "$g" ] && [ "$g" != "$name/$golden" ] || continue
+         f="${g#$prefix.}"
+         [ -f "$dir/$f" ] || result="$result $f: not written;"
+      done
+   fi
+
    for ((i=0; i<${#compare_list[@]}; i+=2)); do
       obtained="${compare_list[i]}"
       expected="${compare_list[i+1]}"
@@ -174,10 +196,19 @@ for name in $pattern; do
          result="$result $obtained: not written;"
          continue
       fi
-      grep -v "^#" "$dir/$obtained" > "$dir/$obtained.obtained"
+      # binary files are compared byte for byte, text files without comment lines
+      binary=false
+      if [ -s "$dir/$obtained" ] && ! grep -qI . "$dir/$obtained"; then
+         binary=true
+         cp "$dir/$obtained" "$dir/$obtained.obtained"
+      else
+         grep -v "^#" "$dir/$obtained" > "$dir/$obtained.obtained"
+      fi
       if [ "$bless" = true ]; then
          cp "$dir/$obtained.obtained" "$expected"
-      elif [ "$exact" = true ]; then
+      elif [ ! -f "$expected" ]; then
+         result="$result $obtained: no golden file;"
+      elif [ "$exact" = true ] || [ "$binary" = true ]; then
          cmp -s "$expected" "$dir/$obtained.obtained" || result="$result $obtained: files differ;"
       else
          tolerance=""
