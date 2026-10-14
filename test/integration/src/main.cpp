@@ -144,6 +144,12 @@ int main(int argc, char* argv[]){
                                                                    {"E[111]", 2, 0.0, 1.0e-10, 1.0e-30},
                                                                    {"E(d4)", 3, 1.357142857142857e-21, 1.0e-10, 1.0e-30},
                                                                    {"E(d5)", 4, 7.142857142857171e-23, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
+      // triaxial-fourth-order: E = -sum_i k_i (S_i^4 - 30/35 S_i^2), k = (1,2,-3) x 1e-23 J, for 100 spins along each direction
+      if( !final_values_test("anisotropy/triaxial-fourth-order", { {"E[001]", 0, 4.285714285714287e-22, 1.0e-10, 1.0e-30},
+                                                                   {"E[100]", 1, -1.428571428571429e-22, 1.0e-10, 1.0e-30},
+                                                                   {"E[111]", 2, -3.673419846319648e-38, 1.0e-10, 1.0e-30},
+                                                                   {"E(d4)", 3, -2.238650562265698e-23, 1.0e-10, 1.0e-30},
+                                                                   {"E(d5)", 4, -2.397959183673470e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
 
       // DMI energy tests
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
