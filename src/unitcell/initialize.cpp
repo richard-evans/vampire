@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include <sstream>
 #include "errors.hpp"
 #include "unitcell.hpp"
 #include "vio.hpp"
@@ -58,11 +59,9 @@ namespace unitcell{
       else if(uc::internal::crystal_structure == "SmFeN"              ) uc::internal::build_SmFeN(                  unit_cell );
       // Otherwise print an error to user
       else{
-         terminaltextcolor(RED);
-         std::cerr << "Error: Unknown crystal_type "<< uc::internal::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl;
-         terminaltextcolor(WHITE);
-         zlog << zTs() << "Error: Unknown crystal_type "<< uc::internal::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Error: Unknown crystal_type " << uc::internal::crystal_structure << " found during unit cell initialisation. Exiting.";
+         err::fatal(message.str());
       }
 
       // optionally write generated unit cell file to disk

@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <cmath>
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -242,11 +243,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // Check for interactions
    if(unit_cell.bilinear.interaction.size()==0){
-      terminaltextcolor(RED);
-      std::cerr << "Error! No interactions generated for " << uc::internal::crystal_structure << " crystal structure. Try increasing the interaction range. Aborting." << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Error! No interactions generated for " << uc::internal::crystal_structure << " crystal structure. Try increasing the interaction range. Aborting." << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "Error! No interactions generated for " << uc::internal::crystal_structure << " crystal structure. Try increasing the interaction range. Aborting.";
+      err::fatal(message.str());
    }
 
    return;
