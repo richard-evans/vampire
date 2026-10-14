@@ -1,0 +1,33 @@
+create:crystal-structure=bcc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+exchange:interaction-range = 3
+sim:program=time-series
+sim:integrator=spin-lattice
+sim:temperature=300.0
+sim:equilibration-temperature=300.0
+sim:equilibration-time-steps=0
+sim:total-time-steps=200
+sim:time-steps-increment=20
+sim:time-step=0.5 !fs
+sim:integrator-random-seed=12345
+spin-lattice:potential=harmonic
+spin-lattice:coupling=pseudodipolar
+spin-lattice:potential-cutoff-range=7.8 !A
+spin-lattice:fields-cutoff-range=3.75 !A
+output:precision=16
+output:time-steps
+output:temperature
+output:magnetisation
+output:mean-magnetisation-length
+output:spin-temperature
+output:lattice-temperature
+output:kinetic-energy
+output:potential-energy
+output:sld-total-energy
