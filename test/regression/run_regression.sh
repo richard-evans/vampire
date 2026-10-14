@@ -18,6 +18,8 @@
 #    expected-serial.dat          golden output (comment lines stripped)
 #    expected-mpi-np<N>.dat       golden output for vampire-parallel on N processes
 #    tolerance                    optional, "rel <r> abs <a>" (default rel 1e-12 abs 1e-14)
+#    files                        optional, other output files to compare, one per line; their
+#                                 golden files are expected-serial.<file> and expected-mpi-np<N>.<file>
 #
 # A case is only run in a mode for which it has a golden file, unless --bless is given.
 #
@@ -107,7 +109,7 @@ for name in $pattern; do
    mkdir -p "$dir"
    for f in "$name"/*; do
       case "$(basename "$f")" in
-         expected-*|tolerance) ;;
+         expected-*|tolerance|files) ;;
          *) cp -R "$f" "$dir/";;
       esac
    done
@@ -122,30 +124,44 @@ for name in $pattern; do
       fail=$((fail+1))
       continue
    fi
-   grep -v "^#" "$dir/output" > "$dir/obtained.dat"
+   # output files to compare, as pairs of obtained file and golden file
+   compare_list=("output" "$name/$golden")
+   if [ -f "$name/files" ]; then
+      while read -r f; do
+         [ -n "$f" ] && compare_list+=("$f" "$name/${golden%.dat}.$f")
+      done < "$name/files"
+   fi
 
-   if [ "$bless" = true ]; then
-      cp "$dir/obtained.dat" "$name/$golden"
-      echo "BLESSED ($(wc -l < "$name/$golden" | tr -d ' ') lines, ${elapsed} s)"
+   result=""
+   for ((i=0; i<${#compare_list[@]}; i+=2)); do
+      obtained="${compare_list[i]}"
+      expected="${compare_list[i+1]}"
+      if [ ! -f "$dir/$obtained" ]; then
+         result="$result $obtained: not written;"
+         continue
+      fi
+      grep -v "^#" "$dir/$obtained" > "$dir/$obtained.obtained"
+      if [ "$bless" = true ]; then
+         cp "$dir/$obtained.obtained" "$expected"
+      elif [ "$exact" = true ]; then
+         cmp -s "$expected" "$dir/$obtained.obtained" || result="$result $obtained: files differ;"
+      else
+         tolerance=""
+         [ -f "$name/tolerance" ] && tolerance="$(awk '{for(i=1;i<NF;i++){if($i=="rel")r=$(i+1);if($i=="abs")a=$(i+1)}} END{print r, a}' "$name/tolerance")"
+         diffs="$(python3 -I "$here/compare.py" "$expected" "$dir/$obtained.obtained" $tolerance)" || result="$result $obtained: ${diffs:-compare failed};"
+      fi
+   done
+
+   if [ -z "$result" ] && [ "$bless" = true ]; then
+      echo "BLESSED ($(( ${#compare_list[@]}/2 )) files, ${elapsed} s)"
       blessed=$((blessed+1))
       [ "$keep" = true ] || rm -rf "$dir"
-      continue
-   fi
-
-   if [ "$exact" = true ]; then
-      cmp -s "$name/$golden" "$dir/obtained.dat" && result="" || result="files differ"
-   else
-      tolerance=""
-      [ -f "$name/tolerance" ] && tolerance="$(awk '{for(i=1;i<NF;i++){if($i=="rel")r=$(i+1);if($i=="abs")a=$(i+1)}} END{print r, a}' "$name/tolerance")"
-      result="$(python3 -I "$here/compare.py" "$name/$golden" "$dir/obtained.dat" $tolerance)"
-   fi
-
-   if [ $? -eq 0 ] && [ -z "$result" ]; then
+   elif [ -z "$result" ]; then
       echo "OK (${elapsed} s)"
       pass=$((pass+1))
       [ "$keep" = true ] || rm -rf "$dir"
    else
-      echo "FAIL | $result | see $dir"
+      echo "FAIL |$result see $dir"
       fail=$((fail+1))
    fi
 

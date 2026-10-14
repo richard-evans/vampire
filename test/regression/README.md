@@ -21,6 +21,7 @@ Each case is a directory `cases/<module>/<case>/` containing:
 | `expected-serial.dat` | golden `output` file from `vampire-serial` (comment lines removed) |
 | `expected-mpi-np<N>.dat` | golden `output` file from `vampire-parallel` on N processes |
 | `tolerance` | optional, `rel <r> abs <a>`; the default is `rel 1e-12 abs 1e-14` |
+| `files` | optional, other output files to compare, one per line, with goldens `expected-serial.<file>` and `expected-mpi-np<N>.<file>` |
 
 A case runs only in the modes for which it has a golden file. Numeric fields pass if
 `|obtained - expected| <= abs + rel*|expected|`.
