@@ -1,0 +1,16 @@
+#------------------------------------------------------------------------------
+# Single spin (alpha = 0.1) precessing in 1 T along z from x, to t = 20 ps
+# with time step 1.0E-13 s, for the convergence order test of llg-rkmk2
+#------------------------------------------------------------------------------
+create:single-spin
+material:file=Co.mat
+sim:temperature=0.0
+sim:time-steps-increment = 200
+sim:total-time-steps = 200
+sim:time-step=1.0E-13
+sim:applied-field-strength = 1.0 !T
+sim:program=benchmark
+sim:integrator=llg-rkmk2
+output:precision=16
+output:real-time
+output:magnetisation
