@@ -1,13 +1,13 @@
 #ifndef SPINTORQUE_INTERNAL_H_
 #define SPINTORQUE_INTERNAL_H_
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This header file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans and P Chureemart 2014. All rights reserved.
+//   (c) R F L Evans and P Chureemart 2014. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------
 // Defines shared internal data structures and functions for the
