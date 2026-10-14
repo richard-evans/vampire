@@ -4,9 +4,10 @@
 //   Free BSD licence (see licence file for details).
 //
 //   (c) Andrew J Naden, Richard F L Evans and Rory Pond 2016-2019.
-//       All rights reserved.
+//   All rights reserved.
 //
-//   Email: richard.evans@york.ac.uk and rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk
+//          rory.pond@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //

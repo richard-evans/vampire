@@ -3,9 +3,11 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans and Rory Pond 2016. (Jack Collings 2021) All rights reserved.
+//   (c) Richard F L Evans and Rory Pond 2016, Jack Collings 2021.
+//   All rights reserved.
 //
-//   Email: richard.evans@york.ac.uk and rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk
+//          rory.pond@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -91,9 +93,6 @@ namespace vin{
 
    /// @brief Function to read in variables from a file.
    ///
-   /// @section License
-   /// Use of this code, either in source or compiled form, is subject to license from the authors.
-   /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
    ///
    /// @section Information
    /// @author  Richard Evans, rfle500@york.ac.uk
