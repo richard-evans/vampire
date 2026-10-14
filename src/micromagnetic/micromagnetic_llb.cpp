@@ -32,7 +32,6 @@
 #include <sstream>
 
 namespace mm = micromagnetic::internal;
-using namespace std;
 
 //function declaration for the serial LLB
 int LLB_serial_heun( std::vector <int> local_cell_array,
