@@ -11,9 +11,9 @@ namespace vcuda{
 
     namespace internal{
 
-		__device__ cu_real_t calculate_thermal_field(const cu_real_t temperature, const cu_real_t alpha, 
-																	const cu_real_t Tc, const cu_real_t sigma,
-																	curandState local_state);
+      __device__ cu_real_t calculate_thermal_field(const cu_real_t temperature, const cu_real_t alpha,
+                                                   const cu_real_t Tc, const cu_real_t sigma,
+                                                   curandState local_state);
 
     }
 }

@@ -37,21 +37,21 @@ namespace internal{
    // Kernel function to calculate external applied fields
    //------------------------------------------------------------------------------
    __global__ void update_applied_fields_kernel(
-   		cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
+         cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
          const cu_real_t Hx_app, const cu_real_t Hy_app, const cu_real_t Hz_app,
          int *  material, vcuda::internal::material_parameters_t * material_params,
-   		const int n_atoms
-   		)
+         const int n_atoms
+         )
    {
-   	for ( int atom = blockIdx.x * blockDim.x + threadIdx.x;
-   	      atom < n_atoms;
-   	      atom += blockDim.x * gridDim.x)
-   	{
+      for ( int atom = blockIdx.x * blockDim.x + threadIdx.x;
+            atom < n_atoms;
+            atom += blockDim.x * gridDim.x)
+      {
          // Get material of atom
          int mid = material[atom];
          // Load parameters to local variables from memory
          cu::material_parameters_t mat = material_params[mid];
- 
+
          // initialize registers for total external field
          cu_real_t field_x = 0.0;
          cu_real_t field_y = 0.0;
@@ -68,10 +68,10 @@ namespace internal{
          field_y += Hy_app;
          field_z += Hz_app;
 
-   	   x_field_array[atom] += field_x;
-   	   y_field_array[atom] += field_y;
-   	   z_field_array[atom] += field_z;
-   	}
+         x_field_array[atom] += field_x;
+         y_field_array[atom] += field_y;
+         z_field_array[atom] += field_z;
+      }
    } // end calculate_applied_fields_kernel
 
 
@@ -79,22 +79,22 @@ namespace internal{
    void update_applied_fields()
    {
 
-   	// copy simulation variables to temporary constants
+      // copy simulation variables to temporary constants
       const cu_real_t Hx_app = sim::H_vec[0]*sim::H_applied;
       const cu_real_t Hy_app = sim::H_vec[1]*sim::H_applied;
       const cu_real_t Hz_app = sim::H_vec[2]*sim::H_applied;
 
-   	const int num_atoms = ::atoms::num_atoms;
+      const int num_atoms = ::atoms::num_atoms;
 
-   	update_applied_fields_kernel <<< cu::grid_size, cu::block_size >>> (
-   		cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+      update_applied_fields_kernel <<< cu::grid_size, cu::block_size >>> (
+         cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
          Hx_app, Hy_app, Hz_app,
          cu::atoms::d_materials, cu::mp::d_material_params,
-   		num_atoms); 
+         num_atoms);
 
-   	check_cuda_errors (__FILE__, __LINE__);
+      check_cuda_errors (__FILE__, __LINE__);
 
-   	return;
+      return;
    } // end update_global_thermal_field
 
 
@@ -186,7 +186,7 @@ namespace internal{
          * TODO: FMR fields?
          */
 
-			// Add dipolar fields
+         // Add dipolar fields
          x_ext_field[atom] += x_dip_field[atom];
          y_ext_field[atom] += y_dip_field[atom];
          z_ext_field[atom] += z_dip_field[atom];
@@ -237,10 +237,10 @@ namespace internal{
       //std::cerr << cu::x_total_external_field_array[0] << "\t";
       //std::cerr << cu::y_total_external_field_array[0] << "\t";
       //std::cerr << cu::z_total_external_field_array[0] << "\t";
-   
+
       return;
 
-   }   
+   }
 
 
 } // end of internal namespace

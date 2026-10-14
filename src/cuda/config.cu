@@ -26,7 +26,7 @@ namespace vcuda{
 
       void synchronise(){
 
-		   // copy spin data to CPU
+         // copy spin data to CPU
          cudaMemcpy(::atoms::x_spin_array.data(), internal::atoms::d_x_spin, ::atoms::num_atoms * sizeof(internal::cu_real_t), cudaMemcpyDeviceToHost);
          cudaMemcpy(::atoms::y_spin_array.data(), internal::atoms::d_y_spin, ::atoms::num_atoms * sizeof(internal::cu_real_t), cudaMemcpyDeviceToHost);
          cudaMemcpy(::atoms::z_spin_array.data(), internal::atoms::d_z_spin, ::atoms::num_atoms * sizeof(internal::cu_real_t), cudaMemcpyDeviceToHost);

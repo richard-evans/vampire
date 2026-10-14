@@ -45,7 +45,7 @@ void update_dipolar_fields ()
 
    // save last time of demag update
    ::dipole::update_time = ::sim::time;
-   
+
    update_cell_magnetizations ();
 
    check_cuda_errors (__FILE__, __LINE__);
@@ -89,7 +89,7 @@ void update_dipolar_fields ()
          );
 
    check_cuda_errors (__FILE__, __LINE__);
-   
+
 //   // Transfer cells dipolar fields from gpu to cpu
 //   vcuda::transfer_dipole_cells_fields_from_gpu_to_cpu();
 }
@@ -217,7 +217,7 @@ __global__ void update_dipolar_fields (
 //         cu_real_t my_i = y_mag[i] * imuB;
 //         cu_real_t mz_i = z_mag[i] * imuB;
 
-      // Initialise field for cell i 
+      // Initialise field for cell i
       cu_real_t field_x = 0.0;
       cu_real_t field_y = 0.0;
       cu_real_t field_z = 0.0;
@@ -230,7 +230,7 @@ __global__ void update_dipolar_fields (
 
       for ( int j = 0; j < n_cells; j ++){
 
-         const int k = lc * n_cells + j; 
+         const int k = lc * n_cells + j;
 
          cu_real_t mx_j = x_mag[j] * imuB;
          cu_real_t my_j = y_mag[j] * imuB;
@@ -254,7 +254,7 @@ __global__ void update_dipolar_fields (
       z_cell_mu0H_field[i] = prefactor * (field_z + (-0.5 * self_demag * z_mag[i] * imuB));
 
 //      printf("%d  %lf  %lf  %lf\n",i,x_cell_field[i],y_cell_field[i],z_cell_field[i]);
-      
+
    } // end for loop over n_local_cells
 }
 
@@ -283,7 +283,7 @@ __global__ void update_atomistic_dipolar_fields (
       x_mu0H_dip_field[i] = x_cell_mu0H_field[cid];
       y_mu0H_dip_field[i] = y_cell_mu0H_field[cid];
       z_mu0H_dip_field[i] = z_cell_mu0H_field[cid];
-      
+
 //      printf("%d  %lf  %lf  %lf\n",i,x_dip_field[i],y_dip_field[i],z_dip_field[i]);
    }
 }

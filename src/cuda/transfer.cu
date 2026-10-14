@@ -73,7 +73,7 @@ void transfer_dipole_fields_from_cpu_to_gpu(){
    cudaMemcpy(cu::d_y_mu0H_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
    std::copy(::dipole::atom_mu0demag_field_array_z.begin(), ::dipole::atom_mu0demag_field_array_z.end(), tmp_buffer.begin());
    cudaMemcpy(cu::d_z_mu0H_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
-   
+
    /*
    thrust::copy(::dipole::atom_dipolar_field_array_x.begin(),::dipole::atom_dipolar_field_array_x.end(), cu::x_dipolar_field_array.begin());
    thrust::copy(::dipole::atom_dipolar_field_array_y.begin(),::dipole::atom_dipolar_field_array_y.end(), cu::y_dipolar_field_array.begin());
@@ -95,7 +95,7 @@ void transfer_dipole_cells_fields_from_gpu_to_cpu(){
    cudaMemcpy(::dipole::cells_mu0Hd_field_array_x.data(), cu::cells::d_x_cell_mu0H_field, ::cells::num_cells * sizeof(double), cudaMemcpyDeviceToHost);
    cudaMemcpy(::dipole::cells_mu0Hd_field_array_y.data(), cu::cells::d_y_cell_mu0H_field, ::cells::num_cells * sizeof(double), cudaMemcpyDeviceToHost);
    cudaMemcpy(::dipole::cells_mu0Hd_field_array_z.data(), cu::cells::d_z_cell_mu0H_field, ::cells::num_cells * sizeof(double), cudaMemcpyDeviceToHost);
-    
+
    return;
 
 }

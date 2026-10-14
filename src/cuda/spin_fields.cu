@@ -80,7 +80,7 @@ __device__ cu_real_t uniaxial_anisotropy_energy(cu::material_parameters_t &mater
       const cu_real_t sdote = sx * ex + sy * ey + sz * ez;
       const cu_real_t sdote2 = sdote * sdote;
 
-      const cu_real_t k2 = material.sh2;  
+      const cu_real_t k2 = material.sh2;
       const cu_real_t k4 = material.sh4;
       const cu_real_t k6 = material.sh6;
 
@@ -136,7 +136,7 @@ __global__ void update_non_exchange_spin_fields_kernel (
 
       const cu_real_t scale = 2.0 / 3.0;
 
-	// Reduced anisotropy constants ku/mu_s [J/T]
+   // Reduced anisotropy constants ku/mu_s [J/T]
       const cu_real_t k2 = material.sh2;
       const cu_real_t k4 = material.sh4;
       const cu_real_t k6 = material.sh6;
@@ -144,7 +144,7 @@ __global__ void update_non_exchange_spin_fields_kernel (
       const cu_real_t ek2 = k2 * 3.0 * sdote;
       const cu_real_t ek4 = k4 * (6.0 * sdote3 - ((18.0/7.0) * sdote));
       const cu_real_t ek6 = k6 * (3.0/11.0) * (((33.0)*sdote5) - (30.0 * sdote3) + (5.0*sdote));
-      
+
       field_x += scale * ex * (ek2 + ek4 + ek6);
       field_y += scale * ey * (ek2 + ek4 + ek6);
       field_z += scale * ez * (ek2 + ek4 + ek6);

@@ -44,11 +44,11 @@ namespace vcuda{
 
 #ifdef CUDA
 
-	namespace internal {
+   namespace internal {
 
-		//--------------------------------------------------------------
+      //--------------------------------------------------------------
       // device data structures and functions for llg integration
-		//--------------------------------------------------------------
+      //--------------------------------------------------------------
       namespace llg{
 
          // flag to indicate initialization of llg data structures and variables
@@ -93,11 +93,11 @@ namespace vcuda{
             cudaMalloc((void**)&cu::llg::d_z_spin_buffer, ::atoms::num_atoms * sizeof(cu_real_t));
 
             // Initial copy to the buffer
-	    // This is later taken care of inside the corrector step kernel
+       // This is later taken care of inside the corrector step kernel
             cudaMemcpy(cu::llg::d_x_spin_buffer, cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
             cudaMemcpy(cu::llg::d_y_spin_buffer, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
             cudaMemcpy(cu::llg::d_z_spin_buffer, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-            
+
             cudaMalloc((void**)&cu::llg::d_ds_x, ::atoms::num_atoms * sizeof(cu_real_t));
             cudaMalloc((void**)&cu::llg::d_ds_y, ::atoms::num_atoms * sizeof(cu_real_t));
             cudaMalloc((void**)&cu::llg::d_ds_z, ::atoms::num_atoms * sizeof(cu_real_t));
@@ -119,10 +119,10 @@ namespace vcuda{
                h_heun_params.at(i).lambda_times_prefactor = -gamma * alpha / (1.0 + alpha * alpha);
 
                #ifdef CUDA_SPIN_DEBUG
-					   // output variables to screen for debugging
+                  // output variables to screen for debugging
                   std::cout << "Heun parameters: "
-									 << h_heun_params.at(i).prefactor << " "
-									 << h_heun_params.at(i).lambda_times_prefactor << std::endl;
+                            << h_heun_params.at(i).prefactor << " "
+                            << h_heun_params.at(i).lambda_times_prefactor << std::endl;
                #endif
 
             }
@@ -137,8 +137,8 @@ namespace vcuda{
             // set flag to indicate data initialization
             initialized=true;
 
-				// check for errors?
-				return;
+            // check for errors?
+            return;
 
          }
 
@@ -159,9 +159,9 @@ namespace vcuda{
 
             #ifdef CUDA_SPIN_DEBUG
                // Output first spin position
-				   // std::cout << cu::atoms::x_spin_array[0] << " "
-					// 			 << cu::atoms::y_spin_array[0] << " "
-					// 			 << cu::atoms::z_spin_array[0] << std::endl;
+               // std::cout << cu::atoms::x_spin_array[0] << " "
+               //           << cu::atoms::y_spin_array[0] << " "
+               //           << cu::atoms::z_spin_array[0] << std::endl;
             #endif
 
             // Cast device pointers for calling kernel function calls
@@ -201,7 +201,7 @@ namespace vcuda{
             // Invoke kernel for heun predictor step
             cu::llg::llg_heun_predictor_step <<< cu::grid_size, cu::block_size >>> (
                cu::atoms::d_materials, cu::llg::d_heun_params,
-					cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+               cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
                cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
                cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
                cu::llg::d_ds_x, cu::llg::d_ds_y, cu::llg::d_ds_z,
@@ -226,7 +226,7 @@ namespace vcuda{
             // Invoke kernel for heun corrector step
             cu::llg::llg_heun_corrector_step <<< cu::grid_size, cu::block_size >>> (
                cu::atoms::d_materials, cu::llg::d_heun_params,
-					cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+               cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
                cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
                cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
                cu::llg::d_x_spin_buffer, cu::llg::d_y_spin_buffer, cu::llg::d_z_spin_buffer,
@@ -235,7 +235,7 @@ namespace vcuda{
 
             check_cuda_errors (__FILE__, __LINE__);
 
-				return;
+            return;
 
          }
 
@@ -317,9 +317,9 @@ namespace vcuda{
          }
 
          //-----------------------------------------------------------------------------
-			// CUDA Kernel to calculate the corrector step of the Landau-Lifshitz-Gilbert
-			// (LLG) equation using the Heun scheme
-			//-----------------------------------------------------------------------------
+         // CUDA Kernel to calculate the corrector step of the Landau-Lifshitz-Gilbert
+         // (LLG) equation using the Heun scheme
+         //-----------------------------------------------------------------------------
          __global__ void llg_heun_corrector_step (
                int * material_id,
                cu::heun_parameters_t * heun_parameters,
@@ -378,16 +378,16 @@ namespace vcuda{
                   float mods = __frsqrt_rn(S_x*S_x + S_y*S_y + S_z*S_z);
                #endif
 
-	       cu_real_t sp_x_new = mods * S_x;
-	       cu_real_t sp_y_new = mods * S_y;
-	       cu_real_t sp_z_new = mods * S_z;
+          cu_real_t sp_x_new = mods * S_x;
+          cu_real_t sp_y_new = mods * S_y;
+          cu_real_t sp_z_new = mods * S_z;
 
                // save final spin direction to spin array
                x_spin[atom] = sp_x_new;
                y_spin[atom] = sp_y_new;
                z_spin[atom] = sp_z_new;
 
-	       // Update the spin buffer
+          // Update the spin buffer
                x_spin_buffer[atom] = sp_x_new;
                y_spin_buffer[atom] = sp_y_new;
                z_spin_buffer[atom] = sp_z_new;

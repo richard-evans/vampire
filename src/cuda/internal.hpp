@@ -160,12 +160,12 @@ namespace vcuda{
             );
 
       __global__ void apply_global_temperature_kernel(
-      		cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
-      		cu_real_t temperature,
-      		curandState * rand_states,
-      		material_parameters_t * material_params,
-      		int * material,
-      		int n_atoms);
+            cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
+            cu_real_t temperature,
+            curandState * rand_states,
+            material_parameters_t * material_params,
+            int * material,
+            int n_atoms);
 
       __global__ void update_applied_fields_kernel(
             cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
