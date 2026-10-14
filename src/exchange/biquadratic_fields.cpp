@@ -55,16 +55,16 @@ namespace internal{
                                     std::vector<double>& field_array_z){
 
       // loop over all atoms
-		for(int atom = start_index; atom < end_index; ++atom){
+      for(int atom = start_index; atom < end_index; ++atom){
 
          // temporary variables (registers) to calculate intermediate sum
-			double hx = 0.0;
-			double hy = 0.0;
-			double hz = 0.0;
+         double hx = 0.0;
+         double hy = 0.0;
+         double hz = 0.0;
 
          // temporary constants for loop start and end indices
-			const int start = neighbour_list_start_index[atom];
-			const int end   = neighbour_list_end_index[atom]+1;
+         const int start = neighbour_list_start_index[atom];
+         const int end   = neighbour_list_end_index[atom]+1;
 
          // load spin Si components into temporary contants
          const double six = spin_array_x[atom];
@@ -72,13 +72,13 @@ namespace internal{
          const double siz = spin_array_z[atom];
 
          // loop over all neighbours
-			for(int nn = start; nn < end; ++nn){
+         for(int nn = start; nn < end; ++nn){
 
             // get neighbouring atom number
-				const int natom = neighbour_list_array[nn];
+            const int natom = neighbour_list_array[nn];
 
             // get exchange constant between atoms
-				const double twoJbq = 2.0*bq_i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij;
+            const double twoJbq = 2.0*bq_i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij;
 
             // load spin Sj components
             const double sjx = spin_array_x[natom];
@@ -87,21 +87,21 @@ namespace internal{
 
             const double si_dot_sj = six*sjx + siy*sjy + siz*sjz;
 
-				hx += twoJbq * sjx*si_dot_sj; // add exchange fields
-				hy += twoJbq * sjy*si_dot_sj;
-				hz += twoJbq * sjz*si_dot_sj;
+            hx += twoJbq * sjx*si_dot_sj; // add exchange fields
+            hy += twoJbq * sjy*si_dot_sj;
+            hz += twoJbq * sjz*si_dot_sj;
 
-			}
+         }
 
-			field_array_x[atom] += hx; // save total field to field array
-			field_array_y[atom] += hy;
-			field_array_z[atom] += hz;
+         field_array_x[atom] += hx; // save total field to field array
+         field_array_y[atom] += hy;
+         field_array_z[atom] += hz;
 
-		}
+      }
 
-		return;
+      return;
 
-	}
+   }
 
 } // end of internal namespace
 

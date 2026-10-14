@@ -42,7 +42,7 @@ namespace exchange{
                std::vector<double>& field_array_z){
 
 
-   	// Calculate standard (bilinear) exchange fields
+      // Calculate standard (bilinear) exchange fields
       exchange::internal::exchange_fields(start_index, end_index,
                                 neighbour_list_start_index, neighbour_list_end_index,
                                 type_array, neighbour_list_array, neighbour_interaction_type_array,
@@ -64,7 +64,7 @@ namespace exchange{
          exchange::internal::four_spin_exchange_fields(start_index, end_index, field_array_x, field_array_y, field_array_z);
       }
 
-   	return;
+      return;
 
    }
 

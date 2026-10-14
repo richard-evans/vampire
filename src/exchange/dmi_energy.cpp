@@ -39,13 +39,13 @@ namespace exchange{
       // DMI is only possible with tensorial exchange
       if(internal::exchange_type != exchange::tensorial) return 0.0;
 
-   	// energy
-   	double energy=0.0;
+      // energy
+      double energy=0.0;
 
       // Loop over neighbouring spins to calculate dmi
-   	for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; ++nn){
+      for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; ++nn){
 
-   		const int natom = atoms::neighbour_list_array[nn];
+         const int natom = atoms::neighbour_list_array[nn];
          const zten_t& J = atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]];
 
          // antisymmetric components of exchange tensor
@@ -53,17 +53,17 @@ namespace exchange{
          const double Axz = 0.5 * (J.Jij[0][2] - J.Jij[2][0]);
          const double Ayz = 0.5 * (J.Jij[1][2] - J.Jij[2][1]);
 
-   		const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
+         const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
 
          // note: sum over j only (not sum over i for j) leads to a silent factor 1/2 in dmi energy value
          //       - must be normalised in statistics to account for double sum
-   		energy -= ( Axy * (sx * S[1] - sy * S[0]) +
+         energy -= ( Axy * (sx * S[1] - sy * S[0]) +
                      Axz * (sx * S[2] - sz * S[0]) +
                      Ayz * (sy * S[2] - sz * S[1]) );
 
-   	}
+      }
 
-   	return energy;
+      return energy;
 
    }
 

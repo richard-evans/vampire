@@ -36,25 +36,25 @@ namespace exchange{
    //----------------------------------------------------------------------------
    void unroll_normalised_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear2){
 
-   	// temporary class variables
-   	zval_t tmp_zval;
-   	zvec_t tmp_zvec;
-   	zten_t tmp_zten;
+      // temporary class variables
+      zval_t tmp_zval;
+      zvec_t tmp_zvec;
+      zten_t tmp_zten;
 
-   	switch(exchange::internal::exchange_type){
-   		case exchange::isotropic:
-   			// unroll material calculations
-   			std::cout << "Using generic/normalised form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
-   			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-   			atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
-   			// loop over all interactions
+      switch(exchange::internal::exchange_type){
+         case exchange::isotropic:
+            // unroll material calculations
+            std::cout << "Using generic/normalised form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
+            zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+            atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
+            // loop over all interactions
             for(int atom = 0; atom < atoms::num_atoms; atom++){
-   				const int imaterial = atoms::type_array[atom];
+               const int imaterial = atoms::type_array[atom];
                const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
-   				for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; nn++){
-   					const int natom = atoms::neighbour_list_array[nn];
-   					const int jmaterial = atoms::type_array[natom];
-   					atoms::i_exchange_list.push_back(tmp_zval);
+               for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; nn++){
+                  const int natom = atoms::neighbour_list_array[nn];
+                  const int jmaterial = atoms::type_array[natom];
+                  atoms::i_exchange_list.push_back(tmp_zval);
                   // get unit cell interaction id
                   int i = atoms::neighbour_interaction_type_array[nn];
                   // get shell ID for interaction
@@ -63,25 +63,25 @@ namespace exchange{
                   std::vector<double> Jij = internal::bilinear_exchange_constants.get_exchange_values(imaterial, jmaterial, shell);
                   // set exchange field, normalising to mu_s^i
                   atoms::i_exchange_list[nn].Jij = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * Jij[0] * imus;
-   					// reset interaction id to neighbour number - causes segfault if nn out of range
-   					atoms::neighbour_interaction_type_array[nn] = nn;
-   				}
-   			}
-   			break;
+                  // reset interaction id to neighbour number - causes segfault if nn out of range
+                  atoms::neighbour_interaction_type_array[nn] = nn;
+               }
+            }
+            break;
 
          case exchange::vectorial: // normalised vectorial exchange
-      			// unroll material calculations
-      			std::cout << "Using normalised vectorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
-      			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-      			atoms::v_exchange_list.reserve(atoms::neighbour_list_array.size());
-      			// loop over all interactions
-      			for(int atom = 0; atom < atoms::num_atoms; atom++){
-      				const int imaterial = atoms::type_array[atom];
+               // unroll material calculations
+               std::cout << "Using normalised vectorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
+               zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+               atoms::v_exchange_list.reserve(atoms::neighbour_list_array.size());
+               // loop over all interactions
+               for(int atom = 0; atom < atoms::num_atoms; atom++){
+                  const int imaterial = atoms::type_array[atom];
                   const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
-      		      for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
-      					const int natom = atoms::neighbour_list_array[nn];
-      					const int jmaterial = atoms::type_array[natom];
-      					atoms::v_exchange_list.push_back(tmp_zvec);
+                  for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
+                     const int natom = atoms::neighbour_list_array[nn];
+                     const int jmaterial = atoms::type_array[natom];
+                     atoms::v_exchange_list.push_back(tmp_zvec);
                      // get unit cell interaction id
                      int i = atoms::neighbour_interaction_type_array[nn];
                      // get shell ID for interaction
@@ -105,18 +105,18 @@ namespace exchange{
                         err::vexit();
                      }
                    //  if (imaterial == 4) std::cout << imaterial << '\t' << jmaterial << "\t" << d << '\t' << J  << "\t" << atoms::v_exchange_list[nn].Jij[0] <<  std::endl;
-      					// reset interaction id to neighbour number - causes segfault if nn out of range
-      					atoms::neighbour_interaction_type_array[nn] = nn;
-      				}
-      			}
-      			break;
+                     // reset interaction id to neighbour number - causes segfault if nn out of range
+                     atoms::neighbour_interaction_type_array[nn] = nn;
+                  }
+               }
+               break;
 
          case exchange::tensorial: // normalised tensorial exchange
          {
-   			std::cout << "Using normalised tensorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
-   			zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-   			// unroll isotopic interactions
-   			atoms::t_exchange_list.reserve(atoms::neighbour_list_array.size());
+            std::cout << "Using normalised tensorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
+            zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+            // unroll isotopic interactions
+            atoms::t_exchange_list.reserve(atoms::neighbour_list_array.size());
 
             // loop over all interactions
             for(int atom = 0; atom < atoms::num_atoms; atom++){
@@ -169,17 +169,17 @@ namespace exchange{
                   atoms::neighbour_interaction_type_array[nn] = nn;
 
                } // end of neighbour loop
-   			} // end of atom loop
+            } // end of atom loop
          }
-   		break;
+         break;
 
-   		default:
-   			terminaltextcolor(RED);
-   			std::cerr << "Error! - Unknown unit cell exchange type " << internal::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
-   			terminaltextcolor(WHITE);
-   			err::vexit();
-   			break;
-   	}
+         default:
+            terminaltextcolor(RED);
+            std::cerr << "Error! - Unknown unit cell exchange type " << internal::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+            break;
+      }
 
       return;
 

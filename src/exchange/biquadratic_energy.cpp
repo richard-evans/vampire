@@ -29,13 +29,13 @@ namespace exchange{
    //---------------------------------------------------------------------------
    double spin_biquadratic_exchange_energy_isotropic(const int atom, const double sx, const double sy, const double sz){
 
-   	// energy
-   	double energy=0.0;
+      // energy
+      double energy=0.0;
 
-   	// Loop over neighbouring spins to calculate exchange
-   	for(int nn = internal::biquadratic_neighbour_list_start_index[atom]; nn <= internal::biquadratic_neighbour_list_end_index[atom]; ++nn){
+      // Loop over neighbouring spins to calculate exchange
+      for(int nn = internal::biquadratic_neighbour_list_start_index[atom]; nn <= internal::biquadratic_neighbour_list_end_index[atom]; ++nn){
 
-   		const int natom = internal::biquadratic_neighbour_list_array[nn];
+         const int natom = internal::biquadratic_neighbour_list_array[nn];
 
          // get exchange constant between atoms
          const double Jbq = internal::bq_i_exchange_list[ internal::biquadratic_neighbour_interaction_type_array[nn] ].Jij;
@@ -49,11 +49,11 @@ namespace exchange{
 
          // note: sum over j only (not sum over i for j) leads to a silent factor 1/2 in exchange energy value
          //       - must be normalised in statistics to account for double sum
-   		energy -= Jbq * si_dot_sj * si_dot_sj;
+         energy -= Jbq * si_dot_sj * si_dot_sj;
 
-   	}
+      }
 
-   	return energy;
+      return energy;
 
    }
 
@@ -68,7 +68,7 @@ namespace exchange{
       // select calculation based on exchange type
       switch(internal::biquadratic_exchange_type){
 
-   		case exchange::isotropic:
+         case exchange::isotropic:
             return spin_biquadratic_exchange_energy_isotropic(atom, sx, sy, sz);
             break;
 
@@ -85,7 +85,7 @@ namespace exchange{
          default:
             return 0.0;
 
-   	}
+      }
 
       return 0.0;
 

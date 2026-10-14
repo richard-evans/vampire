@@ -54,8 +54,8 @@ double single_spin_four_spin_energy(const int atom, const double sx, const doubl
    for(int nn = internal::four_spin_neighbour_list_start_index[atom]; nn <= internal::four_spin_neighbour_list_end_index[atom]; ++nn){
 
       const int natomj = internal::four_spin_neighbour_list_array_j[nn];
-		const int natomk = internal::four_spin_neighbour_list_array_k[nn];
-		const int natoml = internal::four_spin_neighbour_list_array_l[nn];
+      const int natomk = internal::four_spin_neighbour_list_array_k[nn];
+      const int natoml = internal::four_spin_neighbour_list_array_l[nn];
 
       const double sjx = atoms::x_spin_array[natomj];
       const double sjy = atoms::y_spin_array[natomj];

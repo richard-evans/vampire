@@ -193,48 +193,48 @@ namespace exchange{
 
       // simple vector and tensor class definitions
       class value_t{
-      	public:
-      	double Jij;
+         public:
+         double Jij;
 
-      	// constructor
-      	value_t():
-      		Jij(0.0)
-      	{
-      	};
+         // constructor
+         value_t():
+            Jij(0.0)
+         {
+         };
       };
 
       class vector_t{
-      	public:
-      	double Jij[3];
+         public:
+         double Jij[3];
 
-      	// constructor
-      	vector_t()
-      	{
-      		Jij[0] = 0.0;
-      		Jij[1] = 0.0;
-      		Jij[2] = 0.0;
-      	};
+         // constructor
+         vector_t()
+         {
+            Jij[0] = 0.0;
+            Jij[1] = 0.0;
+            Jij[2] = 0.0;
+         };
       };
 
       class tensor_t{
-      	public:
-      	double Jij[3][3];
+         public:
+         double Jij[3][3];
 
-      	// constructor
-      	tensor_t()
-      	{
-      		Jij[0][0] = 0.0;
-      		Jij[0][1] = 0.0;
-      		Jij[0][2] = 0.0;
+         // constructor
+         tensor_t()
+         {
+            Jij[0][0] = 0.0;
+            Jij[0][1] = 0.0;
+            Jij[0][2] = 0.0;
 
-      		Jij[1][0] = 0.0;
-      		Jij[1][1] = 0.0;
-      		Jij[1][2] = 0.0;
+            Jij[1][0] = 0.0;
+            Jij[1][1] = 0.0;
+            Jij[1][2] = 0.0;
 
-      		Jij[2][0] = 0.0;
-      		Jij[2][1] = 0.0;
-      		Jij[2][2] = 0.0;
-      	};
+            Jij[2][0] = 0.0;
+            Jij[2][1] = 0.0;
+            Jij[2][2] = 0.0;
+         };
       };
 
       extern std::vector <int> biquadratic_neighbour_list_array; // 1D list of biquadratic neighbours

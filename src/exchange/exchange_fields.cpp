@@ -44,43 +44,43 @@ namespace internal{
                         std::vector<double>& field_array_y,
                         std::vector<double>& field_array_z){
 
-   	// Use appropriate function for exchange calculation
-   	switch(internal::exchange_type){
+      // Use appropriate function for exchange calculation
+      switch(internal::exchange_type){
 
-   		case exchange::isotropic:
+         case exchange::isotropic:
 
             // loop over all atoms
-   			for(int atom = start_index; atom < end_index; ++atom){
+            for(int atom = start_index; atom < end_index; ++atom){
 
                // temporary variables (registers) to calculate intermediate sum
-   				double hx = 0.0;
-   				double hy = 0.0;
-   				double hz = 0.0;
+               double hx = 0.0;
+               double hy = 0.0;
+               double hz = 0.0;
 
                // temporray constants for loop start and end indices
-   				const int start = neighbour_list_start_index[atom];
-   				const int end   = neighbour_list_end_index[atom]+1;
+               const int start = neighbour_list_start_index[atom];
+               const int end   = neighbour_list_end_index[atom]+1;
 
                // loop over all neighbours
-   				for(int nn = start; nn < end; ++nn){
+               for(int nn = start; nn < end; ++nn){
 
-   					const int natom = neighbour_list_array[nn]; // get neighbouring atom number
-   					const double Jij = i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij; // get exchange constant between atoms
+                  const int natom = neighbour_list_array[nn]; // get neighbouring atom number
+                  const double Jij = i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij; // get exchange constant between atoms
 
-   					hx += Jij * spin_array_x[natom]; // add exchange fields
-   					hy += Jij * spin_array_y[natom];
-   					hz += Jij * spin_array_z[natom];
+                  hx += Jij * spin_array_x[natom]; // add exchange fields
+                  hy += Jij * spin_array_y[natom];
+                  hz += Jij * spin_array_z[natom];
 
-   				}
+               }
 
-   				field_array_x[atom] += hx; // save total field to field array
-   				field_array_y[atom] += hy;
-   				field_array_z[atom] += hz;
+               field_array_x[atom] += hx; // save total field to field array
+               field_array_y[atom] += hy;
+               field_array_z[atom] += hz;
 
-   			}
-   			break;
+            }
+            break;
 
-   		case exchange::vectorial: // vector
+         case exchange::vectorial: // vector
 
             // loop over all atoms
             for(int atom = start_index; atom < end_index; ++atom){
@@ -100,24 +100,24 @@ namespace internal{
                   const int natom = neighbour_list_array[nn]; // get neighbouring atom number
                   const int iid = neighbour_interaction_type_array[nn]; // interaction id
 
-   					const double Jij[3]={v_exchange_list[iid].Jij[0],
-   												v_exchange_list[iid].Jij[1],
-   												v_exchange_list[iid].Jij[2]};
+                  const double Jij[3]={v_exchange_list[iid].Jij[0],
+                                       v_exchange_list[iid].Jij[1],
+                                       v_exchange_list[iid].Jij[2]};
 
                   hx += Jij[0] * spin_array_x[natom]; // add exchange fields
-   					hy += Jij[1] * spin_array_y[natom];
-   					hz += Jij[2] * spin_array_z[natom];
+                  hy += Jij[1] * spin_array_y[natom];
+                  hz += Jij[2] * spin_array_z[natom];
 
-   				}
+               }
 
                field_array_x[atom] += hx; // save total field to field array
-   				field_array_y[atom] += hy;
-   				field_array_z[atom] += hz;
+               field_array_y[atom] += hy;
+               field_array_z[atom] += hz;
 
-   			}
-   			break;
+            }
+            break;
 
-   		case exchange::tensorial: // tensor
+         case exchange::tensorial: // tensor
 
             // loop over all atoms
             for(int atom = start_index; atom < end_index; ++atom){
@@ -137,33 +137,33 @@ namespace internal{
                   const int natom = neighbour_list_array[nn]; // get neighbouring atom number
                   const int iid = neighbour_interaction_type_array[nn]; // interaction id
 
-   					const double Jij[3][3]={ {t_exchange_list[iid].Jij[0][0],
-   													  t_exchange_list[iid].Jij[0][1],
-   												     t_exchange_list[iid].Jij[0][2]},
+                  const double Jij[3][3]={ {t_exchange_list[iid].Jij[0][0],
+                                            t_exchange_list[iid].Jij[0][1],
+                                            t_exchange_list[iid].Jij[0][2]},
 
-   													 {t_exchange_list[iid].Jij[1][0],
-   													  t_exchange_list[iid].Jij[1][1],
-   													  t_exchange_list[iid].Jij[1][2]},
+                                           {t_exchange_list[iid].Jij[1][0],
+                                            t_exchange_list[iid].Jij[1][1],
+                                            t_exchange_list[iid].Jij[1][2]},
 
-   													 {t_exchange_list[iid].Jij[2][0],
-   													  t_exchange_list[iid].Jij[2][1],
-   													  t_exchange_list[iid].Jij[2][2]} };
+                                           {t_exchange_list[iid].Jij[2][0],
+                                            t_exchange_list[iid].Jij[2][1],
+                                            t_exchange_list[iid].Jij[2][2]} };
 
-   					const double S[3]={spin_array_x[natom], spin_array_y[natom], spin_array_z[natom]};
+                  const double S[3]={spin_array_x[natom], spin_array_y[natom], spin_array_z[natom]};
 
-   					hx += ( Jij[0][0] * S[0] + Jij[0][1] * S[1] + Jij[0][2] * S[2]);
-   					hy += ( Jij[1][0] * S[0] + Jij[1][1] * S[1] + Jij[1][2] * S[2]);
-   					hz += ( Jij[2][0] * S[0] + Jij[2][1] * S[1] + Jij[2][2] * S[2]);
-   				}
+                  hx += ( Jij[0][0] * S[0] + Jij[0][1] * S[1] + Jij[0][2] * S[2]);
+                  hy += ( Jij[1][0] * S[0] + Jij[1][1] * S[1] + Jij[1][2] * S[2]);
+                  hz += ( Jij[2][0] * S[0] + Jij[2][1] * S[1] + Jij[2][2] * S[2]);
+               }
 
                field_array_x[atom] += hx; // save total field to field array
-   				field_array_y[atom] += hy;
-   				field_array_z[atom] += hz;
+               field_array_y[atom] += hy;
+               field_array_z[atom] += hz;
 
-   			}
-   			break;
+            }
+            break;
 
-   		}
+         }
 
          // if (dipole::atomsitic_tensor_enabled){
          //
@@ -185,9 +185,9 @@ namespace internal{
 
 
 
-   		return;
+         return;
 
-   	}
+      }
 
 } // end of internal namespace
 

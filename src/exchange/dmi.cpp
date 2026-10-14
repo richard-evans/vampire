@@ -65,7 +65,7 @@ namespace internal{
 
       //std::ofstream ofile("dmi.txt");
 
-      //	Loop over all atoms i
+      // Loop over all atoms i
       for(unsigned int i=0; i < static_cast<unsigned int>(atoms::num_atoms); i++){
 
          // get material id for atom

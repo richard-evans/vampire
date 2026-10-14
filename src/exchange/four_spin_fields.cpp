@@ -40,12 +40,12 @@ void four_spin_exchange_fields(const int start_index, // first atom for exchange
    const int num_four_spin_neighbours = four_spin_neighbour_list_array_l.size();
 
    // loop over all neighbours
-	for(int nn = 0; nn < num_four_spin_neighbours; ++nn){
+   for(int nn = 0; nn < num_four_spin_neighbours; ++nn){
 
       // get neighbouring atom number
-   	const int atom = four_spin_neighbour_list_array_i[nn];
-   	const int natomj = four_spin_neighbour_list_array_j[nn];
-   	const int natomk = four_spin_neighbour_list_array_k[nn];
+      const int atom = four_spin_neighbour_list_array_i[nn];
+      const int natomj = four_spin_neighbour_list_array_j[nn];
+      const int natomk = four_spin_neighbour_list_array_k[nn];
       const int natoml = four_spin_neighbour_list_array_l[nn];
       //const int jmaterial = atoms::type_array[natomj];
       const double Jij = four_spin_exchange_list[nn];
