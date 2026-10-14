@@ -26,6 +26,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 namespace grains{
 
@@ -110,8 +111,9 @@ namespace grains{
                new_grain_numbers[old_grain_number] = new_grain_number;
             }
             else{
-               std::cerr << "Programmer error! grain index of " << old_grain_number << " is greater than total number of grains " << grains::num_grains << std::endl;
-               err::vexit();
+               std::ostringstream message;
+               message << "Programmer error! grain index of " << old_grain_number << " is greater than total number of grains " << grains::num_grains;
+               err::fatal(message.str());
             }
 
          }

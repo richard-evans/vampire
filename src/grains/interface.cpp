@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -296,11 +297,9 @@ namespace grains{
          int gfs=atoi(value.c_str());
          vin::check_for_valid_int(gfs, word, line, prefix, 0, 8,"input","0, 4, 6 or 8");
          if(gfs!=0 && gfs!=4 && gfs!=6 && gfs!=8){
-            terminaltextcolor(RED);
-            std::cerr << "Error - value for \'" << prefix << ":" << word << "\' must be one of 0 (off), 4, 6 or 8." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error - value for \'" << prefix << ":" << word << "\' must be one of 0 (off), 4, 6 or 8." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error - value for \'" << prefix << ":" << word << "\' must be one of 0 (off), 4, 6 or 8.";
+            err::fatal(message.str());
          }
          internal::grain_facet_symmetry=gfs;
          return true;

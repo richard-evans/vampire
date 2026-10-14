@@ -130,11 +130,7 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
    // Check for grains >=1
    //-----------------------
    if(grain<1){
-      terminaltextcolor(RED);
-      std::cerr << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
-      err::vexit();
+      err::fatal("Error! - No grains found in structure - Increase system dimensions");
    }
 
    // Tessellate the hexagonal lattice of substructure sites into an ordinary

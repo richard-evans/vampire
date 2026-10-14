@@ -89,11 +89,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
    // Check for grains >=1
    //-----------------------
    if(grain<1){
-      terminaltextcolor(RED);
-      std::cerr << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
-      err::vexit();
+      err::fatal("Error! - No grains found in structure - Increase system dimensions");
    }
 
    // create:grain-tessellation selects plain Voronoi vs weighted Laguerre

@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -63,11 +64,9 @@ namespace grains{
 
          std::ifstream ifile(filename.c_str());
          if(!ifile.is_open()){
-            terminaltextcolor(RED);
-            std::cerr << "Error: could not open create:grain-size-distribution-file \"" << filename << "\"" << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error: could not open create:grain-size-distribution-file \"" << filename << "\"" << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error: could not open create:grain-size-distribution-file \"" << filename << "\"";
+            err::fatal(message.str());
          }
 
          double d;
@@ -76,13 +75,9 @@ namespace grains{
          }
 
          if(diameters.empty()){
-            terminaltextcolor(RED);
-            std::cerr << "Error: create:grain-size-distribution-file \"" << filename
-                      << "\" contains no valid (positive) diameters" << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error: create:grain-size-distribution-file \"" << filename
-                 << "\" contains no valid (positive) diameters" << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error: create:grain-size-distribution-file \"" << filename << "\" contains no valid (positive) diameters";
+            err::fatal(message.str());
          }
 
          return diameters;
