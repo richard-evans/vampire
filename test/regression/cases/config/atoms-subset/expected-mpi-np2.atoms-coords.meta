@@ -1,0 +1,7 @@
+Format: text
+Number of atoms: 84
+Number of materials: 1
+0	2.2	H	Fe
+Number of coord files: 1
+atoms-coords.data
+Grain data: true
