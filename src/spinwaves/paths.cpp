@@ -173,9 +173,9 @@ namespace spinwaves{
          void determine_kpoints_from_user_specific_k(const double system_dimensions_x,
                     const double system_dimensions_y,
                     const double system_dimensions_z,
-					const double unit_cell_size_x,
-					const double unit_cell_size_y,
-					const double unit_cell_size_z){
+               const double unit_cell_size_x,
+               const double unit_cell_size_y,
+               const double unit_cell_size_z){
 
 
             // kfile
@@ -218,9 +218,9 @@ namespace spinwaves{
         void determine_kpoints_from_user_high_sym_path(const double system_dimensions_x,
                     const double system_dimensions_y,
                     const double system_dimensions_z,
-					const double unit_cell_size_x,
-					const double unit_cell_size_y,
-					const double unit_cell_size_z){
+               const double unit_cell_size_x,
+               const double unit_cell_size_y,
+               const double unit_cell_size_z){
 
             // kfile
             std::ofstream kfile;

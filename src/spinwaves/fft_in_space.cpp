@@ -116,7 +116,7 @@ namespace spinwaves {
          }
       #endif
 
-	   return;
+      return;
 
    }
 

@@ -123,8 +123,8 @@ namespace spinwaves{
       extern void determine_spin_component();
       extern void check_numbering_of_spectrums();
       extern void calculate_fourier_prefactor(const std::vector<double>& rx, const std::vector<double>& ry, const std::vector<double>& rz);
-      extern void determine_kpoints_from_user_specific_k(const double dimx, const double dimy, const double dimz,	const double uc_x, const double uc_y, const double uc_z);
-      extern void determine_kpoints_from_user_high_sym_path(const double dimx, const double dimy, const double dimz,	const double uc_x, const double uc_y, const double uc_z);
+      extern void determine_kpoints_from_user_specific_k(const double dimx, const double dimy, const double dimz, const double uc_x, const double uc_y, const double uc_z);
+      extern void determine_kpoints_from_user_high_sym_path(const double dimx, const double dimy, const double dimz, const double uc_x, const double uc_y, const double uc_z);
 
 
       // post analysis functions
