@@ -49,24 +49,24 @@ namespace anisotropy{
       //--------------------------------------------------------------------------------------------------------------
 
       // Define useful constants
-		const double three = 3.0;
-		const double four = 4.0;
-		const double five = 5.0;
-		const double twelve = 12.0;
-		const double fourteen = 14.0;
-		const double fortytwo = 42.0;
-		const double oneoeleven = 1.0 / 11.0;
-		const double threeoeleven = 3.0 / 11.0;
+      const double three = 3.0;
+      const double four = 4.0;
+      const double five = 5.0;
+      const double twelve = 12.0;
+      const double fourteen = 14.0;
+      const double fortytwo = 42.0;
+      const double oneoeleven = 1.0 / 11.0;
+      const double threeoeleven = 3.0 / 11.0;
 
-      void sixth_order_theta_third_order_phi_odd_fields(	std::vector< double >& spin_array_x,
-                                       						std::vector< double >& spin_array_y,
-                                       						std::vector< double >& spin_array_z,
-                                       						std::vector< int >&    atom_material_array,
-                                      							std::vector< double >& field_array_x,
-                                       						std::vector< double >& field_array_y,
-                                       						std::vector< double >& field_array_z,
-                                       						const int start_index,
-                                       						const int end_index )
+      void sixth_order_theta_third_order_phi_odd_fields( std::vector< double >& spin_array_x,
+                                                         std::vector< double >& spin_array_y,
+                                                         std::vector< double >& spin_array_z,
+                                                         std::vector< int >&    atom_material_array,
+                                                         std::vector< double >& field_array_x,
+                                                         std::vector< double >& field_array_y,
+                                                         std::vector< double >& field_array_z,
+                                                         const int start_index,
+                                                         const int end_index )
       {
 
          // if not enabled then do nothing
@@ -100,7 +100,7 @@ namespace anisotropy{
             const double Sy = sx * gx + sy * gy + sz * gz;
             const double Sy2 = Sy * Sy;
 
-				const double Sy2Sz2 = Sy2 * Sz2;
+            const double Sy2Sz2 = Sy2 * Sz2;
 
             // get reduced anisotropy constant ku/mu_s
             const double k6r3_odd = internal::k6r3_odd[ mat ];
@@ -123,11 +123,11 @@ namespace anisotropy{
       // Function to add 6-theta-3-phi-odd anisotropy
       //---------------------------------------------------------------------------------
 
-      double sixth_order_theta_third_order_phi_odd_energy(	const int atom,
-                                          						const int mat,
-                                          						const double sx,
-                                          						const double sy,
-                                          						const double sz )
+      double sixth_order_theta_third_order_phi_odd_energy(  const int atom,
+                                                            const int mat,
+                                                            const double sx,
+                                                            const double sy,
+                                                            const double sz )
       {
 
          const double ex = internal::ku_vector[ mat ].x;

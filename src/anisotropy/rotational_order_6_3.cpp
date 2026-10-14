@@ -42,31 +42,31 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{6r3} = -k_{6r3}sin^3{theta}( cos^3(theta) (3/11)cos(theta) )cos{3phi}
-      // 
+      //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
-      // Define useful constants
-		const double three = 3.0;
-		const double four = 4.0;
-		const double five = 5.0;
-		const double twelve = 12.0;
-		const double fourteen = 14.0;
-		const double fortytwo = 42.0;
-		const double oneoeleven = 1.0 / 11.0;
-		const double threeoeleven = 3.0 / 11.0;
 
-      void sixth_order_theta_third_order_phi_fields(	std::vector< double >& spin_array_x,
-                                       					std::vector< double >& spin_array_y,
-                                       					std::vector< double >& spin_array_z,
-                                       					std::vector< int >&    atom_material_array,
-                                    						std::vector< double >& field_array_x,
-                                    						std::vector< double >& field_array_y,
-                                    						std::vector< double >& field_array_z,
-                           	      						const int start_index,
-                                    						const int end_index )
+      // Define useful constants
+      const double three = 3.0;
+      const double four = 4.0;
+      const double five = 5.0;
+      const double twelve = 12.0;
+      const double fourteen = 14.0;
+      const double fortytwo = 42.0;
+      const double oneoeleven = 1.0 / 11.0;
+      const double threeoeleven = 3.0 / 11.0;
+
+      void sixth_order_theta_third_order_phi_fields(  std::vector< double >& spin_array_x,
+                                                      std::vector< double >& spin_array_y,
+                                                      std::vector< double >& spin_array_z,
+                                                      std::vector< int >&    atom_material_array,
+                                                      std::vector< double >& field_array_x,
+                                                      std::vector< double >& field_array_y,
+                                                      std::vector< double >& field_array_z,
+                                                      const int start_index,
+                                                      const int end_index )
       {
 
          // if not enabled then do nothing
@@ -100,7 +100,7 @@ namespace anisotropy{
             const double Sx = sx * fx + sy * fy + sz * fz;
             const double Sx2 = Sx * Sx;
 
-				const double Sx2Sz2 = Sx2 * Sz2;
+            const double Sx2Sz2 = Sx2 * Sz2;
 
             // get reduced anisotropy constant ku/mu_s
             const double k6r3 = internal::k6r3[ mat ];
@@ -108,7 +108,7 @@ namespace anisotropy{
             // calculate full form to add to field
             const double x_component = k6r3 * Sz * three * ( Sz4 + four * Sx2Sz2 - oneoeleven * ( fourteen * Sz2 + twelve * Sx2 - three ) );
             const double z_component = k6r3 * Sx * three * ( five * Sz4 + four * Sx2Sz2 - oneoeleven * ( fortytwo * Sz2 + four * Sx2 - three ) );
-            
+
             field_array_x[ atom ] += z_component * ex + x_component * fx;
             field_array_y[ atom ] += z_component * ey + x_component * fy;
             field_array_z[ atom ] += z_component * ez + x_component * fz;
@@ -123,11 +123,11 @@ namespace anisotropy{
       // Function to add 6-theta-3-phi anisotropy
       //---------------------------------------------------------------------------------
 
-      double sixth_order_theta_third_order_phi_energy(	const int atom,
-                                          					const int mat,
-                                          					const double sx,
-                                          					const double sy,
-                                          					const double sz )
+      double sixth_order_theta_third_order_phi_energy(   const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz )
       {
 
          const double ex = internal::ku_vector[ mat ].x;

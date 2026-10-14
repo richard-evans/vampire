@@ -47,7 +47,7 @@ namespace anisotropy{
       // basis.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
+
       //Define useful constants
       const double four = 4.0;
       const double three = 3.0;

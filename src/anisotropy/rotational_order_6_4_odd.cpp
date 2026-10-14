@@ -42,18 +42,18 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{6r-4} = -k_{6r-4}sin^4{theta}(cos^2{theta} - 1/11)sin{4phi}
-      // 
+      //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
+
       // Define useful constants
       const double three = 3.0;
       const double four = 4.0;
       const double five = 5.0;
       const double tenoeleven = 10.0 / 11.0;
-      
+
       void sixth_order_theta_fourth_order_phi_odd_fields( std::vector< double >& spin_array_x,
                                        std::vector< double >& spin_array_y,
                                        std::vector< double >& spin_array_z,
@@ -103,7 +103,7 @@ namespace anisotropy{
             // calculate full form to add to field
             const double x_component = four_k6r4_odd * Sy * ( Sy4 - five * Sx4 + tenoeleven * ( three * Sx2 - Sy2 ) );
             const double y_component = four_k6r4_odd * Sx * ( five * Sy4 - Sx4 + tenoeleven * ( Sx2 - three * Sy2 ) );
-            
+
             field_array_x[ atom ] += x_component * fx + y_component * gx;
             field_array_y[ atom ] += x_component * fy + y_component * gy;
             field_array_z[ atom ] += x_component * fz + y_component * gz;

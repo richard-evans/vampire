@@ -141,12 +141,12 @@ namespace anisotropy{
             lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
 
             bool random_anisotropy; // flag to control random anisotropy by material
-      		bool random_grain_anisotropy; // flag to control random anisotropy by grain
+            bool random_grain_anisotropy; // flag to control random anisotropy by grain
 
             // constructor
             mp_t ( const unsigned int max_materials = 100 ):
                need_rotated_basis(false), // in genetral we do not need a rotated basis
-            	ku2( 0.0 ),       // set initial value of ku2 to zero
+               ku2( 0.0 ),       // set initial value of ku2 to zero
                k2r1( 0.0 ),      // set initial value of k2r1 to zero
                k2r1_odd( 0.0 ),  // set initial value of k2r1_odd to zero
                k2r2( 0.0 ),      // set initial value of k2r2 to zero

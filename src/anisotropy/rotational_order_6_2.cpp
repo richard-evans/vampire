@@ -43,7 +43,7 @@ namespace anisotropy{
       // The rotational term here is given by
       // E_{ 6r2 } = - k_{ 6r2 } sin^2{ theta } ( cos^4{ theta } - ( 9 / 11 ) cos^2{ theta } + ( 1 / 33 ) ) cos{ 2 phi }
       //
-      // The field is found by taking the negative gradient w.r.t. the magnetic moment 
+      // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis.
       //
       //--------------------------------------------------------------------------------------------------------------

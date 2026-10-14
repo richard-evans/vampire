@@ -45,7 +45,7 @@ namespace internal{
       // temporary tensor for calculating sum
       std::vector<double> tmp_tensor(9,0.0);
 
-      //	Populate surface atom and 1D nearest neighbour list and index arrays
+      // Populate surface atom and 1D nearest neighbour list and index arrays
       for(int atom=0;atom<atoms::num_atoms;atom++){
 
 

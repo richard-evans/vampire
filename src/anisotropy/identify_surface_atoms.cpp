@@ -37,7 +37,7 @@ namespace anisotropy{
       if(internal::neel_anisotropy_threshold == 123456789) internal::neel_anisotropy_threshold = cs::unit_cell.surface_threshold;
 
       //-------------------------------------------------
-      //	Optionally set up surface anisotropy
+      // Optionally set up surface anisotropy
       //-------------------------------------------------
 
       // create temporary array for storing surface threshold

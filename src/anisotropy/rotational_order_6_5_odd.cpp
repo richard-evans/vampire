@@ -42,34 +42,34 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{6r-5} = -k_{6r-5}sin^5{theta}cos(theta)sin{5phi}
-      // 
+      //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
-      // Define useful constants
-		const double one = 1.0;
-		const double two = 2.0;
-		const double three = 3.0;
-      const double five = 5.0;
-		const double six = 6.0;
-		const double ten = 10.0;
-		const double twelve = 12.0;
-		const double sixteen = 16.0;
-		const double twenty = 20.0;
-		const double twentyfive = 25.0;
-		const double sixty = 60.0;
 
-      void sixth_order_theta_fifth_order_phi_odd_fields(	std::vector< double >& spin_array_x,
-                                       						std::vector< double >& spin_array_y,
-                                       						std::vector< double >& spin_array_z,
-                                       						std::vector< int >&    atom_material_array,
-                                      							std::vector< double >& field_array_x,
-                                       						std::vector< double >& field_array_y,
-                                       						std::vector< double >& field_array_z,
-                                       						const int start_index,
-                                       						const int end_index )
+      // Define useful constants
+      const double one = 1.0;
+      const double two = 2.0;
+      const double three = 3.0;
+      const double five = 5.0;
+      const double six = 6.0;
+      const double ten = 10.0;
+      const double twelve = 12.0;
+      const double sixteen = 16.0;
+      const double twenty = 20.0;
+      const double twentyfive = 25.0;
+      const double sixty = 60.0;
+
+      void sixth_order_theta_fifth_order_phi_odd_fields( std::vector< double >& spin_array_x,
+                                                         std::vector< double >& spin_array_y,
+                                                         std::vector< double >& spin_array_z,
+                                                         std::vector< int >&    atom_material_array,
+                                                         std::vector< double >& field_array_x,
+                                                         std::vector< double >& field_array_y,
+                                                         std::vector< double >& field_array_z,
+                                                         const int start_index,
+                                                         const int end_index )
       {
 
          // if not enabled then do nothing
@@ -104,7 +104,7 @@ namespace anisotropy{
             const double Sy2 = Sy * Sy;
             const double Sy4 = Sy2 * Sy2;
 
-				const double Sy2Sz2 = Sy2 * Sz2;
+            const double Sy2Sz2 = Sy2 * Sz2;
 
             // get reduced anisotropy constant ku/mu_s
             const double k6r5_odd = internal::k6r5_odd[ mat ];
@@ -112,7 +112,7 @@ namespace anisotropy{
             // calculate full form to add to field
             const double y_component = k6r5_odd * Sz * five * ( sixteen * Sy4 + twelve * Sy2Sz2 + Sz4 - two * ( six * Sy2 + Sz2 ) + one );
             const double z_component = k6r5_odd * Sy * ( sixteen * Sy4 + sixty * Sy2Sz2 + twentyfive * Sz4 - ten * ( two * Sy2 + three * Sz2 ) + five );
-            
+
             field_array_x[ atom ] += z_component * ex + y_component * gx;
             field_array_y[ atom ] += z_component * ey + y_component * gy;
             field_array_z[ atom ] += z_component * ez + y_component * gz;
@@ -127,11 +127,11 @@ namespace anisotropy{
       // Function to add 6-theta-5-phi-odd anisotropy
       //---------------------------------------------------------------------------------
 
-      double sixth_order_theta_fifth_order_phi_odd_energy(	const int atom,
-                                          						const int mat,
-                                          						const double sx,
-                                          						const double sy,
-                                          						const double sz )
+      double sixth_order_theta_fifth_order_phi_odd_energy(  const int atom,
+                                                            const int mat,
+                                                            const double sx,
+                                                            const double sy,
+                                                            const double sz )
       {
 
          const double ex = internal::ku_vector[ mat ].x;

@@ -47,20 +47,20 @@ namespace anisotropy{
       // basis.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
+
       //Define useful constants
       const double three = 3.0;
-		const double six = 6.0;
+      const double six = 6.0;
 
-      void fourth_order_theta_third_order_phi_odd_fields(	std::vector< double >& spin_array_x,
+      void fourth_order_theta_third_order_phi_odd_fields(   std::vector< double >& spin_array_x,
                                                             std::vector< double >& spin_array_y,
                                                             std::vector< double >& spin_array_z,
                                                             std::vector< int >&    atom_material_array,
-                                       							std::vector< double >& field_array_x,
-                                       							std::vector< double >& field_array_y,
-                                       							std::vector< double >& field_array_z,
-                                       							const int start_index,
-                                       							const int end_index )
+                                                            std::vector< double >& field_array_x,
+                                                            std::vector< double >& field_array_y,
+                                                            std::vector< double >& field_array_z,
+                                                            const int start_index,
+                                                            const int end_index )
       {
 
          // if not enabled then do nothing
@@ -78,9 +78,9 @@ namespace anisotropy{
             // get atom material
             const int mat = atom_material_array[ atom ];
 
-				const double ex = internal::ku_vector[ mat ].x;
-				const double ey = internal::ku_vector[ mat ].y;
-				const double ez = internal::ku_vector[ mat ].z;
+            const double ex = internal::ku_vector[ mat ].x;
+            const double ey = internal::ku_vector[ mat ].y;
+            const double ez = internal::ku_vector[ mat ].z;
 
             const double fx = internal::kr_vector[ mat ].x;
             const double fy = internal::kr_vector[ mat ].y;
@@ -90,8 +90,8 @@ namespace anisotropy{
             const double gy = internal::kl_vector[ mat ].y;
             const double gz = internal::kl_vector[ mat ].z;
 
-				// calculate S_z
-				const double Sz = sx * ex + sy * ey + sz * ez;
+            // calculate S_z
+            const double Sz = sx * ex + sy * ey + sz * ez;
 
             // calculate S_x and S_x^3 parts
             const double Sx = sx * fx + sy * fy + sz * fz;
@@ -107,7 +107,7 @@ namespace anisotropy{
             // calculate full form to add to field
             const double x_component = k4r3_odd * six * Sx * Sy * Sz;
             const double y_component = k4r3_odd * three * Sz * ( Sx2 - Sy2 );
-				const double z_component = k4r3_odd * Sy * ( three * Sx2 - Sy2 );
+            const double z_component = k4r3_odd * Sy * ( three * Sx2 - Sy2 );
 
             // Sum components into field
             field_array_x[ atom ] += x_component * fx + y_component * gx + z_component * ex;
@@ -133,9 +133,9 @@ namespace anisotropy{
          // get reduced anisotropy constant ku/mu_s (Tesla)
          const double k4r3_odd = internal::k4r3_odd[ mat ];
 
-			const double ex = internal::ku_vector[ mat ].x;
-			const double ey = internal::ku_vector[ mat ].y;
-			const double ez = internal::ku_vector[ mat ].z;
+         const double ex = internal::ku_vector[ mat ].x;
+         const double ey = internal::ku_vector[ mat ].y;
+         const double ez = internal::ku_vector[ mat ].z;
 
          const double fx = internal::kr_vector[ mat ].x;
          const double fy = internal::kr_vector[ mat ].y;
@@ -145,13 +145,13 @@ namespace anisotropy{
          const double gy = internal::kl_vector[ mat ].y;
          const double gz = internal::kl_vector[ mat ].z;
 
-         // Calculate - k{4r-3} sin^3{theta}cos{theta}sin{3phi}	= - k{4r-3} * Sy * Sz ( 3 * ( Sx^2 + Sy^2 ) - 4 * Sy^2 )
-         //                                 								= 4 * Sx^3 * S_y - 4 * S_x * S_y^3
+         // Calculate - k{4r-3} sin^3{theta}cos{theta}sin{3phi}   = - k{4r-3} * Sy * Sz ( 3 * ( Sx^2 + Sy^2 ) - 4 * Sy^2 )
+         //                                                       = 4 * Sx^3 * S_y - 4 * S_x * S_y^3
          const double Sx = sx * fx + sy * fy + sz * fz;
 
          const double Sy = sx * gx + sy * gy + sz * gz;
 
-			const double Sz = sx * ex + sy * ey + sz * ez;
+         const double Sz = sx * ex + sy * ey + sz * ez;
 
          return - k4r3_odd * Sy * Sz * ( three * Sx * Sx - Sy * Sy );
 

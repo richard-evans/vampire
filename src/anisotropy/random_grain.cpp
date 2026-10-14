@@ -160,9 +160,9 @@ double spin_spherical_harmonic_random_aniostropy_energy(const int atom, const in
    const double k6 = mp::material_spherical_harmonic_constants_array[3*imaterial + 2];
 
    // determine anisotropy direction and dot product
-	const double ex = atoms::uniaxial_anisotropy_vector_x[atom];
-	const double ey = atoms::uniaxial_anisotropy_vector_y[atom];
-	const double ez = atoms::uniaxial_anisotropy_vector_z[atom];
+   const double ex = atoms::uniaxial_anisotropy_vector_x[atom];
+   const double ey = atoms::uniaxial_anisotropy_vector_y[atom];
+   const double ez = atoms::uniaxial_anisotropy_vector_z[atom];
 
    const double sdote2 = (sx*ex + sy*ey + sz*ez)*(sx*ex + sy*ey + sz*ez);
    const double sdote4 = sdote2*sdote2;

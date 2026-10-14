@@ -42,7 +42,7 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{64} = -k_{6r4}sin^4{theta}(cos^2{theta} - 1/11)cos{4phi}
-      // 
+      //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis and is detailed in an as yet unpublished paper.
       //

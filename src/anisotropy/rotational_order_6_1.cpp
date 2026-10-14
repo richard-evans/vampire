@@ -42,28 +42,28 @@ namespace anisotropy{
       //
       // The rotational term here is given by
       // E_{6r1} = -k_{6r1}sin{theta} ( cos^5{theta} - ( 10 / 11 ) cos^3(theta) + ( 5 / 33 ) cos(theta) ) cos{phi}
-      // 
+      //
       // The field is found by taking the negative gradient w.r.t. the magnetic moment
       // basis.
       //
       //--------------------------------------------------------------------------------------------------------------
-      
-      // Define useful constants
-		const double five = 5.0;
-		const double oneothirtythree = 1.0 / 33.0;
-		const double fiveothirtythree = 5.0 / 33.0;
-		const double sixoeleven = 6.0 / 11.0;
-		const double tenoeleven = 10.0 / 11.0;
 
-      void sixth_order_theta_first_order_phi_fields(	std::vector< double >& spin_array_x,
-                                       					std::vector< double >& spin_array_y,
-                                       					std::vector< double >& spin_array_z,
-                                       					std::vector< int >&    atom_material_array,
-                                    						std::vector< double >& field_array_x,
-                                   							std::vector< double >& field_array_y,
-                                 							std::vector< double >& field_array_z,
-                                    						const int start_index,
-                                    						const int end_index )
+      // Define useful constants
+      const double five = 5.0;
+      const double oneothirtythree = 1.0 / 33.0;
+      const double fiveothirtythree = 5.0 / 33.0;
+      const double sixoeleven = 6.0 / 11.0;
+      const double tenoeleven = 10.0 / 11.0;
+
+      void sixth_order_theta_first_order_phi_fields(  std::vector< double >& spin_array_x,
+                                                      std::vector< double >& spin_array_y,
+                                                      std::vector< double >& spin_array_z,
+                                                      std::vector< int >&    atom_material_array,
+                                                      std::vector< double >& field_array_x,
+                                                      std::vector< double >& field_array_y,
+                                                      std::vector< double >& field_array_z,
+                                                      const int start_index,
+                                                      const int end_index )
       {
 
          // if not enabled then do nothing
@@ -102,7 +102,7 @@ namespace anisotropy{
             // calculate full form to add to field
             const double x_component = k6r1 * Sz * ( Sz4 - tenoeleven * Sz2 + fiveothirtythree );
             const double z_component = k6r1 * Sx * five * ( Sz4 - sixoeleven * Sz2 + oneothirtythree );
-            
+
             field_array_x[ atom ] += z_component * ex + x_component * fx;
             field_array_y[ atom ] += z_component * ey + x_component * fy;
             field_array_z[ atom ] += z_component * ez + x_component * fz;
@@ -117,11 +117,11 @@ namespace anisotropy{
       // Function to add 6-theta-1-phi anisotropy
       //---------------------------------------------------------------------------------
 
-      double sixth_order_theta_first_order_phi_energy(	const int atom,
-                                          					const int mat,
-                                          					const double sx,
-                                          					const double sy,
-                                          					const double sz )
+      double sixth_order_theta_first_order_phi_energy(   const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz )
       {
 
          const double ex = internal::ku_vector[ mat ].x;

@@ -50,17 +50,17 @@ namespace anisotropy{
 
       //Define useful constants
       const double three = 3.0;
-		const double threeoseven = 3.0 / 7.0;
+      const double threeoseven = 3.0 / 7.0;
 
-      void fourth_order_theta_first_order_phi_fields(	std::vector< double >& spin_array_x,
+      void fourth_order_theta_first_order_phi_fields( std::vector< double >& spin_array_x,
                                                       std::vector< double >& spin_array_y,
                                                       std::vector< double >& spin_array_z,
                                                       std::vector< int >&    atom_material_array,
-                                 							std::vector< double >& field_array_x,
-                                 							std::vector< double >& field_array_y,
-                                 							std::vector< double >& field_array_z,
-                                 							const int start_index,
-                                 							const int end_index )
+                                                      std::vector< double >& field_array_x,
+                                                      std::vector< double >& field_array_y,
+                                                      std::vector< double >& field_array_z,
+                                                      const int start_index,
+                                                      const int end_index )
       {
 
          // if not enabled then do nothing
@@ -78,17 +78,17 @@ namespace anisotropy{
             // get atom material
             const int mat = atom_material_array[ atom ];
 
-				const double ex = internal::ku_vector[ mat ].x;
-				const double ey = internal::ku_vector[ mat ].y;
-				const double ez = internal::ku_vector[ mat ].z;
+            const double ex = internal::ku_vector[ mat ].x;
+            const double ey = internal::ku_vector[ mat ].y;
+            const double ez = internal::ku_vector[ mat ].z;
 
-         	const double fx = internal::kr_vector[ mat ].x;
-         	const double fy = internal::kr_vector[ mat ].y;
-         	const double fz = internal::kr_vector[ mat ].z;
+            const double fx = internal::kr_vector[ mat ].x;
+            const double fy = internal::kr_vector[ mat ].y;
+            const double fz = internal::kr_vector[ mat ].z;
 
-				// calculate S_z and S_z^2
-				const double Sz = sx * ex + sy * ey + sz * ez;
-         	const double Sz2 = Sz * Sz;
+            // calculate S_z and S_z^2
+            const double Sz = sx * ex + sy * ey + sz * ez;
+            const double Sz2 = Sz * Sz;
 
             // calculate S_y and S_y^3 parts
             const double Sx = sx * fx + sy * fy + sz * fz;
@@ -98,7 +98,7 @@ namespace anisotropy{
 
             // calculate full form to add to field
             const double x_component = k4r1 * Sz * ( Sz2 - threeoseven );
-				const double z_component = k4r1 * Sx * ( three * Sz2 - threeoseven );
+            const double z_component = k4r1 * Sx * ( three * Sz2 - threeoseven );
 
             // Sum components into field
             field_array_x[ atom ] += x_component * fx + z_component * ex;
@@ -114,28 +114,28 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add 4-theta-1-phi anisotropy
       //---------------------------------------------------------------------------------
-      double fourth_order_theta_first_order_phi_energy(	const int atom,
-                                          					const int mat,
-                                          					const double sx,
-                                          					const double sy,
-                                          					const double sz )
+      double fourth_order_theta_first_order_phi_energy(  const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz )
       {
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
          const double k4r1 = internal::k4r1[ mat ];
 
-			const double ex = internal::ku_vector[ mat ].x;
-			const double ey = internal::ku_vector[ mat ].y;
-			const double ez = internal::ku_vector[ mat ].z;
+         const double ex = internal::ku_vector[ mat ].x;
+         const double ey = internal::ku_vector[ mat ].y;
+         const double ez = internal::ku_vector[ mat ].z;
 
          const double fx = internal::kr_vector[ mat ].x;
          const double fy = internal::kr_vector[ mat ].y;
          const double fz = internal::kr_vector[ mat ].z;
 
-         // Calculate - k{4r1} sin{theta}cos{phi}(cos^3{theta} - (3/7)cos{theta})	= - k{4r1} * Sx * Sz * ( Sz^2 - 3 / 7 )
+         // Calculate - k{4r1} sin{theta}cos{phi}(cos^3{theta} - (3/7)cos{theta})   = - k{4r1} * Sx * Sz * ( Sz^2 - 3 / 7 )
          const double Sx = sx * fx + sy * fy + sz * fz;
 
-			const double Sz = sx * ex + sy * ey + sz * ez;
+         const double Sz = sx * ex + sy * ey + sz * ez;
 
          return - k4r1 * Sx * Sz * ( Sz * Sz - threeoseven );
 
