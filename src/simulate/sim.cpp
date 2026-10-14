@@ -555,7 +555,7 @@ int run(){
       default:{
          std::cerr << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
          zlog << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
-         exit (EXIT_FAILURE);
+         err::vexit();
          }
    }
 
