@@ -9,6 +9,7 @@ energy.o \
 initialize.o \
 interface.o \
 magnetization.o \
+max_torque.o \
 specific_heat.o \
 standard_deviation.o\
 reset.o \

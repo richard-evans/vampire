@@ -6,7 +6,6 @@
 utility_objects =\
 checkpoint.o \
 errors.o \
-statistics.o \
 units.o \
 vmath.o
 
