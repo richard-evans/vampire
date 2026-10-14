@@ -74,7 +74,7 @@ void build_hexagonal_close_packed(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[3].x = 0.833333;
    unit_cell.atom[3].y = 0.5;
    unit_cell.atom[3].z = 0.5;
-   unit_cell.atom[3].mat = uc::internal::sublattice_materials ? 3 : 0; // if sublattice material is defined, then identify at as same as ID  
+   unit_cell.atom[3].mat = uc::internal::sublattice_materials ? 3 : 0; // if sublattice material is defined, then identify at as same as ID
    unit_cell.atom[3].lc = 3;
    unit_cell.atom[3].hc = 1;
    unit_cell.atom[3].ni = 12;

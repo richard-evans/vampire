@@ -40,8 +40,8 @@ namespace unitcell{
       //-------------------------------------------------------------------------
       // Internal shared variables set by input file
       //-------------------------------------------------------------------------
-	   extern std::string crystal_structure;
-	   extern std::string unit_cell_filename;
+      extern std::string crystal_structure;
+      extern std::string unit_cell_filename;
 
       extern double unit_cell_size_x;
       extern double unit_cell_size_y;

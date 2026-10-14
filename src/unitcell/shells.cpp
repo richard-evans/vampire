@@ -34,8 +34,8 @@ struct shell_t{
 
 // comparison function
 bool compare(shell_t first, shell_t second){
-	if( first.range < second.range) return true;
-	else return false;
+   if( first.range < second.range) return true;
+   else return false;
 }
 
 //------------------------------------------------------------------------

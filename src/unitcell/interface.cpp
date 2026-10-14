@@ -37,27 +37,27 @@ namespace unitcell{
       prefix="material";
       if(key == prefix){
          //-------------------------------------------------------------------
-   		// Get unit cell filename
-   		//-------------------------------------------------------------------
+         // Get unit cell filename
+         //-------------------------------------------------------------------
          test="unit-cell-file";
-   		if(word==test){
-   			std::string ucffile=value;
-   			// strip quotes
-   			ucffile.erase(std::remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
-   			test="";
-   			// if filename not blank set ucf file name
-   			if(ucffile!=test){
-   				//std::cout << matfile << std::endl;
-   				uc::internal::unit_cell_filename=ucffile;
-   				return true;
-   			}
-   			else{
-   				terminaltextcolor(RED);
-   				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-   				terminaltextcolor(WHITE);
-   				return false;
-   			}
-   		}
+         if(word==test){
+            std::string ucffile=value;
+            // strip quotes
+            ucffile.erase(std::remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
+            test="";
+            // if filename not blank set ucf file name
+            if(ucffile!=test){
+               //std::cout << matfile << std::endl;
+               uc::internal::unit_cell_filename=ucffile;
+               return true;
+            }
+            else{
+               terminaltextcolor(RED);
+               std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
+               terminaltextcolor(WHITE);
+               return false;
+            }
+         }
       }
 
       // Check for third prefix

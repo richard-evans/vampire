@@ -46,7 +46,7 @@ void build_SmFeN(unitcell::unit_cell_t& unit_cell){
    unit_cell.shape[2][2] = 1;
 
    unit_cell.lcsize = 28;
-   unit_cell.hcsize = 6;            // 
+   unit_cell.hcsize = 6;            //
    unit_cell.interaction_range = 1;
    unit_cell.atom.resize(28);
    unit_cell.surface_threshold = 10; // Not yet properly calculated. Also atom.ni not properly calculated, but ni is now redundant.

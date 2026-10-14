@@ -27,12 +27,12 @@ namespace unitcell{
    //----------------------------------------------------------------------------
    void initialise(unit_cell_t & unit_cell){
 
-   	// check for read-in of unit cell
-   	std::string blank="";
-   	if(uc::internal::unit_cell_filename.c_str()!=blank){
-   		uc::internal::read_unit_cell(unit_cell, uc::internal::unit_cell_filename);
-   		return;
-   	}
+      // check for read-in of unit cell
+      std::string blank="";
+      if(uc::internal::unit_cell_filename.c_str()!=blank){
+         uc::internal::read_unit_cell(unit_cell, uc::internal::unit_cell_filename);
+         return;
+      }
 
       //------------------------------------------------------------------------
       // Determine which unit cell to build

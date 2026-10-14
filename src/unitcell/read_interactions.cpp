@@ -33,7 +33,7 @@ namespace unitcell{
       unsigned int& interaction_range
    ){
 
-		int num_interactions = 0; // assume no interactions
+      int num_interactions = 0; // assume no interactions
       std::string exchange_type_string; // string defining exchange type
 
       // get number of exchange types
