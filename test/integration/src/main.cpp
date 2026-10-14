@@ -68,6 +68,17 @@ int main(int argc, char* argv[]){
    // Run tests
    //---------------------------------------------------------------------------
    unsigned int fail = 0;
+   unsigned int skipped = 0;
+
+   // tests on a single spin cannot be decomposed over several mpi processes, so are skipped in mpi mode
+   auto serial_only = [&](const std::string dir){
+      if(mpi_processes == 0) return true;
+      std::stringstream test_name;
+      test_name << "Skipping " << dir;
+      std::cout << std::setw(60) << std::left << test_name.str() << " : SKIPPED (single spin, serial only)" << std::endl;
+      skipped += 1;
+      return false;
+   };
 
    //---------------------------------------------------------------------------
    // Standard tests
@@ -86,15 +97,15 @@ int main(int argc, char* argv[]){
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
 
       // Integrator tests
-      if( !integrator_test("dynamics/heun",    9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
-      if( !integrator_test("dynamics/midpoint",9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
-      if( !integrator_test("dynamics/rkmk2",   9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
-      if( !integrator_test("dynamics/rkmk4",   9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
-      if( !integrator_test("dynamics/dm",      9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( serial_only("dynamics/heun") && !integrator_test("dynamics/heun",    9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( serial_only("dynamics/midpoint") && !integrator_test("dynamics/midpoint",9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( serial_only("dynamics/rkmk2") && !integrator_test("dynamics/rkmk2",   9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( serial_only("dynamics/rkmk4") && !integrator_test("dynamics/rkmk4",   9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
+      if( serial_only("dynamics/dm") && !integrator_test("dynamics/dm",      9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
 
       // Program tests
       // effective-damping: single spin rotated 120 degrees from z relaxing in 1T field along z
-      if( !integrator_test("dynamics/effective-damping", 9.75e-11, -0.552854, 0.159192, 0.817931, exe ) ) fail += 1;
+      if( serial_only("dynamics/effective-damping") && !integrator_test("dynamics/effective-damping", 9.75e-11, -0.552854, 0.159192, 0.817931, exe ) ) fail += 1;
 
       // Structure tests
       if( !material_atoms_test("structure/core-shell", 3474, 485, 0, 0, exe ) ) fail += 1;
@@ -105,11 +116,11 @@ int main(int argc, char* argv[]){
 
       // Constants tests
       // gamma_SI: single spin precession — spin trajectory at t=9.74e-11 s with alpha=0.001
-      if( !integrator_test("constants/gamma", 9.74e-11, -0.127636, -0.991673, 0.0171491, exe ) ) fail += 1;
+      if( serial_only("constants/gamma") && !integrator_test("constants/gamma", 9.74e-11, -0.127636, -0.991673, 0.0171491, exe ) ) fail += 1;
       // muB: Zeeman energy for 125 spins of 1 muB in 1T field = -125*muB = -1.15925125979e-21 J
       if( !energy_test("constants/muB", -1.15925125979e-21, exe, "muB" ) ) fail += 1;
       // kB: single spin MC with fixed seed; final spin direction is deterministic and depends on kB
-      if( !integrator_test("constants/kB", 9.74e-11, 0.411154, -0.829297, 0.378442, exe ) ) fail += 1;
+      if( serial_only("constants/kB") && !integrator_test("constants/kB", 9.74e-11, 0.411154, -0.829297, 0.378442, exe ) ) fail += 1;
 
    }
 
@@ -138,10 +149,14 @@ int main(int argc, char* argv[]){
    // Summary
    std::cout << "---------------------------------------------------------------------" << std::endl;
    if(fail >0){
-      std::cout << "Failed " << fail << " tests : OVERALL FAIL" << std::endl;
+      std::cout << "Failed " << fail << " tests";
+      if(skipped > 0) std::cout << ", skipped " << skipped;
+      std::cout << " : OVERALL FAIL" << std::endl;
    }
    else{
-      std::cout << "Failed " << fail << " tests : OVERALL PASS" <<	std::endl;
+      std::cout << "Failed " << fail << " tests";
+      if(skipped > 0) std::cout << ", skipped " << skipped;
+      std::cout << " : OVERALL PASS" << std::endl;
    }
    std::cout << "---------------------------------------------------------------------" << std::endl;
 
