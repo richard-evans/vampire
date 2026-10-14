@@ -1,0 +1,32 @@
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+sim:time-step=1.0E-16
+sim:integrator-random-seed=12345
+output:precision=16
+sim:program=cmc-anisotropy
+sim:integrator=constrained-monte-carlo
+sim:minimum-temperature=300.0
+sim:maximum-temperature=300.0
+sim:temperature-increment=100.0
+sim:constraint-angle-theta-minimum=0.0
+sim:constraint-angle-theta-maximum=0.0
+sim:constraint-angle-theta-increment=45.0
+sim:constraint-angle-phi-minimum=0.0
+sim:constraint-angle-phi-maximum=90.0
+sim:constraint-angle-phi-increment=45.0
+sim:equilibration-time-steps=50
+sim:loop-time-steps=100
+sim:time-steps-increment=10
+output:time-steps
+output:temperature
+output:applied-field-strength
+output:magnetisation
+output:mean-magnetisation-length
+output:total-energy
