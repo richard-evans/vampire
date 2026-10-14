@@ -125,8 +125,7 @@ namespace dipole{
 
          // check for initialised data structures
          if(!output_atomistic_field_initialised){
-            std::cerr << "Programmer error : dipole::output_atomistic_dipole_fields() called before initialisation" << std::endl;
-            err::vexit();
+            err::fatal("Programmer error : dipole::output_atomistic_dipole_fields() called before initialisation");
          }
 
          // get number of atoms (local CPU)
