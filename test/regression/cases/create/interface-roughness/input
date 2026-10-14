@@ -1,0 +1,19 @@
+create:crystal-structure=fcc
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+sim:program=benchmark
+sim:integrator=llg-heun
+sim:total-time-steps=0
+config:atoms
+config:output-format=text
+output:precision=16
+output:time-steps
+create:interfacial-roughness-random-seed=1234
+create:interfacial-roughness
+create:interfacial-roughness-number-of-seed-points=5
+create:interfacial-roughness-seed-radius=0.5 !nm
+create:interfacial-roughness-mean-height=0.35 !nm
+create:interfacial-roughness-maximum-height=0.7 !nm
