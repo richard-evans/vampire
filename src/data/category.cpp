@@ -25,27 +25,27 @@
 
 namespace cat{
 
-	// vector of categories for book keeping
-	std::vector <category_t> category(0);
+   // vector of categories for book keeping
+   std::vector <category_t> category(0);
 
-	// constructor
-	category_t::category_t():
-		magm(0.0),
-		mean_magm(0.0),
-		mx(0.0),
-		my(0.0),
-		mz(0.0),
-		torque(0.0),
-		mean_torque(0.0),
-		energy(0.0),
-		theta(0.0),
-		phi(0.0),
-		spin_temp(0.0),
-		mean_spin_temp(0.0),
-		SxH2(0.0),
-		SH(0.0)
-	{
-		category_atoms.resize(0,0);
-	}
+   // constructor
+   category_t::category_t():
+      magm(0.0),
+      mean_magm(0.0),
+      mx(0.0),
+      my(0.0),
+      mz(0.0),
+      torque(0.0),
+      mean_torque(0.0),
+      energy(0.0),
+      theta(0.0),
+      phi(0.0),
+      spin_temp(0.0),
+      mean_spin_temp(0.0),
+      SxH2(0.0),
+      SH(0.0)
+   {
+      category_atoms.resize(0,0);
+   }
 
 } // End of namespace cat
