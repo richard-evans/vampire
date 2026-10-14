@@ -33,7 +33,7 @@ namespace sim{
    //-----------------------------------------------------------------------------
    // Function to process input file parameters for sim module
    //-----------------------------------------------------------------------------
-   bool match_input_parameter(string const key, string const word, string const value, string const unit, int const line){
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
 
       // Check for valid key, if no match return false
       std::string prefix="sim";
@@ -902,12 +902,12 @@ namespace sim{
       if(word==test){
          double H=atof(value.c_str());
          // test for unit
-         string unit_type="field";
+         std::string unit_type="field";
          // if no unit given, assume internal
          if(unit.size() != 0){
             units::convert(unit,H,unit_type);
          }
-         string str="field";
+         std::string str="field";
          if(unit_type==str){
             // Test for valid range
             if((H>=-1.0E5) && (H<1.0E5)){

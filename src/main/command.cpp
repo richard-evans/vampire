@@ -58,7 +58,7 @@ void command_line_args(int argc, char* argv[]){
          // check number of args not exceeded
          if(arg+1 < argc){
             arg++;
-            vmain::internal::input_file_name = string(argv[arg]);
+            vmain::internal::input_file_name = std::string(argv[arg]);
          }
          else{
             terminaltextcolor(RED);
@@ -76,7 +76,7 @@ void command_line_args(int argc, char* argv[]){
          // check number of args not exceeded
          if(arg+1 < argc){
             arg++;
-            vout::output_file_name = string(argv[arg]);
+            vout::output_file_name = std::string(argv[arg]);
          }
          else{
             terminaltextcolor(RED);

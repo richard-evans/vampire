@@ -76,8 +76,8 @@ namespace unitcell{
          //--------------------------------------------------------------------
          test="crystal-sublattice-materials";
          if(word==test){
-            string t = "true";
-            string f = "false";
+            std::string t = "true";
+            std::string f = "false";
             if(value==t){
                uc::internal::sublattice_materials = true;
                return true;

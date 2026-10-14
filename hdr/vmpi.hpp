@@ -24,9 +24,6 @@
    #include <mpi.h>
 #endif
 
-using std::string;
-//using std::vector;
-
 namespace vmpi{
 
    extern bool master;              // boolean variable (only true on master process)

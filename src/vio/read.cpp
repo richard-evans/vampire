@@ -107,7 +107,7 @@ namespace vin{
    ///   Revision:     ---
    ///=====================================================================================
    ///
-   int read(string const filename){
+   int read(std::string const filename){
       //zlog << zTs() << "READING" << std::endl;
       // Print informative message to zlog file
       zlog << zTs() << "Opening main input file \"" << filename << "\"." << std::endl;
@@ -193,7 +193,7 @@ namespace vin{
          }
 
          // Change super/sub indicies from string to int form
-         string empty="";
+         std::string empty="";
 
          int superIndex = 0;
          int subIndex = 0;

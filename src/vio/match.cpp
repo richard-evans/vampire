@@ -56,7 +56,7 @@ namespace vin{
    // Function to match input file keywords to module input parameters. Each
    // module processes its own keywords in src/<module>/interface.cpp
    //---------------------------------------------------------------------------
-   int match(string const key, string const word, string const value, string const unit, int const line){
+   int match(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
 
       //-------------------------------------------------------------------
       // Call module input parameters
@@ -100,7 +100,7 @@ namespace vin{
 
    } // end of match function
 
-   int match(string const key, string const word, string const value, string const unit, int const line, int const superIndex, int const subIndex){
+   int match(std::string const key, std::string const word, std::string const value, std::string const unit, int const line, int const superIndex, int const subIndex){
       if(unitcell::match_input_parameter(key, word, value, unit, line, superIndex, subIndex)) return EXIT_SUCCESS;
 
       terminaltextcolor(RED);

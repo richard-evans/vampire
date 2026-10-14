@@ -23,7 +23,7 @@ namespace create{
    //-----------------------------------------------------------------------------
    // Function to process input file parameters for create module
    //-----------------------------------------------------------------------------
-   bool match_input_parameter(string const key, string const word, string const value, string const unit, int const line){
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
 
       std::string test="";
 

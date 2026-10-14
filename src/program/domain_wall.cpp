@@ -334,7 +334,7 @@ namespace program{
 
 
          std::ofstream myfile;
-         string filename = "dw-" + std::to_string(sim::time) + ".txt";
+         std::string filename = "dw-" + std::to_string(sim::time) + ".txt";
          myfile.open (filename);
 
          for(int atom=0;atom<num_local_atoms;atom++){

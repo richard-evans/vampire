@@ -27,7 +27,7 @@ namespace cells{
    //---------------------------------------------------------------------------
    // Function to process input file parameters for cells module
    //---------------------------------------------------------------------------
-   bool match_input_parameter(string const key, string const word, string const value, string const unit, int const line){
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
 
       // Check for valid key, if no match return false
       std::string prefix="cells";
