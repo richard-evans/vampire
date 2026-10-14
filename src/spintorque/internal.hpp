@@ -80,8 +80,8 @@ namespace st{
       extern std::vector<double> magx_mat; // magnetisation of material
       extern std::vector<double> magy_mat;
       extern std::vector<double> magz_mat;
-      
-      
+
+
 
       // material parameters for spin torque calculation
       struct mp_t{

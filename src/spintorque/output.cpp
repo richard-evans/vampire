@@ -46,12 +46,12 @@ namespace st{
                ofile.open("st-microcells-base.cfg");
                ofile << num_cells << std::endl;
                for(int cell=0; cell < num_cells; ++cell){
-	               ofile << pos[3*cell+0] << "\t" << pos[3*cell+1] << "\t" << pos[3*cell+2];
-	               ofile << "\t" << beta_cond[cell] << "\t" << beta_diff[cell] << "\t" << sa_infinity[cell] << "\t" << lambda_sdl[cell] << std::endl;
+                  ofile << pos[3*cell+0] << "\t" << pos[3*cell+1] << "\t" << pos[3*cell+2];
+                  ofile << "\t" << beta_cond[cell] << "\t" << beta_diff[cell] << "\t" << sa_infinity[cell] << "\t" << lambda_sdl[cell] << std::endl;
                }
 
-		         ofile.close();
-	         }
+               ofile.close();
+            }
 
          }
 
@@ -88,7 +88,7 @@ namespace st{
                std::ofstream ofile;
                ofile.open(std::string(filename.str()).c_str());
 
-	            ofile<<"Time:"<< "\t" << sim::time*mp::dt_SI<< std::endl;
+               ofile<<"Time:"<< "\t" << sim::time*mp::dt_SI<< std::endl;
 
                for(int cell=0; cell<num_cells; ++cell){
                   ofile << pos[3*cell+0] << "\t" << pos[3*cell+1] << "\t" << pos[3*cell+2] << "\t";

@@ -77,9 +77,9 @@ namespace st{
                            +st::internal::magz_mat[mat]*st::internal::magz_mat[mat]);
 
             if(norm_mag>1.0e-8){
-		st::internal::magx_mat[mat] /= norm_mag;
-		st::internal::magy_mat[mat] /= norm_mag;
-		st::internal::magz_mat[mat] /= norm_mag;
+      st::internal::magx_mat[mat] /= norm_mag;
+      st::internal::magy_mat[mat] /= norm_mag;
+      st::internal::magz_mat[mat] /= norm_mag;
             }
          }
       }

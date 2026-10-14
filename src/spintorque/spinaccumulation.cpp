@@ -58,8 +58,8 @@ namespace st{
          //---------------------------------------------------------------------------------------------------
          //set parameters for TMR calculation
          if(st::internal::TMRenable == true){
-            int FL =	st::internal::free_layer;
-            int RL =	st::internal::reference_layer;
+            int FL = st::internal::free_layer;
+            int RL = st::internal::reference_layer;
             double dot = st::internal::magx_mat[RL]*st::internal::magx_mat[FL]+
                          st::internal::magy_mat[RL]*st::internal::magy_mat[FL]+
                          st::internal::magz_mat[RL]*st::internal::magz_mat[FL];
@@ -353,7 +353,7 @@ namespace st{
                const double plus_perp =  (pm_b2*pm_b2 + pm_b3*pm_b3);
                // const double minus_perp = (pm_b2*pm_b2 - pm_b3*pm_b3); // unused variable
 
-	            double aj; // the ST parameter describing Slonczewski torque
+               double aj; // the ST parameter describing Slonczewski torque
                double bj; // the ST parameter describing field-like torque
 
 

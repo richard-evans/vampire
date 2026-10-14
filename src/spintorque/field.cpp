@@ -28,7 +28,7 @@ namespace st{
                                   const std::vector<double>& z_spin_array,
                                   const std::vector<int>& atom_type_array,
                                   const std::vector<double>& mu_s_array){
-       
+
       if(st::internal::enabled==false) return;
 
 
@@ -61,7 +61,7 @@ namespace st{
                                std::vector<double>& z_total_external_field_array,
                                const int start_index,
                                const int end_index){
-     
+
       if(st::internal::enabled==false) return;
 
 
