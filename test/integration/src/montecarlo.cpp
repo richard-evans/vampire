@@ -51,13 +51,15 @@
 //
 // Runs a vampire simulation in the given subdirectory, reads the last data
 // line of the output file, and checks one or more columns against expected
-// values, each to within its own relative tolerance
-// (i.e. |value/expected - 1| < tol). Each value is reported on its own line.
+// values, each to within its own tolerance
+// (i.e. |value - expected| <= abs_tol + tol*|expected|). Each value is
+// reported on its own line.
 //
 // Parameters:
 //   dir        - path relative to test/integration/data/
-//   values     - list of {label, column, expected, tol} to check, where
-//                column is the 0-based index of the column in the output
+//   values     - list of {label, column, expected, tol[, abs_tol]} to check,
+//                where column is the 0-based index of the column in the output
+//                and abs_tol (default 0) is needed when expected is zero
 //   executable - full shell command used to invoke vampire-serial
 //
 // Returns true if all values pass, false otherwise.
@@ -125,10 +127,10 @@ bool final_values_test(const std::string dir, const std::vector<expected_value_t
          continue;
       }
 
-      // relative comparison: pass if |value/expected - 1| < tol
+      // pass if |value - expected| <= abs_tol + tol*|expected|
       const double value = columns[values[i].column];
-      const double ratio = value / values[i].expected;
-      if(ratio > 1.0 - values[i].tol && ratio < 1.0 + values[i].tol){
+      const double expected = values[i].expected;
+      if( std::abs(value - expected) <= values[i].abs_tol + values[i].tol * std::abs(expected) ){
          std::cout << "OK" << std::endl;
       }
       else{

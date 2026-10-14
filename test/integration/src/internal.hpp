@@ -13,6 +13,7 @@
 #pragma once
 
 // C++ standard library headers
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -44,5 +45,6 @@ struct expected_value_t{
    int column;        // 0-based column index in output file
    double expected;   // expected value
    double tol;        // relative tolerance
+   double abs_tol = 0.0; // absolute tolerance, needed when the expected value is zero
 };
 bool final_values_test(const std::string dir, const std::vector<expected_value_t> values, const std::string executable);
