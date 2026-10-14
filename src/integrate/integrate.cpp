@@ -408,7 +408,7 @@ int integrate_mpi(uint64_t n_steps){
          terminaltextcolor(RED);
          std::cerr << "Unknown integrator type "<< static_cast<int>(integrate::integrator) << " requested, exiting" << std::endl;
          terminaltextcolor(WHITE);
-         exit (EXIT_FAILURE);
+         err::vexit();
          }
       }
    }
