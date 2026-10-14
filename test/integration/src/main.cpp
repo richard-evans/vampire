@@ -120,6 +120,12 @@ int main(int argc, char* argv[]){
                                                                 {"E[111]", 2, -1.666666666666668e-22, 1.0e-10, 1.0e-30},
                                                                 {"E(d4)", 3, -2.500000000000001e-22, 1.0e-10, 1.0e-30},
                                                                 {"E(d5)", 4, -2.499999999999999e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
+      // cubic-sixth-order: E = K Sx^2 Sy^2 Sz^2, for 100 spins along each direction
+      if( !final_values_test("anisotropy/cubic-sixth-order", { {"E[001]", 0, 0.0, 1.0e-10, 1.0e-30},
+                                                               {"E[100]", 1, 0.0, 1.0e-10, 1.0e-30},
+                                                               {"E[111]", 2, 3.703703703703706e-23, 1.0e-10, 1.0e-30},
+                                                               {"E(d4)", 3, 1.529974755416535e-23, 1.0e-10, 1.0e-30},
+                                                               {"E(d5)", 4, 1.311953352769679e-23, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
 
       // DMI energy tests
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
