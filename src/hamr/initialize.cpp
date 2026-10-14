@@ -42,7 +42,7 @@ namespace hamr{
                    const int num_local_atoms
                   ){
 
-		// If program:hamr-simulation not requested, then stop
+      // If program:hamr-simulation not requested, then stop
       if(!hamr::internal::enabled){
          return;
       }

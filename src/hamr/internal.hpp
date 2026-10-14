@@ -44,25 +44,25 @@ namespace hamr{
       // Function to apply field only to atoms within box around centre of writer coil
       //-----------------------------------------------------------------------------
       void apply_field_spatial_box(const int start_index,
-					                  const int end_index,
-											const double Hloc_parity_field,
-											const double Hvecx,
-											const double Hvecy,
-											const double Hvecz,
-					                  std::vector<double>& x_total_external_field_array,
-					                  std::vector<double>& y_total_external_field_array,
-					                  std::vector<double>& z_total_external_field_array);
+                                 const int end_index,
+                                 const double Hloc_parity_field,
+                                 const double Hvecx,
+                                 const double Hvecy,
+                                 const double Hvecz,
+                                 std::vector<double>& x_total_external_field_array,
+                                 std::vector<double>& y_total_external_field_array,
+                                 std::vector<double>& z_total_external_field_array);
 
       //-----------------------------------------------------------------------------
       // Function to create singletone bit sequence
       //-----------------------------------------------------------------------------
-		void create_singletone_vector();
+      void create_singletone_vector();
 
       //-----------------------------------------------------------------------------
       // Function to check that user defined bit sequence is consistent with system
-		// size and "number-of-bits" parameter
+      // size and "number-of-bits" parameter
       //-----------------------------------------------------------------------------
-		void check_sequence_length();
+      void check_sequence_length();
 
       //-----------------------------------------------------------------------------
       // Shared variables used for hamr calculation
