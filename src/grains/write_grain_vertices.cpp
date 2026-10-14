@@ -42,5 +42,5 @@ void grains::internal::write_grain_vertices(int id, double dx, double dy, std::o
    }
    ofile << std::endl;
 
-	return;
+   return;
 }
