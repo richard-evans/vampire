@@ -9,10 +9,10 @@ initialize.o \
 interface.o\
 forces.o\
 fields.o\
-suzuki-trotter.o\
+suzuki_trotter.o\
 temperatures.o\
 energy.o\
-suzuki-trotter-mpi.o\
+suzuki_trotter_mpi.o\
 tests.o
 
 # Append module objects to global tree
