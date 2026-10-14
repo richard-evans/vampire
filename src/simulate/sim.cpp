@@ -114,14 +114,6 @@ namespace sim{
    double constraint_theta_max=0.0; // loop angle max [degrees]
    double constraint_theta_delta=5.0; /// loop angle delta [degrees]
 
-   // LaGrange multiplier variables
-   double lagrange_lambda_x=0.0;
-   double lagrange_lambda_y=0.0;
-   double lagrange_lambda_z=0.0;
-   double lagrange_m=1.0;
-   double lagrange_N=1000.0;
-   bool   lagrange_multiplier=false;
-
    double cooling_time=100.0e-12; ///seconds
    int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
    pump_functions_t pump_function=two_temperature;

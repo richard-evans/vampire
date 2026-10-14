@@ -99,7 +99,7 @@ void calculate_spin_fields(const int start_index,const int end_index){
                       start_index, end_index, sim::temperature);
 
    // Spin Dependent Extra Fields
-   if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
+   if(program::lagrange_multiplier_enabled==true) calculate_lagrange_fields(start_index,end_index);
 
    // Add spin torque fields
    if( sim::internal::enable_spin_torque_fields == true ||
@@ -470,9 +470,9 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 void calculate_lagrange_fields(const int start_index,const int end_index){
 
    // LaGrange Multiplier
-   const double lx=sim::lagrange_lambda_x;
-   const double ly=sim::lagrange_lambda_y;
-   const double lz=sim::lagrange_lambda_z;
+   const double lx=program::lagrange_lambda_x;
+   const double ly=program::lagrange_lambda_y;
+   const double lz=program::lagrange_lambda_z;
 
    // Constraint vector
    const double nu_x=cos(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
@@ -480,10 +480,10 @@ void calculate_lagrange_fields(const int start_index,const int end_index){
    const double nu_z=cos(sim::constraint_phi*M_PI/180.0);
 
    // Magnetisation
-   const double imm=1.0/sim::lagrange_m;
-   const double imm3=1.0/(sim::lagrange_m*sim::lagrange_m*sim::lagrange_m);
+   const double imm=1.0/program::lagrange_m;
+   const double imm3=1.0/(program::lagrange_m*program::lagrange_m*program::lagrange_m);
 
-   const double N=sim::lagrange_N;
+   const double N=program::lagrange_N;
 
    // Calculate LaGrange fields
    for(int atom=start_index;atom<end_index;atom++){

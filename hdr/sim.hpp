@@ -198,15 +198,6 @@ namespace sim{
 
    extern double spin_temperature;
 
-   // LaGrange multiplier variables
-   extern double lagrange_lambda_x;
-   extern double lagrange_lambda_y;
-   extern double lagrange_lambda_z;
-   extern double lagrange_m;
-   extern double lagrange_N;
-   extern bool   lagrange_multiplier;
-   extern void   update_lagrange_lambda();
-
    // Monte Carlo statistics counters
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;

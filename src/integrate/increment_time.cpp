@@ -15,6 +15,7 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "dipole.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 
 // integrate module headers
@@ -43,7 +44,7 @@ void increment_time(){
    // Update dipole fields
    dipole::calculate_field(sim::time, atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::magnetic);
 
-   if(sim::lagrange_multiplier) sim::update_lagrange_lambda();
+   if(program::lagrange_multiplier_enabled) program::update_lagrange_lambda();
    st::update_spin_torque_fields(atoms::x_spin_array,
                                atoms::y_spin_array,
                                atoms::z_spin_array,

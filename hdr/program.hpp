@@ -84,6 +84,15 @@ namespace program
    extern std::vector < double > domain_wall_second_vector_y;
    extern std::vector < double > domain_wall_second_vector_z;
 
+   // LaGrange multiplier program
+   extern double lagrange_lambda_x;
+   extern double lagrange_lambda_y;
+   extern double lagrange_lambda_z;
+   extern double lagrange_m;
+   extern double lagrange_N;
+   extern bool   lagrange_multiplier_enabled;
+   void   update_lagrange_lambda();
+
    //---------------------------------------------------------------------------
    // Function to run the program selected with the sim:program keyword
    //---------------------------------------------------------------------------

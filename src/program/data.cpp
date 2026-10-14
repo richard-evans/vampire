@@ -37,6 +37,14 @@ namespace program{
    std::vector < double > domain_wall_second_vector_y(100,0);
    std::vector < double > domain_wall_second_vector_z(100,1.0);
 
+   // LaGrange multiplier program
+   double lagrange_lambda_x=0.0;
+   double lagrange_lambda_y=0.0;
+   double lagrange_lambda_z=0.0;
+   double lagrange_m=1.0;
+   double lagrange_N=1000.0;
+   bool   lagrange_multiplier_enabled=false;
+
    namespace internal{
 
       //------------------------------------------------------------------------

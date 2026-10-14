@@ -25,20 +25,20 @@
 #include "vmath.hpp"
 #include "vmpi.hpp"
 
-namespace sim{
+namespace program{
 
 /// Function to update lagrange lambda
 void update_lagrange_lambda(){
 
    // Save initial value of lambda
-   const double lamda_old_x = sim::lagrange_lambda_x;
-   const double lamda_old_y = sim::lagrange_lambda_y;
-   const double lamda_old_z = sim::lagrange_lambda_z;
+   const double lamda_old_x = program::lagrange_lambda_x;
+   const double lamda_old_y = program::lagrange_lambda_y;
+   const double lamda_old_z = program::lagrange_lambda_z;
 
    // Calculate magnetisation
    stats::update();
 
-   //std::cout << "xx " << sim::lagrange_m << std::endl;
+   //std::cout << "xx " << program::lagrange_m << std::endl;
 
    const std::vector<double> mm = stats::system_magnetization.get_magnetization();
 
@@ -46,20 +46,20 @@ void update_lagrange_lambda(){
    const double mx = mm[0];
    const double my = mm[1];
    const double mz = mm[2];
-   sim::lagrange_m = mm[3];
+   program::lagrange_m = mm[3];
 
    // Constraint vector
    const double nu_x=cos(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
    const double nu_y=sin(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
    const double nu_z=cos(sim::constraint_phi*M_PI/180.0);
 
-   double lx = -sim::lagrange_N*(mx-nu_x);
-   double ly = -sim::lagrange_N*(my-nu_y);
-   double lz = -sim::lagrange_N*(mz-nu_z);
+   double lx = -program::lagrange_N*(mx-nu_x);
+   double ly = -program::lagrange_N*(my-nu_y);
+   double lz = -program::lagrange_N*(mz-nu_z);
 
-   sim::lagrange_lambda_x = lamda_old_x + lx*mp::dt;
-   sim::lagrange_lambda_y = lamda_old_y + ly*mp::dt;
-   sim::lagrange_lambda_z = lamda_old_z + lz*mp::dt;
+   program::lagrange_lambda_x = lamda_old_x + lx*mp::dt;
+   program::lagrange_lambda_y = lamda_old_y + ly*mp::dt;
+   program::lagrange_lambda_z = lamda_old_z + lz*mp::dt;
 
 }
 
@@ -82,13 +82,13 @@ void lagrange_multiplier(){
    if(err::check==true){std::cout << "program::lagrange_multiplier has been called" << std::endl;}
 
    // Enable LMM fields
-   sim::lagrange_multiplier=true;
+   program::lagrange_multiplier_enabled=true;
 
    // Set prefactor in LaGrange multiplier (Tesla)
-   sim::lagrange_N=10.0;
+   program::lagrange_N=10.0;
 
    // Initialise LaGrange m
-   sim::update_lagrange_lambda();
+   program::update_lagrange_lambda();
 
    // Set temperature to zero
    sim::temperature=0.0;
