@@ -154,7 +154,7 @@ void calculate_external_fields(const int start_index,const int end_index){
    else{
 
       // Thermal Fields
-      if(sim::hamiltonian_simulation_flags[3]==1) calculate_thermal_fields(start_index,end_index);
+      if(sim::thermal_field_enabled) calculate_thermal_fields(start_index,end_index);
 
    }
 
@@ -212,7 +212,7 @@ void calculate_thermal_fields_only(const int start_index,const int end_index){
    else{
 
       // Thermal Fields
-      if(sim::hamiltonian_simulation_flags[3]==1) calculate_thermal_fields(start_index,end_index);
+      if(sim::thermal_field_enabled) calculate_thermal_fields(start_index,end_index);
 
    }
 
@@ -222,7 +222,7 @@ void calculate_thermal_fields_only(const int start_index,const int end_index){
 void add_deterministic_external_fields(const int start_index,const int end_index){
 
    // Applied Fields (included in hamr::fields() for HAMR program)
-   if(program::program != program::program_t::hamr_simulation && sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
+   if(program::program != program::program_t::hamr_simulation && sim::applied_field_enabled) calculate_applied_fields(start_index,end_index);
 
    // Get updated spin torque fields
    st::get_spin_torque_fields(atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array, start_index, end_index);

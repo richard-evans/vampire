@@ -276,7 +276,7 @@ void CMCMCinit(){
    }
 
    // disable thermal field calculation
-   sim::hamiltonian_simulation_flags[3]=0;
+   sim::thermal_field_enabled = false;
 
    // set initialised flag to true
    cmc::is_initialised=true;

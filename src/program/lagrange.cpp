@@ -92,7 +92,7 @@ void lagrange_multiplier(){
 
    // Set temperature to zero
    sim::temperature=0.0;
-   sim::hamiltonian_simulation_flags[3] = 0; // Thermal
+   sim::thermal_field_enabled = false;
 
    // set minimum rotational angle
    sim::constraint_theta=sim::constraint_theta_min;

@@ -111,7 +111,7 @@ namespace internal{
       tz.resize(atoms::num_atoms, 0.0);
 
       // Disable external thermal field calculations
-      sim::hamiltonian_simulation_flags[3] = 0;
+      sim::thermal_field_enabled = false;
 
       LSF_RK4_set = true;
 

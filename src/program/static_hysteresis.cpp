@@ -44,7 +44,7 @@ int static_hysteresis(){
 
    // Disable temperature as this will prevent convergence
    sim::temperature = 0.0;
-   sim::hamiltonian_simulation_flags[3] = 0; // Thermal
+   sim::thermal_field_enabled = false;
 
    // Setup min and max fields and increment (uT)
    int64_t iHmax=vmath::iround64(double(sim::Hmax)*1.0E6);

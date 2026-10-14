@@ -117,7 +117,6 @@ int default_system(){
    // Initialise system creation flags to zero
    for (int i=0;i<10;i++){
       cs::system_creation_flags[i] = 0;
-      sim::hamiltonian_simulation_flags[i] = 0;
    }
 
    // Set system dimensions !Angstroms
@@ -131,12 +130,6 @@ int default_system(){
 
    cs::particle_creation_parity=0;
    uc::set_crystal_structure_to_simple_cubic();
-
-   // Setup Hamiltonian Flags
-   sim::hamiltonian_simulation_flags[0] = 1; /// Exchange
-   sim::hamiltonian_simulation_flags[1] = 1; /// Anisotropy
-   sim::hamiltonian_simulation_flags[2] = 1; /// Applied
-   sim::hamiltonian_simulation_flags[3] = 1; /// Thermal
 
    //Integration parameters
    dt_SI = 1.0e-15;  // seconds
@@ -185,9 +178,6 @@ int single_spin_system(){
 
    cs::particle_creation_parity=0;
    uc::set_crystal_structure_to_simple_cubic();
-
-   // Turn off multi-spin Flags
-   sim::hamiltonian_simulation_flags[0] = 0; /// Exchange
 
    // MPI Mode (Homogeneous execution)
    //vmpi::mpi_mode=0;

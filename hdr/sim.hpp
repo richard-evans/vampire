@@ -133,8 +133,8 @@ namespace sim{
    extern double TTTe; /// electron temperature
    extern double TTTp; /// phonon temperature
 
-   extern int system_simulation_flags;
-   extern int hamiltonian_simulation_flags[10];
+   extern bool applied_field_enabled; // include the applied field in the spin field (default true)
+   extern bool thermal_field_enabled; // include the thermal field in the spin field (default true)
 
    // Local system variables
    extern bool local_temperature; /// flag to enable material specific temperature
