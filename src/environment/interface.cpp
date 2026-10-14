@@ -90,14 +90,14 @@ namespace environment{
       if(word==test){
          double y=atof(value.c_str());
          vin::check_for_valid_value(y, word, line, prefix, unit, "length", 10, 1.0e8,"input","10 Angstroms - 10 millimetre");
-                  env::dim[1] =y;
+         env::dim[1] =y;
          return true;
       }
       test="system-size-z";
       if(word==test){
          double z=atof(value.c_str());
          vin::check_for_valid_value(z, word, line, prefix, unit, "length", 10, 1.0e8,"input","10 Angstroms - 10 millimetre");
-                  env::dim[2] =z;
+         env::dim[2] =z;
          return true;
       }
       test="system-size";

@@ -30,27 +30,27 @@ namespace environment{
       int initialise_demag_fields(){
 
 
-        std::cout << "initialise demag env " <<std::endl;
+         std::cout << "initialise demag env " <<std::endl;
 
-        int num_interactions = num_cells*num_cells;
-        rij_tensor_xx.resize(num_interactions,0.0);
-        rij_tensor_xy.resize(num_interactions,0.0);
-        rij_tensor_xz.resize(num_interactions,0.0);
-        rij_tensor_yy.resize(num_interactions,0.0);
-        rij_tensor_zz.resize(num_interactions,0.0);
-        rij_tensor_yz.resize(num_interactions,0.0);
-        int interaction_no = 0;
-        for(int celli=0; celli<num_cells; celli++){
+         int num_interactions = num_cells*num_cells;
+         rij_tensor_xx.resize(num_interactions,0.0);
+         rij_tensor_xy.resize(num_interactions,0.0);
+         rij_tensor_xz.resize(num_interactions,0.0);
+         rij_tensor_yy.resize(num_interactions,0.0);
+         rij_tensor_zz.resize(num_interactions,0.0);
+         rij_tensor_yz.resize(num_interactions,0.0);
+         int interaction_no = 0;
+         for(int celli=0; celli<num_cells; celli++){
 
-          for(int cellj=0; cellj<num_cells; cellj++){
+            for(int cellj=0; cellj<num_cells; cellj++){
 
-              if (celli != cellj){
+               if (celli != cellj){
 
-                double rx2 = cell_coords_array_x[cellj] - cell_coords_array_x[celli];
-                double ry2 = cell_coords_array_y[cellj] - cell_coords_array_y[celli];
-                double rz2 = cell_coords_array_z[cellj] - cell_coords_array_z[celli];
-                double rij = sqrt(rx2*rx2+ry2*ry2+rz2*rz2);
-                double rij_1 = 1.0/rij;//Reciprocal of the distance
+                  double rx2 = cell_coords_array_x[cellj] - cell_coords_array_x[celli];
+                  double ry2 = cell_coords_array_y[cellj] - cell_coords_array_y[celli];
+                  double rz2 = cell_coords_array_z[cellj] - cell_coords_array_z[celli];
+                  double rij = sqrt(rx2*rx2+ry2*ry2+rz2*rz2);
+                  double rij_1 = 1.0/rij;//Reciprocal of the distance
 
                   // define unitarian distance vectors
 
@@ -68,24 +68,24 @@ namespace environment{
                   rij_tensor_yy[interaction_no] = ((3.0*ey*ey - 1.0)*rij3);
                   rij_tensor_yz[interaction_no] = ((3.0*ey*ez      )*rij3);
                   rij_tensor_zz[interaction_no] = ((3.0*ez*ez - 1.0)*rij3);
-               //   std::cout << interaction_no << '\t' << cell_i << '\t' << cell_j << rij_tensor_xx[interaction_no] <<  std::endl;
+                  //   std::cout << interaction_no << '\t' << cell_i << '\t' << cell_j << rij_tensor_xx[interaction_no] <<  std::endl;
                   interaction_no++;
-              }
-              else if (celli == cellj){
+               }
+               else if (celli == cellj){
 
-                rij_tensor_xx[interaction_no] = 0.0;
-                rij_tensor_xy[interaction_no] = 0.0;
-                rij_tensor_xz[interaction_no] = 0.0;
-                //
-                rij_tensor_yy[interaction_no] = 0.0;
-                rij_tensor_yz[interaction_no] = 0.0;
-                rij_tensor_zz[interaction_no] = 0.0;
-                interaction_no++;
+                  rij_tensor_xx[interaction_no] = 0.0;
+                  rij_tensor_xy[interaction_no] = 0.0;
+                  rij_tensor_xz[interaction_no] = 0.0;
+                  //
+                  rij_tensor_yy[interaction_no] = 0.0;
+                  rij_tensor_yz[interaction_no] = 0.0;
+                  rij_tensor_zz[interaction_no] = 0.0;
+                  interaction_no++;
 
-              }
+               }
 
-          }
-        }
+            }
+         }
 
 
 
@@ -277,206 +277,206 @@ namespace environment{
       int calculate_demag_fields(){
 
          // For MPI version, only add local atoms
-          #ifdef MPICF
-             int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-          #else
-             int num_local_atoms = atoms::num_atoms;
-          #endif
+         #ifdef MPICF
+         int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+         #else
+         int num_local_atoms = atoms::num_atoms;
+         #endif
 
-        int interaction_no = 0;
-           const double imuB = constants::i_muB;
+         int interaction_no = 0;
+         const double imuB = constants::i_muB;
 
-      //  std::cout << "calcualte demag env " <<std::endl;
+         //  std::cout << "calcualte demag env " <<std::endl;
 
-      for(int cell_i = 0; cell_i<num_cells;cell_i++){
+         for(int cell_i = 0; cell_i<num_cells;cell_i++){
 
-        //const double V = cell_volume[cell_i];
-        //const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
-        //double self_demag = eightPI_three_cell_volume;
-        // Normalise cell magnetisation by the Bohr magneton
+            //const double V = cell_volume[cell_i];
+            //const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
+            //double self_demag = eightPI_three_cell_volume;
+            // Normalise cell magnetisation by the Bohr magneton
 
-        //std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
-        //Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
-        dipole_field_x[cell_i] = 0.0;//self_demag * mx_i*0.0; //*0.0
-        dipole_field_y[cell_i] = 0.0;//self_demag * my_i*0.0; //*0.0
-        dipole_field_z[cell_i] = 0.0;//self_demag * mz_i*0.0; //*0.0
+            //std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
+            //Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
+            dipole_field_x[cell_i] = 0.0;//self_demag * mx_i*0.0; //*0.0
+            dipole_field_y[cell_i] = 0.0;//self_demag * my_i*0.0; //*0.0
+            dipole_field_z[cell_i] = 0.0;//self_demag * mz_i*0.0; //*0.0
 
 
-        for(int cell_j = 0; cell_j<num_cells;cell_j++){
-          int shield = shield_number[cell_j];
-          //dont loop over micromagnetic cells to stop double couting - only environment cell_size
-          //mm -> mm calculated in the main micromagnetic module
-          if (shield != num_shields){
-             int j = interaction_no;
+            for(int cell_j = 0; cell_j<num_cells;cell_j++){
+               int shield = shield_number[cell_j];
+               //dont loop over micromagnetic cells to stop double couting - only environment cell_size
+               //mm -> mm calculated in the main micromagnetic module
+               if (shield != num_shields){
+                  int j = interaction_no;
 
-             const double mx = x_mag_array[cell_j]*imuB;
-             const double my = y_mag_array[cell_j]*imuB;
-             const double mz = z_mag_array[cell_j]*imuB;
-           //std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
-             dipole_field_x[cell_i]      +=(mx*rij_tensor_xx[j] + my*rij_tensor_xy[j] + mz*rij_tensor_xz[j]);
-             dipole_field_y[cell_i]      +=(mx*rij_tensor_xy[j] + my*rij_tensor_yy[j] + mz*rij_tensor_yz[j]);
-             dipole_field_z[cell_i]      +=(mx*rij_tensor_xz[j] + my*rij_tensor_yz[j] + mz*rij_tensor_zz[j]);
-           // Demag field
-            //std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << mx << std::endl;
+                  const double mx = x_mag_array[cell_j]*imuB;
+                  const double my = y_mag_array[cell_j]*imuB;
+                  const double mz = z_mag_array[cell_j]*imuB;
+                  //std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
+                  dipole_field_x[cell_i]      +=(mx*rij_tensor_xx[j] + my*rij_tensor_xy[j] + mz*rij_tensor_xz[j]);
+                  dipole_field_y[cell_i]      +=(mx*rij_tensor_xy[j] + my*rij_tensor_yy[j] + mz*rij_tensor_yz[j]);
+                  dipole_field_z[cell_i]      +=(mx*rij_tensor_xz[j] + my*rij_tensor_yz[j] + mz*rij_tensor_zz[j]);
+                  // Demag field
+                  //std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << mx << std::endl;
+               }
+               interaction_no ++;
             }
-            interaction_no ++;
+            //std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
+
+            dipole_field_x[cell_i] = dipole_field_x[cell_i]*constants::dipole_prefactor;
+            dipole_field_y[cell_i] = dipole_field_y[cell_i]*constants::dipole_prefactor;
+            dipole_field_z[cell_i] = dipole_field_z[cell_i]*constants::dipole_prefactor;
+            //   std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
          }
-        //std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
+         // std::cout << interaction_no << '\t' << num_cells*num_cells << std::endl;
+         // std::cin.get();
+         // saves the dipole field for each cell to the environment cell for use in the environment module
+         for(int lc=0; lc<cells::num_local_cells; lc++){
+            int cell = cells::cell_id_array[lc];
+            int env_cell = list_env_cell_atomistic_cell[cell];
+            //std::cout << cell << '\t' << env_cell <<std::endl;
+            environment_field_x[cell] = dipole_field_x[env_cell];// + bias_field_x[env_cell];
+            environment_field_y[cell] = dipole_field_y[env_cell];// + bias_field_y[env_cell];
+            environment_field_z[cell] = dipole_field_z[env_cell];//+ bias_field_z[env_cell];
 
-        dipole_field_x[cell_i] = dipole_field_x[cell_i]*constants::dipole_prefactor;
-        dipole_field_y[cell_i] = dipole_field_y[cell_i]*constants::dipole_prefactor;
-        dipole_field_z[cell_i] = dipole_field_z[cell_i]*constants::dipole_prefactor;
-    //   std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
-      }
-    // std::cout << interaction_no << '\t' << num_cells*num_cells << std::endl;
-    // std::cin.get();
-    // saves the dipole field for each cell to the environment cell for use in the environment module
-      for(int lc=0; lc<cells::num_local_cells; lc++){
-         int cell = cells::cell_id_array[lc];
-         int env_cell = list_env_cell_atomistic_cell[cell];
-         //std::cout << cell << '\t' << env_cell <<std::endl;
-         environment_field_x[cell] = dipole_field_x[env_cell];// + bias_field_x[env_cell];
-         environment_field_y[cell] = dipole_field_y[env_cell];// + bias_field_y[env_cell];
-         environment_field_z[cell] = dipole_field_z[env_cell];//+ bias_field_z[env_cell];
+            //  std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
 
-      //  std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
-
-      }
-      //  std::cin.get();
-//          #ifdef FFT
-//          //initalise all components of M and H arrays to 0
-//          for (int id = 0; id < eight_num_cells; id++){
-//
-//                   Mx_in[id][0]=0;
-//                   Mx_in[id][1]=0;
-//                   My_in[id][0]=0;
-//                   My_in[id][1]=0;
-//                   Mz_in[id][0]=0;
-//                   Mz_in[id][1]=0;
-//
-//
-//                   Mx_out[id][0]=0;
-//                   Mx_out[id][1]=0;
-//                   My_out[id][0]=0;
-//                   My_out[id][1]=0;
-//                   Mz_out[id][0]=0;
-//                   Mz_out[id][1]=0;
-//
-//
-//                   Hx_in[id][0]=0;
-//                   Hx_in[id][1]=0;
-//                   Hy_in[id][0]=0;
-//                   Hy_in[id][1]=0;
-//                   Hz_in[id][0]=0;
-//                   Hz_in[id][1]=0;
-//
-//
-//                   Hx_out[id][0]=0;
-//                   Hx_out[id][1]=0;
-//                   Hy_out[id][0]=0;
-//                   Hy_out[id][1]=0;
-//                   Hz_out[id][0]=0;
-//                   Hz_out[id][1]=0;
-//                }
-//
-//
-//         // std::ofstream pfile;
-//       //   pfile.open("m.txt");
-//          //initialised the in components for the FT to the magnetisation of each cell
-//          int cell = 0;
-//          const double imuB = constants::i_muB;
-//
-//          for(unsigned int k = 0 ; k < num_cells_z ; k++){
-//             for(unsigned int j = 0 ; j < num_cells_y; j++){
-//                for(unsigned int i = 0 ; i < num_cells_x ; i++){
-//                   int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
-//
-//                   // get cell index
-//                   int cell = k * num_cells_x*num_cells_y + j * num_cells_x + i;
-//
-//                   Mx_in[id][0] = x_mag_array[cell] * imuB;
-//                   My_in[id][0] = y_mag_array[cell] * imuB;
-//                   Mz_in[id][0] = z_mag_array[cell] * imuB;
-//               //    pfile <<i << '\t' << j << '\t' << k << "\t"<< cell << '\t' <<   Mx_in[id][0] << "\t" << My_in[id][0] << "\t" << Mz_in[id][0] << "\t" << std::endl;
-//                 }
-//               }
-//             }
-//
-//
-//          fftw_execute(MxP);
-//          fftw_execute(MyP);
-//          fftw_execute(MzP);
-//
-//
-//          cell = 0;
-//
-//          // performs the converlusion between Nk and Mk
-//          for(unsigned int k = 0 ; k < 2*num_cells_z ; k++){
-//             for(unsigned int j = 0 ; j < 2*num_cells_y; j++){
-//                for(unsigned int i = 0 ; i < 2*num_cells_x ; i++){
-//                  int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
-//
-//                   Hx_in[id][0] = N2xx[id][0]*Mx_out[id][0] + N2xy[id][0]*My_out[id][0] + N2xz[id][0]*Mz_out[id][0]; //summing the real part
-//                   Hx_in[id][0] -= (N2xx[id][1]*Mx_out[id][1] + N2xy[id][1]*My_out[id][1] + N2xz[id][1]*Mz_out[id][1]);
-//
-//                   Hx_in[id][1] = N2xx[id][0]*Mx_out[id][1] + N2xy[id][0]*My_out[id][1] + N2xz[id][0]*Mz_out[id][1];
-//                   Hx_in[id][1] += (N2xx[id][1]*Mx_out[id][0] + N2xy[id][1]*My_out[id][0] + N2xz[id][1]*Mz_out[id][0]);
-//
-//                   Hy_in[id][0] = N2yx[id][0]*Mx_out[id][0] + N2yy[id][0]*My_out[id][0] + N2yz[id][0]*Mz_out[id][0];
-//                   Hy_in[id][0] -= (N2yx[id][1]*Mx_out[id][1] + N2yy[id][1]*My_out[id][1] + N2yz[id][1]*Mz_out[id][1]);
-//
-//                   Hy_in[id][1] = N2yx[id][0]*Mx_out[id][1] + N2yy[id][0]*My_out[id][1] + N2yz[id][0]*Mz_out[id][1];
-//                   Hy_in[id][1] += (N2yx[id][1]*Mx_out[id][0] + N2yy[id][1]*My_out[id][0] + N2yz[id][1]*Mz_out[id][0]);
-//
-//                   Hz_in[id][0] = N2zx[id][0]*Mx_out[id][0] + N2zy[id][0]*My_out[id][0] + N2zz[id][0]*Mz_out[id][0]; //summing the real part
-//                   Hz_in[id][0] -= (N2zx[id][1]*Mx_out[id][1] + N2zy[id][1]*My_out[id][1] + N2zz[id][1]*Mz_out[id][1]);
-//
-//                   Hz_in[id][1] = N2zx[id][0]*Mx_out[id][1] + N2zy[id][0]*My_out[id][1] + N2zz[id][0]*Mz_out[id][1];
-//                   Hz_in[id][1] += (N2zx[id][1]*Mx_out[id][0] + N2zy[id][1]*My_out[id][0] + N2zz[id][1]*Mz_out[id][0]);
-//                   cell++;
-//                }
-//             }
-//          }
-//          fftw_execute(HxP);
-//          fftw_execute(HyP);
-//          fftw_execute(HzP);
-//
-//          double constant = constants::dipole_prefactor/eight_num_cells;
-//
-//
-//          // for (int i = 0; i< num_cells; i++){
-//          //
-//          //    // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
-//          //    dipole_field_x[i]=0.0;//eightPI_three_cell_volume*(x_mag_array[i]/constants::muB);
-//          //    dipole_field_y[i]=0.0;//eightPI_three_cell_volume*(y_mag_array[i]/constants::muB);
-//          //    dipole_field_z[i]=0.0;//eightPI_three_cell_volume*(z_mag_array[i]/constants::muB);
-//          // }
-//
-//       //   std::ofstream ofile;
-//       //   ofile.open("field.txt");
-//
-//          //sums the dipole field N.m + self demag/eightnumcells
-//          for(unsigned int k = 0 ; k < num_cells_z ; k++){
-//             for(unsigned int j = 0 ; j < num_cells_y; j++){
-//                for(unsigned int i = 0 ; i < num_cells_x ; i++){
-//                   int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
-//
-//
-//                 // get cell index
-//                 int cell = k * num_cells_x*num_cells_y + j * num_cells_x + i;
-//
-//                //   std:: cout << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << Hx_out[id][0] << '\t' << Hy_out[id][0] << '\t' << Hz_out[id][0] << std::endl;
-//                  dipole_field_x[cell] = Hx_out[id][0]*constant;
-//                  dipole_field_y[cell] = Hy_out[id][0]*constant;
-//                  dipole_field_z[cell] = Hz_out[id][0]*constant;
-//               //   ofile <<i << '\t' << j << '\t' << k << "\t" <<  cell << '\t' << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << std::endl;
-//                }
-//              }
-//            }
-// //std::cin.get();
-  //  std::ofstream ofile;
-  // ofile.open("field.txt");
-//          //saves the dipole field for each cell to the environment cell for use in the environment module
+         }
+         //  std::cin.get();
+         //          #ifdef FFT
+         //          //initalise all components of M and H arrays to 0
+         //          for (int id = 0; id < eight_num_cells; id++){
+         //
+         //                   Mx_in[id][0]=0;
+         //                   Mx_in[id][1]=0;
+         //                   My_in[id][0]=0;
+         //                   My_in[id][1]=0;
+         //                   Mz_in[id][0]=0;
+         //                   Mz_in[id][1]=0;
+         //
+         //
+         //                   Mx_out[id][0]=0;
+         //                   Mx_out[id][1]=0;
+         //                   My_out[id][0]=0;
+         //                   My_out[id][1]=0;
+         //                   Mz_out[id][0]=0;
+         //                   Mz_out[id][1]=0;
+         //
+         //
+         //                   Hx_in[id][0]=0;
+         //                   Hx_in[id][1]=0;
+         //                   Hy_in[id][0]=0;
+         //                   Hy_in[id][1]=0;
+         //                   Hz_in[id][0]=0;
+         //                   Hz_in[id][1]=0;
+         //
+         //
+         //                   Hx_out[id][0]=0;
+         //                   Hx_out[id][1]=0;
+         //                   Hy_out[id][0]=0;
+         //                   Hy_out[id][1]=0;
+         //                   Hz_out[id][0]=0;
+         //                   Hz_out[id][1]=0;
+         //                }
+         //
+         //
+         //         // std::ofstream pfile;
+         //       //   pfile.open("m.txt");
+         //          //initialised the in components for the FT to the magnetisation of each cell
+         //          int cell = 0;
+         //          const double imuB = constants::i_muB;
+         //
+         //          for(unsigned int k = 0 ; k < num_cells_z ; k++){
+         //             for(unsigned int j = 0 ; j < num_cells_y; j++){
+         //                for(unsigned int i = 0 ; i < num_cells_x ; i++){
+         //                   int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
+         //
+         //                   // get cell index
+         //                   int cell = k * num_cells_x*num_cells_y + j * num_cells_x + i;
+         //
+         //                   Mx_in[id][0] = x_mag_array[cell] * imuB;
+         //                   My_in[id][0] = y_mag_array[cell] * imuB;
+         //                   Mz_in[id][0] = z_mag_array[cell] * imuB;
+         //               //    pfile <<i << '\t' << j << '\t' << k << "\t"<< cell << '\t' <<   Mx_in[id][0] << "\t" << My_in[id][0] << "\t" << Mz_in[id][0] << "\t" << std::endl;
+         //                 }
+         //               }
+         //             }
+         //
+         //
+         //          fftw_execute(MxP);
+         //          fftw_execute(MyP);
+         //          fftw_execute(MzP);
+         //
+         //
+         //          cell = 0;
+         //
+         //          // performs the converlusion between Nk and Mk
+         //          for(unsigned int k = 0 ; k < 2*num_cells_z ; k++){
+         //             for(unsigned int j = 0 ; j < 2*num_cells_y; j++){
+         //                for(unsigned int i = 0 ; i < 2*num_cells_x ; i++){
+         //                  int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
+         //
+         //                   Hx_in[id][0] = N2xx[id][0]*Mx_out[id][0] + N2xy[id][0]*My_out[id][0] + N2xz[id][0]*Mz_out[id][0]; //summing the real part
+         //                   Hx_in[id][0] -= (N2xx[id][1]*Mx_out[id][1] + N2xy[id][1]*My_out[id][1] + N2xz[id][1]*Mz_out[id][1]);
+         //
+         //                   Hx_in[id][1] = N2xx[id][0]*Mx_out[id][1] + N2xy[id][0]*My_out[id][1] + N2xz[id][0]*Mz_out[id][1];
+         //                   Hx_in[id][1] += (N2xx[id][1]*Mx_out[id][0] + N2xy[id][1]*My_out[id][0] + N2xz[id][1]*Mz_out[id][0]);
+         //
+         //                   Hy_in[id][0] = N2yx[id][0]*Mx_out[id][0] + N2yy[id][0]*My_out[id][0] + N2yz[id][0]*Mz_out[id][0];
+         //                   Hy_in[id][0] -= (N2yx[id][1]*Mx_out[id][1] + N2yy[id][1]*My_out[id][1] + N2yz[id][1]*Mz_out[id][1]);
+         //
+         //                   Hy_in[id][1] = N2yx[id][0]*Mx_out[id][1] + N2yy[id][0]*My_out[id][1] + N2yz[id][0]*Mz_out[id][1];
+         //                   Hy_in[id][1] += (N2yx[id][1]*Mx_out[id][0] + N2yy[id][1]*My_out[id][0] + N2yz[id][1]*Mz_out[id][0]);
+         //
+         //                   Hz_in[id][0] = N2zx[id][0]*Mx_out[id][0] + N2zy[id][0]*My_out[id][0] + N2zz[id][0]*Mz_out[id][0]; //summing the real part
+         //                   Hz_in[id][0] -= (N2zx[id][1]*Mx_out[id][1] + N2zy[id][1]*My_out[id][1] + N2zz[id][1]*Mz_out[id][1]);
+         //
+         //                   Hz_in[id][1] = N2zx[id][0]*Mx_out[id][1] + N2zy[id][0]*My_out[id][1] + N2zz[id][0]*Mz_out[id][1];
+         //                   Hz_in[id][1] += (N2zx[id][1]*Mx_out[id][0] + N2zy[id][1]*My_out[id][0] + N2zz[id][1]*Mz_out[id][0]);
+         //                   cell++;
+         //                }
+         //             }
+         //          }
+         //          fftw_execute(HxP);
+         //          fftw_execute(HyP);
+         //          fftw_execute(HzP);
+         //
+         //          double constant = constants::dipole_prefactor/eight_num_cells;
+         //
+         //
+         //          // for (int i = 0; i< num_cells; i++){
+         //          //
+         //          //    // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
+         //          //    dipole_field_x[i]=0.0;//eightPI_three_cell_volume*(x_mag_array[i]/constants::muB);
+         //          //    dipole_field_y[i]=0.0;//eightPI_three_cell_volume*(y_mag_array[i]/constants::muB);
+         //          //    dipole_field_z[i]=0.0;//eightPI_three_cell_volume*(z_mag_array[i]/constants::muB);
+         //          // }
+         //
+         //       //   std::ofstream ofile;
+         //       //   ofile.open("field.txt");
+         //
+         //          //sums the dipole field N.m + self demag/eightnumcells
+         //          for(unsigned int k = 0 ; k < num_cells_z ; k++){
+         //             for(unsigned int j = 0 ; j < num_cells_y; j++){
+         //                for(unsigned int i = 0 ; i < num_cells_x ; i++){
+         //                   int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
+         //
+         //
+         //                 // get cell index
+         //                 int cell = k * num_cells_x*num_cells_y + j * num_cells_x + i;
+         //
+         //                //   std:: cout << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << Hx_out[id][0] << '\t' << Hy_out[id][0] << '\t' << Hz_out[id][0] << std::endl;
+         //                  dipole_field_x[cell] = Hx_out[id][0]*constant;
+         //                  dipole_field_y[cell] = Hy_out[id][0]*constant;
+         //                  dipole_field_z[cell] = Hz_out[id][0]*constant;
+         //               //   ofile <<i << '\t' << j << '\t' << k << "\t" <<  cell << '\t' << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << std::endl;
+         //                }
+         //              }
+         //            }
+         // //std::cin.get();
+         //  std::ofstream ofile;
+         // ofile.open("field.txt");
+         //          //saves the dipole field for each cell to the environment cell for use in the environment module
          for(int lc=0; lc<cells::num_local_cells; lc++){
             int cell = cells::cell_id_array[lc];
             int env_cell = list_env_cell_atomistic_cell[cell];
@@ -485,7 +485,7 @@ namespace environment{
             environment_field_y[cell] = dipole_field_y[env_cell];// + bias_field_y[env_cell];
             environment_field_z[cell] = dipole_field_z[env_cell];// + bias_field_z[env_cell];
 
-         //   std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
+            //   std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
 
          }
          for (int atom =0; atom < num_local_atoms; atom++){
