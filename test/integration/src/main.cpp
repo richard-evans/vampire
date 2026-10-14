@@ -188,6 +188,7 @@ int main(int argc, char* argv[]){
 
       // Checkpoint tests: a run saved part way and continued must match an uninterrupted run exactly
       if( !checkpoint_test("checkpoint/llg-heun", exe ) ) fail += 1;
+      if( !checkpoint_test("checkpoint/monte-carlo", exe ) ) fail += 1;
 
       // Constants tests
       // gamma_SI: single spin precession — spin trajectory at t=9.74e-11 s with alpha=0.001
