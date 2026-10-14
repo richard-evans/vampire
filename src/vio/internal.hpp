@@ -52,9 +52,9 @@ namespace vout{
    extern std::string zLogHostName; /// Host Name
    extern bool        zLogInitialised; /// Initialised flag
    #ifdef WIN_COMPILE
-   	extern int      zLogPid; /// Process ID
+      extern int      zLogPid; /// Process ID
    #else
-   	extern pid_t    zLogPid; /// Process ID
+      extern pid_t    zLogPid; /// Process ID
    #endif
 
    // namespaced io lists (to avoid collisions)
@@ -171,8 +171,8 @@ namespace vout{
    void height_mvec_actual(std::ostream& stream,bool header);
    void material_height_mvec_actual(std::ostream& stream,bool header);
    void fmr_field_strength(std::ostream& stream,bool header);
-	void mean_mvec(std::ostream& stream,bool header);
-	void mat_mean_mvec(std::ostream& stream,bool header);
+   void mean_mvec(std::ostream& stream,bool header);
+   void mat_mean_mvec(std::ostream& stream,bool header);
    void mean_material_susceptibility(std::ostream& stream,bool header);
    void material_binder_cumulant(std::ostream& stream,bool header);
    void mean_height_magnetisation_length(std::ostream& stream,bool header);
@@ -206,7 +206,7 @@ namespace vout{
    void material_lattice_temp(std::ostream& stream, bool header);
    void mean_syslatticetemp(std::ostream& stream,bool header);
    void material_mean_syslatticetemp(std::ostream& stream,bool header);
-   void mean_coupling_field_vec(std::ostream& stream, bool header); 
+   void mean_coupling_field_vec(std::ostream& stream, bool header);
 
    void potential_energy(std::ostream& stream, bool header);
    void kinetic_energy(std::ostream& stream, bool header);

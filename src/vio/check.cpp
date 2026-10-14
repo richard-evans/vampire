@@ -283,32 +283,32 @@ namespace vin{
 
        // check size
        if(u.size()!=3){
-    	  terminaltextcolor(RED);
+        terminaltextcolor(RED);
           std::cerr << "Error: vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+        zlog << zTs() << "Error: vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
           err::vexit();
        }
        // Check for valid range
        if(fabs(u.at(0)) >1.e10){
-    	  terminaltextcolor(RED);
+        terminaltextcolor(RED);
           std::cerr << "Error: first element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: first element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+        zlog << zTs() << "Error: first element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           err::vexit();
        }
        if(fabs(u.at(1)) >1.e10){
-    	  terminaltextcolor(RED);
+        terminaltextcolor(RED);
           std::cerr << "Error: second element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: second element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+        zlog << zTs() << "Error: second element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           err::vexit();
        }
        if(fabs(u.at(2)) >1.e10){
-    	  terminaltextcolor(RED);
+        terminaltextcolor(RED);
           std::cerr << "Error: third element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: third element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+        zlog << zTs() << "Error: third element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           err::vexit();
        }
 
@@ -342,38 +342,38 @@ namespace vin{
           double value = u.at(idx);
 
           // Define test unit
-       	std::string test_unit_type=unit_type;
+         std::string test_unit_type=unit_type;
 
-       	// Define integer for unit conversion status
-       	int convert_status=0;
+         // Define integer for unit conversion status
+         int convert_status=0;
 
-       	// If no unit given, assume internal, otherwise convert to internal units
-       	if(unit.size() != 0) convert_status = units::convert(unit,value,test_unit_type);
+         // If no unit given, assume internal, otherwise convert to internal units
+         if(unit.size() != 0) convert_status = units::convert(unit,value,test_unit_type);
 
-       	// Test for valid conversion
-       	if(convert_status==EXIT_FAILURE){
-       		terminaltextcolor(RED);
-       		std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
-       		terminaltextcolor(WHITE);
-       		zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
-       		err::vexit();
-       	}
+         // Test for valid conversion
+         if(convert_status==EXIT_FAILURE){
+            terminaltextcolor(RED);
+            std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+            err::vexit();
+         }
 
-       	// Test for change in unit type in case of wrong unit type
-       	if(unit_type!=test_unit_type){
-       		terminaltextcolor(RED);
-       		std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
-       		terminaltextcolor(WHITE);
-       		zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
-       		err::vexit();
-       	}
+         // Test for change in unit type in case of wrong unit type
+         if(unit_type!=test_unit_type){
+            terminaltextcolor(RED);
+            std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+            err::vexit();
+         }
 
           // Check for valid range
           if((fabs(value)<range_min) || (fabs(value)>range_max)){
              terminaltextcolor(RED);
              std::cerr << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
              terminaltextcolor(WHITE);
-       	   zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
              err::vexit();
           }
 
@@ -410,38 +410,38 @@ namespace vin{
           double maxvalue = range_max.at(idx);
 
           // Define test unit
-       	std::string test_unit_type=unit_type;
+         std::string test_unit_type=unit_type;
 
-       	// Define integer for unit conversion status
-       	int convert_status=0;
+         // Define integer for unit conversion status
+         int convert_status=0;
 
-       	// If no unit given, assume internal, otherwise convert to internal units
-       	if(unit.size() != 0) convert_status = units::convert(unit,value,test_unit_type);
+         // If no unit given, assume internal, otherwise convert to internal units
+         if(unit.size() != 0) convert_status = units::convert(unit,value,test_unit_type);
 
-       	// Test for valid conversion
-       	if(convert_status==EXIT_FAILURE){
-       		terminaltextcolor(RED);
-       		std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
-       		terminaltextcolor(WHITE);
-       		zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
-       		err::vexit();
-       	}
+         // Test for valid conversion
+         if(convert_status==EXIT_FAILURE){
+            terminaltextcolor(RED);
+            std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+            err::vexit();
+         }
 
-       	// Test for change in unit type in case of wrong unit type
-       	if(unit_type!=test_unit_type){
-       		terminaltextcolor(RED);
-       		std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
-       		terminaltextcolor(WHITE);
-       		zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
-       		err::vexit();
-       	}
+         // Test for change in unit type in case of wrong unit type
+         if(unit_type!=test_unit_type){
+            terminaltextcolor(RED);
+            std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+            err::vexit();
+         }
 
           // Check for valid range
           if((value<minvalue) || (value>maxvalue)){
              terminaltextcolor(RED);
              std::cerr << "Error: element " << idx+1 << " of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
              terminaltextcolor(WHITE);
-       	   zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
              err::vexit();
           }
 
@@ -458,10 +458,10 @@ namespace vin{
 
     ///
     /// Function to check for vector with valid values for bit sequence:
-	 /// only -1, 0, 1 values are accepted
+    /// only -1, 0, 1 values are accepted
     ///-------------------------------------------------------------------------
     ///
-	void check_for_valid_bitsequence(std::vector<int>& u, /// vector of integers
+   void check_for_valid_bitsequence(std::vector<int>& u, /// vector of integers
                                 std::string word, /// input file keyword
                                 int line, /// input file line
                                 std::string prefix, /// input file prefix

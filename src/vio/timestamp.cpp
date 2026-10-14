@@ -31,7 +31,7 @@ void zLogTsInit(std::string tmp){
    int linelength = tmp.length();
 
    // set character triggers
-   const char* key="/";	/// Word identifier
+   const char* key="/"; /// Word identifier
 
    // copy characters after last /
    for(int i=linelength-1;i>=0;i--){
@@ -112,38 +112,38 @@ std::string zTs(){
   std::string NullString;
   NullString="";
 
-	if(vout::zLogInitialised==true){
-		std::ostringstream Ts;
+   if(vout::zLogInitialised==true){
+      std::ostringstream Ts;
 
-		// varibale for time
-		time_t seconds;
+      // varibale for time
+      time_t seconds;
 
-		// get current time
-		seconds = std::time (NULL);
-		struct tm * timeinfo;
-		char logtime [80];
+      // get current time
+      seconds = std::time (NULL);
+      struct tm * timeinfo;
+      char logtime [80];
 
-		timeinfo = localtime ( &seconds );
-		// Format time string
-		//strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
+      timeinfo = localtime ( &seconds );
+      // Format time string
+      //strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
       strftime (logtime,80,"%d-%m-%Y [%X] ",timeinfo);
 
-		Ts << logtime;
+      Ts << logtime;
       // << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
 
-		return Ts.str();
+      return Ts.str();
 
-	}
-	else{
-		terminaltextcolor(RED);
-		std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
-		// This can be recursive - vexit calls zTs()
-		//err::vexit();
-		// Exit manually
-		std::cerr << "Fatal error: Aborting program. See log file for details." << std::endl;
-	  terminaltextcolor(WHITE);
-		exit(EXIT_FAILURE);
-	}
+   }
+   else{
+      terminaltextcolor(RED);
+      std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
+      // This can be recursive - vexit calls zTs()
+      //err::vexit();
+      // Exit manually
+      std::cerr << "Fatal error: Aborting program. See log file for details." << std::endl;
+     terminaltextcolor(WHITE);
+      exit(EXIT_FAILURE);
+   }
 
-	return NullString;
+   return NullString;
 }

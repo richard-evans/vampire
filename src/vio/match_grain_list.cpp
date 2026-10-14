@@ -119,7 +119,7 @@ namespace vout{
          grain::output_list.push_back(grain::material_magnetisation);
          return true;
       }
-     
+
 
       //--------------------------------------------------------------------
       test="material-height-magnetisation";

@@ -35,18 +35,18 @@ namespace vout{
    //------------------------------------------------------------------------------
    // Function to redirect output streams to file
    //------------------------------------------------------------------------------
-	void redirect(std::ostream& strm, std::string filename) {
-		errfile.open(filename.c_str());
-		// redirect ouput into the file
-		strm.rdbuf (vout::errfile.rdbuf());
-	}
+   void redirect(std::ostream& strm, std::string filename) {
+      errfile.open(filename.c_str());
+      // redirect ouput into the file
+      strm.rdbuf (vout::errfile.rdbuf());
+   }
 
    //------------------------------------------------------------------------------
    // Function to nullify output streams for parallel version
    //------------------------------------------------------------------------------
-	void nullify(std::ostream& strm){
-		strm.rdbuf(&nullbuf);
-	}
+   void nullify(std::ostream& strm){
+      strm.rdbuf(&nullbuf);
+   }
 
 } // end of namespace vout
 
