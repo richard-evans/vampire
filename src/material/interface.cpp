@@ -133,7 +133,7 @@ namespace mp{
          }
          else{
             // pad value to be equal to 3 characters
-            string tmp="   ";
+            std::string tmp="   ";
             for(unsigned int i=0;i<3;i++){
                if(i<value.length()){
                   tmp.at(i)=value.at(i);
@@ -146,8 +146,8 @@ namespace mp{
       //--------------------------------------------------------------------
       test="constrained"; // determines use of alternate integrator
       if(word==test){
-         string t="true";
-         string f="false";
+         std::string t="true";
+         std::string f="false";
          if(value==t){
             mp::read_material[super_index].constrained=true;
             return true;

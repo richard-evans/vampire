@@ -212,7 +212,7 @@ namespace internal{
                 }
                 //break;
             }
-            string empty="";
+            std::string empty="";
             if(key!=empty){
                 //std::cout << key << "[" << super_index << "]:" << word << "[" << sub_index << "]=" << value << " !" << unit << std::endl;
                 //std::cout << "\t" << "key:  " << key << std::endl;

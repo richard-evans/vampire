@@ -51,8 +51,6 @@ class zkten_t{
 namespace mp
 {
 
-   using std::string;
-
    //----------------------------------
    // Material Container
    //----------------------------------
@@ -63,8 +61,8 @@ namespace mp
    class materials_t {
       public:
       // input parameters
-      string name;
-      string element;
+      std::string name;
+      std::string element;
 
 
       bool micromagnetic_enabled;

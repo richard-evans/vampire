@@ -361,7 +361,7 @@ int set_derived_parameters(){
 
    check_hysteresis_loop_parameters();
 
-   const string blank="";
+   const std::string blank="";
 
    // Set derived material parameters
    for(int mat=0;mat<mp::num_materials;mat++){

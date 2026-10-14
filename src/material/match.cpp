@@ -49,9 +49,9 @@ namespace internal{
    //---------------------------------------------------------------------------
    // Function to match material file keywords to module material parameters
    //---------------------------------------------------------------------------
-   int match_material(string const word,
-                      string const value,
-                      string const unit,
+   int match_material(std::string const word,
+                      std::string const value,
+                      std::string const unit,
                       int const line,
                       int const super_index,
                       int const sub_index,
