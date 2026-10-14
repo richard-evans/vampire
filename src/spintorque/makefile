@@ -1,9 +1,9 @@
 #--------------------------------------------------------------
-#                 Makefile for ltmp module
+#          Makefile for spintorque module
 #--------------------------------------------------------------
 
 # List module object filenames
-spintorque_objects=\
+spintorque_objects =\
 data.o \
 field.o \
 initialise.o \
@@ -11,8 +11,7 @@ interface.o \
 magnetization.o \
 matrix.o \
 output.o \
-spinaccumulation.o \
-
+spinaccumulation.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/spintorque/,$(spintorque_objects))

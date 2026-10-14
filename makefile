@@ -89,37 +89,16 @@ GHASH:=$(shell git rev-parse HEAD)
 
 OPTIONS=
 
-# Objects
-OBJECTS= \
-obj/data/atoms.o \
-obj/data/category.o \
-obj/random/mtrand.o \
-obj/random/random.o \
-obj/simulate/energy.o \
-obj/simulate/fields.o \
-obj/simulate/sim.o \
-obj/simulate/standard_programs.o \
-obj/spintorque/data.o \
-obj/spintorque/field.o \
-obj/spintorque/initialise.o \
-obj/spintorque/interface.o \
-obj/spintorque/magnetization.o \
-obj/spintorque/matrix.o \
-obj/spintorque/output.o \
-obj/spintorque/spinaccumulation.o \
-obj/utility/checkpoint.o \
-obj/utility/errors.o \
-obj/utility/statistics.o \
-obj/utility/units.o \
-obj/utility/vmath.o\
-
+# Objects (each module makefile appends its own)
+OBJECTS=
 
 # Include supplementary makefiles
 include src/anisotropy/makefile
 include src/cells/makefile
-include src/create/makefile
 include src/config/makefile
 include src/constants/makefile
+include src/create/makefile
+include src/data/makefile
 include src/dipole/makefile
 include src/environment/makefile
 include src/exchange/makefile
@@ -135,15 +114,18 @@ include src/montecarlo/makefile
 include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
+include src/random/makefile
 include src/program/makefile
 include src/simulate/makefile
 include src/spininitialize/makefile
 include src/spinlattice/makefile
 include src/spintextures/makefile
+include src/spintorque/makefile
 include src/spintransport/makefile
 include src/spinwaves/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
+include src/utility/makefile
 include src/vio/makefile
 
 # Cuda must be last for some odd reason
