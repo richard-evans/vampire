@@ -472,11 +472,9 @@ namespace sim{
          // Extra check for demagnetisation-factor Nx+Ny+Nz=1
          double sum=u.at(0)+u.at(1)+u.at(2);
          if(fabs(1.0-sum)>1.e-4){
-            terminaltextcolor(RED);
-            std::cerr << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1.";
+            err::fatal(message.str());
          }
          sim::demag_factor[0]=u.at(0);
          sim::demag_factor[1]=u.at(1);
@@ -850,10 +848,9 @@ namespace sim{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range 0.0 - 1.0E5";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -914,17 +911,15 @@ namespace sim{
                return true;
             }
             else{
-               terminaltextcolor(RED);
-               std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range -1.0e5 - +1.0e5" << std::endl;
-               terminaltextcolor(WHITE);
-               err::vexit();
+               std::ostringstream message;
+               message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " is outside of valid range -1.0e5 - +1.0e5";
+               err::fatal(message.str());
             }
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:" << word;
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -938,11 +933,9 @@ namespace sim{
 
          // check size
          if(u.size()!=3){
-            terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error in input file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error in input file - material[" << super_index+1 << "]:" << word << " must have three values.";
+            err::fatal(message.str());
          }
 
          // Normalise
@@ -950,11 +943,9 @@ namespace sim{
 
          // Check for correct length unit vector
          if(ULength < 1.0e-9){
-            terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error in input file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error in input file - material[" << super_index+1 << "]:" << word << " must be normalisable (possibly all zero).";
+            err::fatal(message.str());
          }
          u.at(0)/=ULength;
          u.at(1)/=ULength;
@@ -999,11 +990,9 @@ namespace sim{
 
          // check size
          if(u.size()!=3){
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " must have three values.";
+            err::fatal(message.str());
          }
 
          // Normalise
@@ -1011,11 +1000,9 @@ namespace sim{
 
          // Check for correct length unit vector
          if(ULength < 1.0e-9){
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " must be normalisable (possibly all zero).";
+            err::fatal(message.str());
          }
          u.at(0)/=ULength;
          u.at(1)/=ULength;
