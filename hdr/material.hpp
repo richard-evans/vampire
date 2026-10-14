@@ -155,7 +155,4 @@ namespace mp
 
 }
 
-/// Alias deprecated material_parameters to mp namespace
-namespace material_parameters=mp;
-
 #endif // MATERIAL_H_

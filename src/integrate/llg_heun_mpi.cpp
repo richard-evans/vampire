@@ -84,8 +84,8 @@ int LLG_Heun_mpi(){
       for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
 
          const int imaterial=atoms::type_array[atom];
-         const double one_oneplusalpha_sq = material_parameters::material[imaterial].one_oneplusalpha_sq;
-         const double alpha_oneplusalpha_sq = material_parameters::material[imaterial].alpha_oneplusalpha_sq;
+         const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
+         const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
 
          // Store local spin in Sand local field in H
          const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
@@ -104,9 +104,9 @@ int LLG_Heun_mpi(){
          z_euler_array[atom]=xyz[2];
 
          // Calculate Euler Step
-         S_new[0]=S[0]+xyz[0]*material_parameters::dt;
-         S_new[1]=S[1]+xyz[1]*material_parameters::dt;
-         S_new[2]=S[2]+xyz[2]*material_parameters::dt;
+         S_new[0]=S[0]+xyz[0]*mp::dt;
+         S_new[1]=S[1]+xyz[1]*mp::dt;
+         S_new[2]=S[2]+xyz[2]*mp::dt;
 
          // Normalise Spin Length
          mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
@@ -140,8 +140,8 @@ int LLG_Heun_mpi(){
       for(int atom=post_comm_si;atom<post_comm_ei;atom++){
 
          const int imaterial=atoms::type_array[atom];
-         const double one_oneplusalpha_sq = material_parameters::material[imaterial].one_oneplusalpha_sq;
-         const double alpha_oneplusalpha_sq = material_parameters::material[imaterial].alpha_oneplusalpha_sq;
+         const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
+         const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
 
          // Store local spin in Sand local field in H
          const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
@@ -160,9 +160,9 @@ int LLG_Heun_mpi(){
          z_euler_array[atom]=xyz[2];
 
          // Calculate Euler Step
-         S_new[0]=S[0]+xyz[0]*material_parameters::dt;
-         S_new[1]=S[1]+xyz[1]*material_parameters::dt;
-         S_new[2]=S[2]+xyz[2]*material_parameters::dt;
+         S_new[0]=S[0]+xyz[0]*mp::dt;
+         S_new[1]=S[1]+xyz[1]*mp::dt;
+         S_new[2]=S[2]+xyz[2]*mp::dt;
 
          // Normalise Spin Length
          mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
@@ -204,8 +204,8 @@ int LLG_Heun_mpi(){
       for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
 
          const int imaterial=atoms::type_array[atom];;
-         const double one_oneplusalpha_sq = material_parameters::material[imaterial].one_oneplusalpha_sq;
-         const double alpha_oneplusalpha_sq = material_parameters::material[imaterial].alpha_oneplusalpha_sq;
+         const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
+         const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
 
          // Store local spin in Sand local field in H
          const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
@@ -242,8 +242,8 @@ int LLG_Heun_mpi(){
       for(int atom=post_comm_si;atom<post_comm_ei;atom++){
 
          const int imaterial=atoms::type_array[atom];;
-         const double one_oneplusalpha_sq = material_parameters::material[imaterial].one_oneplusalpha_sq;
-         const double alpha_oneplusalpha_sq = material_parameters::material[imaterial].alpha_oneplusalpha_sq;
+         const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
+         const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
 
          // Store local spin in Sand local field in H
          const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
@@ -267,9 +267,9 @@ int LLG_Heun_mpi(){
       //----------------------------------------
 
       for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
-         S_new[0]=x_initial_spin_array[atom]+material_parameters::half_dt*(x_euler_array[atom]+x_heun_array[atom]);
-         S_new[1]=y_initial_spin_array[atom]+material_parameters::half_dt*(y_euler_array[atom]+y_heun_array[atom]);
-         S_new[2]=z_initial_spin_array[atom]+material_parameters::half_dt*(z_euler_array[atom]+z_heun_array[atom]);
+         S_new[0]=x_initial_spin_array[atom]+mp::half_dt*(x_euler_array[atom]+x_heun_array[atom]);
+         S_new[1]=y_initial_spin_array[atom]+mp::half_dt*(y_euler_array[atom]+y_heun_array[atom]);
+         S_new[2]=z_initial_spin_array[atom]+mp::half_dt*(z_euler_array[atom]+z_heun_array[atom]);
 
          // Normalise Spin Length
          mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);

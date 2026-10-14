@@ -26,7 +26,7 @@
 #include <iostream>
 #include <sstream>
 //==========================================================
-// Namespace material_parameters
+// Namespace mp (material parameters)
 //==========================================================
 namespace mp{
    //----------------------------------
