@@ -4,7 +4,6 @@
 
 # List module object filenames
 utility_objects =\
-checkpoint.o \
 errors.o \
 units.o \
 vmath.o

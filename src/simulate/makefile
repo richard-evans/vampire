@@ -4,6 +4,7 @@
 
 # List module object filenames
 sim_objects =\
+checkpoint.o \
 data.o \
 energy.o \
 fields.o \
