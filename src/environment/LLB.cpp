@@ -232,7 +232,7 @@ namespace environment{
                   + GW1y[cell]*sigma_para
                   - env::alpha_perp*(m[2]*(m[1]*GW2t[2]-m[2]*GW2t[1])-m[0]*(m[0]*GW2t[1]-m[1]*GW2t[0]))*one_o_m_squared*sigma_perp;
 
-                  xyz[2]=	 - (m[0]*H[1]-m[1]*H[0])
+                  xyz[2]=   - (m[0]*H[1]-m[1]*H[0])
                   + env::alpha_para*m[2]*SdotH*one_o_m_squared
                   - env::alpha_perp*(m[0]*(m[2]*H[0]-m[0]*H[2])-m[1]*(m[1]*H[2]-m[2]*H[1]))*one_o_m_squared
                   + GW1z[cell]*sigma_para
@@ -306,7 +306,7 @@ namespace environment{
                   + GW1y[cell]*sigma_para
                   - env::alpha_perp*(m[2]*(m[1]*GW2t[2]-m[2]*GW2t[1])-m[0]*(m[0]*GW2t[1]-m[1]*GW2t[0]))*one_o_m_squared*sigma_perp;
 
-                  xyz[2]=	 - (m[0]*H[1]-m[1]*H[0])
+                  xyz[2]=   - (m[0]*H[1]-m[1]*H[0])
                   + env::alpha_para*m[2]*SdotH*one_o_m_squared
                   - env::alpha_perp*(m[0]*(m[2]*H[0]-m[0]*H[2])-m[1]*(m[1]*H[2]-m[2]*H[1]))*one_o_m_squared
                   + GW1z[cell]*sigma_para

@@ -285,12 +285,12 @@ int read_in_shield_info(){
       int last=0;
 
       // set character triggers
-      const char* colon=":";	// Word identifier
-      const char* eq="=";		// Value identifier
-      const char* exc="!";		// Unit identifier
-      const char* hash="#";	// Comment identifier
-      const char* si="[";		// Index identifier
-      const char* ei="]";		// End index identifier
+      const char* colon=":";  // Word identifier
+      const char* eq="=";     // Value identifier
+      const char* exc="!";    // Unit identifier
+      const char* hash="#";   // Comment identifier
+      const char* si="[";     // Index identifier
+      const char* ei="]";     // End index identifier
 
       // Determine key and super index by looping over characters in line
       for(int i=0;i<linelength;i++){
