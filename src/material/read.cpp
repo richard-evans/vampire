@@ -128,8 +128,9 @@ namespace internal{
                     }
                     else{
                         std::cerr << "Invalid index number " << index << " on line " << line_counter << " in material input file" << std::endl;
-                        std::cerr << "Causes could be invalid character or outside of range, ie less than 1 or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
-                        err::vexit();
+                        std::ostringstream message;
+                        message << "Causes could be invalid character or outside of range, ie less than 1 or greater than max_materials=" << mp::max_materials << ", exiting";
+                        err::fatal(message.str());
                     }
 
                 }
@@ -161,8 +162,9 @@ namespace internal{
                                 // Check for valid index
                                 if((sub_index<1) || (sub_index>=mp::max_materials)){
                                     std::cerr << "Invalid sub-index number " << index << " on line " << line_counter << " in material input file" << std::endl;
-                                    std::cerr << "Causes could be invalid character or outside of range, ie less than 1 or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
-                                    err::vexit();
+                                    std::ostringstream message;
+                                    message << "Causes could be invalid character or outside of range, ie less than 1 or greater than max_materials=" << mp::max_materials << ", exiting";
+                                    err::fatal(message.str());
                                 }
                                 // end of word
                                 break;

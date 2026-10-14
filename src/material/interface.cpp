@@ -13,6 +13,7 @@
 // C++ standard library headers
 #include <string>
 #include <algorithm>
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -47,10 +48,9 @@ namespace mp{
                return true;
             }
             else{
-               terminaltextcolor(RED);
-               std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-               terminaltextcolor(WHITE);
-               err::vexit();
+               std::ostringstream message;
+               message << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file";
+               err::fatal(message.str());
             }
          }
          return false;
@@ -126,10 +126,9 @@ namespace mp{
       if(word==test){
          // Test for 3 characters
          if(value.length()>3){
-            terminaltextcolor(RED);
-            std::cerr << "Error - element identifier on line "<<  line << " of material file must be a maximum of three characters long" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error - element identifier on line " << line << " of material file must be a maximum of three characters long";
+            err::fatal(message.str());
          }
          else{
             // pad value to be equal to 3 characters
@@ -157,10 +156,9 @@ namespace mp{
             return true;
          }
          else {
-            terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:constrained must be either true or false" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error in input file - material[" << super_index+1 << "]:constrained must be either true or false";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
@@ -201,10 +199,9 @@ namespace mp{
             return true;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " = " << value <<" is not a valid option: remove, keep." << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - material[" << super_index+1 << "]:" << word << " = " << value << " is not a valid option: remove, keep.";
+            err::fatal(message.str());
          }
       }
       //--------------------------------------------------------------------
