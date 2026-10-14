@@ -6,6 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Vampire is a C++ atomistic simulation code for magnetic materials. It solves the stochastic Landau-Lifshitz-Gilbert (LLG) equation and Monte Carlo methods to calculate equilibrium and dynamic magnetic properties. It supports MPI parallelism and CUDA acceleration.
 
+## Repository Layout
+
+The top level is kept for users; developer-only material lives in `developers/`.
+
+| Path | Contents |
+|------|----------|
+| `src/`, `hdr/`, `obj/` | Vampire source, public headers, object files |
+| `vdc/` | Vampire data converter (separate program, `make vdc`) |
+| `samples/` | Example simulations for users |
+| `manual/` | LaTeX user manual |
+| `developers/test/` | Unit, integration and regression tests |
+| `developers/tests.sh` | Test runner |
+| `developers/tools/` | Developer tools: module generator, style check, CUDA remote-run scripts, UCF utilities |
+
 ## Build Commands
 
 ```bash
