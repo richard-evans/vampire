@@ -3,7 +3,8 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Andrea Meo, Sarah Jenkins and Richard F L Evans 2020. All rights reserved.
+//   (c) Andrea Meo, Sarah Jenkins and Richard F L Evans 2020.
+//   All rights reserved.
 //
 //------------------------------------------------------------------------------
 //

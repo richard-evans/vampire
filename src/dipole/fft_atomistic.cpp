@@ -4,7 +4,7 @@
 //   Free BSD licence (see licence file for details).
 //
 //   (c) Sarah Jenkins, Andrea Meo and Richard F L Evans 2017.
-//       All rights reserved.
+//   All rights reserved.
 //
 //------------------------------------------------------------------------------
 //
