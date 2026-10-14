@@ -1,13 +1,13 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-// This source file is part of the VAMPIRE open source package under the
-// GNU GPL (version 2) licence (see licence file for details).
+//   This file is part of the VAMPIRE open source package under the
+//   GNU GPL (version 2) licence (see licence file for details).
 //
 //   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 #include <stdio.h>
 // C++ standard library headers
 #include <iomanip>

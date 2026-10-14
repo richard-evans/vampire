@@ -74,9 +74,6 @@ namespace internal
 ///   $sx $sy $sz
 ///   $sx $sy ...
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
@@ -209,9 +206,6 @@ double legacy_atoms(){
 ///   $material $category $x $y $z $species
 ///   $material $category $x ...
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
@@ -332,9 +326,6 @@ double legacy_atoms_coords()
 ///   Material Properties 2:  $mu_s $mmx $mmy $mmz ...
 ///   #------------------------------------------------------
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
@@ -468,9 +459,6 @@ void legacy_cells()
 ///   $material $category $x $y $z $species
 ///   $material $category $x ...
 ///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
