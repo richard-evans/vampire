@@ -33,11 +33,7 @@ void binder_cumulant_statistic_t::initialize(stats::magnetization_statistic_t& m
 
    // Check that magnetization statistic is properly initialized
    if(!mag_stat.is_initialized()){
-      terminaltextcolor(RED);
-      std::cerr << "Programmer Error - Uninitialized magnetization statistic passed to binder cumulant statistic - please initialize first." << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Programmer Error - Uninitialized magnetization statistic passed to binder cumulant statistic - please initialize first." << std::endl;
-      err::vexit();
+      err::fatal("Programmer Error - Uninitialized magnetization statistic passed to binder cumulant statistic - please initialize first.");
    }
 
    // Determine number of magnetization statistics*4

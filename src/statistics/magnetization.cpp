@@ -75,11 +75,9 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
    // Check that mask values never exceed mask_size
    for(unsigned int atom=0; atom<in_mask.size(); ++atom){
       if(in_mask[atom] > in_mask_size-1){
-         terminaltextcolor(RED);
-         std::cerr << "Programmer Error - mask id " << in_mask[atom] << " is greater than number of elements for mask "<< in_mask_size << std::endl;
-         terminaltextcolor(WHITE);
-         zlog << zTs() << "Programmer Error - mask id " << in_mask[atom] << " is greater than number of elements for mask "<< in_mask_size << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Programmer Error - mask id " << in_mask[atom] << " is greater than number of elements for mask " << in_mask_size;
+         err::fatal(message.str());
       }
    }
 
@@ -478,11 +476,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
    vout::fixed_width_output result(res,vout::fw_size);
    // check vector has correct size
    if(vec.size()!=3){
-      terminaltextcolor(RED);
-      std::cerr << "Programmer Error - dot product vector in magnetization statistics must have three elements." << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Programmer Error - dot product vector in magnetization statistics must have three elements." << std::endl;
-      err::vexit();
+      err::fatal("Programmer Error - dot product vector in magnetization statistics must have three elements.");
    }
 
    // loop over all magnetization values

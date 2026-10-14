@@ -52,11 +52,7 @@ void specific_heat_statistic_t::initialize(stats::energy_statistic_t& energy_sta
 
    // Check that magnetization statistic is properly initialized
    if(!energy_statistic.is_initialized()){
-      terminaltextcolor(RED);
-      std::cerr << "Programmer Error - Uninitialized energy statistic passed to specific_heat statistic - please initialize first." << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Programmer Error - Uninitialized energy statistic passed to specific_heat statistic - please initialize first." << std::endl;
-      err::vexit();
+      err::fatal("Programmer Error - Uninitialized energy statistic passed to specific_heat statistic - please initialize first.");
    }
 
    // Determine number of magnetization statistics*4

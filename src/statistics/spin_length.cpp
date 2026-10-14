@@ -43,11 +43,9 @@ void spin_length_statistic_t::set_mask(const int in_mask_size, std::vector<int> 
    // Check that mask values never exceed mask_size
    for(unsigned int atom=0; atom<in_mask.size(); ++atom){
       if(in_mask[atom] > in_mask_size-1){
-         terminaltextcolor(RED);
-         std::cerr << "Programmer Error - mask id " << in_mask[atom] << " is greater than number of elements for mask "<< in_mask_size << std::endl;
-         terminaltextcolor(WHITE);
-         zlog << zTs() << "Programmer Error - mask id " << in_mask[atom] << " is greater than number of elements for mask "<< in_mask_size << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Programmer Error - mask id " << in_mask[atom] << " is greater than number of elements for mask " << in_mask_size;
+         err::fatal(message.str());
       }
    }
 
