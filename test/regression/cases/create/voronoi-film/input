@@ -1,0 +1,17 @@
+create:crystal-structure=fcc
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 5.0 !nm
+dimensions:system-size-y = 5.0 !nm
+dimensions:system-size-z = 0.7 !nm
+dimensions:particle-size = 1.5 !nm
+dimensions:particle-spacing = 0.2 !nm
+create:voronoi-film
+create:voronoi-random-seed=1234
+material:file=Fe.mat
+sim:program=benchmark
+sim:integrator=llg-heun
+sim:total-time-steps=0
+config:atoms
+config:output-format=text
+output:precision=16
+output:time-steps
