@@ -102,12 +102,10 @@ namespace sim{
    extern bool constraint_phi_changed; /// flag to note change in phi
    extern bool constraint_theta_changed; /// flag to note change in theta
 
-   extern double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
    extern double constraint_phi_min; /// loop angle min [degrees]
    extern double constraint_phi_max; /// loop angle max [degrees]
    extern double constraint_phi_delta; /// loop angle delta [degrees]
 
-   extern double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
    extern double constraint_theta_min; /// loop angle min [degrees]
    extern double constraint_theta_max; /// loop angle max [degrees]
    extern double constraint_theta_delta; /// loop angle delta [degrees]
@@ -138,8 +136,6 @@ namespace sim{
    extern int system_simulation_flags;
    extern int hamiltonian_simulation_flags[10];
 
-   extern int program;
-
    // Local system variables
    extern bool local_temperature; /// flag to enable material specific temperature
    extern bool local_applied_field; /// flag to enable material specific applied field
@@ -164,10 +160,6 @@ namespace sim{
    extern int run();
    extern int initialise();
    extern int integrate(std::uint64_t);
-
-   // Legacy integrators
-   extern int LLG(int);
-   extern int LLG_relax(int);
 
    // Field and energy functions
    extern double calculate_spin_energy(const int atom);
