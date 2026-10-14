@@ -16,6 +16,7 @@ GCC_CFLAGS=-O3 -std=c++17
 # Objects
 OBJECTS= \
 obj/main.o \
+obj/checkpoint.o \
 obj/energy.o \
 obj/integrator.o \
 obj/montecarlo.o \
