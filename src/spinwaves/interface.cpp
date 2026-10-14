@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 // Vampire headers
 #include "material.hpp"
@@ -53,11 +54,9 @@ namespace spinwaves{
                // check file exists
                std::ifstream fin(kpath_file);
                if (!fin){
-                  terminaltextcolor(RED);
-                  std::cerr << "Error - cannot find file \'" << kpath_file << "\' in control statement \'spinwaves:" << word << "\' on line " << line << " of input file" << std::endl;
-                  zlog << zTs() << "Error - cannot find file \'" << kpath_file << "\' in control statement \'spinwaves:" << word << "\' on line " << line << " of input file" << std::endl;
-                  terminaltextcolor(WHITE);
-                  err::vexit();
+                  std::ostringstream message;
+                  message << "Error - cannot find file \'" << kpath_file << "\' in control statement \'spinwaves:" << word << "\' on line " << line << " of input file";
+                  err::fatal(message.str());
                }
 
                return true;

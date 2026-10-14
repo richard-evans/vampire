@@ -69,8 +69,9 @@ namespace spinwaves {
             if (static_cast<unsigned>(internal::nspec) != internal::super_index_values.size()){
                 terminaltextcolor(RED);
                 std::cerr << "The value of spinwaves:number-of-spectrums does not agree with the values of \"spinwaves[x]:\" found in input file" << std::endl;
-                std::cerr << internal::nspec << " " << internal::super_index_values.size() << std::endl;
-                err::vexit();
+                std::ostringstream message;
+                message << internal::nspec << " " << internal::super_index_values.size();
+                err::fatal(message.str());
             }
 
             for (int i = 0; i < internal::nspec; i++){
@@ -78,8 +79,9 @@ namespace spinwaves {
                     terminaltextcolor(RED);
                     std::cerr << "Difference identified between spinwaves::num-spectrums and ordering of spectrum specific parameters." << std::endl;
                     std::cerr << "Number of spectrums specified with spinwaves::num-spectrums: " << internal::nspec << std::endl;
-                    std::cerr << "Additional/Missing parameters for spectrum \"spinwaves[" << internal::super_index_values[i] <<  "]:\" found in input file" << std::endl;
-                    err::vexit();
+                    std::ostringstream message;
+                    message << "Additional/Missing parameters for spectrum \"spinwaves[" << internal::super_index_values[i] << "]:\" found in input file";
+                    err::fatal(message.str());
                 }
             }
         }
@@ -111,9 +113,9 @@ namespace spinwaves {
 
                     // check mat value does not exceed number of materials
                     if (mat[i] >= mp::num_materials){
-                        terminaltextcolor(RED);
-                        std::cerr << "Error: Numeric value of materials in spectrum " << internal::mat_in_spec[i] << " exceeds the total number of materials." << std::endl;
-                        err::vexit();
+                        std::ostringstream message;
+                        message << "Error: Numeric value of materials in spectrum " << internal::mat_in_spec[i] << " exceeds the total number of materials.";
+                        err::fatal(message.str());
                     }
 
                     for (int atom=0;atom<vmpi::num_core_atoms+vmpi::num_bdry_atoms;atom++){
@@ -133,9 +135,9 @@ namespace spinwaves {
 
                     // check mat value does not exceed number of materials
                     if (mat[i] >= mp::num_materials){
-                        terminaltextcolor(RED);
-                        std::cerr << "Error: Numeric value of materials in spectrum " << internal::mat_in_spec[i] << " exceeds the total number of materials." << std::endl;
-                        err::vexit();
+                        std::ostringstream message;
+                        message << "Error: Numeric value of materials in spectrum " << internal::mat_in_spec[i] << " exceeds the total number of materials.";
+                        err::fatal(message.str());
                     }
 
                     for (int atom=0;atom<atoms::num_atoms;atom++){
