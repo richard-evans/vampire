@@ -35,8 +35,8 @@
 /// @version 1.0
 /// @date    10/03/2011
 /// @internal
-///	Created:		10/03/2011
-///	Revision:	  ---
+///   Created:    10/03/2011
+///   Revision:     ---
 ///=====================================================================================
 ///
 
@@ -128,10 +128,10 @@ namespace err
 
       // Abort MPI processes for parallel execution
       #ifdef MPICF
-	  terminaltextcolor(RED);
+     terminaltextcolor(RED);
       std::cerr << "Fatal error on rank " << vmpi::my_rank << ": " << message << std::endl;
       std::cerr << "Aborting program." << std::endl;
-	  terminaltextcolor(WHITE);
+     terminaltextcolor(WHITE);
       zlog << zTs() << "Fatal error on rank " << vmpi::my_rank << ": " << message << std::endl;
       zlog << zTs() << "Aborting program." << std::endl;
 
@@ -139,18 +139,18 @@ namespace err
       // MPI program dies ungracefully here
       #else
          // Print Error message to screen and log
-	     terminaltextcolor(RED);
+        terminaltextcolor(RED);
          std::cerr << "Fatal error: " << message << std::endl;
-		 terminaltextcolor(WHITE);
+       terminaltextcolor(WHITE);
          zlog << zTs() << "Fatal error: " << message << std::endl;
 
       #endif
 
       // Print error message to screen and log
       zlog << zTs() << "Aborting program." << std::endl;
-	  terminaltextcolor(RED);
+     terminaltextcolor(RED);
       std::cout << "Aborting program. See log file for details." << std::endl;
-	  terminaltextcolor(WHITE);
+     terminaltextcolor(WHITE);
 
       // Now exit program disgracefully
       exit(EXIT_FAILURE);
