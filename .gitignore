@@ -35,7 +35,9 @@
 *old.hpp
 *.bkp
 *.json
-vampire.pkg # installation package
+
+# installation package made by make install
+/vampire.pkg/
 
 #----------------------------------------------
 # Profiling and debugging extensions
@@ -62,6 +64,7 @@ crystal.xyz
 log
 grain
 output
+log.*
 MPI-compute-times
 MPI-wait-times
 tags
@@ -73,18 +76,12 @@ exchange-template
 mm_output
 
 #----------------------------------------------
-# Executables
+# Executables (vampire builds go in the repository root)
 #----------------------------------------------
-vampire-serial
-vampire-parallel
-vampire*
+/vampire-*
 vdc/vdc
 developers/test/integration/integration_tests
 developers/test/unit/unit_tests
-#----------------------------------------------
-# Obsolete
-#----------------------------------------------
-log.*
 
 #----------------------------------------------
 # Eclipse project files and folders
