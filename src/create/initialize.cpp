@@ -28,28 +28,28 @@ namespace create{
       }
 
       // Loop over materials to check for invalid input and warn appropriately
-		for(int mat=0;mat<mp::num_materials;mat++){
-			const double lmin=create::internal::mp[mat].min;
-			const double lmax=create::internal::mp[mat].max;
-			for(int nmat=0;nmat<mp::num_materials;nmat++){
-				if(nmat!=mat){
-					double min=create::internal::mp[nmat].min;
-					double max=create::internal::mp[nmat].max;
-					if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
-						terminaltextcolor(RED);
-						std::cout << "Warning: Overlapping material heights found. Check log for details." << std::endl;
-						terminaltextcolor(WHITE);
-						zlog << zTs() << "Warning: material " << mat+1 << " overlaps material " << nmat+1 << "." << std::endl;
-						zlog << zTs() << "If you have defined geometry then this may be OK, or possibly you meant to specify alloy keyword instead." << std::endl;
-						zlog << zTs() << "----------------------------------------------------" << std::endl;
-						zlog << zTs() << "  Material "<< mat+1 << ":minimum-height = " << lmin << std::endl;
-						zlog << zTs() << "  Material "<< mat+1 << ":maximum-height = " << lmax << std::endl;
-						zlog << zTs() << "  Material "<< nmat+1 << ":minimum-height = " << min << std::endl;
-						zlog << zTs() << "  Material "<< nmat+1 << ":maximum-height = " << max << std::endl;
-					}
-				}
-			}
-		}
+      for(int mat=0;mat<mp::num_materials;mat++){
+         const double lmin=create::internal::mp[mat].min;
+         const double lmax=create::internal::mp[mat].max;
+         for(int nmat=0;nmat<mp::num_materials;nmat++){
+            if(nmat!=mat){
+               double min=create::internal::mp[nmat].min;
+               double max=create::internal::mp[nmat].max;
+               if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
+                  terminaltextcolor(RED);
+                  std::cout << "Warning: Overlapping material heights found. Check log for details." << std::endl;
+                  terminaltextcolor(WHITE);
+                  zlog << zTs() << "Warning: material " << mat+1 << " overlaps material " << nmat+1 << "." << std::endl;
+                  zlog << zTs() << "If you have defined geometry then this may be OK, or possibly you meant to specify alloy keyword instead." << std::endl;
+                  zlog << zTs() << "----------------------------------------------------" << std::endl;
+                  zlog << zTs() << "  Material "<< mat+1 << ":minimum-height = " << lmin << std::endl;
+                  zlog << zTs() << "  Material "<< mat+1 << ":maximum-height = " << lmax << std::endl;
+                  zlog << zTs() << "  Material "<< nmat+1 << ":minimum-height = " << min << std::endl;
+                  zlog << zTs() << "  Material "<< nmat+1 << ":maximum-height = " << max << std::endl;
+               }
+            }
+         }
+      }
       for (int mat = 0; mat < mp::num_materials; mat++){
          mp::material[mat].pinning_field_unit_vector[0] *= mp::material[mat].pinning_field_strength;
          mp::material[mat].pinning_field_unit_vector[1] *= mp::material[mat].pinning_field_strength;

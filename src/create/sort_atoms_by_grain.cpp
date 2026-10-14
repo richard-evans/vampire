@@ -21,8 +21,8 @@
 
 // comparison function
 bool compare(cs::catom_t first,cs::catom_t second){
-	if(first.grain<second.grain) return true;
-	else return false;
+   if(first.grain<second.grain) return true;
+   else return false;
 }
 
 namespace create{

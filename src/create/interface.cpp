@@ -148,21 +148,21 @@ namespace create{
          vin::check_for_valid_three_vector(u, word, line, prefix, "input");
          // check for sensible values
          if(u.at(0) < 1.0 || u.at(0) > 1000.0){
-      	   terminaltextcolor(RED);
+            terminaltextcolor(RED);
             std::cerr << "Error: 100 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
             terminaltextcolor(WHITE);
             zlog << zTs() << "Error: 100 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
             err::vexit();
          }
          if(u.at(1) < 1.0 || u.at(1) > 1000.0){
-      	   terminaltextcolor(RED);
+            terminaltextcolor(RED);
             std::cerr << "Error: 110 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
             terminaltextcolor(WHITE);
             zlog << zTs() << "Error: 110 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
             err::vexit();
          }
          if(u.at(2) < 1.0 || u.at(2) > 1000.0){
-      	   terminaltextcolor(RED);
+            terminaltextcolor(RED);
             std::cerr << "Error: 111 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
             terminaltextcolor(WHITE);
             zlog << zTs() << "Error: 111 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;

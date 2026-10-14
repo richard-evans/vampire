@@ -57,14 +57,14 @@ namespace create{
 //======================================================================
 int create_system_type(std::vector<cs::catom_t> & catom_array){
 
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "cs::create_system_type has been called" << std::endl;}
+   //----------------------------------------------------------
+   // check calling of routine if error checking is activated
+   //----------------------------------------------------------
+   if(err::check==true){std::cout << "cs::create_system_type has been called" << std::endl;}
 
-	//----------------------------------------
-	// Local variables
-	//----------------------------------------
+   //----------------------------------------
+   // Local variables
+   //----------------------------------------
 
    // Check for selection of materials by z-hright
    if(create::internal::select_material_by_z_height){
@@ -92,64 +92,64 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
    //----------------------------------------------------------------------------------
    // Choose which system type to create
    //----------------------------------------------------------------------------------
-	switch(cs::system_creation_flags[2]){
-		case 0: // Isolated particle
-			internal::particle(catom_array);
-			break;
+   switch(cs::system_creation_flags[2]){
+      case 0: // Isolated particle
+         internal::particle(catom_array);
+         break;
 
-		case 1: // Cubic Particle Array
-			internal::particle_array(catom_array);
-			break;
+      case 1: // Cubic Particle Array
+         internal::particle_array(catom_array);
+         break;
 
-		case 2: // Hexagonal Particle Array
-			internal::hex_particle_array(catom_array);
-			break;
+      case 2: // Hexagonal Particle Array
+         internal::hex_particle_array(catom_array);
+         break;
 
-		case 3: // Voronoi Granular Film
-			grains::voronoi_film(catom_array);
-			break;
+      case 3: // Voronoi Granular Film
+         grains::voronoi_film(catom_array);
+         break;
 
-		case 4: // Grain Growth Method
-			//grain_growth(cs_num_atoms,cs_coord_array,particle_include_array,cs_atom_type_array);
-			std::cerr << "Grain growth not yet implemented, exiting" << std::endl;
-			err::vexit();
-			break;
+      case 4: // Grain Growth Method
+         //grain_growth(cs_num_atoms,cs_coord_array,particle_include_array,cs_atom_type_array);
+         std::cerr << "Grain growth not yet implemented, exiting" << std::endl;
+         err::vexit();
+         break;
 
       case 5: // Agglomorate
          internal::agglomorate(catom_array);
          break;
 
-		default:{
-			std::cerr << "Unknown system type requested in create module, exiting" << std::endl;
-			err::vexit();
-		}
-	}
+      default:{
+         std::cerr << "Unknown system type requested in create module, exiting" << std::endl;
+         err::vexit();
+      }
+   }
 
    // Apply an optional grain substructure before csg operations; a no-op
    // unless create:voronoi-grain-substructure was set (see
    // grains::voronoi_substructure()).
    grains::voronoi_substructure(catom_array);
 
-	// call fill function to fill in void
-	fill(catom_array);
+   // call fill function to fill in void
+   fill(catom_array);
 
-	// call geometry function
-	internal::geometry(catom_array);
+   // call geometry function
+   internal::geometry(catom_array);
 
-	// call intermixing function - must be before alloy function
-	intermixing(catom_array);
+   // call intermixing function - must be before alloy function
+   intermixing(catom_array);
 
-	// call alloy function
-	create::internal::alloy(catom_array);
+   // call alloy function
+   create::internal::alloy(catom_array);
 
-	// call dilution function
-	dilute(catom_array);
+   // call dilution function
+   dilute(catom_array);
 
-	// Delete unneeded atoms
-	create::internal::clear_atoms(catom_array);
+   // Delete unneeded atoms
+   create::internal::clear_atoms(catom_array);
 
-	// Calculate final atomic composition
-	create::internal::calculate_atomic_composition(catom_array);
+   // Calculate final atomic composition
+   create::internal::calculate_atomic_composition(catom_array);
 
    // For parallel check which processors have zero atoms
    #ifdef MPICF
@@ -180,49 +180,49 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
          err::v_parallel_all_exit(message_stream.str());
       }
    #else
-		// Check for zero atoms generated
-		if(catom_array.size()==0){
-			terminaltextcolor(RED);
-			std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
-			terminaltextcolor(WHITE);
-			err::vexit();
-		}
+      // Check for zero atoms generated
+      if(catom_array.size()==0){
+         terminaltextcolor(RED);
+         std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
+         terminaltextcolor(WHITE);
+         err::vexit();
+      }
    #endif
 
-	return 0;
+   return 0;
 }
 
 /*
 int pop_template_2D(int** template_array_2D,int cs_num_atoms,int** cs_coord_array,int* particle_include_array,int* template_bounds){
 
-	//====================================================================================
-	//
-	//											pop_template_2D
-	//
-	//					Subroutine to map 2D template onto particles include array
-	//
-	//									Version 0.2 R Evans 16/09/2008
-	//
-	//====================================================================================
+   //====================================================================================
+   //
+   //                               pop_template_2D
+   //
+   //             Subroutine to map 2D template onto particles include array
+   //
+   //                         Version 0.2 R Evans 16/09/2008
+   //
+   //====================================================================================
 
-  	for(int atom=0;atom<cs_num_atoms;atom++){
-		#ifdef MPICF
-		int cx=cs_coord_array[atom][0]+mpi_create_variables::int_mpi_offset[0];
-		int cy=cs_coord_array[atom][1]+mpi_create_variables::int_mpi_offset[1];
-		#else
-		int cx=cs_coord_array[atom][0];
-		int cy=cs_coord_array[atom][1];
-		#endif
+   for(int atom=0;atom<cs_num_atoms;atom++){
+      #ifdef MPICF
+      int cx=cs_coord_array[atom][0]+mpi_create_variables::int_mpi_offset[0];
+      int cy=cs_coord_array[atom][1]+mpi_create_variables::int_mpi_offset[1];
+      #else
+      int cx=cs_coord_array[atom][0];
+      int cy=cs_coord_array[atom][1];
+      #endif
 
-		// Check for coords in template bounds
-		if((cx>0) && (cx<template_bounds[0]) && (cy>0) && (cy<template_bounds[1])){
-			if(template_array_2D[cx][cy]!=-1){
-				particle_include_array[atom]=template_array_2D[cx][cy];
-			}
-		}
-	}
+      // Check for coords in template bounds
+      if((cx>0) && (cx<template_bounds[0]) && (cy>0) && (cy<template_bounds[1])){
+         if(template_array_2D[cx][cy]!=-1){
+            particle_include_array[atom]=template_array_2D[cx][cy];
+         }
+      }
+   }
 
-	return 0;
+   return 0;
 
 }
 */
@@ -268,14 +268,14 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
          // if atom is part of a non-magnetic material to be removed then save to nm array
          else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == 1){
             cs::nm_atom_t tmp;
-         	tmp.x = catom_array[a].x;
-         	tmp.y = catom_array[a].y;
-         	tmp.z = catom_array[a].z;
-         	tmp.mat = catom_array[a].material;
+            tmp.x = catom_array[a].x;
+            tmp.y = catom_array[a].y;
+            tmp.z = catom_array[a].z;
+            tmp.mat = catom_array[a].material;
             tmp.cat = catom_array[atom].lh_category;
             tmp.grain = tmp_catom_array[a].grain;
-         	// save atom to non-magnet array
-         	cs::non_magnetic_atoms_array.push_back(tmp);
+            // save atom to non-magnet array
+            cs::non_magnetic_atoms_array.push_back(tmp);
          }
       }
       tmp_catom_array.resize(0);
@@ -290,51 +290,51 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
 }
 
 int intermixing(std::vector<cs::catom_t> & catom_array){
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::intermixing has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "cs::intermixing has been called" << std::endl;}
 
    // re-seed random number generator on each CPU with a different number
-	create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::mixing_seed));
+   create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::mixing_seed));
 
-	// loop over all atoms
-	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		// get current material
-		int current_material=catom_array[atom].material;
-		int final_material=current_material;
+   // loop over all atoms
+   for(unsigned int atom=0;atom<catom_array.size();atom++){
+      // get current material
+      int current_material=catom_array[atom].material;
+      int final_material=current_material;
 
-		//loop over all potential intermixing materials
-		for(int mat=0;mat<mp::num_materials;mat++){
-			if(mp::material[current_material].intermixing[mat]>0.0){
-				// find which region atom is in and test for probability of different material
-				double z=catom_array[atom].z;
-				double min = create::internal::mp[mat].min*cs::system_dimensions[2];
-				double max = create::internal::mp[mat].max*cs::system_dimensions[2];
-				double mean = (min+max)/2.0;
-				if(z<=min){
-					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-					if(create::internal::grnd() < probability) final_material=mat;
-				}
-				else if(z>min && z<=mean){
-					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-					if(create::internal::grnd() < probability) final_material=mat;
-				}
-				else if(z>mean && z<=max){
-					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-					if(create::internal::grnd() < probability) final_material=mat;
-				}
-				else if(z>max){
-					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-					//std::cout << current_material << "\t" << mat << "\t" << atom << "\t" << z << "\t" << max << "\t" << probability << std::endl;
-					if(create::internal::grnd() < probability) final_material=mat;
-				}
-			}
-		}
+      //loop over all potential intermixing materials
+      for(int mat=0;mat<mp::num_materials;mat++){
+         if(mp::material[current_material].intermixing[mat]>0.0){
+            // find which region atom is in and test for probability of different material
+            double z=catom_array[atom].z;
+            double min = create::internal::mp[mat].min*cs::system_dimensions[2];
+            double max = create::internal::mp[mat].max*cs::system_dimensions[2];
+            double mean = (min+max)/2.0;
+            if(z<=min){
+               double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
+               if(create::internal::grnd() < probability) final_material=mat;
+            }
+            else if(z>min && z<=mean){
+               double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
+               if(create::internal::grnd() < probability) final_material=mat;
+            }
+            else if(z>mean && z<=max){
+               double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
+               if(create::internal::grnd() < probability) final_material=mat;
+            }
+            else if(z>max){
+               double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
+               //std::cout << current_material << "\t" << mat << "\t" << atom << "\t" << z << "\t" << max << "\t" << probability << std::endl;
+               if(create::internal::grnd() < probability) final_material=mat;
+            }
+         }
+      }
 
-		// set final material
-		catom_array[atom].material=final_material;
-	}
+      // set final material
+      catom_array[atom].material=final_material;
+   }
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 void dilute (std::vector<cs::catom_t> & catom_array){

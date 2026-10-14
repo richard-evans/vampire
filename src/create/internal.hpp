@@ -62,7 +62,7 @@ namespace create{
          slave_alloy_d_t slave_alloy_distribution;
          // constructor
          slave_material_t ():
-         	fraction(0.0),
+            fraction(0.0),
             variance(0.1),
             slave_alloy_distribution(native)
             {};
@@ -91,11 +91,11 @@ namespace create{
          double max; // maximum material height
 
          bool geometry = false; // define geometry for material
-   		std::vector<points_t> geometry_points; // array of geometry coordinates
+         std::vector<points_t> geometry_points; // array of geometry coordinates
 
          // constructor
          mp_t ():
-         	alloy_master(false),
+            alloy_master(false),
             host_alloy_smoothness(2.0),
             host_alloy_scale (50.0),
             save_host_alloy_profile(false),
@@ -136,7 +136,7 @@ namespace create{
       extern double bubble_radius;
       extern double bubble_nucleation_height;
 
-      extern bool select_material_by_geometry;	// Toggle override of input material type by geometry
+      extern bool select_material_by_geometry;  // Toggle override of input material type by geometry
       extern bool select_material_by_z_height;
 
       //-----------------------------------------------------------------------------

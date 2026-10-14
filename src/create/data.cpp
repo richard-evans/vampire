@@ -44,8 +44,8 @@ namespace create{
          double bubble_radius = 0.3333;
          double bubble_nucleation_height = 0.0;
 
-         bool select_material_by_geometry = false;	// Toggle override of input material type by geometry
-         bool select_material_by_z_height = false;	// Toggle overwriting of material id by z-height
+         bool select_material_by_geometry = false; // Toggle override of input material type by geometry
+         bool select_material_by_z_height = false; // Toggle overwriting of material id by z-height
 
       } // end of internal namespace
 

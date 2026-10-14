@@ -41,7 +41,7 @@ void particle_array(std::vector<cs::catom_t> & catom_array){
    std::vector<double> particle_origin(3,0.0);
 
    for (int x_particle=0;x_particle < num_x_particle;x_particle++){
-   	for (int y_particle=0;y_particle < num_y_particle;y_particle++){
+      for (int y_particle=0;y_particle < num_y_particle;y_particle++){
 
          // Determine particle origin
          particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
@@ -51,9 +51,9 @@ void particle_array(std::vector<cs::catom_t> & catom_array){
          create::internal::centre_particle_on_atom(particle_origin, catom_array);
 
          if(cs::particle_creation_parity==1){
-         	particle_origin[0]+=cs::unit_cell.dimensions[0]*0.5;
-         	particle_origin[1]+=cs::unit_cell.dimensions[1]*0.5;
-         	particle_origin[2]+=cs::unit_cell.dimensions[2]*0.5;
+            particle_origin[0]+=cs::unit_cell.dimensions[0]*0.5;
+            particle_origin[1]+=cs::unit_cell.dimensions[1]*0.5;
+            particle_origin[2]+=cs::unit_cell.dimensions[2]*0.5;
          }
 
          // Check to see if a complete particle fits within the system bounds

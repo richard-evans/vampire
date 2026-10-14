@@ -26,10 +26,10 @@ namespace create{
 namespace internal{
 
 //------------------------------------------------------------------------------
-//									hex_particle_array
+//                         hex_particle_array
 //
-//					Function to cut many particles from lattice
-//					in a hexagonal configuration
+//             Function to cut many particles from lattice
+//             in a hexagonal configuration
 //------------------------------------------------------------------------------
 void hex_particle_array(std::vector<cs::catom_t> & catom_array){
 

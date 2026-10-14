@@ -36,16 +36,16 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
                    neighbours::list_t& bilinear,
                    neighbours::list_t& biquadratic){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){
-		std::cout << "cs::set_atom_vars has been called " << vmpi::my_rank << std::endl;
-	}
+   // check calling of routine if error checking is activated
+   if(err::check==true){
+      std::cout << "cs::set_atom_vars has been called " << vmpi::my_rank << std::endl;
+   }
 
-	// Set number of atoms
-	atoms::num_atoms = catom_array.size(); // core and boundary spins in mpi mode
+   // Set number of atoms
+   atoms::num_atoms = catom_array.size(); // core and boundary spins in mpi mode
 
-	zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl;
-	zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl;
+   zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl;
+   zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl;
 
    // Save number of non-magnetic atoms in total (all processors)
    uint64_t total_non_magnetic_atoms = cs::non_magnetic_atoms_array.size();
@@ -56,9 +56,9 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
    atoms::y_coord_array.resize(atoms::num_atoms,0.0);
    atoms::z_coord_array.resize(atoms::num_atoms,0.0);
 
-	atoms::x_spin_array.resize(atoms::num_atoms,0.0);
-	atoms::y_spin_array.resize(atoms::num_atoms,0.0);
-	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
+   atoms::x_spin_array.resize(atoms::num_atoms,0.0);
+   atoms::y_spin_array.resize(atoms::num_atoms,0.0);
+   atoms::z_spin_array.resize(atoms::num_atoms,1.0);
    atoms::m_spin_array.resize(atoms::num_atoms,0.0);
 
 
@@ -69,9 +69,9 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 
    atoms::magnetic.resize(       atoms::num_atoms,0);
 
-	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
-	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
-	atoms::z_total_spin_field_array.resize(atoms::num_atoms,0.0);
+   atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
+   atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
+   atoms::z_total_spin_field_array.resize(atoms::num_atoms,0.0);
 
    // For spin lattice only
    if(sld::enabled){
@@ -88,43 +88,43 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 
    }
 
-	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);
-	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);
-	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);
-	atoms::x_thermal_field_array.resize(atoms::num_atoms,0.0);
-	atoms::y_thermal_field_array.resize(atoms::num_atoms,0.0);
-	atoms::z_thermal_field_array.resize(atoms::num_atoms,0.0);
-//	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
-//	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
-//	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);
+   atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);
+   atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);
+   atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);
+   atoms::x_thermal_field_array.resize(atoms::num_atoms,0.0);
+   atoms::y_thermal_field_array.resize(atoms::num_atoms,0.0);
+   atoms::z_thermal_field_array.resize(atoms::num_atoms,0.0);
+// atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
+// atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
+// atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);
    // Resize to zero atoms_dipolar_field-x,y,z
-	dipole::atom_dipolar_field_array_x.resize(atoms::num_atoms,0.0);
-	dipole::atom_dipolar_field_array_y.resize(atoms::num_atoms,0.0);
-	dipole::atom_dipolar_field_array_z.resize(atoms::num_atoms,0.0);
+   dipole::atom_dipolar_field_array_x.resize(atoms::num_atoms,0.0);
+   dipole::atom_dipolar_field_array_y.resize(atoms::num_atoms,0.0);
+   dipole::atom_dipolar_field_array_z.resize(atoms::num_atoms,0.0);
    // Resize to zero atoms_mu0demag_field-x,y,z
-	dipole::atom_mu0demag_field_array_x.resize(atoms::num_atoms,0.0);
-	dipole::atom_mu0demag_field_array_y.resize(atoms::num_atoms,0.0);
-	dipole::atom_mu0demag_field_array_z.resize(atoms::num_atoms,0.0);
+   dipole::atom_mu0demag_field_array_x.resize(atoms::num_atoms,0.0);
+   dipole::atom_mu0demag_field_array_y.resize(atoms::num_atoms,0.0);
+   dipole::atom_mu0demag_field_array_z.resize(atoms::num_atoms,0.0);
 
    // Set custom RNG for spin initialisation
    MTRand random_spin_rng;
    random_spin_rng.seed(vmpi::parallel_rng_seed(create::internal::spin_init_seed));
 
-	for(int atom=0;atom<atoms::num_atoms;atom++){
+   for(int atom=0;atom<atoms::num_atoms;atom++){
 
-		atoms::x_coord_array[atom] = catom_array[atom].x;
-		atoms::y_coord_array[atom] = catom_array[atom].y;
-		atoms::z_coord_array[atom] = catom_array[atom].z;
+      atoms::x_coord_array[atom] = catom_array[atom].x;
+      atoms::y_coord_array[atom] = catom_array[atom].y;
+      atoms::z_coord_array[atom] = catom_array[atom].z;
 
-		atoms::type_array[atom] = catom_array[atom].material;
-		atoms::category_array[atom] = catom_array[atom].lh_category;
-		//std::cout << atom << " grain: " << catom_array[atom].grain << std::endl;
-		atoms::grain_array[atom] = catom_array[atom].grain;
+      atoms::type_array[atom] = catom_array[atom].material;
+      atoms::category_array[atom] = catom_array[atom].lh_category;
+      //std::cout << atom << " grain: " << catom_array[atom].grain << std::endl;
+      atoms::grain_array[atom] = catom_array[atom].grain;
 
-		// initialise atomic spin positions according to the material's initial
+      // initialise atomic spin positions according to the material's initial
       // spin texture (uniform vector, random, domain wall, skyrmion, etc.)
-		int mat=atoms::type_array[atom];
-		double sx,sy,sz; // spins
+      int mat=atoms::type_array[atom];
+      double sx,sy,sz; // spins
 
       // fractional coordinates of the atom within the system bounding box
       const double fx = (cs::system_dimensions[0] > 0.0) ? catom_array[atom].x / cs::system_dimensions[0] : 0.0;
@@ -133,9 +133,9 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 
       spininitialize::initialize_spin(mat, fx, fy, fz, sx, sy, sz, random_spin_rng);
 
-		atoms::x_spin_array[atom]=sx;
-		atoms::y_spin_array[atom]=sy;
-		atoms::z_spin_array[atom]=sz;
+      atoms::x_spin_array[atom]=sx;
+      atoms::y_spin_array[atom]=sy;
+      atoms::z_spin_array[atom]=sz;
       atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/constants::muB;
 
 
@@ -143,7 +143,7 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
       if( mp::material[mat].non_magnetic == 0 ) atoms::magnetic[atom] = true;
       else atoms::magnetic[atom] = false;
 
-	}
+   }
 
    // apply any requested grain-level alternation of the initial spin
    // directions (create:grain-magnetisation-direction). This is a single
@@ -157,16 +157,16 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
    //---------------------------------------------------------------------------
    anisotropy::identify_surface_atoms(catom_array, bilinear.list);
 
-	//===========================================================
-	// Create 1-D neighbourlist
-	//===========================================================
+   //===========================================================
+   // Create 1-D neighbourlist
+   //===========================================================
 
-	zlog << zTs() << "Memory required for creation of 1D neighbour list on rank " << vmpi::my_rank << ": ";
-	zlog << (2.0*double(atoms::num_atoms)+2.0*double(atoms::total_num_neighbours))*8.0/1.0e6 << " MB RAM"<< std::endl;
+   zlog << zTs() << "Memory required for creation of 1D neighbour list on rank " << vmpi::my_rank << ": ";
+   zlog << (2.0*double(atoms::num_atoms)+2.0*double(atoms::total_num_neighbours))*8.0/1.0e6 << " MB RAM"<< std::endl;
 
    //-------------------------------------------------
-	//	Initialise exchange calculation
-	//-------------------------------------------------
+   // Initialise exchange calculation
+   //-------------------------------------------------
    exchange::initialize(bilinear.list, biquadratic.list);
 
    // Save number of atoms in unit cell first

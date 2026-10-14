@@ -22,15 +22,15 @@ namespace internal{
 
    void cylinder(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
 
-   	//-----------------------------------------
-   	// Set particle radius
-   	//-----------------------------------------
-   	const double particle_radius_squared = (cs::particle_scale * 0.5) * (cs::particle_scale * 0.5);
+      //-----------------------------------------
+      // Set particle radius
+      //-----------------------------------------
+      const double particle_radius_squared = (cs::particle_scale * 0.5) * (cs::particle_scale * 0.5);
 
-   	//-----------------------------------------------
-   	// Loop over all atoms and mark atoms in sphere
-   	//-----------------------------------------------
-   	const int num_atoms = catom_array.size();
+      //-----------------------------------------------
+      // Loop over all atoms and mark atoms in sphere
+      //-----------------------------------------------
+      const int num_atoms = catom_array.size();
 
       // determine order for core-shell particles
       std::list<core_radius_t> material_order(0);
@@ -58,40 +58,40 @@ namespace internal{
          uc_cat[mat] = create::internal::mp[mat].unit_cell_category; // unit cell category of material
       }
 
-    	for(int atom=0;atom<num_atoms;atom++){
-   		double range_squared = 	(catom_array[atom].x - particle_origin[0]) * (catom_array[atom].x - particle_origin[0]) +
-   										(catom_array[atom].y - particle_origin[1]) * (catom_array[atom].y - particle_origin[1]);
-   		if(mp::material[catom_array[atom].material].core_shell_size>0.0){
+      for(int atom=0;atom<num_atoms;atom++){
+         double range_squared =  (catom_array[atom].x - particle_origin[0]) * (catom_array[atom].x - particle_origin[0]) +
+                                 (catom_array[atom].y - particle_origin[1]) * (catom_array[atom].y - particle_origin[1]);
+         if(mp::material[catom_array[atom].material].core_shell_size>0.0){
             // Iterate over materials
             for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
                int mat = (it)->mat;
-   				double my_radius = mat_cssize[mat];
-   				double max_range = my_radius*my_radius*particle_radius_squared;
-   				double maxz = mat_max[mat];
-   				double minz = mat_min[mat];
-   				double cz=catom_array[atom].z;
+               double my_radius = mat_cssize[mat];
+               double max_range = my_radius*my_radius*particle_radius_squared;
+               double maxz = mat_max[mat];
+               double minz = mat_min[mat];
+               double cz=catom_array[atom].z;
                const int atom_uc_cat = catom_array[atom].uc_category;
-   				// check for within core shell range
-   				if(range_squared <= max_range){
-   					if( (cz >= minz) && (cz < maxz) && (atom_uc_cat == uc_cat[mat]) ){
-   					catom_array[atom].include = true;
-   					catom_array[atom].material = mat;
-   					catom_array[atom].grain = grain;
-   					}
-   					// if set to clear atoms then remove atoms within radius
-   					else if(cs::fill_core_shell == false){
-   						catom_array[atom].include = false;
-   					}
-   				}
-   			}
-   		}
-   		else if(range_squared <= particle_radius_squared){
-   			catom_array[atom].include = true;
-   			catom_array[atom].grain = grain;
-   		}
-   	}
+               // check for within core shell range
+               if(range_squared <= max_range){
+                  if( (cz >= minz) && (cz < maxz) && (atom_uc_cat == uc_cat[mat]) ){
+                  catom_array[atom].include = true;
+                  catom_array[atom].material = mat;
+                  catom_array[atom].grain = grain;
+                  }
+                  // if set to clear atoms then remove atoms within radius
+                  else if(cs::fill_core_shell == false){
+                     catom_array[atom].include = false;
+                  }
+               }
+            }
+         }
+         else if(range_squared <= particle_radius_squared){
+            catom_array[atom].include = true;
+            catom_array[atom].grain = grain;
+         }
+      }
 
-   	return;
+      return;
 
    }
 

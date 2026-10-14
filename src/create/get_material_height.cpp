@@ -20,14 +20,14 @@ namespace create{
    // Functions to extract min fractional height of material
    //-------------------------------------------------------------------------------
    double get_material_height_min(const int material){
-   	return internal::mp[material].min;
+      return internal::mp[material].min;
    }
 
    //-------------------------------------------------------------------------------
    // Functions to extract max fractional height of material
    //-------------------------------------------------------------------------------
    double get_material_height_max(const int material){
-   	return internal::mp[material].max;
+      return internal::mp[material].max;
    }
 
    //-------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ namespace create{
    // substructure (create::internal::mp_t::sub_fill)
    //-------------------------------------------------------------------------------
    bool get_material_sub_fill(const int material){
-   	return internal::mp[material].sub_fill;
+      return internal::mp[material].sub_fill;
    }
 
    //-------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ namespace create{
    // (create::internal::mp_t::unit_cell_category)
    //-------------------------------------------------------------------------------
    int get_material_unit_cell_category(const int material){
-   	return internal::mp[material].unit_cell_category;
+      return internal::mp[material].unit_cell_category;
    }
 
    //-------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ namespace create{
    // substructure path (create::internal::mp_t::voronoi_grain_substructure_nucleation_height)
    //-------------------------------------------------------------------------------
    double get_material_substructure_nucleation_height(const int material){
-   	return internal::mp[material].voronoi_grain_substructure_nucleation_height;
+      return internal::mp[material].voronoi_grain_substructure_nucleation_height;
    }
 
 } // end of namespace create

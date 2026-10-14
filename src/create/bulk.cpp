@@ -24,14 +24,14 @@ namespace internal{
    //------------------------------------------------------------
    void bulk(std::vector<cs::catom_t> & catom_array){
 
-   	// Loop over all atoms and mark as selected
-   	const int num_atoms = catom_array.size();
+      // Loop over all atoms and mark as selected
+      const int num_atoms = catom_array.size();
 
-    	for(int atom=0; atom < num_atoms; atom++){
-   		catom_array[atom].include=true;
-   	}
+      for(int atom=0; atom < num_atoms; atom++){
+         catom_array[atom].include=true;
+      }
 
-   	return;
+      return;
 
    }
 

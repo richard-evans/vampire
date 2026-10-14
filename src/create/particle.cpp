@@ -23,7 +23,7 @@ namespace create{
 namespace internal{
 
 //------------------------------------------------------------------------------
-//					Function to cut single particle from lattice
+//             Function to cut single particle from lattice
 //------------------------------------------------------------------------------
 void particle(std::vector<cs::catom_t> & catom_array){
 
@@ -40,12 +40,12 @@ void particle(std::vector<cs::catom_t> & catom_array){
 
    // check for move in particle origin and that unit cell size < 0.5 system size
    if(cs::particle_creation_parity==1 &&
-   	(2.0*cs::unit_cell.dimensions[0]<cs::system_dimensions[0]) &&
-   	(2.0*cs::unit_cell.dimensions[1]<cs::system_dimensions[1]) &&
-   	(2.0*cs::unit_cell.dimensions[2]<cs::system_dimensions[2])){
-   	particle_origin[0]+=cs::unit_cell.dimensions[0]*0.5;
-   	particle_origin[1]+=cs::unit_cell.dimensions[1]*0.5;
-   	particle_origin[2]+=cs::unit_cell.dimensions[2]*0.5;
+      (2.0*cs::unit_cell.dimensions[0]<cs::system_dimensions[0]) &&
+      (2.0*cs::unit_cell.dimensions[1]<cs::system_dimensions[1]) &&
+      (2.0*cs::unit_cell.dimensions[2]<cs::system_dimensions[2])){
+      particle_origin[0]+=cs::unit_cell.dimensions[0]*0.5;
+      particle_origin[1]+=cs::unit_cell.dimensions[1]*0.5;
+      particle_origin[2]+=cs::unit_cell.dimensions[2]*0.5;
    }
 
    // Use particle type flags to determine which particle shape to cut
@@ -88,7 +88,7 @@ void particle(std::vector<cs::catom_t> & catom_array){
          err::vexit();
    }
 
-	return;
+   return;
 }
 
 } // end of namespace internal

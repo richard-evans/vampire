@@ -29,7 +29,7 @@ namespace internal{
 void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
 
    // print informative message to log file
-	zlog<< zTs() << "Determining atomic composition:" << std::endl;
+   zlog<< zTs() << "Determining atomic composition:" << std::endl;
 
    // temporary counter for number of (local) atoms
    uint64_t num_atoms = 0;
@@ -70,15 +70,15 @@ void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
    // calculate inverse number of atoms
    const double inverse_num_atoms = 100.0 / double(num_atoms);
 
-	// Output composition to log file
-	for(int mat=0;mat<mp::num_materials;mat++){
+   // Output composition to log file
+   for(int mat=0;mat<mp::num_materials;mat++){
       zlog << zTs() << "Material " << mat+1 << " " << mp::material[mat].name <<
                        " makes up " << double(material_numbers[mat]) * inverse_num_atoms <<
                        " % of all atoms ( " << material_numbers[mat] <<
                        " atoms )" << std::endl;
    }
 
-	return;
+   return;
 
 }
 

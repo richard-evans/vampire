@@ -18,9 +18,9 @@
 class seed_point_t{
 public:
 
-	double x,y;
-	double radius;
-	double height;
+   double x,y;
+   double radius;
+   double height;
 
 };
 
@@ -57,117 +57,117 @@ namespace internal{
 //
 void roughness(std::vector<cs::catom_t> & catom_array){
 
-	// Output instructuve message to log file
-	zlog << zTs() << "Calculating interfacial roughness for generated system." << std::endl;
+   // Output instructuve message to log file
+   zlog << zTs() << "Calculating interfacial roughness for generated system." << std::endl;
 
-	// Construct a 2D array of height according to roughness resoution
-	const double resolution=cs::interfacial_roughness_height_field_resolution; // Angstroms
-	const unsigned int seed_density=cs::interfacial_roughness_seed_count;
-	const double seed_radius=cs::interfacial_roughness_mean_seed_radius;
-	const double seed_height_mean=cs::interfacial_roughness_mean_seed_height;
-	const double seed_height_max=cs::interfacial_roughness_seed_height_max;
-	const double seed_radius_variance=cs::interfacial_roughness_seed_radius_variance;
+   // Construct a 2D array of height according to roughness resoution
+   const double resolution=cs::interfacial_roughness_height_field_resolution; // Angstroms
+   const unsigned int seed_density=cs::interfacial_roughness_seed_count;
+   const double seed_radius=cs::interfacial_roughness_mean_seed_radius;
+   const double seed_height_mean=cs::interfacial_roughness_mean_seed_height;
+   const double seed_height_max=cs::interfacial_roughness_seed_height_max;
+   const double seed_radius_variance=cs::interfacial_roughness_seed_radius_variance;
 
-	// Declare array to store height field
-	std::vector<std::vector<double> >height_field(0);
+   // Declare array to store height field
+   std::vector<std::vector<double> >height_field(0);
 
-	// Calculate size of height_field array
-	double nx = int(vmath::iceil(cs::system_dimensions[0]/resolution));
-	double ny = int(vmath::iceil(cs::system_dimensions[1]/resolution));
+   // Calculate size of height_field array
+   double nx = int(vmath::iceil(cs::system_dimensions[0]/resolution));
+   double ny = int(vmath::iceil(cs::system_dimensions[1]/resolution));
 
-	// Resize height_field array
-	height_field.resize(nx);
-	for(int i=0; i<nx; i++) height_field.at(i).resize(ny);
+   // Resize height_field array
+   height_field.resize(nx);
+   for(int i=0; i<nx; i++) height_field.at(i).resize(ny);
 
-	// Generate seed points and radii
-	std::vector<seed_point_t> seed_points(0);
+   // Generate seed points and radii
+   std::vector<seed_point_t> seed_points(0);
 
-	// Define local random generator for surface roughness
-	MTRand rgrnd;
+   // Define local random generator for surface roughness
+   MTRand rgrnd;
 
-	// Initialise random number generator
-	rgrnd.seed(cs::interfacial_roughness_random_seed);
+   // Initialise random number generator
+   rgrnd.seed(cs::interfacial_roughness_random_seed);
 
-	for(unsigned int p=0; p < seed_density ; p++){
-		// Generate random point coordinates
-		double x=rgrnd()*cs::system_dimensions[0];
-		double y=rgrnd()*cs::system_dimensions[1];
+   for(unsigned int p=0; p < seed_density ; p++){
+      // Generate random point coordinates
+      double x=rgrnd()*cs::system_dimensions[0];
+      double y=rgrnd()*cs::system_dimensions[1];
 
-		// Generate random radius with flat profile r = r0 +/- variance*rnd()
-		double r=seed_radius*(1.0+seed_radius_variance*(2.0*rgrnd()-1.0));
+      // Generate random radius with flat profile r = r0 +/- variance*rnd()
+      double r=seed_radius*(1.0+seed_radius_variance*(2.0*rgrnd()-1.0));
 
-		// Generate random height with gaussian profile
-		double h=seed_height_mean*mtrandom::gaussianc(rgrnd);
+      // Generate random height with gaussian profile
+      double h=seed_height_mean*mtrandom::gaussianc(rgrnd);
 
-		// Overwrite generated height if greater than maximum
-		if(fabs(h)>seed_height_max) h=vmath::sign(h)*seed_height_max;
+      // Overwrite generated height if greater than maximum
+      if(fabs(h)>seed_height_max) h=vmath::sign(h)*seed_height_max;
 
-		// Check for type of roughness
-		// Troughs
-		if(cs::interfacial_roughness_type==-1) h = -1.0*fabs(h);
-		// Peaks
-		else if(cs::interfacial_roughness_type==1) h = fabs(h);
+      // Check for type of roughness
+      // Troughs
+      if(cs::interfacial_roughness_type==-1) h = -1.0*fabs(h);
+      // Peaks
+      else if(cs::interfacial_roughness_type==1) h = fabs(h);
 
-		// Save point characteristics to array
-		seed_point_t tmp;
-		tmp.x = x;
-		tmp.y = y;
-		tmp.radius = r;
-		tmp.height = h;
-		seed_points.push_back(tmp);
-	}
+      // Save point characteristics to array
+      seed_point_t tmp;
+      tmp.x = x;
+      tmp.y = y;
+      tmp.radius = r;
+      tmp.height = h;
+      seed_points.push_back(tmp);
+   }
 
-	// Now apply seed points to generate local height field
-	// Loop over all height field coordinates
-	for(int ix = 0; ix < nx; ix++){
-		for(int iy = 0; iy < ny; iy++){
+   // Now apply seed points to generate local height field
+   // Loop over all height field coordinates
+   for(int ix = 0; ix < nx; ix++){
+      for(int iy = 0; iy < ny; iy++){
 
-			const double x = double(ix)*resolution; // real space coordinates
-			const double y = double(iy)*resolution;
+         const double x = double(ix)*resolution; // real space coordinates
+         const double y = double(iy)*resolution;
 
-			// Loop over all seed points
-			for(unsigned int p=0; p < seed_density ; p++){
-				double rx=x-seed_points.at(p).x;
-				double ry=y-seed_points.at(p).y;
+         // Loop over all seed points
+         for(unsigned int p=0; p < seed_density ; p++){
+            double rx=x-seed_points.at(p).x;
+            double ry=y-seed_points.at(p).y;
 
-				// Check for point in range
-				if(rx*rx+ry*ry <= seed_points.at(p).radius*seed_points.at(p).radius) height_field.at(ix).at(iy)=seed_points.at(p).height;
-			}
-		}
-	}
+            // Check for point in range
+            if(rx*rx+ry*ry <= seed_points.at(p).radius*seed_points.at(p).radius) height_field.at(ix).at(iy)=seed_points.at(p).height;
+         }
+      }
+   }
 
-	// Assign materials to generated atoms
-	for(unsigned int atom=0;atom<catom_array.size();atom++){
+   // Assign materials to generated atoms
+   for(unsigned int atom=0;atom<catom_array.size();atom++){
 
-		// Determine height field coordinates
-		const int hx = int(catom_array[atom].x/resolution);
-		const int hy = int(catom_array[atom].y/resolution);
+      // Determine height field coordinates
+      const int hx = int(catom_array[atom].x/resolution);
+      const int hy = int(catom_array[atom].y/resolution);
 
-		// Loop over all materials and determine local height
-		for(int mat=0;mat<mp::num_materials;mat++){
+      // Loop over all materials and determine local height
+      for(int mat=0;mat<mp::num_materials;mat++){
 
-			double min=create::internal::mp[mat].min*cs::system_dimensions[2];
-			double max=create::internal::mp[mat].max*cs::system_dimensions[2];
-			double local_height = height_field.at(hx).at(hy);
+         double min=create::internal::mp[mat].min*cs::system_dimensions[2];
+         double max=create::internal::mp[mat].max*cs::system_dimensions[2];
+         double local_height = height_field.at(hx).at(hy);
          bool fill = mp::material[mat].fill;
 
-			// optionally specify a material specific height here -- not yet implemented
-			//if(cs::interfacial_roughness_local_height_field==true){
-			//double local_height = height_field.at(mat).at(hx).at(hy);
-			//}
+         // optionally specify a material specific height here -- not yet implemented
+         //if(cs::interfacial_roughness_local_height_field==true){
+         //double local_height = height_field.at(mat).at(hx).at(hy);
+         //}
          const int atom_uc_cat = catom_array[atom].uc_category;
          const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
 
-			// Include atoms if within material height
-			const double cz=catom_array[atom].z;
-			if((cz>=min+local_height) && (cz<max+local_height) && (fill==false)  && (atom_uc_cat == mat_uc_cat) ){
-				catom_array[atom].material=mat;
-				catom_array[atom].include=true;
-			}
-		}
-	}
+         // Include atoms if within material height
+         const double cz=catom_array[atom].z;
+         if((cz>=min+local_height) && (cz<max+local_height) && (fill==false)  && (atom_uc_cat == mat_uc_cat) ){
+            catom_array[atom].material=mat;
+            catom_array[atom].include=true;
+         }
+      }
+   }
 
-	return;
+   return;
 
 }
 

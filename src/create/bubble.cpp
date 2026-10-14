@@ -44,14 +44,14 @@ namespace create{
          // sort by increasing radius
          material_order.sort(compare_radius);
 
-			//-----------------------------------------------
-			// Loop over all atoms and mark atoms in sphere
-			//-----------------------------------------------
-			const int num_atoms = catom_array.size();
+         //-----------------------------------------------
+         // Loop over all atoms and mark atoms in sphere
+         //-----------------------------------------------
+         const int num_atoms = catom_array.size();
 
          const double particle_radius_sq = 0.25 * cs::particle_scale * cs::particle_scale;
 
- 	 	 	for(int atom=0;atom<num_atoms;atom++){
+         for(int atom=0;atom<num_atoms;atom++){
 
             const double range_sq = (catom_array[atom].x-particle_origin[0])*(catom_array[atom].x-particle_origin[0]) +
                                     (catom_array[atom].y-particle_origin[1])*(catom_array[atom].y-particle_origin[1]);
@@ -72,34 +72,34 @@ namespace create{
                // Iterate over materials
                for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
                   int mat = (it)->mat;
-						double my_radius = mp::material[mat].core_shell_size;
-						const double my_radius_sq = my_radius*my_radius;
-						double maxz=mp::material[mat].max*cs::system_dimensions[2];
-						double minz=mp::material[mat].min*cs::system_dimensions[2];
-						//double max_range = my_radius*my_radius*particle_radius_squared;
-						// check for within core shell range
-				      //if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (2.0*cs::system_dimensions[2]-(cz))*(2.0*cs::system_dimensions[2]-(cz))*inv_c_sq*my_radius_sq){
-				      if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (L_cone-(cz))*(L_cone-(cz))*inv_c_sq*my_radius_sq){
-							if((cz>=minz) && (cz<maxz)){
-							   catom_array[atom].include=true;
-							   catom_array[atom].material=mat;
-							   catom_array[atom].grain=grain;
-							}
-							// if set to clear atoms then remove atoms within radius
-							else if(cs::fill_core_shell==false){
-								catom_array[atom].include=false;
-							}
-						}
-					}
-				}*/
+                  double my_radius = mp::material[mat].core_shell_size;
+                  const double my_radius_sq = my_radius*my_radius;
+                  double maxz=mp::material[mat].max*cs::system_dimensions[2];
+                  double minz=mp::material[mat].min*cs::system_dimensions[2];
+                  //double max_range = my_radius*my_radius*particle_radius_squared;
+                  // check for within core shell range
+                  //if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (2.0*cs::system_dimensions[2]-(cz))*(2.0*cs::system_dimensions[2]-(cz))*inv_c_sq*my_radius_sq){
+                  if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (L_cone-(cz))*(L_cone-(cz))*inv_c_sq*my_radius_sq){
+                     if((cz>=minz) && (cz<maxz)){
+                        catom_array[atom].include=true;
+                        catom_array[atom].material=mat;
+                        catom_array[atom].grain=grain;
+                     }
+                     // if set to clear atoms then remove atoms within radius
+                     else if(cs::fill_core_shell==false){
+                        catom_array[atom].include=false;
+                     }
+                  }
+               }
+            }*/
             // determine if atom is within bubble
-				if(range_sq < factor_radius*factor_radius*particle_radius_sq){
-					catom_array[atom].include=true;
-					catom_array[atom].grain=grain;
-				}
-			} // end for loop
+            if(range_sq < factor_radius*factor_radius*particle_radius_sq){
+               catom_array[atom].include=true;
+               catom_array[atom].grain=grain;
+            }
+         } // end for loop
 
-	      return;
+         return;
 
       }  // end of bubble function
 
