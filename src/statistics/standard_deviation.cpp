@@ -116,7 +116,7 @@ std::string standard_deviation_statistic_t::output_standard_deviation(bool heade
       res.precision(vout::precision);
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    if(!header){
        // determine inverse mean counter and its square
        const double imean_counter = 1.0/mean_counter;
@@ -136,7 +136,7 @@ std::string standard_deviation_statistic_t::output_standard_deviation(bool heade
        }else{
           for(int id=0; id< num_elements -1; ++id){ // ignore last element as always contains non-magnetic atoms
              result <<name + std::to_string(id) + "_std_x"
-                    <<name + std::to_string(id) + "_std_y" 
+                    <<name + std::to_string(id) + "_std_y"
                     <<name + std::to_string(id) + "_std_z"
                     <<name + std::to_string(id) + "_std_l";
              }

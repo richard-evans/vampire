@@ -129,23 +129,23 @@ void torque_statistic_t::calculate_torque(const std::vector<double>& sx, // spin
       const int mask_id = mask[atom]; // get mask id
 
       // get atomic moment
-		const double mu = mm[atom];
+      const double mu = mm[atom];
 
-		// Store local spin in Sand local field in H
-		const double S[3] = {sx[atom]*mu,         sy[atom]*mu,         sz[atom]*mu        };
-		// (SLD spin fields already include the applied field)
-		double B[3] = {bxs[atom], bys[atom], bzs[atom]};
-		if(!sld::enabled){
-			B[0] += bxe[atom];
-			B[1] += bye[atom];
-			B[2] += bze[atom];
-		}
+      // Store local spin in Sand local field in H
+      const double S[3] = {sx[atom]*mu,         sy[atom]*mu,         sz[atom]*mu        };
+      // (SLD spin fields already include the applied field)
+      double B[3] = {bxs[atom], bys[atom], bzs[atom]};
+      if(!sld::enabled){
+         B[0] += bxe[atom];
+         B[1] += bye[atom];
+         B[2] += bze[atom];
+      }
 
-		torque[3*mask_id + 0] += S[1]*B[2]-S[2]*B[1];
-		torque[3*mask_id + 1] += S[2]*B[0]-S[0]*B[2];
-		torque[3*mask_id + 2] += S[0]*B[1]-S[1]*B[0];
+      torque[3*mask_id + 0] += S[1]*B[2]-S[2]*B[1];
+      torque[3*mask_id + 1] += S[2]*B[0]-S[0]*B[2];
+      torque[3*mask_id + 2] += S[0]*B[1]-S[1]*B[0];
 
-	}
+   }
 
    // Reduce on all CPUS
    #ifdef MPICF

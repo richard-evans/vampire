@@ -116,7 +116,7 @@ std::string binder_cumulant_statistic_t::output_binder_cumulant(bool header){
       res.precision(vout::precision);
       if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
-   vout::fixed_width_output result(res,vout::fw_size); 
+   vout::fixed_width_output result(res,vout::fw_size);
    if(!header){
 
    // determine inverse mean counter and its square

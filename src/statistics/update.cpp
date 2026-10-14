@@ -193,10 +193,10 @@ namespace stats{
    void update(){
 
       // call actual function, picking up arguments directly from namespace header files
-      stats::internal::update(atoms::x_spin_array, 				  		atoms::y_spin_array, 				    atoms::z_spin_array,
-   					            atoms::x_total_spin_field_array,     atoms::y_total_spin_field_array, 	 atoms::z_total_spin_field_array,
-   					            atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array,
-   					            atoms::m_spin_array, 					   atoms::type_array, 						 sim::temperature);
+      stats::internal::update(atoms::x_spin_array,                   atoms::y_spin_array,                 atoms::z_spin_array,
+                              atoms::x_total_spin_field_array,     atoms::y_total_spin_field_array,    atoms::z_total_spin_field_array,
+                              atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array,
+                              atoms::m_spin_array,                   atoms::type_array,                   sim::temperature);
 
       return;
 
