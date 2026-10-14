@@ -317,14 +317,17 @@ tests:
 	$(MAKE) -C developers/test/integration/
 	$(MAKE) -C developers/test/unit/
 
+# phony as vdc/ is also a directory name
+.PHONY: vdc vdc-debug vdc-purge
+
 vdc:
-	$(MAKE) -C util/vdc/
+	$(MAKE) -C vdc/
 
 vdc-debug:
-	$(MAKE) -C util/vdc/ gcc-debug
+	$(MAKE) -C vdc/ gcc-debug
 
 vdc-purge:
-	$(MAKE) -C util/vdc/ purge
+	$(MAKE) -C vdc/ purge
 
 install:
 	echo "Preparing installation package"
@@ -332,7 +335,7 @@ install:
 	mkdir vampire.pkg
 	mkdir vampire.pkg/bin
 	cp vampire-* vampire.pkg/bin/
-	cp util/vdc/vdc vampire.pkg/bin/
+	cp vdc/vdc vampire.pkg/bin/
 	mkdir vampire.pkg/examples
 	cp input vampire.pkg/examples/
 	cp Co.mat vampire.pkg/examples/

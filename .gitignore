@@ -78,7 +78,7 @@ mm_output
 vampire-serial
 vampire-parallel
 vampire*
-util/vdc/vdc
+vdc/vdc
 developers/test/integration/integration_tests
 developers/test/unit/unit_tests
 #----------------------------------------------
