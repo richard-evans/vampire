@@ -45,12 +45,19 @@ Run the compiled binary with an input file in the working directory:
 ## Testing
 
 ```bash
-# Run all tests
+# Run standard integration and unit tests (default, fast)
+./tests.sh
+
+# Run all tests, including extended (long running) integration tests
 ./tests.sh -a
 
-# Integration tests only
+# Standard integration tests only
 ./tests.sh -i
 # or: cd test/integration && make && ./integration_tests
+
+# Extended integration tests only (statistical tests against exact results, several seconds each)
+./tests.sh -e
+# or: ./integration_tests --extended   (--all runs standard and extended)
 
 # Unit tests only
 ./tests.sh -u
@@ -79,6 +86,7 @@ Key modules:
 | Module | Purpose |
 |--------|---------|
 | `main` | Entry point, command-line parsing (`--input-file`, `--output-file`, `--version`), calls `mp::initialise` |
+| `material` | Material container (`mp::materials_t`), `.mat` file reader, dispatch of material keywords to each module's `match_material_parameter`, core material keywords (damping, moment, name, etc.) |
 | `create` | Atomic structure generation: lattice types, nanoparticle shapes, Voronoi granular structures, multilayers |
 | `simulate` | Integrators (LLG-Heun, LLG-midpoint, Monte Carlo, CMC, LLB, LSF); dispatches to `program::` |
 | `program` | High-level simulation programs (benchmark, hysteresis, Curie temperature, HAMR, field sweep, etc.) |
@@ -110,7 +118,7 @@ Atom data lives in flat SoA (Structure-of-Arrays) vectors in the `atoms` namespa
 
 Simulation state is in the `sim` namespace (`hdr/sim.hpp`): integrator enum, program enum, `sim::time`, `sim::total_time`, `sim::partial_time`, temperature, field, etc.
 
-Material parameters are in the `mp` namespace (`src/main/initialise_variables.cpp`), loaded from `.mat` files.
+Material parameters are in the `mp` namespace (`hdr/material.hpp`), loaded from `.mat` files by the `material` module into `mp::read_material` and then copied to `mp::material`. Global initialisation and derived parameters (`mp::initialise`, `mp::set_derived_parameters`) remain in `src/main/initialise_variables.cpp`.
 
 ### Input Files
 
