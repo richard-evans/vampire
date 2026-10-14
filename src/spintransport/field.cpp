@@ -34,39 +34,39 @@ namespace spin_transport{
          //-------------------------------------------------------------------------
          // check that module is needed - if not do nothing
          //-------------------------------------------------------------------------
-         if( st::internal::enabled == false ) return;
+         if( spin_transport::internal::enabled == false ) return;
 
          //---------------------------------------------------------------------------
          // loop over all atoms and apply cell spin torque field
          //---------------------------------------------------------------------------
-         if(!st::internal::sublattice){
+         if(!spin_transport::internal::sublattice){
             for(unsigned int atom = start_index; atom < end_index; atom++){
 
                // get cell id
-               const uint64_t cell = st::internal::atom_in_cell[atom];
+               const uint64_t cell = spin_transport::internal::atom_in_cell[atom];
 
-               atoms_x_field_array[atom] += st::internal::cell_spin_torque_fields[3*cell+0];
-               atoms_y_field_array[atom] += st::internal::cell_spin_torque_fields[3*cell+1];
-               atoms_z_field_array[atom] += st::internal::cell_spin_torque_fields[3*cell+2];
+               atoms_x_field_array[atom] += spin_transport::internal::cell_spin_torque_fields[3*cell+0];
+               atoms_y_field_array[atom] += spin_transport::internal::cell_spin_torque_fields[3*cell+1];
+               atoms_z_field_array[atom] += spin_transport::internal::cell_spin_torque_fields[3*cell+2];
 
             }
          }
          else{
-            const int num_sublattices = st::internal::num_sublattices;
+            const int num_sublattices = spin_transport::internal::num_sublattices;
             for(unsigned int atom = start_index; atom < end_index; atom++){
 
                // get cell id
-               const uint64_t cell = st::internal::atom_in_cell[atom];
+               const uint64_t cell = spin_transport::internal::atom_in_cell[atom];
 
                // get sublattice of atom
-               const int sl = st::internal::atom_sublattice[atom];
+               const int sl = spin_transport::internal::atom_sublattice[atom];
 
                // flat index: sl is the fastest-varying index
                const int idx = (int)cell * num_sublattices + sl;
 
-               atoms_x_field_array[atom] += st::internal::cell_sl_spin_torque_fields_x[idx];
-               atoms_y_field_array[atom] += st::internal::cell_sl_spin_torque_fields_y[idx];
-               atoms_z_field_array[atom] += st::internal::cell_sl_spin_torque_fields_z[idx];
+               atoms_x_field_array[atom] += spin_transport::internal::cell_sl_spin_torque_fields_x[idx];
+               atoms_y_field_array[atom] += spin_transport::internal::cell_sl_spin_torque_fields_y[idx];
+               atoms_z_field_array[atom] += spin_transport::internal::cell_sl_spin_torque_fields_z[idx];
 
             }
          }

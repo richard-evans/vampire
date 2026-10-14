@@ -35,7 +35,7 @@ namespace spin_transport{
       //------------------------------------------------------------------------
       // If spin-transport parameter is requested, then enable module
       //------------------------------------------------------------------------
-      st::internal::enabled = true;
+      spin_transport::internal::enabled = true;
 
       //----------------------------------
       // Now test for all valid options
@@ -87,42 +87,42 @@ namespace spin_transport{
          test = "+x";
          if( value == test ){
           // set current along +x direction
-          st::internal::current_direction = st::internal::px;
+          spin_transport::internal::current_direction = spin_transport::internal::px;
           return true;
          }
          //-------------------------------------
          test = "-x";
          if( value == test ){
           // set current along -x direction
-          st::internal::current_direction = st::internal::mx;
+          spin_transport::internal::current_direction = spin_transport::internal::mx;
           return true;
          }
          //-------------------------------------
          test = "+y";
          if( value == test ){
           // set current along +y direction
-          st::internal::current_direction = st::internal::py;
+          spin_transport::internal::current_direction = spin_transport::internal::py;
           return true;
          }
          //-------------------------------------
          test = "-y";
          if( value == test ){
           // set current along -y direction
-          st::internal::current_direction = st::internal::my;
+          spin_transport::internal::current_direction = spin_transport::internal::my;
           return true;
          }
          //-------------------------------------
          test = "+z";
          if( value == test ){
           // set current along +z direction
-          st::internal::current_direction = st::internal::pz;
+          spin_transport::internal::current_direction = spin_transport::internal::pz;
           return true;
          }
          //-------------------------------------
          test = "-z";
          if( value == test ){
           // set current along -z direction
-          st::internal::current_direction = st::internal::mz;
+          spin_transport::internal::current_direction = spin_transport::internal::mz;
           return true;
          }
          //--------------------------------------------
@@ -169,9 +169,9 @@ namespace spin_transport{
           // Set resistivity for environment (cells with no atoms)
           uint64_t ur = vin::str_to_uint64(value);
           vin::check_for_valid_int(ur, word, line, prefix, 1,10000000,"input","1 - 1E7 time steps");
-          st::internal::update_rate = ur;
+          spin_transport::internal::update_rate = ur;
           // set time counter to ensure initial calculation at start
-          st::internal::time_counter = ur;
+          spin_transport::internal::time_counter = ur;
           return true;
       }
       //------------------------------------------------------------------------
@@ -179,7 +179,7 @@ namespace spin_transport{
       if( word == test ){
          bool tf = vin::check_for_valid_bool(value, word, line, prefix, "input");
           // set control flag for sublattice resolved (material specific) calculations
-          st::internal::sublattice = tf;
+          spin_transport::internal::sublattice = tf;
           return true;
       }
       // channel length
@@ -212,7 +212,7 @@ namespace spin_transport{
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
          vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 1.0e-20, 1.0e20,"input","1E-20 - 1E20 Ohm metres");
-         st::internal::mp[super_index].resistivity.set(rho * 1.0e10); // save resistivity and convert to Ohm Angstroms
+         spin_transport::internal::mp[super_index].resistivity.set(rho * 1.0e10); // save resistivity and convert to Ohm Angstroms
          return true;
       }
       //---------------------------------------------------------------------------
@@ -224,7 +224,7 @@ namespace spin_transport{
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
          vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 0.0, 1.0e20,"input","0.0 - 1E20 Ohm metres");
-         st::internal::mp[super_index].spin_resistivity.set(rho * 1.0e10); // save resistivity and convert to Ohm Angstroms
+         spin_transport::internal::mp[super_index].spin_resistivity.set(rho * 1.0e10); // save resistivity and convert to Ohm Angstroms
          return true;
       }
       //---------------------------------------------------------------------------
@@ -233,7 +233,7 @@ namespace spin_transport{
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
          vin::check_for_valid_bool(rho, word, line, prefix, unit, "resistivity", 1.0e-10, 1.0e12,"input","1E-10 - 1E12 Ohm metres");
-         st::internal::mp[super_index].tunnel_barrier = true;
+         spin_transport::internal::mp[super_index].tunnel_barrier = true;
          return true;
       }*/
       //------------------------------------------------------------
@@ -245,7 +245,7 @@ namespace spin_transport{
          double eta = atof(value.c_str());
          // Test for valid range
          vin::check_for_valid_value(eta, word, line, prefix, unit, "", -1.0, 1.0,"input","-1.0 - 1.0");
-         st::internal::mp[super_index].stt_rj.set(eta);
+         spin_transport::internal::mp[super_index].stt_rj.set(eta);
          return true;
       }
       //------------------------------------------------------------
@@ -257,7 +257,7 @@ namespace spin_transport{
          double beta = atof(value.c_str());
          // Test for valid range
          vin::check_for_valid_value(beta, word, line, prefix, unit, "", -1.0, 1.0,"input","-1.0 - 1.0");
-         st::internal::mp[super_index].stt_pj.set(beta);
+         spin_transport::internal::mp[super_index].stt_pj.set(beta);
          return true;
       }
       //------------------------------------------------------------
@@ -267,7 +267,7 @@ namespace spin_transport{
          int stsl = atoi(value.c_str());
          // Test for valid range
          vin::check_for_valid_int(stsl, word, line, prefix,1,100,"input","1 - 100");
-         st::internal::mp[super_index].stsl = stsl;
+         spin_transport::internal::mp[super_index].stsl = stsl;
          return true;
       }
       //--------------------------------------------------------------------

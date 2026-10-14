@@ -203,9 +203,4 @@ namespace spin_transport{
 
 } // end of spin_transport namespace
 
-//--------------------------------------------------------------------------------
-// Alias spin_transport to st namespace internal to module for code brevity
-//--------------------------------------------------------------------------------
-namespace st = spin_transport;
-
 #endif //SPINTRANSPORT_INTERNAL_H_

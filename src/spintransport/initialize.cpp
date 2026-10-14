@@ -91,7 +91,7 @@ namespace spin_transport{
       //-------------------------------------------------------------------------
       // check that module is needed - if not do nothing
       //-------------------------------------------------------------------------
-      if( st::internal::enabled == false ) return;
+      if( spin_transport::internal::enabled == false ) return;
 
       // Inform user that module is initializing
       zlog << zTs() << "Initializing spin transport module" << std::endl;
@@ -109,14 +109,14 @@ namespace spin_transport{
       int stack_z = 2;
 
       // calculate stack order based on current direction (always calculated along the stack-z direction)
-      if(st::internal::current_direction == st::internal::px ||
-         st::internal::current_direction == st::internal::mx){
+      if(spin_transport::internal::current_direction == spin_transport::internal::px ||
+         spin_transport::internal::current_direction == spin_transport::internal::mx){
          stack_x = 1; // y-direction
          stack_y = 2; // z-direction
          stack_z = 0; // x-direction
       }
-      if(st::internal::current_direction == st::internal::py ||
-         st::internal::current_direction == st::internal::my){
+      if(spin_transport::internal::current_direction == spin_transport::internal::py ||
+         spin_transport::internal::current_direction == spin_transport::internal::my){
          stack_x = 0; // x-direction
          stack_y = 2; // z-direction
          stack_z = 1; // y-direction
@@ -133,7 +133,7 @@ namespace spin_transport{
       // Calculate cell-specific data
       //---------------------------------------------------------------------------------
 
-      if(st::internal::sublattice) internal::initialise_sublattice_cell_data(num_atoms, num_materials, atoms_type_array, atoms_m_spin_array,
+      if(spin_transport::internal::sublattice) internal::initialise_sublattice_cell_data(num_atoms, num_materials, atoms_type_array, atoms_m_spin_array,
                                                                              material_damping_array, is_magnetic_material, non_magnetic_atoms_array,
                                                                              cells3D, stack_x, stack_y, stack_z);
       else internal::initialise_cell_data(atoms_type_array, atoms_m_spin_array, material_damping_array, is_magnetic_material, non_magnetic_atoms_array,
@@ -148,18 +148,18 @@ namespace spin_transport{
       //---------------------------------------------------------------------------------
       // Output cell data to file on rank0 and only if not sublattice calculation
       //---------------------------------------------------------------------------------
-      if( vmpi::my_rank == 0 && !st::internal::sublattice){
+      if( vmpi::my_rank == 0 && !spin_transport::internal::sublattice){
          std::ofstream ofile("spin_transport_cell_data.txt");
-         for(uint64_t i =0; i< st::internal::total_num_cells; i++){
-            ofile << st::internal::cell_position[3*i+0] << "\t" <<
-                     st::internal::cell_position[3*i+1] << "\t" <<
-                     st::internal::cell_position[3*i+2] << "\t" <<
-                     st::internal::cell_magnetization[3*i+0] << "\t" <<
-                     st::internal::cell_magnetization[3*i+1] << "\t" <<
-                     st::internal::cell_magnetization[3*i+2] << "\t" <<
-                     st::internal::cell_alpha[i] << "\t" <<
-                     st::internal::cell_resistance[i] << "\t" <<
-                     st::internal::cell_spin_resistance[i] << std::endl;
+         for(uint64_t i =0; i< spin_transport::internal::total_num_cells; i++){
+            ofile << spin_transport::internal::cell_position[3*i+0] << "\t" <<
+                     spin_transport::internal::cell_position[3*i+1] << "\t" <<
+                     spin_transport::internal::cell_position[3*i+2] << "\t" <<
+                     spin_transport::internal::cell_magnetization[3*i+0] << "\t" <<
+                     spin_transport::internal::cell_magnetization[3*i+1] << "\t" <<
+                     spin_transport::internal::cell_magnetization[3*i+2] << "\t" <<
+                     spin_transport::internal::cell_alpha[i] << "\t" <<
+                     spin_transport::internal::cell_resistance[i] << "\t" <<
+                     spin_transport::internal::cell_spin_resistance[i] << std::endl;
          }
          ofile.close();
       }
@@ -167,27 +167,27 @@ namespace spin_transport{
       //---------------------------------------------------------------------------------
       // Output cell data to file on rank0 and only if sublattice calculation
       //---------------------------------------------------------------------------------
-      if( vmpi::my_rank == 0 && st::internal::sublattice){
-         const int num_sublattices = st::internal::num_sublattices;
+      if( vmpi::my_rank == 0 && spin_transport::internal::sublattice){
+         const int num_sublattices = spin_transport::internal::num_sublattices;
          std::ofstream ofile("spin_transport_cell_data.txt");
-         for(uint64_t i =0; i< st::internal::total_num_cells; i++){
-            ofile << st::internal::cell_position[3*i+0] << "\t" <<
-                     st::internal::cell_position[3*i+1] << "\t" <<
-                     st::internal::cell_position[3*i+2] << "\t" <<
-                     st::internal::cell_resistance[i] << "\t";
+         for(uint64_t i =0; i< spin_transport::internal::total_num_cells; i++){
+            ofile << spin_transport::internal::cell_position[3*i+0] << "\t" <<
+                     spin_transport::internal::cell_position[3*i+1] << "\t" <<
+                     spin_transport::internal::cell_position[3*i+2] << "\t" <<
+                     spin_transport::internal::cell_resistance[i] << "\t";
 
                      for( int sl = 0; sl < num_sublattices; sl++ ){
 
                         // flat index: sl is the fastest-varying index
                         const int idx = int(i * num_sublattices + sl);
 
-                        const double isat = st::internal::cell_sl_isaturation[idx];
-                        double mix = st::internal::cell_sl_magnetization_x[idx] * isat;
-                        double miy = st::internal::cell_sl_magnetization_y[idx] * isat;
-                        double miz = st::internal::cell_sl_magnetization_z[idx] * isat;
-                        ofile << mix << "\t" << miy << "\t" << miz << "\t" << st::internal::cell_sl_alpha[idx] << "\t" <<
-                                                                              st::internal::cell_sl_resistance[idx] << "\t" <<
-                                                                              st::internal::cell_sl_spin_resistance[idx] << "\t";
+                        const double isat = spin_transport::internal::cell_sl_isaturation[idx];
+                        double mix = spin_transport::internal::cell_sl_magnetization_x[idx] * isat;
+                        double miy = spin_transport::internal::cell_sl_magnetization_y[idx] * isat;
+                        double miz = spin_transport::internal::cell_sl_magnetization_z[idx] * isat;
+                        ofile << mix << "\t" << miy << "\t" << miz << "\t" << spin_transport::internal::cell_sl_alpha[idx] << "\t" <<
+                                                                              spin_transport::internal::cell_sl_resistance[idx] << "\t" <<
+                                                                              spin_transport::internal::cell_sl_spin_resistance[idx] << "\t";
                      }
                      ofile << std::endl;
          }
@@ -243,9 +243,9 @@ namespace spin_transport{
          //-------------------------------------------------------------------------
 
          // copy cell sizes to local variable to enable arbitrary current direction
-         const double cell_size[3] = { st::internal::cell_size_x,
-                                       st::internal::cell_size_y,
-                                       st::internal::cell_size_z };
+         const double cell_size[3] = { spin_transport::internal::cell_size_x,
+                                       spin_transport::internal::cell_size_y,
+                                       spin_transport::internal::cell_size_z };
 
          // calculate number of cells in each direction x,y,z (rounding up)
          const int num_cells[3] = { static_cast<int>( ceil(system_size_x/cell_size[0]) ),
@@ -289,7 +289,7 @@ namespace spin_transport{
          //---------------------------------------------------------------------------------
 
          // resize array to store which cell each atom is in
-         st::internal::atom_in_cell.resize(num_atoms);
+         spin_transport::internal::atom_in_cell.resize(num_atoms);
 
          for(uint64_t atom = 0; atom < num_atoms; atom++){
 
@@ -309,7 +309,7 @@ namespace spin_transport{
             const uint64_t k = cellID[stack_z];
 
             // associate atom with stack cell ID
-            st::internal::atom_in_cell[atom] = cells3D[i][j][k].id;
+            spin_transport::internal::atom_in_cell[atom] = cells3D[i][j][k].id;
 
             // add atom to atoms in cell list
             cells3D[i][j][k].atom.push_back(atom);
@@ -345,45 +345,45 @@ namespace spin_transport{
          //---------------------------------------------------------------------------------
 
          // calculate number of stacks (x*y)
-         st::internal::num_stacks = num_cells[stack_x]*num_cells[stack_y];
+         spin_transport::internal::num_stacks = num_cells[stack_x]*num_cells[stack_y];
          const uint64_t num_cells_in_stack = num_cells[stack_z]; // save number of cells in stack along current direction
 
          // resize limits for each stack
-         st::internal::stack_start_index.resize(st::internal::num_stacks);
-         st::internal::stack_final_index.resize(st::internal::num_stacks);
-         st::internal::stack_resistance.resize(st::internal::num_stacks, 0.0); // total resistance in each stack
-         st::internal::stack_current.resize(st::internal::num_stacks, 0.0);    // total current in each stack
+         spin_transport::internal::stack_start_index.resize(spin_transport::internal::num_stacks);
+         spin_transport::internal::stack_final_index.resize(spin_transport::internal::num_stacks);
+         spin_transport::internal::stack_resistance.resize(spin_transport::internal::num_stacks, 0.0); // total resistance in each stack
+         spin_transport::internal::stack_current.resize(spin_transport::internal::num_stacks, 0.0);    // total current in each stack
 
          // determine initial start and end cell of each stack
-         for(uint64_t s = 0; s < st::internal::num_stacks; s++){
-            st::internal::stack_start_index[s] = s*num_cells_in_stack;
-            st::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack - 1; // loop to less than or equal to this number
+         for(uint64_t s = 0; s < spin_transport::internal::num_stacks; s++){
+            spin_transport::internal::stack_start_index[s] = s*num_cells_in_stack;
+            spin_transport::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack - 1; // loop to less than or equal to this number
          }
 
          //---------------------------------------------------------------------------------
          // set up current direction for increment
          //---------------------------------------------------------------------------------
-         if(st::internal::current_direction == st::internal::px ||
-            st::internal::current_direction == st::internal::py ||
-            st::internal::current_direction == st::internal::pz){
+         if(spin_transport::internal::current_direction == spin_transport::internal::px ||
+            spin_transport::internal::current_direction == spin_transport::internal::py ||
+            spin_transport::internal::current_direction == spin_transport::internal::pz){
             // positive loop for the current
-            st::internal::cell_increment = +1;
+            spin_transport::internal::cell_increment = +1;
          }
          else{
             // negative loop for the current
-            st::internal::cell_increment = -1;
+            spin_transport::internal::cell_increment = -1;
             // loop over stacks and swap start and end cell IDs
-            for(uint64_t s = 0; s < st::internal::num_stacks; s++){
-               int ssi = st::internal::stack_start_index[s];
-               int sfi = st::internal::stack_final_index[s];
-               st::internal::stack_start_index[s] = sfi;
-               st::internal::stack_final_index[s] = ssi;
+            for(uint64_t s = 0; s < spin_transport::internal::num_stacks; s++){
+               int ssi = spin_transport::internal::stack_start_index[s];
+               int sfi = spin_transport::internal::stack_final_index[s];
+               spin_transport::internal::stack_start_index[s] = sfi;
+               spin_transport::internal::stack_final_index[s] = ssi;
             }
 
          }
 
          // calculate total number of cells
-         st::internal::total_num_cells = num_cells[0]*num_cells[1]*num_cells[2];
+         spin_transport::internal::total_num_cells = num_cells[0]*num_cells[1]*num_cells[2];
 
          return cells3D;
 
@@ -404,32 +404,32 @@ namespace spin_transport{
       ){
 
          // copy cell sizes to local variable
-         const double cell_size[3] = { st::internal::cell_size_x,
-                                       st::internal::cell_size_y,
-                                       st::internal::cell_size_z };
+         const double cell_size[3] = { spin_transport::internal::cell_size_x,
+                                       spin_transport::internal::cell_size_y,
+                                       spin_transport::internal::cell_size_z };
 
          // resize boolean array to determine if cell is magnetic or not
-         st::internal::magnetic.resize(st::internal::total_num_cells, true); // initially assume all cells magnetic
+         spin_transport::internal::magnetic.resize(spin_transport::internal::total_num_cells, true); // initially assume all cells magnetic
 
          // resize arrays to store average resistance in each cell
-         st::internal::cell_resistance.resize(st::internal::total_num_cells,0.0); // also stores accumulated resistance before averaging
-         st::internal::cell_spin_resistance.resize(st::internal::total_num_cells,0.0); // also stores accumulated spin resistance before averaging
+         spin_transport::internal::cell_resistance.resize(spin_transport::internal::total_num_cells,0.0); // also stores accumulated resistance before averaging
+         spin_transport::internal::cell_spin_resistance.resize(spin_transport::internal::total_num_cells,0.0); // also stores accumulated spin resistance before averaging
 
          // resize array to store average damping constant alpha in each cell
-         st::internal::cell_alpha.resize(st::internal::total_num_cells,0.0); // also stores accumulated resistance before averaging
+         spin_transport::internal::cell_alpha.resize(spin_transport::internal::total_num_cells,0.0); // also stores accumulated resistance before averaging
 
          // resize array to store inverse total moment m_s (T = 0)
-         st::internal::cell_isaturation.resize(st::internal::total_num_cells,1.0); // also stores accumulated moment before inversion
+         spin_transport::internal::cell_isaturation.resize(spin_transport::internal::total_num_cells,1.0); // also stores accumulated moment before inversion
 
          // resize arrays to store slonczewski prefactors
-         st::internal::cell_relaxation_torque_rj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
-         st::internal::cell_precession_torque_pj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
+         spin_transport::internal::cell_relaxation_torque_rj.resize(spin_transport::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
+         spin_transport::internal::cell_precession_torque_pj.resize(spin_transport::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
 
          // Temporary arrays to accumulate intermediate values
-         std::vector<uint64_t> total_num_atoms_in_cell(    st::internal::total_num_cells, 0  ); // array to store total number of magnetic and non-magnetic atoms in cell
-         std::vector<double>   total_num_magnetic_atoms(   st::internal::total_num_cells, 0  ); // array to store total number of actually magnetic atoms (ignoring nm = keep atoms) [double format for easy normalisation]
-         std::vector<double>   total_resistivity_sq(       st::internal::total_num_cells, 0.0); // array to store total resistivity^2 calculated from constituent atoms
-         std::vector<double>   total_spin_resistivity_sq(  st::internal::total_num_cells, 0.0); // array to store total spin resistivity^2 calculated from constituent atoms
+         std::vector<uint64_t> total_num_atoms_in_cell(    spin_transport::internal::total_num_cells, 0  ); // array to store total number of magnetic and non-magnetic atoms in cell
+         std::vector<double>   total_num_magnetic_atoms(   spin_transport::internal::total_num_cells, 0  ); // array to store total number of actually magnetic atoms (ignoring nm = keep atoms) [double format for easy normalisation]
+         std::vector<double>   total_resistivity_sq(       spin_transport::internal::total_num_cells, 0.0); // array to store total resistivity^2 calculated from constituent atoms
+         std::vector<double>   total_spin_resistivity_sq(  spin_transport::internal::total_num_cells, 0.0); // array to store total spin resistivity^2 calculated from constituent atoms
 
          // loop over all xy-cells (stacks)
          for(unsigned int i = 0; i < cells3D.size(); i++){
@@ -476,10 +476,10 @@ namespace spin_transport{
                      int mat = atoms_type_array[atomID]; // get material type
 
                      // add resistivities
-                     resistivity += st::internal::mp[mat].resistivity.get(); // add resistivity to total
-                     resistivity_sq += st::internal::mp[mat].resistivity.get() * st::internal::mp[mat].resistivity.get(); // add resistivity^2 to total
-                     spin_resistivity += st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity to total
-                     spin_resistivity_sq += st::internal::mp[mat].spin_resistivity.get() * st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity^2 to total
+                     resistivity += spin_transport::internal::mp[mat].resistivity.get(); // add resistivity to total
+                     resistivity_sq += spin_transport::internal::mp[mat].resistivity.get() * spin_transport::internal::mp[mat].resistivity.get(); // add resistivity^2 to total
+                     spin_resistivity += spin_transport::internal::mp[mat].spin_resistivity.get(); // add spin resistivity to total
+                     spin_resistivity_sq += spin_transport::internal::mp[mat].spin_resistivity.get() * spin_transport::internal::mp[mat].spin_resistivity.get(); // add spin resistivity^2 to total
 
                      // check that atom is magnetic
                      if(is_magnetic_material[mat] == true){
@@ -492,8 +492,8 @@ namespace spin_transport{
                         total_alpha  += material_damping_array[mat];
 
                         // calculate total prefactor parameters
-                        total_rj += st::internal::mp[mat].stt_rj.get();
-                        total_pj += st::internal::mp[mat].stt_pj.get();
+                        total_rj += spin_transport::internal::mp[mat].stt_rj.get();
+                        total_pj += spin_transport::internal::mp[mat].stt_pj.get();
 
                      }
 
@@ -502,19 +502,19 @@ namespace spin_transport{
                   // non-magnetic (remove) atoms
                   for(unsigned int atom = 0; atom < cells3D[i][j][k].nm_atom.size(); atom++ ){
                      int mat = non_magnetic_atoms_array[atom].mat; // get material type
-                     resistivity += st::internal::mp[mat].resistivity.get(); // add resistivity to total
-                     resistivity_sq += st::internal::mp[mat].resistivity.get() * st::internal::mp[mat].resistivity.get(); // add resistivity^2 to total
-                     spin_resistivity += st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity to total
-                     spin_resistivity_sq += st::internal::mp[mat].spin_resistivity.get() * st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity^2 to total
+                     resistivity += spin_transport::internal::mp[mat].resistivity.get(); // add resistivity to total
+                     resistivity_sq += spin_transport::internal::mp[mat].resistivity.get() * spin_transport::internal::mp[mat].resistivity.get(); // add resistivity^2 to total
+                     spin_resistivity += spin_transport::internal::mp[mat].spin_resistivity.get(); // add spin resistivity to total
+                     spin_resistivity_sq += spin_transport::internal::mp[mat].spin_resistivity.get() * spin_transport::internal::mp[mat].spin_resistivity.get(); // add spin resistivity^2 to total
                   }
 
                   // save accumulated values
-                  st::internal::cell_resistance[cell] = resistivity;
-                  st::internal::cell_spin_resistance[cell] = spin_resistivity;
-                  st::internal::cell_relaxation_torque_rj[cell] = total_rj;
-                  st::internal::cell_precession_torque_pj[cell] = total_pj;
-                  st::internal::cell_isaturation[cell] = total_moment; // (mu_B)
-                  st::internal::cell_alpha[cell] = total_alpha; // total damping
+                  spin_transport::internal::cell_resistance[cell] = resistivity;
+                  spin_transport::internal::cell_spin_resistance[cell] = spin_resistivity;
+                  spin_transport::internal::cell_relaxation_torque_rj[cell] = total_rj;
+                  spin_transport::internal::cell_precession_torque_pj[cell] = total_pj;
+                  spin_transport::internal::cell_isaturation[cell] = total_moment; // (mu_B)
+                  spin_transport::internal::cell_alpha[cell] = total_alpha; // total damping
 
                   total_num_atoms_in_cell[cell]    = num_atoms_in_cell;    // store total number of magnetic and non-magnetic atoms in cell
                   total_num_magnetic_atoms[cell]   = num_magnetic_atoms;   // store total number of magnetic atoms in cell in double format for normalisation
@@ -530,14 +530,14 @@ namespace spin_transport{
          //-----------------------------------------------------------------------------------------------
          #ifdef MPICF
             // cast to int for MPI
-            int bufsize = st::internal::total_num_cells;
+            int bufsize = spin_transport::internal::total_num_cells;
             // reduce all cell totals onto all processors
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_resistance[0],             bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_resistance[0],        bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_relaxation_torque_rj[0],   bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_precession_torque_pj[0],   bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_isaturation[0],            bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_alpha[0],                  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_resistance[0],             bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_spin_resistance[0],        bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_relaxation_torque_rj[0],   bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_precession_torque_pj[0],   bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_isaturation[0],            bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_alpha[0],                  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(MPI_IN_PLACE, &total_num_magnetic_atoms[0],                  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(MPI_IN_PLACE, &total_num_atoms_in_cell[0],                   bufsize, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(MPI_IN_PLACE, &total_resistivity_sq[0],                      bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
@@ -570,47 +570,47 @@ namespace spin_transport{
 
                   // if cell is empty space assume uniform padding resistance
                   if(num_atoms_in_cell == 0){
-                     st::internal::cell_resistance[cell]      = st::internal::environment_resistivity * l * iA;
-                     st::internal::cell_spin_resistance[cell] = st::internal::environment_resistivity * l * iA;
-                     st::internal::cell_isaturation[cell] = 0.0; // set inverse saturation to 0.0
-                     st::internal::magnetic[cell] = false; // set cell as non-magnetic
+                     spin_transport::internal::cell_resistance[cell]      = spin_transport::internal::environment_resistivity * l * iA;
+                     spin_transport::internal::cell_spin_resistance[cell] = spin_transport::internal::environment_resistivity * l * iA;
+                     spin_transport::internal::cell_isaturation[cell] = 0.0; // set inverse saturation to 0.0
+                     spin_transport::internal::magnetic[cell] = false; // set cell as non-magnetic
                   }
                   // otherwise add contributions from atoms to calculate average resistivity
                   else{
 
                      // check for empty cells or cells with only non-magnetic atoms (keep) and if so treat as non-magnetic
                      if(total_num_magnetic_atoms[cell] < 0.1){
-                         st::internal::magnetic[cell] = false; // no magnetic atoms -> non-magnetic cell
-                         st::internal::cell_isaturation[cell] = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
+                         spin_transport::internal::magnetic[cell] = false; // no magnetic atoms -> non-magnetic cell
+                         spin_transport::internal::cell_isaturation[cell] = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
                      }
                      else{
                         // calculate mean spin torque prefactor parameters for magnetic cells
                         const double count = total_num_magnetic_atoms[cell]; // number of magnetic atoms in cell
-                        //const double total_moment = st::internal::cell_isaturation[cell]; // total magnetic moment
-                        //st::internal::cell_relaxation_torque_rj[cell] = st::internal::cell_relaxation_torque_rj[cell] * one_o_gamma_e / (count * total_moment);
-                        st::internal::cell_relaxation_torque_rj[cell] = st::internal::cell_relaxation_torque_rj[cell] / count ;
-                        //st::internal::cell_precession_torque_pj[cell] = st::internal::cell_precession_torque_pj[cell] * one_o_gamma_e / (count * total_moment);
-                        st::internal::cell_precession_torque_pj[cell] = st::internal::cell_precession_torque_pj[cell] / count;
-                        st::internal::cell_alpha[cell] = st::internal::cell_alpha[cell] / count;
+                        //const double total_moment = spin_transport::internal::cell_isaturation[cell]; // total magnetic moment
+                        //spin_transport::internal::cell_relaxation_torque_rj[cell] = spin_transport::internal::cell_relaxation_torque_rj[cell] * one_o_gamma_e / (count * total_moment);
+                        spin_transport::internal::cell_relaxation_torque_rj[cell] = spin_transport::internal::cell_relaxation_torque_rj[cell] / count ;
+                        //spin_transport::internal::cell_precession_torque_pj[cell] = spin_transport::internal::cell_precession_torque_pj[cell] * one_o_gamma_e / (count * total_moment);
+                        spin_transport::internal::cell_precession_torque_pj[cell] = spin_transport::internal::cell_precession_torque_pj[cell] / count;
+                        spin_transport::internal::cell_alpha[cell] = spin_transport::internal::cell_alpha[cell] / count;
                      }
 
                      // calculate average resistivity
                      double mean_resistivity = 0.0; // variable to store mean resistivity in cell
                      double mean_spin_resistivity = 0.0; // variable to store mean spin resistivity in cell
                      // if resistance is non-zero, work out average
-                     if( st::internal::cell_resistance[cell]      > 0.0 ) mean_resistivity      = total_resistivity_sq[cell]      / st::internal::cell_resistance[cell];
-                     if( st::internal::cell_spin_resistance[cell] > 0.0 ) mean_spin_resistivity = total_spin_resistivity_sq[cell] / st::internal::cell_spin_resistance[cell];
+                     if( spin_transport::internal::cell_resistance[cell]      > 0.0 ) mean_resistivity      = total_resistivity_sq[cell]      / spin_transport::internal::cell_resistance[cell];
+                     if( spin_transport::internal::cell_spin_resistance[cell] > 0.0 ) mean_spin_resistivity = total_spin_resistivity_sq[cell] / spin_transport::internal::cell_spin_resistance[cell];
 
                      // set cell resistance
-                     st::internal::cell_resistance[cell]      = mean_resistivity * l * iA;
-                     st::internal::cell_spin_resistance[cell] = mean_spin_resistivity * l * iA;
+                     spin_transport::internal::cell_resistance[cell]      = mean_resistivity * l * iA;
+                     spin_transport::internal::cell_spin_resistance[cell] = mean_spin_resistivity * l * iA;
 
                      // set inverse total moment
-                     st::internal::cell_isaturation[cell] = 1.0/st::internal::cell_isaturation[cell]; // (1/mu_B)
+                     spin_transport::internal::cell_isaturation[cell] = 1.0/spin_transport::internal::cell_isaturation[cell]; // (1/mu_B)
 
                      // set inverse saturation of non-magnetic cells to zero
                      if(total_num_magnetic_atoms[cell] < 0.1){
-                         st::internal::cell_isaturation[cell] = 0.0;
+                         spin_transport::internal::cell_isaturation[cell] = 0.0;
                      }
 
                   }
@@ -622,7 +622,7 @@ namespace spin_transport{
          //------------------------------------------------------------------------
          // Calculate cell data
          //------------------------------------------------------------------------
-         st::internal::cell_position.resize(3*st::internal::total_num_cells);
+         spin_transport::internal::cell_position.resize(3*spin_transport::internal::total_num_cells);
 
          // convert to system coordinate system
          // translation from system coordinates to cell coordinates
@@ -665,9 +665,9 @@ namespace spin_transport{
                   const double y = double(xyz[istack[1]]) * cell_size[1];
                   const double z = double(xyz[istack[2]]) * cell_size[2];
 
-                  st::internal::cell_position[3*cell+0] = x;
-                  st::internal::cell_position[3*cell+1] = y;
-                  st::internal::cell_position[3*cell+2] = z;
+                  spin_transport::internal::cell_position[3*cell+0] = x;
+                  spin_transport::internal::cell_position[3*cell+1] = y;
+                  spin_transport::internal::cell_position[3*cell+2] = z;
 
                }
             }
@@ -676,8 +676,8 @@ namespace spin_transport{
          //------------------------------------------------------------------------
          // resize cell vector data arrays (3N) and set to zero
          //------------------------------------------------------------------------
-         st::internal::cell_magnetization.resize(3*st::internal::total_num_cells, 0.0);
-         st::internal::cell_spin_torque_fields.resize(3*st::internal::total_num_cells, 0.0);
+         spin_transport::internal::cell_magnetization.resize(3*spin_transport::internal::total_num_cells, 0.0);
+         spin_transport::internal::cell_spin_torque_fields.resize(3*spin_transport::internal::total_num_cells, 0.0);
 
          return;
 
@@ -689,16 +689,16 @@ namespace spin_transport{
       void determine_stack_order(){
 
          #ifdef MPICF
-            const unsigned int num_local_stacks = st::internal::num_stacks / vmpi::num_processors;
+            const unsigned int num_local_stacks = spin_transport::internal::num_stacks / vmpi::num_processors;
             spin_transport::internal::first_stack = vmpi::my_rank * num_local_stacks;
             spin_transport::internal::last_stack = (vmpi::my_rank+1) * num_local_stacks;
             // add all surplus points to last processor
             if( vmpi::my_rank == vmpi::num_processors - 1){
-               spin_transport::internal::last_stack = st::internal::num_stacks;
+               spin_transport::internal::last_stack = spin_transport::internal::num_stacks;
             }
             // check for more processors than stacks, if so allocate one stack per processor
-            if( st::internal::num_stacks < static_cast<unsigned int>(vmpi::num_processors) ){
-               if( static_cast<unsigned int>(vmpi::my_rank) < st::internal::num_stacks){
+            if( spin_transport::internal::num_stacks < static_cast<unsigned int>(vmpi::num_processors) ){
+               if( static_cast<unsigned int>(vmpi::my_rank) < spin_transport::internal::num_stacks){
                   spin_transport::internal::first_stack = vmpi::my_rank;
                   spin_transport::internal::last_stack  = vmpi::my_rank + 1;
                }
@@ -714,7 +714,7 @@ namespace spin_transport{
          #else
             // for serial exectuation always compute all stacks
             spin_transport::internal::first_stack = 0;
-            spin_transport::internal::last_stack  = st::internal::num_stacks;
+            spin_transport::internal::last_stack  = spin_transport::internal::num_stacks;
          #endif
 
          return;

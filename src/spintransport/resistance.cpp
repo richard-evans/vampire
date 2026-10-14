@@ -36,19 +36,19 @@ void calculate_magnetoresistance(){
    // Zero spin torque arrray for parallel version to allow reduction
    //---------------------------------------------------------------------------------------------------------
    #ifdef MPICF
-      std::fill(st::internal::cell_spin_torque_fields.begin(), st::internal::cell_spin_torque_fields.end(), 0.0);
-      //std::fill(st::internal::stack_resistance.begin(), st::internal::stack_resistance.end(), 0.0); // needed for data output only
-      //std::fill(st::internal::stack_current.begin(),    st::internal::stack_current.end(),    0.0);
+      std::fill(spin_transport::internal::cell_spin_torque_fields.begin(), spin_transport::internal::cell_spin_torque_fields.end(), 0.0);
+      //std::fill(spin_transport::internal::stack_resistance.begin(), spin_transport::internal::stack_resistance.end(), 0.0); // needed for data output only
+      //std::fill(spin_transport::internal::stack_current.begin(),    spin_transport::internal::stack_current.end(),    0.0);
    #endif
 
    //---------------------------------------------------------------------------------------------------------
    // loop over all stacks to calculate stack resistance (parallelised for MPI)
    //---------------------------------------------------------------------------------------------------------
-   for(uint64_t stack = st::internal::first_stack; stack < st::internal::last_stack; stack++){
+   for(uint64_t stack = spin_transport::internal::first_stack; stack < spin_transport::internal::last_stack; stack++){
 
       const unsigned int start = stack_start_index[stack];
       const unsigned int end   = stack_final_index[stack];
-      const double isat = st::internal::cell_isaturation[start]; // saturation magnetization for cell i
+      const double isat = spin_transport::internal::cell_isaturation[start]; // saturation magnetization for cell i
 
       // hbar / ( 2 e mu_B) = 1.054571817e-34 /(2.0 * 1.602176634e-19 * 9.2740100657e-24) = 35486911.9121
       const double hbar_o_2emuB = 35486911.9121;
@@ -56,37 +56,37 @@ void calculate_magnetoresistance(){
       double total_stack_resistance = 0.0;
 
       // load first cell reduced magnetization
-      double mix = st::internal::cell_magnetization[3*start+0] * isat;
-      double miy = st::internal::cell_magnetization[3*start+1] * isat;
-      double miz = st::internal::cell_magnetization[3*start+2] * isat;
+      double mix = spin_transport::internal::cell_magnetization[3*start+0] * isat;
+      double miy = spin_transport::internal::cell_magnetization[3*start+1] * isat;
+      double miz = spin_transport::internal::cell_magnetization[3*start+2] * isat;
 
       // load first cell resistances for P and AP states
-      double Rep = st::internal::cell_resistance[start];      // electron-phonon scattering resistance
-      double Rsp = st::internal::cell_spin_resistance[start]; // electron-spin scattering resistance
+      double Rep = spin_transport::internal::cell_resistance[start];      // electron-phonon scattering resistance
+      double Rsp = spin_transport::internal::cell_spin_resistance[start]; // electron-spin scattering resistance
 
       //------------------------------------------------------------------------------------------------------
       // loop over all other cells in stack starting at cell start+1
       //------------------------------------------------------------------------------------------------------
       //for(unsigned int cell = start+1 ; cell < end ; cell++){
-      const int cell_inc = st::internal::cell_increment;
+      const int cell_inc = spin_transport::internal::cell_increment;
       // slightly unsafe loop structure, but designed for allowing forward and backward loops starting one after the first cell
       for(unsigned int cell = start + cell_inc ; cell != end + cell_inc ; cell += cell_inc){
 
-         if(st::internal::magnetic[cell]){
+         if(spin_transport::internal::magnetic[cell]){
             // calculate next cell reduced magnetization
-            const double jsat = st::internal::cell_isaturation[cell];
-            const double mjx = st::internal::cell_magnetization[3*cell+0] * jsat;
-            const double mjy = st::internal::cell_magnetization[3*cell+1] * jsat;
-            const double mjz = st::internal::cell_magnetization[3*cell+2] * jsat;
-            const double alpha = st::internal::cell_alpha[cell];
+            const double jsat = spin_transport::internal::cell_isaturation[cell];
+            const double mjx = spin_transport::internal::cell_magnetization[3*cell+0] * jsat;
+            const double mjy = spin_transport::internal::cell_magnetization[3*cell+1] * jsat;
+            const double mjz = spin_transport::internal::cell_magnetization[3*cell+2] * jsat;
+            const double alpha = spin_transport::internal::cell_alpha[cell];
             const double mi_dot_mj = ( mix*mjx + miy*mjy + miz*mjz );
 
             // calculate resistance (need to include T dependence of Rep here)
             total_stack_resistance += Rep + 0.5*Rsp*(1.0 - mi_dot_mj);
 
             // calculate relavtive contributions of adiabatic and non-adiabatic spin torque
-            const double strj = st::internal::cell_relaxation_torque_rj[cell];
-            const double stpj = st::internal::cell_precession_torque_pj[cell];
+            const double strj = spin_transport::internal::cell_relaxation_torque_rj[cell];
+            const double stpj = spin_transport::internal::cell_precession_torque_pj[cell];
 
             // calculate field without current based on relative magnetization orientations
             const double hx = (strj-alpha*stpj)*(mjy*miz - mjz*miy) + (stpj+alpha*strj)*mix;
@@ -94,24 +94,24 @@ void calculate_magnetoresistance(){
             const double hz = (strj-alpha*stpj)*(mjx*miy - mjy*mix) + (stpj+alpha*strj)*miz;
 
             // save field (without current factor)
-            st::internal::cell_spin_torque_fields[3*cell+0] = hx * jsat * hbar_o_2emuB; // multiply by inverse moment
-            st::internal::cell_spin_torque_fields[3*cell+1] = hy * jsat * hbar_o_2emuB;
-            st::internal::cell_spin_torque_fields[3*cell+2] = hz * jsat * hbar_o_2emuB;
+            spin_transport::internal::cell_spin_torque_fields[3*cell+0] = hx * jsat * hbar_o_2emuB; // multiply by inverse moment
+            spin_transport::internal::cell_spin_torque_fields[3*cell+1] = hy * jsat * hbar_o_2emuB;
+            spin_transport::internal::cell_spin_torque_fields[3*cell+2] = hz * jsat * hbar_o_2emuB;
 
             // update cell resistances and magnetization
             mix = mjx;
             miy = mjy;
             miz = mjz;
 
-            Rep = st::internal::cell_resistance[cell];
-            Rsp = st::internal::cell_spin_resistance[cell];
+            Rep = spin_transport::internal::cell_resistance[cell];
+            Rsp = spin_transport::internal::cell_spin_resistance[cell];
 
          }
          else{
 
             // update cell resistances and defer spin resistance to later by accumulating
-            Rep += st::internal::cell_resistance[cell];
-            Rsp += st::internal::cell_spin_resistance[cell]; // The += is significant!
+            Rep += spin_transport::internal::cell_resistance[cell];
+            Rsp += spin_transport::internal::cell_spin_resistance[cell]; // The += is significant!
 
          }
 
@@ -128,7 +128,7 @@ void calculate_magnetoresistance(){
       //-----------------------------------------------------
       // Compute stack current
       //-----------------------------------------------------
-      const double I = st::internal::voltage * program::fractional_electric_field_strength / total_stack_resistance;
+      const double I = spin_transport::internal::voltage * program::fractional_electric_field_strength / total_stack_resistance;
 
       //---------------------------------------------------------
       // Compute cell spin torque fields based on stack currents
@@ -139,16 +139,16 @@ void calculate_magnetoresistance(){
       // loop over all other cells in stack
       // slightly unsafe loop structure, but designed for allowing forward and backward loops starting one after the first cell
       for(unsigned int cell = start + cell_inc ; cell != end + cell_inc ; cell += cell_inc){
-         st::internal::cell_spin_torque_fields[3*cell+0] *= I;
-         st::internal::cell_spin_torque_fields[3*cell+1] *= I;
-         st::internal::cell_spin_torque_fields[3*cell+2] *= I;
+         spin_transport::internal::cell_spin_torque_fields[3*cell+0] *= I;
+         spin_transport::internal::cell_spin_torque_fields[3*cell+1] *= I;
+         spin_transport::internal::cell_spin_torque_fields[3*cell+2] *= I;
       }
 
       //-----------------------------------------------------
       // save stack resistance and current to arrays
       //-----------------------------------------------------
-      st::internal::stack_resistance[stack] = total_stack_resistance;
-      st::internal::stack_current[stack]    = I;
+      spin_transport::internal::stack_resistance[stack] = total_stack_resistance;
+      spin_transport::internal::stack_current[stack]    = I;
 
    } // end of stack loop
 
@@ -156,13 +156,13 @@ void calculate_magnetoresistance(){
    // Reduce cell spin torque fields and stack currents and resistances on all processors
    //------------------------------------------------------------------------------------------
    #ifdef MPICF
-      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_torque_fields[0], 3*st::internal::total_num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_spin_torque_fields[0], 3*spin_transport::internal::total_num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &sum_inv_resistance,                       1,                               MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
    // save total resistance and current
-   st::total_resistance = 1.0 / sum_inv_resistance;
-   st::total_current = program::fractional_electric_field_strength * st::internal::voltage / st::total_resistance;
+   spin_transport::total_resistance = 1.0 / sum_inv_resistance;
+   spin_transport::total_current = program::fractional_electric_field_strength * spin_transport::internal::voltage / spin_transport::total_resistance;
 
    return;
 

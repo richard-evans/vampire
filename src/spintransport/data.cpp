@@ -41,7 +41,7 @@ namespace spin_transport{
       std::vector <int> atom_sublattice; // array to store which sublattice each atom is in for spin transport calculation
 
       // enumerated list of different current directions
-      current_direction_t current_direction = st::internal::pz; // current direction (default along +z direction)
+      current_direction_t current_direction = spin_transport::internal::pz; // current direction (default along +z direction)
 
       double cell_size_x = 10.0; // cell size along x-direction (1 nm default size)
       double cell_size_y = 10.0; // cell size along y-direction (1 nm default size)

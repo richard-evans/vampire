@@ -36,7 +36,7 @@ void calculate_cell_magnetization(const unsigned int num_local_atoms,           
    //---------------------------------------------------------------------------
    // reset magnetization vector to zero
    //---------------------------------------------------------------------------
-   std::fill(st::internal::cell_magnetization.begin(), st::internal::cell_magnetization.end(), 0.0);
+   std::fill(spin_transport::internal::cell_magnetization.begin(), spin_transport::internal::cell_magnetization.end(), 0.0);
 
    //---------------------------------------------------------------------------
    // loop over all atoms and determine cell magnetizations (can OpenMP)
@@ -44,15 +44,15 @@ void calculate_cell_magnetization(const unsigned int num_local_atoms,           
    for(unsigned int atom = 0; atom < num_local_atoms; atom++){
 
       // get cell id
-      const uint64_t cell = st::internal::atom_in_cell[atom];
+      const uint64_t cell = spin_transport::internal::atom_in_cell[atom];
 
       // get magnetic moment (muB)
       const double mm = atoms_m_spin_array[atom];
 
       // add magnetization to cell
-      st::internal::cell_magnetization[3*cell+0] += mm*atoms_x_spin_array[atom];
-      st::internal::cell_magnetization[3*cell+1] += mm*atoms_y_spin_array[atom];
-      st::internal::cell_magnetization[3*cell+2] += mm*atoms_z_spin_array[atom];
+      spin_transport::internal::cell_magnetization[3*cell+0] += mm*atoms_x_spin_array[atom];
+      spin_transport::internal::cell_magnetization[3*cell+1] += mm*atoms_y_spin_array[atom];
+      spin_transport::internal::cell_magnetization[3*cell+2] += mm*atoms_z_spin_array[atom];
 
    }
 
@@ -61,8 +61,8 @@ void calculate_cell_magnetization(const unsigned int num_local_atoms,           
    //---------------------------------------------------------------------------
    #ifdef MPICF
       // cast to int for MPI
-      int bufsize = 3*st::internal::total_num_cells;
-      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_magnetization[0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      int bufsize = 3*spin_transport::internal::total_num_cells;
+      MPI_Allreduce(MPI_IN_PLACE, &spin_transport::internal::cell_magnetization[0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
    return;
