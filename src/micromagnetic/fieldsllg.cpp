@@ -19,6 +19,7 @@
 #include "errors.hpp"
 #include "micromagnetic.hpp"
 #include "random.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 #include "vio.hpp"
 
@@ -184,11 +185,11 @@ void mm::calculate_llg_external_fields(const double temperature,
       }
 
       // add field from tracks
-      if (sim::track_field_x.size() != 0 ){
-         x_total_external_field_array[cell] += sim::track_field_x[cell];
-         y_total_external_field_array[cell] += sim::track_field_y[cell];
-         z_total_external_field_array[cell] += sim::track_field_z[cell];
-         //std::cout << sim::track_field_x[cell] << '\t' << sim::track_field_y[cell] << '\t' << sim::track_field_z[cell] << '\t' << std::endl;
+      if (program::track_field_x.size() != 0 ){
+         x_total_external_field_array[cell] += program::track_field_x[cell];
+         y_total_external_field_array[cell] += program::track_field_y[cell];
+         z_total_external_field_array[cell] += program::track_field_z[cell];
+         //std::cout << program::track_field_x[cell] << '\t' << program::track_field_y[cell] << '\t' << program::track_field_z[cell] << '\t' << std::endl;
       }
 
    } // end of loop over all micromagnetic cells

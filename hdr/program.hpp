@@ -93,6 +93,38 @@ namespace program
    extern bool   lagrange_multiplier_enabled;
    void   update_lagrange_lambda();
 
+   // disk tracks program (track and LFA parameters)
+   extern double track_Ms;
+   extern double track_bit_width;
+   extern double track_bit_depth;
+   extern double track_bit_size;
+
+   extern double track_bit_gap;
+   extern double track_track_gap;
+
+   extern double cross_track_velocity;
+   extern double down_track_velocity;
+
+   extern int track_num_bits_per_track;
+   extern int track_num_tracks;
+   extern double LFA_scan_field_step;
+   extern double Ms;
+   extern double track_pos_x;
+   extern double track_pos_z;
+   extern bool LFA;
+
+   // distance of tracks from read head
+   extern double track_fly_height; // Angstroms
+
+   extern double initial_down_track_position;
+   extern double initial_cross_track_position;
+
+   extern bool track_ms_file;
+
+   extern std::vector < double > track_field_x;
+   extern std::vector < double > track_field_y;
+   extern std::vector < double > track_field_z;
+
    //---------------------------------------------------------------------------
    // Function to run the program selected with the sim:program keyword
    //---------------------------------------------------------------------------

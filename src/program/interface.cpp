@@ -292,13 +292,13 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "magnetisation", 0.0, 360.0,"input","0.0 - 360.0");
-         sim::track_Ms = m;
+         program::track_Ms = m;
          return true;
       }
       //--------------------------------------------------------------------
       test="track-file";
       if(word==test){
-         sim::track_ms_file=true; // Save checkpoint
+         program::track_ms_file=true; // Save checkpoint
          return true;
       }
       //--------------------------------------------------------------------
@@ -306,7 +306,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10,000,000.0");
-         sim::track_bit_size = m;
+         program::track_bit_size = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -314,7 +314,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10,000,000.0");
-         sim::track_bit_depth = m;
+         program::track_bit_depth = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -322,7 +322,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10,000,000.0");
-         sim::track_bit_width = m;
+         program::track_bit_width = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -330,7 +330,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 36,000.0");
-         sim::track_fly_height = m;
+         program::track_fly_height = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -338,7 +338,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 36,000.0");
-         sim::track_bit_gap = m;
+         program::track_bit_gap = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -346,7 +346,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 36,000.0");
-         sim::track_track_gap = m;
+         program::track_track_gap = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -354,7 +354,7 @@ namespace program{
       if(word==test){
          int n=atoi(value.c_str());
          vin::check_for_valid_int(n, word, line, prefix, 0, 100,"input","0 - 100");
-         sim::track_num_tracks = n;
+         program::track_num_tracks = n;
          return true;
       }
       //--------------------------------------------------------------------
@@ -362,7 +362,7 @@ namespace program{
       if(word==test){
          int n=atoi(value.c_str());
          vin::check_for_valid_int(n, word, line, prefix, 0, 100,"input","0 - 100");
-         sim::track_num_bits_per_track = n;
+         program::track_num_bits_per_track = n;
          return true;
       }
       //--------------------------------------------------------------------
@@ -370,7 +370,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0");
-         sim::cross_track_velocity = m;
+         program::cross_track_velocity = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -378,7 +378,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0");
-         sim::down_track_velocity = m;
+         program::down_track_velocity = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -386,7 +386,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","-100,000,000.0 - 10,000,000.0");
-         sim::initial_cross_track_position = m;
+         program::initial_cross_track_position = m;
          return true;
       }
       //--------------------------------------------------------------------
@@ -394,13 +394,13 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","-100,000,000.0 - 10,000,000.0");
-         sim::initial_down_track_position = m;
+         program::initial_down_track_position = m;
          return true;
       }
       //--------------------------------------------------------------------
       test="LFA";
       if(word==test){
-         sim::LFA = true;
+         program::LFA = true;
          return true;
       }
       //--------------------------------------------------------------------
@@ -408,7 +408,7 @@ namespace program{
       if(word==test){
          double m=atof(value.c_str());
          vin::check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 36000.0,"input","0.0 - 36,000.0");
-         sim::LFA_scan_field_step = m;
+         program::LFA_scan_field_step = m;
          return true;
       }
       //--------------------------------------------------------------------

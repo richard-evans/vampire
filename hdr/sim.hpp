@@ -25,38 +25,6 @@ enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, d
 
 namespace sim{
 
-   //track parameters
-   extern double track_Ms;
-   extern double track_bit_width;
-   extern double track_bit_depth;
-   extern double track_bit_size;
-
-   extern double track_bit_gap;
-   extern double track_track_gap;
-
-   extern double cross_track_velocity;
-   extern double down_track_velocity;
-
-   extern int track_num_bits_per_track;
-   extern int track_num_tracks;
-   extern double LFA_scan_field_step;
-   extern double Ms;
-   extern double track_pos_x;
-   extern double track_pos_z;
-   extern bool LFA;
-
-   // distance of tracks from read head
-   extern double track_fly_height; // Angstroms
-
-   extern double initial_down_track_position;
-   extern double initial_cross_track_position;
-
-   extern bool track_ms_file;
-
-   extern std::vector < double > track_field_x;
-   extern std::vector < double > track_field_y;
-   extern std::vector < double > track_field_z;
-
    extern std::ofstream mag_file;
    extern std::uint64_t time;
    extern std::uint64_t total_time;

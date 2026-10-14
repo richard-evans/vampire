@@ -508,7 +508,7 @@ namespace vout{
          stream << "MS" << "\t";
       }
       else{
-         stream << sim::Ms << "\t";
+         stream << program::Ms << "\t";
       }
    }
 
@@ -518,7 +518,7 @@ namespace vout{
          stream << "x-pos" << "\t";
       }
       else{
-         stream << sim::track_pos_x << "\t";
+         stream << program::track_pos_x << "\t";
       }
    }
 
@@ -528,7 +528,7 @@ namespace vout{
          stream << "z pos" << "\t";
       }
       else{
-         stream << sim::track_pos_z << "\t";
+         stream << program::track_pos_z << "\t";
       }
    }
 
