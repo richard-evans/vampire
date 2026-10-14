@@ -34,3 +34,4 @@ grain:mean-specific-heat
 grain:mean-torque
 grain:material-magnetisation
 grain:material-height-magnetisation
+grain:output-rate=1
