@@ -23,17 +23,17 @@ file.o \
 hcp.o \
 heusler.o \
 honeycomb.o \
-honeycomb-a.o \
-honeycomb-b.o \
+honeycomb_a.o \
+honeycomb_b.o \
 kagome.o \
 mn2au.o \
 perovskite.o \
 nd2fe14b.o\
 rocksalt.o \
-rocksalt-supercell.o \
+rocksalt_supercell.o \
 smfe12n.o\
 spinel.o \
-spinel-layered.o \
+spinel_layered.o \
 verify.o
 
 # Append module objects to global tree
