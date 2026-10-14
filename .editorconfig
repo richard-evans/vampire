@@ -8,13 +8,13 @@ root = true
 end_of_line = lf
 insert_final_newline = true
 
-# Matches multiple files with brace expansion notation
-# Set default charset
-[*.{cpp,h,cu}]
+# C++, CUDA and OpenCL sources: 3-space indentation, no hard tabs
+[*.{cpp,hpp,h,cu,cuh,cl}]
 charset = utf-8
-indet_style = space
+indent_style = space
 indent_size = 3
+trim_trailing_whitespace = true
 
 # Tab indentation (no size specified)
-[Makefile]
+[{Makefile,makefile}]
 indent_style = tab
