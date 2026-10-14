@@ -4,8 +4,7 @@
 
 # List module object filenames
 data_objects =\
-atoms.o \
-category.o
+atoms.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/data/,$(data_objects))
