@@ -44,20 +44,20 @@ namespace LSF_RK4_arrays{
    std::vector<double> z_initial_spin_array;
 
    std::vector<double> x_k1_array;
-	std::vector<double> y_k1_array;
-	std::vector<double> z_k1_array;
+   std::vector<double> y_k1_array;
+   std::vector<double> z_k1_array;
 
-	std::vector<double> x_k2_array;
-	std::vector<double> y_k2_array;
-	std::vector<double> z_k2_array;
+   std::vector<double> x_k2_array;
+   std::vector<double> y_k2_array;
+   std::vector<double> z_k2_array;
 
-	std::vector<double> x_k3_array;
-	std::vector<double> y_k3_array;
-	std::vector<double> z_k3_array;
+   std::vector<double> x_k3_array;
+   std::vector<double> y_k3_array;
+   std::vector<double> z_k3_array;
 
-	std::vector<double> x_k4_array;
-	std::vector<double> y_k4_array;
-	std::vector<double> z_k4_array;
+   std::vector<double> x_k4_array;
+   std::vector<double> y_k4_array;
+   std::vector<double> z_k4_array;
 
    // Flag to define state of LSF arrays (initialised/uninitialised)
    bool LSF_RK4_set = false;
@@ -88,21 +88,21 @@ namespace internal{
       y_initial_spin_array.resize(atoms::num_atoms, 0.0);
       z_initial_spin_array.resize(atoms::num_atoms, 0.0);
 
-		x_k1_array.resize(atoms::num_atoms, 0.0);
-		y_k1_array.resize(atoms::num_atoms, 0.0);
-		z_k1_array.resize(atoms::num_atoms, 0.0);
+      x_k1_array.resize(atoms::num_atoms, 0.0);
+      y_k1_array.resize(atoms::num_atoms, 0.0);
+      z_k1_array.resize(atoms::num_atoms, 0.0);
 
-		x_k2_array.resize(atoms::num_atoms, 0.0);
-		y_k2_array.resize(atoms::num_atoms, 0.0);
-		z_k2_array.resize(atoms::num_atoms, 0.0);
+      x_k2_array.resize(atoms::num_atoms, 0.0);
+      y_k2_array.resize(atoms::num_atoms, 0.0);
+      z_k2_array.resize(atoms::num_atoms, 0.0);
 
-		x_k3_array.resize(atoms::num_atoms, 0.0);
-		y_k3_array.resize(atoms::num_atoms, 0.0);
-		z_k3_array.resize(atoms::num_atoms, 0.0);
+      x_k3_array.resize(atoms::num_atoms, 0.0);
+      y_k3_array.resize(atoms::num_atoms, 0.0);
+      z_k3_array.resize(atoms::num_atoms, 0.0);
 
-		x_k4_array.resize(atoms::num_atoms, 0.0);
-		y_k4_array.resize(atoms::num_atoms, 0.0);
-		z_k4_array.resize(atoms::num_atoms, 0.0);
+      x_k4_array.resize(atoms::num_atoms, 0.0);
+      y_k4_array.resize(atoms::num_atoms, 0.0);
+      z_k4_array.resize(atoms::num_atoms, 0.0);
 
       mod_S.resize(atoms::num_atoms, 1.0);
 
@@ -203,7 +203,7 @@ namespace internal{
             xyz[1] = (-mp::gamma_SI * (S[2] * H[0] - S[0] * H[2])) + (mp::gamma_SI * alpha * H[1]) + (ty[atom] * (sigma * sqrt(alpha / mu)));
             xyz[2] = (-mp::gamma_SI * (S[0] * H[1] - S[1] * H[0])) + (mp::gamma_SI * alpha * H[2]) + (tz[atom] * (sigma * sqrt(alpha / mu)));
 
-				// k1 = \Delta S * \Delta t
+            // k1 = \Delta S * \Delta t
             x_k1_array[atom] = xyz[0] * mp::dt_SI;
             y_k1_array[atom] = xyz[1] * mp::dt_SI;
             z_k1_array[atom] = xyz[2] * mp::dt_SI;
@@ -211,7 +211,7 @@ namespace internal{
             // Write new spin vectors
             atoms::x_spin_array[atom] += 0.5*x_k1_array[atom];
             atoms::y_spin_array[atom] += 0.5*y_k1_array[atom];
-				atoms::z_spin_array[atom] += 0.5*z_k1_array[atom];
+            atoms::z_spin_array[atom] += 0.5*z_k1_array[atom];
 
          }
 
@@ -246,10 +246,10 @@ namespace internal{
             // Write new spin vectors
             atoms::x_spin_array[atom] += 0.5*x_k2_array[atom];
             atoms::y_spin_array[atom] += 0.5*y_k2_array[atom];
-				atoms::z_spin_array[atom] += 0.5*z_k2_array[atom];
+            atoms::z_spin_array[atom] += 0.5*z_k2_array[atom];
          }
 
-			// Calculate K3
+         // Calculate K3
          for (int atom = 0; atom < num_atoms; atom++){
 
             const int imaterial = atoms::type_array[atom];
@@ -276,15 +276,15 @@ namespace internal{
             // Write new spin vectors
             atoms::x_spin_array[atom] += x_k3_array[atom];
             atoms::y_spin_array[atom] += y_k3_array[atom];
-				atoms::z_spin_array[atom] += z_k3_array[atom];
+            atoms::z_spin_array[atom] += z_k3_array[atom];
 
          }
 
-			// Recalculate spin dependent fields
+         // Recalculate spin dependent fields
          sim::calculate_spin_fields(0, num_atoms);
          calculate_lsf_rk4_magnetic_field(0, num_atoms);
 
-			// Calculate K4
+         // Calculate K4
          for (int atom = 0; atom < num_atoms; atom++){
 
             const int imaterial = atoms::type_array[atom];

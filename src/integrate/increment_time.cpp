@@ -37,13 +37,13 @@ void increment_time(){
    // set flag checkpoint_loaded_flag to false since first step of simulations was performed
    sim::checkpoint_loaded_flag=false;
 
-	sim::time++;
-	// sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
+   sim::time++;
+   // sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 
    // Update dipole fields
    dipole::calculate_field(sim::time, atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::magnetic);
 
-	if(sim::lagrange_multiplier) sim::update_lagrange_lambda();
+   if(sim::lagrange_multiplier) sim::update_lagrange_lambda();
    st::update_spin_torque_fields(atoms::x_spin_array,
                                atoms::y_spin_array,
                                atoms::z_spin_array,

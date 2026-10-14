@@ -44,18 +44,18 @@ namespace integrate{
 //------------------------------------------------------------------------------
 int integrate(uint64_t n_steps){
 
-	// Check for calling of function
-	if(err::check==true) std::cout << "integrate::integrate has been called" << std::endl;
+   // Check for calling of function
+   if(err::check==true) std::cout << "integrate::integrate has been called" << std::endl;
 
-	// Call serial or parallell depending at compile time
-	#ifdef MPICF
-		internal::integrate_mpi(n_steps);
-	#else
-		internal::integrate_serial(n_steps);
-	#endif
+   // Call serial or parallell depending at compile time
+   #ifdef MPICF
+      internal::integrate_mpi(n_steps);
+   #else
+      internal::integrate_serial(n_steps);
+   #endif
 
-	// return
-	return EXIT_SUCCESS;
+   // return
+   return EXIT_SUCCESS;
 }
 
 namespace internal{
@@ -77,8 +77,8 @@ namespace internal{
 /// @date    23/04/2021
 ///
 /// @internal
-///	Created:		05/02/2011
-///	Revision:	    23/04/2021
+///   Created:    05/02/2011
+///   Revision:       23/04/2021
 ///=====================================================================================
 ///
 void integrate_serial(uint64_t n_steps){
@@ -86,7 +86,7 @@ void integrate_serial(uint64_t n_steps){
    // Check for calling of function
    if(err::check==true) std::cout << "integrate::internal::integrate_serial has been called" << std::endl;
 
-	// if simulation is micromagnetic
+   // if simulation is micromagnetic
    if (micromagnetic::discretisation_type >0 ) multiscale_simulation_steps(n_steps);
 
 
@@ -102,26 +102,26 @@ void integrate_serial(uint64_t n_steps){
             if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
             else internal::LLG_Heun();
-				if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0){
-					environment::LLB(sim::temperature, sim::H_applied,sim::H_vec[0],sim::H_vec[1],sim::H_vec[2],mp::dt);
-				}
+            if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0){
+               environment::LLB(sim::temperature, sim::H_applied,sim::H_vec[0],sim::H_vec[1],sim::H_vec[2],mp::dt);
+            }
             // Increment time
             internal::increment_time();
          }
          break;
 
-		case integrator_t::monte_carlo: // Montecarlo
-			for(uint64_t ti=0;ti<n_steps;ti++){
+      case integrator_t::monte_carlo: // Montecarlo
+         for(uint64_t ti=0;ti<n_steps;ti++){
 
                 // Optionally select GPU accelerated version
                 if(gpu::acceleration) gpu::mc_step();
 
                 else montecarlo::mc_step(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::num_atoms, atoms::type_array);
 
-				// increment time
-				internal::increment_time();
-			}
-			break;
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
       case integrator_t::llg_midpoint: // LLG Midpoint
          for(uint64_t ti=0;ti<n_steps;ti++){
@@ -131,90 +131,90 @@ void integrate_serial(uint64_t n_steps){
          }
          break;
 
-		case integrator_t::cmc: // Constrained Monte Carlo
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				montecarlo::cmc_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::cmc: // Constrained Monte Carlo
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            montecarlo::cmc_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::hybrid_cmc: // Hybrid Constrained Monte Carlo
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				montecarlo::cmc_mc_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::hybrid_cmc: // Hybrid Constrained Monte Carlo
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            montecarlo::cmc_mc_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_quantum: // LLG quantum noise
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				internal::llg_quantum_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_quantum: // LLG quantum noise
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            internal::llg_quantum_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_rkmk2: // LLG Runge-Kutta-Munthe-Kaas 2nd order
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				internal::llg_rkmk2_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_rkmk2: // LLG Runge-Kutta-Munthe-Kaas 2nd order
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            internal::llg_rkmk2_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_rkmk4: // LLG Runge-Kutta-Munthe-Kaas 4th order
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				internal::llg_rkmk4_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_rkmk4: // LLG Runge-Kutta-Munthe-Kaas 4th order
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            internal::llg_rkmk4_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_dm: // LLG Depondt-Mertens
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				internal::llg_dm_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_dm: // LLG Depondt-Mertens
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            internal::llg_dm_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::lsf: // LSF
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				internal::lsf_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::lsf: // LSF
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            internal::lsf_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::lsf_mc: // LSF Monte Carlo
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				montecarlo::lsf_mc_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::lsf_mc: // LSF Monte Carlo
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            montecarlo::lsf_mc_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::lsf_rk4: // LSF-RK4
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				internal::lsf_rk4_step();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::lsf_rk4: // LSF-RK4
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            internal::lsf_rk4_step();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::suzuki_trotter: // spin-lattice Dynamics
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				sld::suzuki_trotter();
-			   internal::increment_time();
-			}
-			break;
+      case integrator_t::suzuki_trotter: // spin-lattice Dynamics
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            sld::suzuki_trotter();
+            internal::increment_time();
+         }
+         break;
 
-		default:{
-			std::cerr << "Unknown integrator type "<< static_cast<int>(integrate::integrator) << " requested, exiting" << std::endl;
+      default:{
+         std::cerr << "Unknown integrator type "<< static_cast<int>(integrate::integrator) << " requested, exiting" << std::endl;
          err::vexit();
-		}
-	}
+      }
+   }
 }
 
    return;
@@ -239,50 +239,50 @@ void integrate_serial(uint64_t n_steps){
 /// @return EXIT_SUCCESS
 ///
 /// @internal
-///	Created:		07/03/2011
-///	Revision:	  ---
+///   Created:    07/03/2011
+///   Revision:     ---
 ///=====================================================================================
 ///
 int integrate_mpi(uint64_t n_steps){
 
-	// Check for calling of function
-	if(err::check==true) std::cout << "integrate::internal::integrate_mpi has been called" << std::endl;
+   // Check for calling of function
+   if(err::check==true) std::cout << "integrate::internal::integrate_mpi has been called" << std::endl;
 
 
-	if (micromagnetic::discretisation_type >0 ) multiscale_simulation_steps(n_steps);
+   if (micromagnetic::discretisation_type >0 ) multiscale_simulation_steps(n_steps);
 
-		//else simulation is atomistic
-	else{
+      //else simulation is atomistic
+   else{
 
-	// Case statement to call integrator
-	switch(integrate::integrator){
-		case integrator_t::llg_heun: // LLG Heun
-			for(uint64_t ti=0;ti<n_steps;ti++){
-			#ifdef MPICF
-				// Select CUDA version if supported
-				#ifdef CUDA
-					//sim::LLG_Heun_cuda_mpi();
-				#else
-					internal::LLG_Heun_mpi();
-					//calcualte the field from the environment
-					if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
-						environment::LLB(sim::temperature,
-												sim::H_applied,
-												sim::H_vec[0],
-												sim::H_vec[1],
-												sim::H_vec[2],
-												mp::dt);
-				#endif
-			#endif
-				// increment time
-				internal::increment_time();
-			}
-			break;
+   // Case statement to call integrator
+   switch(integrate::integrator){
+      case integrator_t::llg_heun: // LLG Heun
+         for(uint64_t ti=0;ti<n_steps;ti++){
+         #ifdef MPICF
+            // Select CUDA version if supported
+            #ifdef CUDA
+               //sim::LLG_Heun_cuda_mpi();
+            #else
+               internal::LLG_Heun_mpi();
+               //calcualte the field from the environment
+               if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
+                  environment::LLB(sim::temperature,
+                                    sim::H_applied,
+                                    sim::H_vec[0],
+                                    sim::H_vec[1],
+                                    sim::H_vec[2],
+                                    mp::dt);
+            #endif
+         #endif
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::monte_carlo: // Montecarlo
+      case integrator_t::monte_carlo: // Montecarlo
 
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				#ifdef MPICF
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            #ifdef MPICF
                if(montecarlo::mc_parallel_initialized == false) {
                   montecarlo::mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
                                                vmpi::min_dimensions, vmpi::max_dimensions);
@@ -291,151 +291,151 @@ int integrate_mpi(uint64_t n_steps){
                                             atoms::type_array);
             #endif
 
-				// increment time
-				internal::increment_time();
-			}
-			break;
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_midpoint: // LLG Midpoint
-			for(uint64_t ti=0;ti<n_steps;ti++){
-			#ifdef MPICF
-			// Select CUDA version if supported
-				#ifdef CUDA
-					//sim::LLG_Midpoint_cuda_mpi();
-				#else
-					internal::LLG_Midpoint_mpi();
-				#endif
-			#endif
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_midpoint: // LLG Midpoint
+         for(uint64_t ti=0;ti<n_steps;ti++){
+         #ifdef MPICF
+         // Select CUDA version if supported
+            #ifdef CUDA
+               //sim::LLG_Midpoint_cuda_mpi();
+            #else
+               internal::LLG_Midpoint_mpi();
+            #endif
+         #endif
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_rkmk2: // LLG Runge-Kutta-Munthe-Kaas 2nd order
-			for(uint64_t ti=0;ti<n_steps;ti++){
-			#ifdef MPICF
-				internal::llg_rkmk2_mpi_step();
-			#endif
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_rkmk2: // LLG Runge-Kutta-Munthe-Kaas 2nd order
+         for(uint64_t ti=0;ti<n_steps;ti++){
+         #ifdef MPICF
+            internal::llg_rkmk2_mpi_step();
+         #endif
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_rkmk4: // LLG Runge-Kutta-Munthe-Kaas 4th order
-			for(uint64_t ti=0;ti<n_steps;ti++){
-			#ifdef MPICF
-				internal::llg_rkmk4_mpi_step();
-			#endif
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_rkmk4: // LLG Runge-Kutta-Munthe-Kaas 4th order
+         for(uint64_t ti=0;ti<n_steps;ti++){
+         #ifdef MPICF
+            internal::llg_rkmk4_mpi_step();
+         #endif
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::llg_dm: // LLG Depondt-Mertens
-			for(uint64_t ti=0;ti<n_steps;ti++){
-			#ifdef MPICF
-				internal::llg_dm_mpi_step();
-			#endif
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::llg_dm: // LLG Depondt-Mertens
+         for(uint64_t ti=0;ti<n_steps;ti++){
+         #ifdef MPICF
+            internal::llg_dm_mpi_step();
+         #endif
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::cmc: // Constrained Monte Carlo
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				terminaltextcolor(RED);
-				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
-				terminaltextcolor(WHITE);
-				err::vexit();
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::cmc: // Constrained Monte Carlo
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            terminaltextcolor(RED);
+            std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::lsf: // LSF
-			for(uint64_t ti=0;ti<n_steps;ti++){
-			#ifdef MPICF
-			// Select CUDA version if supported
-				#ifdef CUDA
-					//sim::LSF_cuda();
-				#else
-					internal::LSF_mpi();
-				#endif
-			#endif
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::lsf: // LSF
+         for(uint64_t ti=0;ti<n_steps;ti++){
+         #ifdef MPICF
+         // Select CUDA version if supported
+            #ifdef CUDA
+               //sim::LSF_cuda();
+            #else
+               internal::LSF_mpi();
+            #endif
+         #endif
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::lsf_mc: // LSF-Montecarlo
-			for(uint64_t ti=0;ti<n_steps;ti++){
-				#ifdef MPICF
-					if(montecarlo::lsf_mc_parallel_initialized == false) {
-						montecarlo::lsf_mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
-																	vmpi::min_dimensions, vmpi::max_dimensions);
-					}
-					montecarlo::lsf_mc_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
-																atoms::type_array);
-					#endif
+      case integrator_t::lsf_mc: // LSF-Montecarlo
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            #ifdef MPICF
+               if(montecarlo::lsf_mc_parallel_initialized == false) {
+                  montecarlo::lsf_mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                                                   vmpi::min_dimensions, vmpi::max_dimensions);
+               }
+               montecarlo::lsf_mc_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                                                atoms::type_array);
+               #endif
 
-				// increment time
-				internal::increment_time();
-			}
-			break;
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::lsf_rk4: // LSF-RK4
-			for(uint64_t ti=0;ti<n_steps;ti++){
-			#ifdef MPICF
-			// Select CUDA version if supported
-				#ifdef CUDA
-					//sim::LSF_RK4_cuda();
-				#else
-					internal::LSF_RK4_mpi();
-				#endif
-			#endif
-				// increment time
-				internal::increment_time();
-			}
-			break;
+      case integrator_t::lsf_rk4: // LSF-RK4
+         for(uint64_t ti=0;ti<n_steps;ti++){
+         #ifdef MPICF
+         // Select CUDA version if supported
+            #ifdef CUDA
+               //sim::LSF_RK4_cuda();
+            #else
+               internal::LSF_RK4_mpi();
+            #endif
+         #endif
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		case integrator_t::suzuki_trotter: // Suzuki Trotter decomposition
- 			for(uint64_t ti=0;ti<n_steps;ti++){
- 				#ifdef MPICF
+      case integrator_t::suzuki_trotter: // Suzuki Trotter decomposition
+         for(uint64_t ti=0;ti<n_steps;ti++){
+            #ifdef MPICF
 
                 sld::suzuki_trotter_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
                                              atoms::type_array);
              #endif
- 				// increment time
- 				internal::increment_time();
- 			}
- 			break;
+            // increment time
+            internal::increment_time();
+         }
+         break;
 
-		default:{
-			terminaltextcolor(RED);
-			std::cerr << "Unknown integrator type "<< static_cast<int>(integrate::integrator) << " requested, exiting" << std::endl;
-			terminaltextcolor(WHITE);
-			exit (EXIT_FAILURE);
-			}
-		}
-	}
+      default:{
+         terminaltextcolor(RED);
+         std::cerr << "Unknown integrator type "<< static_cast<int>(integrate::integrator) << " requested, exiting" << std::endl;
+         terminaltextcolor(WHITE);
+         exit (EXIT_FAILURE);
+         }
+      }
+   }
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 void multiscale_simulation_steps(int n_steps){
 
-	if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0)
-		environment::LLB(sim::temperature,
-						   	sim::H_applied,
-						   	sim::H_vec[0],
-						   	sim::H_vec[1],
-						   	sim::H_vec[2],
-						   	mp::dt);
+   if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0)
+      environment::LLB(sim::temperature,
+                        sim::H_applied,
+                        sim::H_vec[0],
+                        sim::H_vec[1],
+                        sim::H_vec[2],
+                        mp::dt);
 
    for(int ti=0;ti<n_steps;ti++){
       //calcaulte the field from the environment
       // if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0)
-		//	environment::LLB(sim::temperature,
+      // environment::LLB(sim::temperature,
       //    sim::H_applied,
       //    sim::H_vec[0],
       //    sim::H_vec[1],
