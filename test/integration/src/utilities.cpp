@@ -37,4 +37,12 @@ bool chdir(const std::string path){
 
 }
 
+// remove files left by a test run, ignoring any that do not exist
+void remove(const std::vector<std::string> files){
+   for(const std::string& file : files){
+      std::error_code ec;
+      std::filesystem::remove(file, ec);
+   }
+}
+
 }

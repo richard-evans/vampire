@@ -79,6 +79,8 @@ bool final_values_test(const std::string dir, const std::vector<expected_value_t
    int vmp = vt::system(executable);
    if( vmp != 0){
       std::cerr << "Error running vampire. Returning as failed test." << std::endl;
+      vt::remove({"output", "log"});
+      vt::chdir(path);
       return false;
    }
 
@@ -94,7 +96,7 @@ bool final_values_test(const std::string dir, const std::vector<expected_value_t
    }
 
    // clean up simulation output before returning (keeps the repo clean)
-   vt::system("rm output log");
+   vt::remove({"output", "log"});
 
    // return to the directory we started in
    if( !vt::chdir(path) ) return false;

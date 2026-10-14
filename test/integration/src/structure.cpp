@@ -37,6 +37,8 @@ bool material_atoms_test(const std::string dir, int n1, int n2, int n3, int n4, 
    int vmp = vt::system(executable);
    if( vmp != 0){
       std::cerr << "Error running vampire. Returning as failed test." << std::endl;
+      vt::remove({"output", "log"});
+      vt::chdir(path);
       return false;
    }
 
@@ -72,7 +74,7 @@ bool material_atoms_test(const std::string dir, int n1, int n2, int n3, int n4, 
    liness4 >> v4;
 
    // cleanup
-   vt::system("rm output log nums.txt");
+   vt::remove({"output", "log", "nums.txt"});
 
    // return to parent directory
    if( !vt::chdir(path) ) return false;

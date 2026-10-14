@@ -1,0 +1,166 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+#
+#   This file is part of the VAMPIRE open source package under the
+#   Free BSD licence (see licence file for details).
+#
+#   (c) Richard F L Evans 2026. All rights reserved.
+#
+#   Email: richard.evans@york.ac.uk
+#
+#------------------------------------------------------------------------------
+#
+# Golden regression tests: runs each case in cases/<module>/<case>/ and
+# compares the output file against the stored golden output.
+#
+# A case directory contains:
+#    input, *.mat, [*.ucf, ...]   inputs, copied into a temporary directory
+#    expected-serial.dat          golden output (comment lines stripped)
+#    expected-mpi-np<N>.dat       golden output for vampire-parallel on N processes
+#    tolerance                    optional, "rel <r> abs <a>" (default rel 1e-12 abs 1e-14)
+#
+# A case is only run in a mode for which it has a golden file, unless --bless is given.
+#
+#------------------------------------------------------------------------------
+
+usage(){
+   echo "Usage: $0 [--serial | --mpi N] [--exact] [--bless] [--case <glob>] [--keep]"
+   echo "   --serial       run vampire-serial (default)"
+   echo "   --mpi N        run vampire-parallel on N processes"
+   echo "   --exact        compare byte for byte instead of with a numerical tolerance"
+   echo "   --bless        write the obtained output as the new golden file"
+   echo "   --case <glob>  only run cases matching <module>/<case> glob, eg 'integrate/llg-*'"
+   echo "   --keep         keep the working directory of every case, not just failed ones"
+}
+
+mode=serial
+nprocs=""
+exact=false
+bless=false
+pattern="*/*"
+keep=false
+
+while [ $# -gt 0 ]; do
+   case "$1" in
+      --serial) mode=serial;;
+      --mpi)    mode=mpi; nprocs="$2"; shift;;
+      --exact)  exact=true;;
+      --bless)  bless=true;;
+      --case)   pattern="$2"; shift;;
+      --keep)   keep=true;;
+      -h|--help) usage; exit 0;;
+      *) usage; exit 1;;
+   esac
+   shift
+done
+
+if [ "$mode" = mpi ] && ! [[ "$nprocs" =~ ^[1-9][0-9]*$ ]]; then
+   echo "Error: --mpi needs a number of processes"
+   exit 1
+fi
+
+# work relative to the location of this script
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root="$(cd "$here/../.." && pwd)"
+
+if [ "$mode" = serial ]; then
+   executable="$root/vampire-serial"
+   golden=expected-serial.dat
+   run="$executable"
+else
+   executable="$root/vampire-parallel"
+   golden=expected-mpi-np$nprocs.dat
+   run="${MPIRUN:-mpirun} -np $nprocs $executable"
+fi
+
+if [ ! -x "$executable" ]; then
+   echo "Error: $executable not found - build it first"
+   exit 1
+fi
+
+work="$(mktemp -d "${TMPDIR:-/tmp}/vampire-regression.XXXXXX")"
+
+pass=0
+fail=0
+skip=0
+blessed=0
+
+echo "---------------------------------------------------------------------"
+echo "    Running regression tests ($mode${nprocs:+, np = $nprocs})"
+echo "---------------------------------------------------------------------"
+
+cd "$here/cases" || exit 1
+for name in $pattern; do
+
+   [ -f "$name/input" ] || continue
+
+   # skip cases without a golden file for this mode
+   if [ "$bless" = false ] && [ ! -f "$name/$golden" ]; then
+      skip=$((skip+1))
+      continue
+   fi
+
+   printf "%-60s : " "$name"
+
+   # run in a clean copy of the case directory
+   dir="$work/$name"
+   mkdir -p "$dir"
+   for f in "$name"/*; do
+      case "$(basename "$f")" in
+         expected-*|tolerance) ;;
+         *) cp -R "$f" "$dir/";;
+      esac
+   done
+
+   start=$SECONDS
+   ( cd "$dir" && $run > stdout 2>&1 )
+   status=$?
+   elapsed=$((SECONDS-start))
+
+   if [ $status -ne 0 ] || [ ! -f "$dir/output" ]; then
+      echo "FAIL (vampire exited with status $status, see $dir/stdout)"
+      fail=$((fail+1))
+      continue
+   fi
+   grep -v "^#" "$dir/output" > "$dir/obtained.dat"
+
+   if [ "$bless" = true ]; then
+      cp "$dir/obtained.dat" "$name/$golden"
+      echo "BLESSED ($(wc -l < "$name/$golden" | tr -d ' ') lines, ${elapsed} s)"
+      blessed=$((blessed+1))
+      [ "$keep" = true ] || rm -rf "$dir"
+      continue
+   fi
+
+   if [ "$exact" = true ]; then
+      cmp -s "$name/$golden" "$dir/obtained.dat" && result="" || result="files differ"
+   else
+      tolerance=""
+      [ -f "$name/tolerance" ] && tolerance="$(awk '{for(i=1;i<NF;i++){if($i=="rel")r=$(i+1);if($i=="abs")a=$(i+1)}} END{print r, a}' "$name/tolerance")"
+      result="$(python3 -I "$here/compare.py" "$name/$golden" "$dir/obtained.dat" $tolerance)"
+   fi
+
+   if [ $? -eq 0 ] && [ -z "$result" ]; then
+      echo "OK (${elapsed} s)"
+      pass=$((pass+1))
+      [ "$keep" = true ] || rm -rf "$dir"
+   else
+      echo "FAIL | $result | see $dir"
+      fail=$((fail+1))
+   fi
+
+done
+
+# remove the working directory unless it holds failed or kept cases
+[ -z "$(find "$work" -type f)" ] && rm -rf "$work"
+
+echo "---------------------------------------------------------------------"
+if [ "$bless" = true ]; then
+   echo "Blessed $blessed cases, $fail failed to run"
+else
+   echo "Passed $pass, failed $fail, skipped $skip (no $golden)"
+   if [ $fail -gt 0 ]; then echo "OVERALL FAIL"; else echo "OVERALL PASS"; fi
+fi
+echo "---------------------------------------------------------------------"
+
+[ $fail -eq 0 ]

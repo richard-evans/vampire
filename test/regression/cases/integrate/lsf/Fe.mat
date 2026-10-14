@@ -1,0 +1,11 @@
+material:num-materials=1
+material[1]:material-name=Fe
+material[1]:damping-constant=0.1
+material[1]:exchange-matrix[1]=5.0e-21
+material[1]:atomic-spin-moment=2.2 !muB
+material[1]:uniaxial-anisotropy-constant=1.0e-23
+material[1]:uniaxial-anisotropy-direction=0,0,1
+material[1]:lsf-second-order-coefficient=-1.0e-21
+material[1]:lsf-fourth-order-coefficient=0.5e-21
+material[1]:lsf-sixth-order-coefficient=0.0
+material[1]:initial-spin-direction=1,0,1

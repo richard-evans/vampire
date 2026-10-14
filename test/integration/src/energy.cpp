@@ -35,6 +35,8 @@ bool energy_test(std::string dir, double result, std::string executable, std::st
    int vmp = vt::system(executable);
    if( vmp != 0){
       std::cerr << "Error running vampire. Returning as failed test." << std::endl;
+      vt::remove({"output", "log"});
+      vt::chdir(path);
       return false;
    }
 
@@ -51,7 +53,7 @@ bool energy_test(std::string dir, double result, std::string executable, std::st
    liness >> value;
 
    // cleanup
-   vt::system("rm output log");
+   vt::remove({"output", "log"});
 
    // return to parent directory
    if( !vt::chdir(path) ) return false;
