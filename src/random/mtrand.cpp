@@ -103,8 +103,7 @@ int32_t MTRand_int32::get_state(std::vector<uint32_t>& iostate) {
 
    // check vector is correct size
    if(iostate.size()!=n){
-      std::cerr << "Programming error in get_state() function. State vector has the wrong number of elements. Exiting." << std::endl;
-      err::vexit();
+      err::fatal("Programming error in get_state() function. State vector has the wrong number of elements. Exiting.");
    }
 
    // copy state elements to iostate vector
@@ -122,8 +121,7 @@ void MTRand_int32::set_state(std::vector<uint32_t>& iostate, int32_t& iop) {
 
    // check vector is correct size
    if(iostate.size()!=n){
-      std::cerr << "Programming error in set_state() function. State vector has the wrong number of elements. Exiting." << std::endl;
-      err::vexit();
+      err::fatal("Programming error in set_state() function. State vector has the wrong number of elements. Exiting.");
    }
 
    // copy iostate elements to state vector
