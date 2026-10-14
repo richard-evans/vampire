@@ -25,15 +25,11 @@
 #include <vector>
 #include <cstdint>
 
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
-
 namespace demag{
 
    extern bool fast;
-   extern uint64_t update_rate;
-   extern uint64_t update_time;
+   extern std::uint64_t update_rate;
+   extern std::uint64_t update_time;
 
    extern void init();
    extern void update();

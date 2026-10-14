@@ -18,10 +18,6 @@
 
 #include "exchange.hpp"
 
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
-
 // unit vector type
 class uvec_t{
    public:
@@ -64,7 +60,7 @@ namespace atoms
    extern int num_atoms;         /// Number of atoms in simulation
    extern int num_neighbours;       /// Maximum number of neighbours for Hamiltonian/Lattice
    extern int total_num_neighbours;/// Total number of neighbours for system
-   extern uint64_t num_non_magnetic_atoms; // Number of non-magnetic atoms not to be simulated
+   extern std::uint64_t num_non_magnetic_atoms; // Number of non-magnetic atoms not to be simulated
 
    //--------------------------
    // Array Variables

@@ -20,10 +20,6 @@
 #include <valarray>
 #include <vector>
 
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
-
 /// Enumerated lists for code readability
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
@@ -62,16 +58,16 @@ namespace sim{
    extern std::vector < double > track_field_z;
 
    extern std::ofstream mag_file;
-   extern uint64_t time;
-   extern uint64_t total_time;
-   extern uint64_t loop_time;
-   extern uint64_t partial_time;
-   extern uint64_t equilibration_time;
+   extern std::uint64_t time;
+   extern std::uint64_t total_time;
+   extern std::uint64_t loop_time;
+   extern std::uint64_t partial_time;
+   extern std::uint64_t equilibration_time;
    extern int runs;
-   extern int64_t parity;
-   extern uint64_t output_atoms_file_counter;
-   extern uint64_t output_cells_file_counter;
-   extern uint64_t output_rate_counter;
+   extern std::int64_t parity;
+   extern std::uint64_t output_atoms_file_counter;
+   extern std::uint64_t output_cells_file_counter;
+   extern std::uint64_t output_rate_counter;
 
    extern bool ext_demag;
 
@@ -94,7 +90,7 @@ namespace sim{
    extern std::vector<double> fmr_field_unit_vector; // Oscillating field direction
    extern double fmr_field; // Instantaneous value of the oscillating field strength H sin(wt)
    extern bool enable_fmr; // Flag to enable fmr field calculation
-   extern int64_t iH;
+   extern std::int64_t iH;
    extern double H; // T
 
    extern double demag_factor[3];
@@ -167,7 +163,7 @@ namespace sim{
    // Wrapper Functions
    extern int run();
    extern int initialise();
-   extern int integrate(uint64_t);
+   extern int integrate(std::uint64_t);
 
    // Legacy integrators
    extern int LLG(int);
@@ -244,10 +240,10 @@ namespace sim{
 }
 
 /*namespace ckp{
-        extern uint64_t parity;
-        extern uint64_t output_atoms_file_counter;
+        extern std::uint64_t parity;
+        extern std::uint64_t output_atoms_file_counter;
         extern double H; // T
-        extern uint64_t iH; // uT
+        extern std::uint64_t iH; // uT
 } // end namespace ckp
 */
 

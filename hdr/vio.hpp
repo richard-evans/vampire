@@ -32,10 +32,6 @@
 #include <iomanip>
 #include <vector>
 
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
-
 // Global Output Streams
 extern std::ofstream zinfo;
 extern std::ofstream zmag;
@@ -72,8 +68,8 @@ namespace vin{
    extern void check_for_valid_int(  unsigned int& value, std::string word, int line, std::string prefix, unsigned int range_min,
                               unsigned int range_max, std::string input_file_type, std::string range_text);
 
-   extern void check_for_valid_int(  uint64_t& value, std::string word, int line, std::string prefix,
-                                     uint64_t range_min, uint64_t range_max, std::string input_file_type, std::string range_text);
+   extern void check_for_valid_int(  std::uint64_t& value, std::string word, int line, std::string prefix,
+                                     std::uint64_t range_min, std::uint64_t range_max, std::string input_file_type, std::string range_text);
 
    extern bool check_for_valid_bool( std::string value, std::string word, int line, std::string prefix, std::string input_file_type);
 
@@ -97,7 +93,7 @@ namespace vin{
    extern std::string get_string(std::string const filename, std::string source_file_name, int line);
 
    // simple functions to extract variables from strings
-   extern uint64_t str_to_uint64(std::string input_str);
+   extern std::uint64_t str_to_uint64(std::string input_str);
    extern int str_to_int(std::string input_str);
    extern double str_to_double(std::string input_str);
 

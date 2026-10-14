@@ -21,10 +21,6 @@
 // Vampire headers
 #include "create.hpp"
 
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
-
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for spintransport module
 //--------------------------------------------------------------------------------
@@ -43,7 +39,7 @@ namespace spin_transport{
                    const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
                    const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
                    const int num_materials,    // number of materials
-                   const uint64_t num_atoms,   // number of atoms
+                   const std::uint64_t num_atoms,   // number of atoms
                    const std::vector<int>& atoms_type_array, // material types of atoms
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms

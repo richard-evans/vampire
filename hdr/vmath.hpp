@@ -17,10 +17,6 @@
 #include <cmath>
 #include <cstdint>
 
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
-
 /// @namespace ns
 /// @brief vmath namespace containing sundry math functions for vampire.
 ///
@@ -66,8 +62,8 @@ namespace vmath{
       return static_cast<int>(floor( value + 0.5 ));
    }
    // rounding function for 64 bit integers
-   inline int64_t iround64( double value ){
-      return static_cast<int64_t>(floor( value + 0.5 ));
+   inline std::int64_t iround64( double value ){
+      return static_cast<std::int64_t>(floor( value + 0.5 ));
    }
    inline int iceil( double value ){
       return static_cast<int>(ceil( value ));

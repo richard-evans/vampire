@@ -17,11 +17,8 @@
 #include "create.hpp"
 #include <cstdlib>
 #include <string>
+#include <cstdint>
 #include <vector>
-
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
 
 #ifdef MPICF
    #include <mpi.h>
@@ -108,10 +105,10 @@ namespace vmpi{
 
    // wrapper functions avoiding MPI library
    extern void barrier();
-   extern uint64_t reduce_sum(uint64_t local);
+   extern std::uint64_t reduce_sum(std::uint64_t local);
    extern double reduce_sum(double local);
    extern double reduce_max(double local);
-   extern uint64_t all_reduce_sum(uint64_t local);
+   extern std::uint64_t all_reduce_sum(std::uint64_t local);
    extern double all_reduce_sum(double local);
    extern void all_reduce_sum(std::vector<double>& array);
    extern void all_reduce_sum(std::vector<int>& array);

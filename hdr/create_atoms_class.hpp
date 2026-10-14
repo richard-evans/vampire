@@ -15,10 +15,6 @@
 
 #include <cstdint>
 
-// Load standard forms of fixed-width types (needed for some compilers)
-using std::uint64_t;
-using std::int64_t;
-
 //namespace create{
 namespace cs{
 
@@ -35,10 +31,10 @@ public:
    double z; // z-position of atom
 
    // Global atomic coordinates
-   uint64_t uc_id;        // atom number of host unit cell
-   int64_t scx;                   // supercell x coordinate of atom |
-   int64_t scy;                   // supercell y coordinate of atom |
-   int64_t scz;                   // supercell z coordinate of atom /
+   std::uint64_t uc_id;        // atom number of host unit cell
+   std::int64_t scx;                   // supercell x coordinate of atom |
+   std::int64_t scy;                   // supercell y coordinate of atom |
+   std::int64_t scz;                   // supercell z coordinate of atom /
 
    // Flags
    bool include; // boolean to incude atom in structure (or not)
