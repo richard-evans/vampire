@@ -1,0 +1,38 @@
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+sim:time-step=1.0E-16
+sim:integrator-random-seed=12345
+output:precision=16
+sim:program=disk-tracks
+sim:integrator=llg-heun
+sim:temperature=300.0
+sim:equilibration-time-steps=100
+sim:total-time-steps=500
+sim:time-steps-increment=50
+cells:macro-cell-size=1.0 !nm
+sim:track-Ms=1.0
+sim:track-bit-size-x=1.0 !nm
+sim:track-bit-size-y=1.0 !nm
+sim:track-bit-size-z=1.0 !nm
+sim:track-fly-height=1.0 !nm
+sim:track-gap-between-bits=0.0
+sim:track-gap-between-tracks=0.0
+sim:num-tracks=1
+sim:num-bits-per-track=4
+sim:x-velocity=0.0
+sim:z-velocity=1.0
+sim:initial-x-position=0.0
+sim:initial-z-position=-2.0 !nm
+output:time-steps
+output:temperature
+output:magnetisation
+output:mean-magnetisation-length
+output:total-energy
+sim:track-file=true
