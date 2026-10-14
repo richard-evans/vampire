@@ -22,8 +22,6 @@ void update_dipolar_fields(){
 
    #ifdef CUDA
       vcuda::update_dipolar_fields();
-   #elif OPENCL
-      // vopencl::update_dipolar_field(); TBD
    #endif
 
    return;

@@ -24,8 +24,6 @@ namespace gpu{
 
          #ifdef CUDA
             vcuda::config::synchronise();
-         #elif OPENCL
-            vopencl::config::synchronise();
          #endif
 
          return;

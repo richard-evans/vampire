@@ -21,8 +21,6 @@ namespace gpu{
    // default is on for GPU compiled code
    #ifdef CUDA
       bool acceleration = true; // flag to enable gpu_acceleration
-   #elif OPENCL
-      bool acceleration = true; // flag to enable gpu_acceleration
    #else
       bool acceleration = false; // flag to enable gpu_acceleration
    #endif
@@ -31,12 +29,6 @@ namespace gpu{
    bool initialized = false; // flag to check for successful initialization
 
    int device = -1; // device id
-   int device_other = -1; // other device to use
-
-   int num_threads = 0; // number of threads to use per kernel on main device
-   int num_threads_other = 0; // as above on other device
-   int platform = -1; // which platform to use for acceleration (OpenCL)
-   int platform_other = -1; // other platform to use for some calculations (OpenCL)
 
    //-----------------------------------------------------------------------------
    // Shared data structures for statistics calculation

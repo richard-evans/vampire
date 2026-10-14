@@ -1090,12 +1090,3 @@ The mpi-io option uses the MPI library routines to output a large, single shared
 {\zicf config:output-nodes = int [default 1]}\phantomsection\addcontentsline{toc}{subsection}{config:output-nodes} Specifies the number of files to be generated per snapshot. For typical small scale simulations (on a single physical node) the default value of 1 is fine. For larger scale simulations more output nodes are beneficial to achieve maximum performance, with one output node per physical node being a sensible choice, but
 this can be specified up to the maximum number of processes in the simulation.
 
-
-%OpenCL and cuda acceleration \\
-%gpu:platform=1
-%gpu:device=0
-%gpu:num-threads=8192
-
-%#gpu:platform-other=0
-%#gpu:device-other=0
-%#gpu:num-threads-other=32

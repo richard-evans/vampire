@@ -25,8 +25,6 @@ void transfer_spin_positions_from_gpu_to_cpu(){
 
    #ifdef CUDA
       vcuda::transfer_spin_positions_from_gpu_to_cpu();
-   #elif OPENCL
-      // vopencl::transfer_spin_positions_from_gpu_to_cpu(); TBD
    #endif
 
    return;
@@ -43,8 +41,6 @@ void transfer_dipole_fields_from_cpu_to_gpu(){
 
    #ifdef CUDA
       vcuda::transfer_dipole_fields_from_cpu_to_gpu();
-   #elif OPENCL
-      // vopencl::transfer_dipole_fields_from_cpu_to_gpu(); TBD
    #endif
 
    return;
@@ -61,8 +57,6 @@ void transfer_dipole_cells_fields_from_gpu_to_cpu(){
 
    #ifdef CUDA
       vcuda::transfer_dipole_cells_fields_from_gpu_to_cpu();
-   #elif OPENCL
-      // vopencl::transfer_dipole_cells_fields_from_gpu_to_cpu(); TBD
    #endif
 
    return;

@@ -81,48 +81,6 @@ namespace gpu{
          }
       }
 
-      test = "num-threads";
-      if (word == test) {
-         int val = atoi(value.c_str());
-         if (val > 0) {
-            gpu::num_threads = val;
-            return true;
-         } else {
-            terminaltextcolor(RED);
-            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be a positive integer" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-         }
-      }
-
-      test = "num-threads-other";
-      if (word == test) {
-         int val = atoi(value.c_str());
-         if (val > 0) {
-            gpu::num_threads_other = val;
-            return true;
-         } else {
-            terminaltextcolor(RED);
-            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be a positive integer" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-         }
-      }
-
-      test = "platform";
-      if (word == test) {
-         int val = atoi(value.c_str());
-         if (val >= 0) {
-            gpu::platform = val;
-            return true;
-         } else {
-            terminaltextcolor(RED);
-            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be zero or a positive integer" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-         }
-      }
-
       //--------------------------------------------------------------------
       test="device";
       if(word==test){
@@ -130,29 +88,6 @@ namespace gpu{
          // Test for valid range
          vin::check_for_valid_int(dev, word, line, prefix, 0, 16,"input","0-16");
          gpu::device = dev;
-         return true;
-      }
-
-      test="platform-other";
-      if (word == test) {
-         int val = atoi(value.c_str());
-         if (val >= 0) {
-            gpu::platform_other = val;
-            return true;
-         } else {
-            terminaltextcolor(RED);
-            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be zero or a positive integer" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-         }
-      }
-
-      test="device-other";
-      if(word==test){
-         int dev=atoi(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_int(dev, word, line, prefix, 0, 16,"input","0-16");
-         gpu::device_other = dev;
          return true;
       }
 

@@ -17,7 +17,7 @@
 namespace gpu{
 
    //--------------------------------------------------------------------------
-   // Function to call correct llg_heun function depending on cuda,opencl etc
+   // Function to call correct llg_heun function depending on the backend (cuda)
    //--------------------------------------------------------------------------
    void mc_step(){
 

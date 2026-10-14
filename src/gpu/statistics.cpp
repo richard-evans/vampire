@@ -25,8 +25,6 @@ namespace gpu{
 
          #ifdef CUDA
             vcuda::stats::update();
-         #elif OPENCL
-            vopencl::stats::update();
          #endif
 
          return;
@@ -45,8 +43,6 @@ namespace gpu{
 
          #ifdef CUDA
             vcuda::stats::get();
-         #elif OPENCL
-            vopencl::stats::get();
          #endif
 
          return;
@@ -59,8 +55,6 @@ namespace gpu{
 
          #ifdef CUDA
             vcuda::stats::reset();
-         #elif OPENCL
-            vopencl::stats::reset();
          #endif
 
          return;

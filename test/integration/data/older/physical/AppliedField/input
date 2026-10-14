@@ -31,7 +31,6 @@ sim:applied-field-unit-vector=0,0,1
 sim:program=time-series
 sim:integrator=llg-heun
 
-gpu:num-threads=64
 
 #------------------------------------------
 # data output

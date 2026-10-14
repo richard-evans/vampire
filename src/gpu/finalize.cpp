@@ -17,14 +17,12 @@
 namespace gpu{
 
    //----------------------------------------------------------------------------------
-   // Function to call correct de-initialization function depending on cuda,opencl etc
+   // Function to call correct de-initialization function depending on the backend (cuda)
    //----------------------------------------------------------------------------------
    void finalize(){
 
       #ifdef CUDA
          vcuda::finalize();
-      #elif OPENCL
-         vopencl::finalize();
       #endif
 
       return;

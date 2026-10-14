@@ -17,14 +17,12 @@
 namespace gpu{
 
    //--------------------------------------------------------------------------
-   // Function to call correct llg_heun function depending on cuda,opencl etc
+   // Function to call correct llg_heun function depending on the backend (cuda)
    //--------------------------------------------------------------------------
    void llg_heun(){
 
       #ifdef CUDA
          vcuda::llg_heun();
-      #elif OPENCL
-         vopencl::llg_heun();
       #endif
 
       return;
