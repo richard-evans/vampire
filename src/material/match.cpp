@@ -31,7 +31,6 @@
 #include "sim.hpp"
 #include "sld.hpp"
 #include "spininitialize.hpp"
-#include "spintextures.hpp"
 #include "spintorque.hpp"
 #include "spintransport.hpp"
 #include "spinwaves.hpp"
@@ -84,7 +83,6 @@ namespace internal{
       else if(sld::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(spininitialize::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(spinwaves::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-      else if(spintextures::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
       //--------------------------------------------------------------------
       // keyword not found

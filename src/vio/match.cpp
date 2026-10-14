@@ -38,7 +38,6 @@
 #include "sim.hpp"
 #include "sld.hpp"
 #include "spininitialize.hpp"
-#include "spintextures.hpp"
 #include "spintorque.hpp"
 #include "spintransport.hpp"
 #include "spinwaves.hpp" // JRH
@@ -88,7 +87,6 @@ namespace vin{
       else if(sld::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(spininitialize::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
       else if(spinwaves::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS; // JRH spinwaves input parameters
-      else if(spintextures::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
       //--------------------------------------------------------------------
       // keyword not found
