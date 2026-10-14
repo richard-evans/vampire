@@ -17,6 +17,7 @@
 // C++ standard library headers
 #include <cstdint>
 #include <iostream>
+#include <sstream>
 
 // Vampire headers
 #include "atoms.hpp"
@@ -208,8 +209,9 @@ void integrate_serial(uint64_t n_steps){
          break;
 
       default:{
-         std::cerr << "Unknown integrator type "<< static_cast<int>(integrate::integrator) << " requested, exiting" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Unknown integrator type " << static_cast<int>(integrate::integrator) << " requested, exiting";
+         err::fatal(message.str());
       }
    }
 }
@@ -337,10 +339,7 @@ int integrate_mpi(uint64_t n_steps){
 
       case integrator_t::cmc: // Constrained Monte Carlo
          for(uint64_t ti=0;ti<n_steps;ti++){
-            terminaltextcolor(RED);
-            std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            err::fatal("Error - Constrained Monte Carlo Integrator unavailable for parallel execution");
             // increment time
             internal::increment_time();
          }
@@ -405,10 +404,9 @@ int integrate_mpi(uint64_t n_steps){
          break;
 
       default:{
-         terminaltextcolor(RED);
-         std::cerr << "Unknown integrator type "<< static_cast<int>(integrate::integrator) << " requested, exiting" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         std::ostringstream message;
+         message << "Unknown integrator type " << static_cast<int>(integrate::integrator) << " requested, exiting";
+         err::fatal(message.str());
          }
       }
    }

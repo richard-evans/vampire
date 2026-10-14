@@ -54,6 +54,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 // Vampire headers
 #include "atoms.hpp"
@@ -119,11 +120,9 @@ void initialize_rotation_integrators(){
    if(program::program == program::program_t::hamr_simulation) unsupported = "the HAMR program";
 
    if(unsupported != ""){
-      terminaltextcolor(RED);
-      std::cerr << "Error - the selected rotation based LLG integrator (llg-rkmk2, llg-rkmk4 or llg-dm) is not yet supported with " << unsupported << ". Exiting." << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Error - the selected rotation based LLG integrator (llg-rkmk2, llg-rkmk4 or llg-dm) is not yet supported with " << unsupported << ". Exiting." << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "Error - the selected rotation based LLG integrator (llg-rkmk2, llg-rkmk4 or llg-dm) is not yet supported with " << unsupported << ". Exiting.";
+      err::fatal(message.str());
    }
 
    zlog << zTs() << "Rotation based LLG integrators ported from JAMS (https://github.com/stonerlab/jams), original implementation by Dr Joseph Barker, University of Leeds" << std::endl;
