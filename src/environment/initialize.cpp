@@ -40,8 +40,6 @@
 
 
 
-using namespace std;
-
 namespace env = environment::internal;
 
 void neighbour(int env, int mm, double overlap);

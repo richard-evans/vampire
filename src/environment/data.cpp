@@ -22,7 +22,6 @@
 #include <fftw3.h>
 #endif
 
-using namespace std;
 namespace environment{
 
    //------------------------------------------------------------------------------
@@ -71,7 +70,7 @@ namespace environment{
 
       bool LFA_scan;
 
-      std::vector <string> shield_shape;
+      std::vector <std::string> shield_shape;
       std::vector <double> shield_ms;
       std::vector <double> shield_Tc;
       std::vector< std::vector <double> > shield_A;
@@ -89,7 +88,7 @@ namespace environment{
       std::vector <double> shield_Hext_z;
       std::vector <double> shield_max_cell_size;
       std::vector <double> shield_min_cell_size;
-      std::vector <string> pos_or_neg;
+      std::vector <std::string> pos_or_neg;
       std::vector <int> shield_number;
       std::vector <int> H_strength;
 
