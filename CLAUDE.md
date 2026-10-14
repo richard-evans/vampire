@@ -106,7 +106,9 @@ Key modules:
 | `micromagnetic` | Micromagnetic hybrid mode |
 | `gpu` | Backend-independent wrapper that dispatches to a GPU acceleration backend (currently `cuda`) |
 | `cuda` | CUDA GPU acceleration backend (compiled with the `CUDA` define) |
-| `qvoronoi` | Embedded qhull library for Voronoi tessellation |
+| `atoms` | Global atom data (`atoms::` SoA arrays declared in `hdr/atoms.hpp`) |
+| `random` | Random number generation (`mtrandom::`, MT19937 in `mtrand.cpp`) |
+| `utility` | Support library: errors (`err::vexit`, `err::fatal`, `err::warning`), unit conversion (`units::`), vector maths (`vmath::`) |
 
 ### Global Data
 
