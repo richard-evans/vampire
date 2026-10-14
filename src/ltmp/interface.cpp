@@ -140,18 +140,14 @@ namespace ltmp{
             line_stream >> z >> ab;
             // check for valid ranges
             if(z < 0.0 || z > 10000.0){
-              terminaltextcolor(RED);
-              std::cerr << "Error on line " << line << " of absorption profile file. Height value " << z << " is outside of valid range (0.0-10000.0 A). Exiting." << std::endl;
-              zlog << zTs() << "Error on line " << line << " of absorption profile file. Height value " << z << " is outside of valid range (0.0-10000.0 A). Exiting." << std::endl;
-              terminaltextcolor(WHITE);
-              err::vexit();
+              std::ostringstream message;
+              message << "Error on line " << line << " of absorption profile file. Height value " << z << " is outside of valid range (0.0-10000.0 A). Exiting.";
+              err::fatal(message.str());
             }
             if(ab < 0.0 || ab > 1.0){
-              terminaltextcolor(RED);
-              std::cerr << "Error on line " << line << " of absorption profile file. Absorption value " << ab << " value is outside of valid range (0.0-1.0). Exiting." << std::endl;
-              zlog << zTs() << "Error on line " << line << " of absorption profile file. Absorption value " << ab << " value is outside of valid range (0.0-1.0). Exiting." << std::endl;
-              terminaltextcolor(WHITE);
-              err::vexit();
+              std::ostringstream message;
+              message << "Error on line " << line << " of absorption profile file. Absorption value " << ab << " value is outside of valid range (0.0-1.0). Exiting.";
+              err::fatal(message.str());
             }
             // everything is safe, so add point to class
             ltmp::absorption_profile.add_point(z,ab);

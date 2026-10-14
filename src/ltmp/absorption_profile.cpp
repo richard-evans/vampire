@@ -10,6 +10,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include <sstream>
 #include "ltmp.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
@@ -46,16 +47,16 @@ void ltmp::abs_t::add_point(double height, double absorption){
 
    // check for valid height value
    if( height < 0.0 || height > 10000.0 ){
-      std::cerr << "Error: height value " << height << " in absorption profile file is invalid. height values must be in the range 0.0 - 10000.0 A. Exiting." << std::endl;
-      zlog << zTs() << "Error: height value " << height << " in absorption profile file is invalid. height values must be in the range 0.0 - 10000.0 A. Exiting." << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "Error: height value " << height << " in absorption profile file is invalid. height values must be in the range 0.0 - 10000.0 A. Exiting.";
+      err::fatal(message.str());
    }
 
    // check for valid absorption value
    if( absorption < 0.0 || absorption > 1.0 ){
-      std::cerr << "Error: absorption value " << height << " in absorption profile file is invalid. absorption values must be in the range 0.0 - 1.0. Exiting." << std::endl;
-      zlog << zTs() << "Error: absorption value " << height << " in absorption profile file is invalid. absorption values must be in the range 0.0 - 1.0. Exiting." << std::endl;
-      err::vexit();
+      std::ostringstream message;
+      message << "Error: absorption value " << height << " in absorption profile file is invalid. absorption values must be in the range 0.0 - 1.0. Exiting.";
+      err::fatal(message.str());
    }
 
    // add values to list
@@ -86,9 +87,9 @@ void ltmp::abs_t::set_interpolation_table(){
    // check z(i+1) > z(i)
    for(unsigned int i=1; i<z.size(); i++){
       if(z[i]<z[i-1]){
-         std::cerr << "Error: height value "<< z[i] <<" on line " << i+1 << " is less than the previous value " << z[i-1] << " and must be given in ascending order. Exiting" << std::endl;
-         zlog << zTs() << "Error: height value "<< z[i] <<" on line " << i+1 << " is less than the previous value " << z[i-1] << " and must be given in ascending order. Exiting" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Error: height value " << z[i] << " on line " << i+1 << " is less than the previous value " << z[i-1] << " and must be given in ascending order. Exiting";
+         err::fatal(message.str());
       }
    }
 
