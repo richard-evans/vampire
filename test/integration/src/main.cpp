@@ -108,6 +108,12 @@ int main(int argc, char* argv[]){
                                                                    {"E[111]", 2, -1.428571428571435e-22, 1.0e-10, 1.0e-30},
                                                                    {"E(d4)", 3, 8.996251561849234e-23, 1.0e-10, 1.0e-30},
                                                                    {"E(d5)", 4, 0.0, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
+      // uniaxial-sixth-order: E = -K [(S.e)^6 - 15/11 (S.e)^4 + 5/11 (S.e)^2], e = [111], for 100 spins along each direction
+      if( !final_values_test("anisotropy/uniaxial-sixth-order", { {"E[001]", 0, -3.703703703703701e-23, 1.0e-10, 1.0e-30},
+                                                                  {"E[100]", 1, -3.703703703703701e-23, 1.0e-10, 1.0e-30},
+                                                                  {"E[111]", 2, -9.090909090909143e-23, 1.0e-10, 1.0e-30},
+                                                                  {"E(d4)", 3, -3.704857051676831e-23, 1.0e-10, 1.0e-30},
+                                                                  {"E(d5)", 4, 0.0, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
 
       // DMI energy tests
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
