@@ -31,7 +31,7 @@ namespace config
 void output(){ // should include variables for data to be outputted, eg spins, cells etc
 
    // ALWAYS enable output of atomic configurations at end of simulation for HAMR simulation, even if output wasn't requested
-   if (program::program == 7){
+   if (program::program == program::program_t::hamr_simulation){
       // overwrite these variables
       config::internal::output_atoms_config = true;
       config::internal::output_atoms_config_end = true;
@@ -104,7 +104,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
          gpu::config::synchronise();
 
          // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
-         if ((program::program != 2) && (program::program != 3) && (program::program != 12))
+         if ((program::program != program::program_t::hysteresis_loop) && (program::program != program::program_t::static_hysteresis_loop) && (program::program != program::program_t::partial_hysteresis_loop))
          {
 
             //Always output coordinates the first time (re-)started, otherwise the spins coordinates won't be printed
@@ -126,7 +126,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
 
          }
          // for hysteresis programs
-         else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
+         else if ((program::program == program::program_t::hysteresis_loop) || (program::program == program::program_t::static_hysteresis_loop) || (program::program == program::program_t::partial_hysteresis_loop))
          {
             // output config only in range [minField_1;maxField_1] for descending branch
             if (sim::parity < 0)
@@ -173,13 +173,13 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       else if (config::internal::output_cells_config_continuous  && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
       {
          // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
-         if ((program::program != 2) && (program::program != 3) && (program::program != 12))
+         if ((program::program != program::program_t::hysteresis_loop) && (program::program != program::program_t::static_hysteresis_loop) && (program::program != program::program_t::partial_hysteresis_loop))
          {
             if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
             config::internal::legacy_cells();
          }
          // for hysteresis programs
-         else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
+         else if ((program::program == program::program_t::hysteresis_loop) || (program::program == program::program_t::static_hysteresis_loop) || (program::program == program::program_t::partial_hysteresis_loop))
          {
             // output config only in range [minField_1;maxField_1] for decreasing field
             if (sim::parity < 0)

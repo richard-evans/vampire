@@ -114,9 +114,9 @@ void initialize_rotation_integrators(){
 
    // check for unsupported combinations
    std::string unsupported = "";
-   if(gpu::acceleration)                        unsupported = "GPU acceleration";
-   if(micromagnetic::discretisation_type > 0)   unsupported = "micromagnetic multiscale simulations";
-   if(program::program == 7)                    unsupported = "the HAMR program";
+   if(gpu::acceleration)                                       unsupported = "GPU acceleration";
+   if(micromagnetic::discretisation_type > 0)                  unsupported = "micromagnetic multiscale simulations";
+   if(program::program == program::program_t::hamr_simulation) unsupported = "the HAMR program";
 
    if(unsupported != ""){
       terminaltextcolor(RED);

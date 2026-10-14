@@ -130,7 +130,7 @@ void calculate_external_fields(const int start_index,const int end_index){
    fill (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index,0.0);
    fill (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index,0.0);
 
-   if(program::program==7){
+   if(program::program == program::program_t::hamr_simulation){
 
       // Calculate thermal field and applied field due to HAMR process
       hamr::fields(start_index,
@@ -144,7 +144,7 @@ void calculate_external_fields(const int start_index,const int end_index){
                atoms::y_total_external_field_array,
                atoms::z_total_external_field_array);
    }
-   else if(program::program==13){
+   else if(program::program == program::program_t::localised_temperature_pulse){
 
       // Local thermal Fields
       ltmp::get_localised_thermal_fields(atoms::x_thermal_field_array,atoms::y_thermal_field_array,
@@ -202,7 +202,7 @@ void calculate_thermal_fields_only(const int start_index,const int end_index){
 
    if(err::check==true){std::cout << "calculate_thermal_fields_only has been called" << std::endl;}
 
-   if(program::program==13){
+   if(program::program == program::program_t::localised_temperature_pulse){
 
       // Local thermal Fields
       ltmp::get_localised_thermal_fields(atoms::x_thermal_field_array,atoms::y_thermal_field_array,
@@ -222,7 +222,7 @@ void calculate_thermal_fields_only(const int start_index,const int end_index){
 void add_deterministic_external_fields(const int start_index,const int end_index){
 
    // Applied Fields (included in hamr::fields() for HAMR program)
-   if(program::program!=7 && sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
+   if(program::program != program::program_t::hamr_simulation && sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
 
    // Get updated spin torque fields
    st::get_spin_torque_fields(atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array, start_index, end_index);

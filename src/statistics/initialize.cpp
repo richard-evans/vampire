@@ -304,7 +304,7 @@ namespace stats{
       // warn that spin temperature excludes the HAMR applied field, which is
       // calculated together with the thermal field in hamr::fields()
       //------------------------------------------------------------------------
-      if(program::program == 7 && (stats::calculate_system_spin_temp || stats::calculate_grain_spin_temp || stats::calculate_material_spin_temp)){
+      if(program::program == program::program_t::hamr_simulation && (stats::calculate_system_spin_temp || stats::calculate_grain_spin_temp || stats::calculate_material_spin_temp)){
          const std::string message = "Warning - spin temperature in the HAMR program does not include the HAMR applied field (only spin-dependent and non-thermal external fields)";
          if(vmpi::my_rank == 0){
             terminaltextcolor(YELLOW);

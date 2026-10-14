@@ -57,7 +57,7 @@ namespace spinwaves{
       //-------------------------------------------------------------------------------------
       // Check if spinwave calculation enabled, if not do nothing
       //-------------------------------------------------------------------------------------
-      if(program::program!=74) return;
+      if(program::program != program::program_t::spin_waves) return;
 
       // ensure that code was compiled with FFT library
       #ifdef FFT

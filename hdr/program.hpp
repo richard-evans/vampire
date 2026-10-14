@@ -24,9 +24,51 @@ namespace program
 {
 
    //---------------------------------------------------------------------------
+   // Enumerated list of programs selected with the sim:program keyword
+   //---------------------------------------------------------------------------
+   // (values match the historic integer codes shown in error messages)
+   enum class program_t {
+      // standard programs
+      benchmark = 0,
+      time_series = 1,
+      hysteresis_loop = 2,
+      static_hysteresis_loop = 3,
+      curie_temperature = 4,
+      field_cool = 5,
+      laser_pulse = 6,
+      hamr_simulation = 7,
+      cmc_anisotropy = 8,
+      hybrid_cmc = 9,
+      reverse_hybrid_cmc = 10,
+      lagrange_multiplier = 11,
+      partial_hysteresis_loop = 12,
+      localised_temperature_pulse = 13,
+      effective_damping = 14,
+      fmr = 15,
+      localised_field_cool = 16,
+      electrical_pulse = 17,
+      field_pulse = 18,
+      laser_electrical_pulse = 19,
+
+      // diagnostics
+      diagnostic_boltzmann = 50,
+      setting = 51,
+      domain_wall = 52,
+      exchange_stiffness = 53,
+      mm_a_calculation = 54,
+
+      // further programs not under general release
+      field_sweep = 70,
+      disk_tracks = 72,
+      diagnostic_boltzmann_micromagnetic_llg = 73,
+      spin_waves = 74,
+      hamr_cool = 75
+   };
+
+   //---------------------------------------------------------------------------
    // Externally visible variables
    //---------------------------------------------------------------------------
-   extern int program; // program type to be run in vampire
+   extern program_t program; // program type to be run in vampire
 
    extern double fractional_electric_field_strength; // factor controlling strength of stt/sot and voltage
 

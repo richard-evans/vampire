@@ -202,7 +202,7 @@ int single_spin_system(){
 void check_hysteresis_loop_parameters(){
 
    // Only applies to hysteresis loop programs, all others return
-   if(program::program!=12) return;
+   if(program::program != program::program_t::partial_hysteresis_loop) return;
 
    double min=sim::Hmin;
    double max=sim::Hmax;

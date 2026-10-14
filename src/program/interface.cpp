@@ -38,154 +38,154 @@ namespace program{
       if(word==test){
          test="benchmark";
          if(value==test){
-            program::program=0;
+            program::program = program_t::benchmark;
             return true;
          }
          test="time-series";
          if(value==test){
-            program::program=1;
+            program::program = program_t::time_series;
             return true;
          }
          test="hysteresis-loop";
          if(value==test){
-            program::program=2;
+            program::program = program_t::hysteresis_loop;
             return true;
          }
          test="static-hysteresis-loop";
          if(value==test){
-            program::program=3;
+            program::program = program_t::static_hysteresis_loop;
             return true;
          }
          test="curie-temperature";
          if(value==test){
-            program::program=4;
+            program::program = program_t::curie_temperature;
             return true;
          }
          test="field-cool";
          if(value==test){
-            program::program=5;
+            program::program = program_t::field_cool;
             return true;
          }
          test="laser-pulse";
          if(value==test){
-            program::program=6;
+            program::program = program_t::laser_pulse;
             return true;
          }
          test="hamr-simulation";
          if(value==test){
-            program::program=7;
+            program::program = program_t::hamr_simulation;
             return true;
          }
          test="cmc-anisotropy";
          if(value==test){
-            program::program=8;
+            program::program = program_t::cmc_anisotropy;
             return true;
          }
          test="hybrid-cmc";
          if(value==test){
-            program::program=9;
+            program::program = program_t::hybrid_cmc;
             return true;
          }
          test="reverse-hybrid-cmc";
          if(value==test){
-            program::program=10;
+            program::program = program_t::reverse_hybrid_cmc;
             return true;
          }
          test="LaGrange-Multiplier";
          if(value==test){
-            program::program=11;
+            program::program = program_t::lagrange_multiplier;
             return true;
          }
          test="partial-hysteresis-loop";
          if(value==test){
-            program::program=12;
+            program::program = program_t::partial_hysteresis_loop;
             return true;
          }
          test="localised-temperature-pulse";
          if(value==test){
-            program::program=13;
+            program::program = program_t::localised_temperature_pulse;
             return true;
          }
          test="effective-damping";
          if(value==test){
-            program::program=14;
+            program::program = program_t::effective_damping;
             return true;
          }
          test="fmr";
          if(value==test){
-            program::program=15;
+            program::program = program_t::fmr;
             return true;
          }
          test="localised-field-cool";
          if(value==test){
-            program::program=16;
+            program::program = program_t::localised_field_cool;
             return true;
          }
          test="electrical-pulse";
          if(value==test){
-            program::program = 17;
+            program::program = program_t::electrical_pulse;
             return true;
          }
          test="field-pulse";
          if(value==test){
-            program::program = 18;
+            program::program = program_t::field_pulse;
             return true;
          }
          test="laser-electrical-pulse";
          if(value==test){
-            program::program = 19;
+            program::program = program_t::laser_electrical_pulse;
             return true;
          }
          test="diagnostic-boltzmann";
          if(value==test){
-            program::program=50;
+            program::program = program_t::diagnostic_boltzmann;
             return true;
          }
          test="setting";
          if(value==test){
-            program::program=51;
+            program::program = program_t::setting;
             return true;
          }
          test="domain-wall";
          if(value==test){
-            program::program=52;
+            program::program = program_t::domain_wall;
             return true;
          }
          test="exchange-stiffness";
          if(value==test){
-            program::program=53;
+            program::program = program_t::exchange_stiffness;
             return true;
          }
          test="mm-A-calculation";
          if(value==test){
-            program::program=54;
+            program::program = program_t::mm_a_calculation;
             return true;
          }
          test="field-sweep";
          if(value==test){
-            program::program=70;
+            program::program = program_t::field_sweep;
             return true;
          }
          test="disk-tracks";
          if(value==test){
-            program::program=72;
+            program::program = program_t::disk_tracks;
             return true;
          }
          test="diagnostic-boltzmann-micromagnetic-llg";
          if(value==test){
-            program::program=73;
+            program::program = program_t::diagnostic_boltzmann_micromagnetic_llg;
             return true;
          }
          // JRH - Program option for spinwaves
          test="spin-waves";
          if(value==test){
-            program::program=74;
+            program::program = program_t::spin_waves;
             return true;
          }
          // HAMR cool
          test="hamr-cool";
          if(value==test){
-            program::program=75;
+            program::program = program_t::hamr_cool;
             return true;
          }
          else{

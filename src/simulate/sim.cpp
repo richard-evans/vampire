@@ -314,7 +314,7 @@ int run(){
 
    // Select program to run
    switch(program::program){
-      case 0:
+      case program::program_t::benchmark:
          if(vmpi::my_rank==0){
             std::cout << "Benchmark..." << std::endl;
             zlog << "Benchmark..." << std::endl;
@@ -322,7 +322,7 @@ int run(){
          program::bmark();
          break;
 
-      case 1:
+      case program::program_t::time_series:
          if(vmpi::my_rank==0){
             std::cout << "Time-Series..." << std::endl;
             zlog << "Time-Series..." << std::endl;
@@ -330,7 +330,7 @@ int run(){
          program::time_series();
          break;
 
-      case 2:
+      case program::program_t::hysteresis_loop:
          if(vmpi::my_rank==0){
             std::cout << "Hysteresis-Loop..." << std::endl;
             zlog << "Hysteresis-Loop..." << std::endl;
@@ -338,7 +338,7 @@ int run(){
          program::hysteresis();
          break;
 
-      case 3:
+      case program::program_t::static_hysteresis_loop:
          if(vmpi::my_rank==0){
             std::cout << "Static-Hysteresis-Loop..." << std::endl;
             zlog << "Static-Hysteresis-Loop..." << std::endl;
@@ -346,7 +346,7 @@ int run(){
          program::static_hysteresis();
          break;
 
-      case 4:
+      case program::program_t::curie_temperature:
          if(vmpi::my_rank==0){
             std::cout << "Curie-Temperature..." << std::endl;
             zlog << "Curie-Temperature..." << std::endl;
@@ -354,7 +354,7 @@ int run(){
          program::curie_temperature();
          break;
 
-      case 5:
+      case program::program_t::field_cool:
          if(vmpi::my_rank==0){
             std::cout << "Field-Cool..." << std::endl;
             zlog << "Field-Cool..." << std::endl;
@@ -362,7 +362,7 @@ int run(){
          program::field_cool();
          break;
 
-      case 6:
+      case program::program_t::laser_pulse:
          if(vmpi::my_rank==0){
             std::cout << "Temperature-Pulse..." << std::endl;
             zlog << "Temperature-Pulse..." << std::endl;
@@ -370,7 +370,7 @@ int run(){
          program::temperature_pulse();
          break;
 
-      case 7:
+      case program::program_t::hamr_simulation:
          if(vmpi::my_rank==0){
             std::cout << "HAMR-Simulation..." << std::endl;
             zlog << "HAMR-Simulation..." << std::endl;
@@ -378,7 +378,7 @@ int run(){
          program::hamr();
          break;
 
-      case 8:
+      case program::program_t::cmc_anisotropy:
          if(vmpi::my_rank==0){
             std::cout << "CMC-Anisotropy..." << std::endl;
             zlog << "CMC-Anisotropy..." << std::endl;
@@ -386,7 +386,7 @@ int run(){
          program::cmc_anisotropy();
          break;
 
-      case 9:
+      case program::program_t::hybrid_cmc:
          if(vmpi::my_rank==0){
             std::cout << "Hybrid-CMC..." << std::endl;
             zlog << "Hybrid-CMC..." << std::endl;
@@ -394,7 +394,7 @@ int run(){
          program::hybrid_cmc();
          break;
 
-      case 10:
+      case program::program_t::reverse_hybrid_cmc:
          if(vmpi::my_rank==0){
             std::cout << "Reverse-Hybrid-CMC..." << std::endl;
             zlog << "Reverse-Hybrid-CMC..." << std::endl;
@@ -402,7 +402,7 @@ int run(){
          program::reverse_hybrid_cmc();
          break;
 
-      case 11:
+      case program::program_t::lagrange_multiplier:
          if(vmpi::my_rank==0){
             std::cout << "LaGrange-Multiplier..." << std::endl;
             zlog << "LaGrange-Multiplier..." << std::endl;
@@ -410,7 +410,7 @@ int run(){
          program::lagrange_multiplier();
          break;
 
-      case 12:
+      case program::program_t::partial_hysteresis_loop:
          if(vmpi::my_rank==0){
             std::cout << "partial-hysteresis-loop..." << std::endl;
             zlog << "partial-hysteresis-loop..." << std::endl;
@@ -418,7 +418,7 @@ int run(){
          program::partial_hysteresis_loop();
          break;
 
-      case 13:
+      case program::program_t::localised_temperature_pulse:
          if(vmpi::my_rank==0){
             std::cout << "localised-temperature-pulse..." << std::endl;
             zlog << "localised-temperature-pulse..." << std::endl;
@@ -426,7 +426,7 @@ int run(){
          program::localised_temperature_pulse();
          break;
 
-      case 14:
+      case program::program_t::effective_damping:
          if(vmpi::my_rank==0){
             std::cout << "effective-damping..." << std::endl;
             zlog << "effective-damping..." << std::endl;
@@ -434,7 +434,7 @@ int run(){
          program::effective_damping();
          break;
 
-      case 15:
+      case program::program_t::fmr:
          if(vmpi::my_rank==0){
             std::cout << "fmr..." << std::endl;
             zlog << "fmr..." << std::endl;
@@ -442,7 +442,7 @@ int run(){
          program::fmr();
          break;
 
-      case 16:
+      case program::program_t::localised_field_cool:
          if(vmpi::my_rank==0){
             std::cout << "localised-field-cool..." << std::endl;
             zlog << "localised-field-cool..." << std::endl;
@@ -450,21 +450,21 @@ int run(){
          program::local_field_cool();
          break;
 
-      case 17:
+      case program::program_t::electrical_pulse:
          if(vmpi::my_rank==0){
             std::cout << "electrical-pulse..." << std::endl;
             zlog << "electrical-pulse..." << std::endl;
          }
          program::electrical_pulse();
          break;
-      case 18:
+      case program::program_t::field_pulse:
          if(vmpi::my_rank==0){
             std::cout << "field-pulse..." << std::endl;
             zlog << "field-pulse..." << std::endl;
          }
          program::field_pulse();
          break;
-      case 19:
+      case program::program_t::laser_electrical_pulse:
          if(vmpi::my_rank==0){
             std::cout << "laser-electrical-pulse..." << std::endl;
             zlog << "laser-electrical-pulse..." << std::endl;
@@ -472,14 +472,14 @@ int run(){
          program::laser_electrical_pulse();
          break;
 
-      case 50:
+      case program::program_t::diagnostic_boltzmann:
          if(vmpi::my_rank==0){
             std::cout << "Diagnostic-Boltzmann..." << std::endl;
             zlog << "Diagnostic-Boltzmann..." << std::endl;
          }
          program::boltzmann_dist();
          break;
-      case 51:
+      case program::program_t::setting:
          if(vmpi::my_rank==0){
             std::cout << "Setting..." << std::endl;
             zlog << "Setting..." << std::endl;
@@ -487,7 +487,7 @@ int run(){
          program::setting_process();
          break;
       //------------------------------------------------------------------------
-      case 52:
+      case program::program_t::domain_wall:
          if(vmpi::my_rank==0){
             std::cout << "Domain walls..." << std::endl;
             zlog << "Domain walls..." << std::endl;
@@ -495,7 +495,7 @@ int run(){
          program::domain_wall();
          break;
       //------------------------------------------------------------------------
-      case 53:
+      case program::program_t::exchange_stiffness:
          if(vmpi::my_rank==0){
             std::cout << "exchange stiffness..." << std::endl;
             zlog << "exchange stiffness..." << std::endl;
@@ -503,7 +503,7 @@ int run(){
          program::exchange_stiffness();
          break;
       //------------------------------------------------------------------------
-      case 54:
+      case program::program_t::mm_a_calculation:
          if(vmpi::my_rank==0){
             std::cout << "mm-A-calculation..." << std::endl;
             zlog << "mm-A-calculation..." << std::endl;
@@ -511,7 +511,7 @@ int run(){
          program::mm_A_calculation();
          break;
       //------------------------------------------------------------------------
-      case 70:
+      case program::program_t::field_sweep:
          if(vmpi::my_rank==0){
             std::cout << "field-sweep..." << std::endl;
             zlog << "field-sweep..." << std::endl;
@@ -519,7 +519,7 @@ int run(){
          program::field_sweep();
       break;
       //------------------------------------------------------------------------
-      case 72:
+      case program::program_t::disk_tracks:
          if(vmpi::my_rank==0){
             std::cout << "Tracks..." << std::endl;
             zlog << "Tracks..." << std::endl;
@@ -527,7 +527,7 @@ int run(){
          program::tracks();
          break;
       //------------------------------------------------------------------------
-      case 73:
+      case program::program_t::diagnostic_boltzmann_micromagnetic_llg:
          if(vmpi::my_rank==0){
             std::cout << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
             zlog << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
@@ -535,7 +535,7 @@ int run(){
          program::boltzmann_dist_micromagnetic_llg();
          break;
       // JRH call spin_waves program -------------------------------------------
-      case 74:
+      case program::program_t::spin_waves:
          if(vmpi::my_rank==0){
             std::cout << "Spin-waves..." << std::endl;
             zlog << "Spin-waves..." << std::endl;
@@ -543,7 +543,7 @@ int run(){
          program::spin_waves();
          break;
       //------------------------------------------------------------------------
-      case 75:
+      case program::program_t::hamr_cool:
          if(vmpi::my_rank==0){
             std::cout << "HAMR cool..." << std::endl;
             zlog << "HAMR cool..." << std::endl;
@@ -553,8 +553,8 @@ int run(){
 
       //------------------------------------------------------------------------
       default:{
-         std::cerr << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
-         zlog << "Unknown Internal Program ID "<< program::program << " requested, exiting" << std::endl;
+         std::cerr << "Unknown Internal Program ID "<< static_cast<int>(program::program) << " requested, exiting" << std::endl;
+         zlog << "Unknown Internal Program ID "<< static_cast<int>(program::program) << " requested, exiting" << std::endl;
          err::vexit();
          }
    }
