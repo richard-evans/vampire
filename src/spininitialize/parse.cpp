@@ -98,10 +98,9 @@ namespace spininitialize{
          std::ifstream ifile(filename.c_str());
 
          if(!ifile.is_open()){
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - vector field file \'" << filename << "\' could not be opened." << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - vector field file \'" << filename << "\' could not be opened.";
+            err::fatal(message.str());
          }
 
          std::vector<field_point_t> points;
@@ -118,10 +117,9 @@ namespace spininitialize{
             if(tokens[0][0] == '#') continue;
 
             if(tokens.size() != 6){
-               terminaltextcolor(RED);
-               std::cerr << "Error - vector field file \'" << filename << "\' contains an invalid line (expected 6 comma-separated values \'x,y,z,mx,my,mz\'): \'" << line_str << "\'" << std::endl;
-               terminaltextcolor(WHITE);
-               err::vexit();
+               std::ostringstream message;
+               message << "Error - vector field file \'" << filename << "\' contains an invalid line (expected 6 comma-separated values \'x,y,z,mx,my,mz\'): \'" << line_str << "\'";
+               err::fatal(message.str());
             }
 
             // x,y,z are fractional coordinates (0-1) of the point within
@@ -137,10 +135,9 @@ namespace spininitialize{
 
             // normalise the supplied direction vector to a unit vector
             if(!normalise(point.mx, point.my, point.mz)){
-               terminaltextcolor(RED);
-               std::cerr << "Error - vector field file \'" << filename << "\' contains a point with a zero-length direction vector: \'" << line_str << "\'" << std::endl;
-               terminaltextcolor(WHITE);
-               err::vexit();
+               std::ostringstream message;
+               message << "Error - vector field file \'" << filename << "\' contains a point with a zero-length direction vector: \'" << line_str << "\'";
+               err::fatal(message.str());
             }
 
             points.push_back(point);
@@ -148,10 +145,9 @@ namespace spininitialize{
          }
 
          if(points.empty()){
-            terminaltextcolor(RED);
-            std::cerr << "Error on line " << line << " of material file - vector field file \'" << filename << "\' contains no data points." << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - vector field file \'" << filename << "\' contains no data points.";
+            err::fatal(message.str());
          }
 
          // add to cache and return the new id, which is stored in
