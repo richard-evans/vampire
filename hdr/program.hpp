@@ -14,6 +14,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
 
 // Vampire headers
 
@@ -71,6 +72,17 @@ namespace program
    extern program_t program; // program type to be run in vampire
 
    extern double fractional_electric_field_strength; // factor controlling strength of stt/sot and voltage
+
+   // domain wall program
+   extern int domain_wall_axis;
+   extern double domain_wall_position;
+   extern double domain_wall_discretisation;
+   extern double domain_wall_centre;
+   extern double domain_wall_width;
+   extern std::vector < bool > anti_PBC;
+   extern std::vector < double > domain_wall_second_vector_x;
+   extern std::vector < double > domain_wall_second_vector_y;
+   extern std::vector < double > domain_wall_second_vector_z;
 
    //---------------------------------------------------------------------------
    // Function to run the program selected with the sim:program keyword

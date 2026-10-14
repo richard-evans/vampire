@@ -489,7 +489,7 @@ namespace vout{
 
    // Output Function 67
    void domain_wall_position(std::ostream& stream, bool header){
-      stream << sim::domain_wall_centre;
+      stream << program::domain_wall_centre;
    }
 
    // Output Function 68

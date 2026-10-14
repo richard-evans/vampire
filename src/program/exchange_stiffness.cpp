@@ -129,9 +129,9 @@ void exchange_stiffness(){
    std::vector<double> fractional_coordinates(atoms::num_atoms);
 
    // x-direction
-   if( sim::domain_wall_axis == 0 ) set_constraint_mask(atoms::x_coord_array, atoms::type_array, fractional_coordinates, constraint_mask, constrained_material_id);
-   if( sim::domain_wall_axis == 1 ) set_constraint_mask(atoms::y_coord_array, atoms::type_array, fractional_coordinates, constraint_mask, constrained_material_id);
-   if( sim::domain_wall_axis == 2 ) set_constraint_mask(atoms::z_coord_array, atoms::type_array, fractional_coordinates, constraint_mask, constrained_material_id);
+   if( program::domain_wall_axis == 0 ) set_constraint_mask(atoms::x_coord_array, atoms::type_array, fractional_coordinates, constraint_mask, constrained_material_id);
+   if( program::domain_wall_axis == 1 ) set_constraint_mask(atoms::y_coord_array, atoms::type_array, fractional_coordinates, constraint_mask, constrained_material_id);
+   if( program::domain_wall_axis == 2 ) set_constraint_mask(atoms::z_coord_array, atoms::type_array, fractional_coordinates, constraint_mask, constrained_material_id);
 
    // count number of atoms in each plane
    int n_atm_p1 = 0;

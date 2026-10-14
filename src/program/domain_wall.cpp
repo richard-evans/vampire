@@ -43,7 +43,7 @@ namespace program{
 
       int num_averages = 50;
       num_averages = num_averages/2.0;
-      int num_dw_cells = (cs::system_dimensions[sim::domain_wall_axis])/sim::domain_wall_discretisation + 1;
+      int num_dw_cells = (cs::system_dimensions[program::domain_wall_axis])/program::domain_wall_discretisation + 1;
       std::vector <double > atom_to_cell_array(num_local_atoms,0);
       std::vector  < double > mag_x(mp::num_materials*num_dw_cells,0.0);
       std::vector  < double > mag_y(mp::num_materials*num_dw_cells,0.0);
@@ -52,52 +52,52 @@ namespace program{
       std::vector < int > num_atoms_in_cell(mp::num_materials*num_dw_cells,0.0);
 
       for (int mat = 0; mat < mp::num_materials; mat ++){
-         std::cout <<mat << "\t" <<  sim::domain_wall_second_vector_x[mat] << "\t" <<sim::domain_wall_second_vector_y[mat] << "\t" <<sim::domain_wall_second_vector_z[mat] << "\t" << std::endl;
-         // sim::domain_wall_second_vector_x[0] = -sim::domain_wall_second_vector_x[1];
-         // sim::domain_wall_second_vector_y[0] = -sim::domain_wall_second_vector_y[1];
-         //    sim::domain_wall_second_vector_z[0] = -sim::domain_wall_second_vector_z[1];
+         std::cout <<mat << "\t" <<  program::domain_wall_second_vector_x[mat] << "\t" <<program::domain_wall_second_vector_y[mat] << "\t" <<program::domain_wall_second_vector_z[mat] << "\t" << std::endl;
+         // program::domain_wall_second_vector_x[0] = -program::domain_wall_second_vector_x[1];
+         // program::domain_wall_second_vector_y[0] = -program::domain_wall_second_vector_y[1];
+         //    program::domain_wall_second_vector_z[0] = -program::domain_wall_second_vector_z[1];
       }
 
-      //  std::cout << sim::domain_wall_width << "\t" << sim::domain_wall_position*cs::system_dimensions[0] << "\t" << num_dw_cells << "\t" << sim::domain_wall_axis << std::endl;
+      //  std::cout << program::domain_wall_width << "\t" << program::domain_wall_position*cs::system_dimensions[0] << "\t" << num_dw_cells << "\t" << program::domain_wall_axis << std::endl;
 
 
 
       //reverses the magentisation of atoms further away than the domain wall distance.
       if (!sim::load_checkpoint_flag){
-         if (sim::domain_wall_axis == 0){
+         if (program::domain_wall_axis == 0){
             for(int atom=0;atom<num_local_atoms;atom++){
-               //    std::cout <<atom << '\t' <<  atoms::x_coord_array[atom] << "\t" << cs::system_dimensions[0]*sim::domain_wall_position -sim::domain_wall_width/2.0 << std::endl;
-               if (atoms::x_coord_array[atom] > cs::system_dimensions[0]*sim::domain_wall_position -sim::domain_wall_width/2.0){
+               //    std::cout <<atom << '\t' <<  atoms::x_coord_array[atom] << "\t" << cs::system_dimensions[0]*program::domain_wall_position -program::domain_wall_width/2.0 << std::endl;
+               if (atoms::x_coord_array[atom] > cs::system_dimensions[0]*program::domain_wall_position -program::domain_wall_width/2.0){
                   int mat = atoms::type_array[atom];
-                  double pos = (atoms::x_coord_array[atom] - cs::system_dimensions[0]*sim::domain_wall_position + sim::domain_wall_width/2.0)/sim::domain_wall_width;
+                  double pos = (atoms::x_coord_array[atom] - cs::system_dimensions[0]*program::domain_wall_position + program::domain_wall_width/2.0)/program::domain_wall_width;
                   if (pos > 1) pos = 1;
                   if (pos < 0) pos = 0;
-                  double dx = -atoms::x_spin_array[atom] + sim::domain_wall_second_vector_x[mat];
-                  double dy = -atoms::y_spin_array[atom] + sim::domain_wall_second_vector_y[mat];
-                  double dz = -atoms::z_spin_array[atom] + sim::domain_wall_second_vector_z[mat];
+                  double dx = -atoms::x_spin_array[atom] + program::domain_wall_second_vector_x[mat];
+                  double dy = -atoms::y_spin_array[atom] + program::domain_wall_second_vector_y[mat];
+                  double dz = -atoms::z_spin_array[atom] + program::domain_wall_second_vector_z[mat];
                   double mx = atoms::x_spin_array[atom] + dx*pos;
                   double my = atoms::y_spin_array[atom] + dy*pos;
                   double mz = atoms::z_spin_array[atom] + dz*pos;
                   atoms::x_spin_array[atom] = mx;
                   atoms::y_spin_array[atom] = my;
                   atoms::z_spin_array[atom] = mz;
-                  std::cout << atom << '\t' << atoms::x_coord_array[atom] << '\t' << atoms::x_spin_array[atom] << '\t' << atoms::y_spin_array[atom] << '\t' << atoms::z_spin_array[atom] << '\t' << sim::domain_wall_second_vector_x[mat] << '\t' << sim::domain_wall_second_vector_y[mat] << '\t' << sim::domain_wall_second_vector_z[mat] << '\t' <<std::endl;
+                  std::cout << atom << '\t' << atoms::x_coord_array[atom] << '\t' << atoms::x_spin_array[atom] << '\t' << atoms::y_spin_array[atom] << '\t' << atoms::z_spin_array[atom] << '\t' << program::domain_wall_second_vector_x[mat] << '\t' << program::domain_wall_second_vector_y[mat] << '\t' << program::domain_wall_second_vector_z[mat] << '\t' <<std::endl;
                }
             }
          }
-         if (sim::domain_wall_axis == 2){
+         if (program::domain_wall_axis == 2){
             for(int atom=0;atom<num_local_atoms;atom++){
-               //       std::cout <<" here" << "\t" << atom << '\t' <<  atoms::z_coord_array[atom] << "\t" << cs::system_dimensions[2] << "\t" << sim::domain_wall_position  << '\t'<< sim::domain_wall_width/2.0 << "\t" << cs::system_dimensions[2]*sim::domain_wall_position -sim::domain_wall_width/2.0 << std::endl;
-               if (atoms::z_coord_array[atom] > cs::system_dimensions[2]*sim::domain_wall_position -sim::domain_wall_width/2.0){
+               //       std::cout <<" here" << "\t" << atom << '\t' <<  atoms::z_coord_array[atom] << "\t" << cs::system_dimensions[2] << "\t" << program::domain_wall_position  << '\t'<< program::domain_wall_width/2.0 << "\t" << cs::system_dimensions[2]*program::domain_wall_position -program::domain_wall_width/2.0 << std::endl;
+               if (atoms::z_coord_array[atom] > cs::system_dimensions[2]*program::domain_wall_position -program::domain_wall_width/2.0){
                   //  std::cout << "entered" << std::endl;
                   int mat = atoms::type_array[atom];
-                  double pos = (atoms::z_coord_array[atom] - cs::system_dimensions[2]*sim::domain_wall_position + sim::domain_wall_width/2.0)/sim::domain_wall_width;
+                  double pos = (atoms::z_coord_array[atom] - cs::system_dimensions[2]*program::domain_wall_position + program::domain_wall_width/2.0)/program::domain_wall_width;
                   if (pos > 1) pos = 1;
                   if (pos < 0) pos = 0;
                   //          std::cout << atoms::z_coord_array[atom] << '\t' << pos << std::endl;
-                  double dx = -atoms::x_spin_array[atom] + sim::domain_wall_second_vector_x[mat];
-                  double dy = -atoms::y_spin_array[atom] + sim::domain_wall_second_vector_y[mat];
-                  double dz = -atoms::z_spin_array[atom] + sim::domain_wall_second_vector_z[mat];
+                  double dx = -atoms::x_spin_array[atom] + program::domain_wall_second_vector_x[mat];
+                  double dy = -atoms::y_spin_array[atom] + program::domain_wall_second_vector_y[mat];
+                  double dz = -atoms::z_spin_array[atom] + program::domain_wall_second_vector_z[mat];
                   // std::cout << dx << '\t' << dy << "\t" << dz << std::endl;
                   double mx = atoms::x_spin_array[atom] + dx*pos;
                   double my = atoms::y_spin_array[atom] + dy*pos;
@@ -107,30 +107,30 @@ namespace program{
                   atoms::x_spin_array[atom] = mx;
                   atoms::y_spin_array[atom] = my;
                   atoms::z_spin_array[atom] = mz;
-                  //    if (mat ==0) std::cout << atom << '\t' << mat << "\t" << atoms::z_coord_array[atom] << '\t' << atoms::x_spin_array[atom] << '\t' << atoms::y_spin_array[atom] << '\t' << atoms::z_spin_array[atom] << '\t' << sim::domain_wall_second_vector_x[mat] << '\t' << sim::domain_wall_second_vector_y[mat] << '\t' << sim::domain_wall_second_vector_z[mat] << '\t' <<std::endl;
+                  //    if (mat ==0) std::cout << atom << '\t' << mat << "\t" << atoms::z_coord_array[atom] << '\t' << atoms::x_spin_array[atom] << '\t' << atoms::y_spin_array[atom] << '\t' << atoms::z_spin_array[atom] << '\t' << program::domain_wall_second_vector_x[mat] << '\t' << program::domain_wall_second_vector_y[mat] << '\t' << program::domain_wall_second_vector_z[mat] << '\t' <<std::endl;
                }
             }
          }
 
 
-         // if (sim::domain_wall_axis == 1){
+         // if (program::domain_wall_axis == 1){
          //    for(int atom=0;atom<num_local_atoms;atom++){
-         //       if (atoms::y_coord_array[atom] > cs::system_dimensions[1]*sim::domain_wall_position){
+         //       if (atoms::y_coord_array[atom] > cs::system_dimensions[1]*program::domain_wall_position){
          //          int mat = atoms::type_array[atom];
-         //          atoms::x_spin_array[atom] = sim::domain_wall_second_vector_x[mat];
-         //          atoms::y_spin_array[atom] = sim::domain_wall_second_vector_y[mat];
-         //        atoms::z_spin_array[atom] = sim::domain_wall_second_vector_z[mat];
+         //          atoms::x_spin_array[atom] = program::domain_wall_second_vector_x[mat];
+         //          atoms::y_spin_array[atom] = program::domain_wall_second_vector_y[mat];
+         //        atoms::z_spin_array[atom] = program::domain_wall_second_vector_z[mat];
          //        }
          //    }
          // }
          //
-         // if (sim::domain_wall_axis == 2){
+         // if (program::domain_wall_axis == 2){
          //    for(int atom=0;atom<num_local_atoms;atom++){
-         //       if (atoms::z_coord_array[atom] > cs::system_dimensions[2]*sim::domain_wall_position){
+         //       if (atoms::z_coord_array[atom] > cs::system_dimensions[2]*program::domain_wall_position){
          //          int mat = atoms::type_array[atom];
-         //          atoms::x_spin_array[atom] = sim::domain_wall_second_vector_x[mat];
-         //          atoms::y_spin_array[atom] = sim::domain_wall_second_vector_y[mat];
-         //         atoms::z_spin_array[atom] = sim::domain_wall_second_vector_z[mat];
+         //          atoms::x_spin_array[atom] = program::domain_wall_second_vector_x[mat];
+         //          atoms::y_spin_array[atom] = program::domain_wall_second_vector_y[mat];
+         //         atoms::z_spin_array[atom] = program::domain_wall_second_vector_z[mat];
          //        }
          //    }
          // }
@@ -138,15 +138,15 @@ namespace program{
 
 
 
-      // std::cout << sim::anti_PBC[0] << '\t' <<  sim::anti_PBC[1] << '\t' <<  sim::anti_PBC[2] <<std::endl;
-      // if (sim::anti_PBC[0] || sim::anti_PBC[1] || sim::anti_PBC[2]){
+      // std::cout << program::anti_PBC[0] << '\t' <<  program::anti_PBC[1] << '\t' <<  program::anti_PBC[2] <<std::endl;
+      // if (program::anti_PBC[0] || program::anti_PBC[1] || program::anti_PBC[2]){
       //   for (int atom = 0; atom <num_local_atoms; atom++){
       //     const int start = atoms::neighbour_list_start_index[atom];
       //     const int end   = atoms::neighbour_list_end_index[atom] + 1;
       //     for(int nn=start;nn<end;nn++){
       //     const int natom = atoms::neighbour_list_array[nn];
       //     bool edge = false;
-      //     if (sim::anti_PBC[0] == true){
+      //     if (program::anti_PBC[0] == true){
       //       #ifdef MPICF
       //       if (atoms::x_coord_array[natom] < -0.1 || atoms::x_coord_array[natom] > cs::system_dimensions[0] || atoms::x_coord_array[atom] < -0.1 || atoms::x_coord_array[atom] > cs::system_dimensions[0]){
       //           std::cout << atom << '\t' << natom  << "\t" << atoms::x_coord_array[atom] << '\t' <<atoms::x_coord_array[natom] << '\t' <<  std::endl;
@@ -160,7 +160,7 @@ namespace program{
       //       }
       //       #endif
       //     }
-      //     if (sim::anti_PBC[1] == true){
+      //     if (program::anti_PBC[1] == true){
       //       //std::cout << "y" << std::endl;
       //       #ifdef MPICF
       //       if (atoms::y_coord_array[natom] < 0 || atoms::y_coord_array[natom] > cs::system_dimensions[1] || atoms::y_coord_array[atom] < 0 || atoms::y_coord_array[atom] > cs::system_dimensions[1]){
@@ -174,7 +174,7 @@ namespace program{
       //       #endif
       //
       //     }
-      //     if (sim::anti_PBC[2] == true){
+      //     if (program::anti_PBC[2] == true){
       //       //std::cout << "z" << std::endl;
       //       #ifdef MPICF
       //       if (atoms::z_coord_array[natom] < 0 || atoms::z_coord_array[natom] > cs::system_dimensions[2] || atoms::z_coord_array[atom] < 0 || atoms::z_coord_array[atom] > cs::system_dimensions[2]){
@@ -227,29 +227,29 @@ namespace program{
       //is along x or y or z
 
 
-      if (sim::domain_wall_axis == 0){
+      if (program::domain_wall_axis == 0){
          for(int atom=0;atom<num_local_atoms;atom++){
             int mat = atoms::type_array[atom];
-            int cell = atoms::x_coord_array[atom]/sim::domain_wall_discretisation;
+            int cell = atoms::x_coord_array[atom]/program::domain_wall_discretisation;
             //          std::cout << atom << '\t' << mat << '\t' << cell << "\t" << atom_to_cell_array.size() << "\t" << num_atoms_in_cell.size() << '\t' << num_dw_cells*mat + cell << std::endl;
             atom_to_cell_array[atom] = cell;
             num_atoms_in_cell[num_dw_cells*mat + cell] ++;
 
-            // if (cell > num_dw_cells) std::cout << atoms::x_coord_array[atom] << '\t' << sim::domain_wall_discretisation <<std::endl;
+            // if (cell > num_dw_cells) std::cout << atoms::x_coord_array[atom] << '\t' << program::domain_wall_discretisation <<std::endl;
          }
       }
-      if (sim::domain_wall_axis == 1){
+      if (program::domain_wall_axis == 1){
          for(int atom=0;atom<num_local_atoms;atom++){
             int mat = atoms::type_array[atom];
-            int cell = atoms::y_coord_array[atom]/sim::domain_wall_discretisation;
+            int cell = atoms::y_coord_array[atom]/program::domain_wall_discretisation;
             atom_to_cell_array[atom] = cell;
             num_atoms_in_cell[num_dw_cells*mat + cell] ++;
          }
       }
-      if (sim::domain_wall_axis == 2){
+      if (program::domain_wall_axis == 2){
          for(int atom=0;atom<num_local_atoms;atom++){
             int mat = atoms::type_array[atom];
-            int cell = atoms::z_coord_array[atom]/sim::domain_wall_discretisation;
+            int cell = atoms::z_coord_array[atom]/program::domain_wall_discretisation;
             atom_to_cell_array[atom] = cell;
             num_atoms_in_cell[num_dw_cells*mat + cell] ++;
 

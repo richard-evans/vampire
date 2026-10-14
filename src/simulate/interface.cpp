@@ -17,6 +17,7 @@
 // Vampire headers
 #include "errors.hpp"
 #include "integrate.hpp"
+#include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
@@ -125,13 +126,13 @@ namespace sim{
       if(word==test){
          //vin::check_for_valid_int(tt, word, line, prefix, 0, max_time,"input","0 - "+max_time_str);
          if (value == "x") {
-         sim::domain_wall_axis = 0;
+         program::domain_wall_axis = 0;
          }
          else if (value == "y") {
-         sim::domain_wall_axis = 1;
+         program::domain_wall_axis = 1;
          }
          else if (value == "z") {
-         sim::domain_wall_axis = 2;
+         program::domain_wall_axis = 2;
          }
          else {
             std::cout << "domain wall axis must equal x or y or z" <<std::endl;
@@ -144,27 +145,27 @@ namespace sim{
       if(word==test){
          double tt = atof(value.c_str()); // convert string to uint64_t
          vin::check_for_valid_value(tt, word, line, prefix, unit, "length", 10, 1000,"input","10 - 1 A");
-         sim::domain_wall_discretisation = tt;
+         program::domain_wall_discretisation = tt;
          return true;
       }
       //--------------------------------------------------------------------
       test="domain-wall-anti-pbc-x";
       if(word==test){
-         sim::anti_PBC[0] = true;
+         program::anti_PBC[0] = true;
          cs::pbc[0]=true;
          return true;
       }
       //--------------------------------------------------------------------
       test="domain-wall-anti-pbc-y";
       if(word==test){
-         sim::anti_PBC[1] = true;
+         program::anti_PBC[1] = true;
          cs::pbc[1]=true;
          return true;
       }
       //--------------------------------------------------------------------
       test="domain-wall-anti-pbc-z";
       if(word==test){
-         sim::anti_PBC[2] = true;
+         program::anti_PBC[2] = true;
          cs::pbc[2]=true;
          return true;
       }
@@ -173,7 +174,7 @@ namespace sim{
       if(word==test){
          double tt = atof(value.c_str()); // convert string to uint64_t
          vin::check_for_valid_value(tt, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
-         sim::domain_wall_position = tt;
+         program::domain_wall_position = tt;
          return true;
       }
       //--------------------------------------------------------------------
@@ -181,7 +182,7 @@ namespace sim{
       if(word==test){
          double tt = atof(value.c_str()); // convert string to uint64_t
          vin::check_for_valid_value(tt, word, line, prefix, unit, "length", 0, 1000,"input","0 - 1 A");
-         sim::domain_wall_width = tt;
+         program::domain_wall_width = tt;
          return true;
       }
       //--------------------------------------------------------------------
@@ -695,10 +696,10 @@ namespace sim{
          std::vector<double> u(3);
          u=vin::doubles_from_string(value);
          vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
-         std::cout << sim::domain_wall_second_vector_x.size() << "\t" << super_index << "\t" << u[0] << '\t' << u[1] << '\t' << u[2] <<std::endl;
-         sim::domain_wall_second_vector_x[super_index] = u[0];
-         sim::domain_wall_second_vector_y[super_index] = u[1];
-         sim::domain_wall_second_vector_z[super_index] = u[2];
+         std::cout << program::domain_wall_second_vector_x.size() << "\t" << super_index << "\t" << u[0] << '\t' << u[1] << '\t' << u[2] <<std::endl;
+         program::domain_wall_second_vector_x[super_index] = u[0];
+         program::domain_wall_second_vector_y[super_index] = u[1];
+         program::domain_wall_second_vector_z[super_index] = u[2];
          return true;
       }
       //------------------------------------------------------------
