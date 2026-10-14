@@ -1,12 +1,3 @@
-//------------------------------------------------------------------------------
-//
-//   This file is part of the VAMPIRE open source package under the
-//   GNU GPL (version 2) licence (see licence file for details).
-//
-//   (c) O Arbelaez Echeverri 2016. All rights reserved.
-//
-//------------------------------------------------------------------------------
-
 /*
  *  Copyright 2008-2009 NVIDIA Corporation
  *

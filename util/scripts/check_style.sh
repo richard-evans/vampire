@@ -50,7 +50,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$root" || exit 1
 
 # vendored third-party files that keep their own formatting and licence
-vendored='^(hdr/mtrand\.hpp|src/random/mtrand\.cpp)$'
+vendored='^(hdr/mtrand\.hpp|src/random/mtrand\.cpp|src/cuda/cuda_timer\.h)$'
 
 if [ $# -gt 0 ]; then
    files=("$@")
