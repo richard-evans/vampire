@@ -1,3 +1,12 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) R F L Evans 2017. All rights reserved.
+//
+//------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 // Optionally calculate random atomic anisotropy axes for spherical harmonics
 //----------------------------------------------------------------------------

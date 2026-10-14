@@ -3,9 +3,12 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sarah Jenkins, Andrew Naden and Richard Evans 2020. All rights reserved.
+//   (c) Sarah Jenkins, Andrew Naden and Richard Evans 2020.
+//   All rights reserved.
 //
-//   Email: sarah.jenkins@york.ac.uk ajn521@york.ac.uk richard.evans@york.ac.uk
+//   Email: sarah.jenkins@york.ac.uk
+//          ajn521@york.ac.uk
+//          richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //

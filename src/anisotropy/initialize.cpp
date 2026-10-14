@@ -3,8 +3,8 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Jack Collings (2022), Sam Westmoreland and Richard Evans 2017. All
-//   rights reserved.
+//   (c) Jack Collings (2022), Sam Westmoreland and Richard Evans 2017.
+//   All rights reserved.
 //
 //   Email: sw766@york.ac.uk
 //          jbc525@york.ac.uk
