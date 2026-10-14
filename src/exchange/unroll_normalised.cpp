@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include <sstream>
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
@@ -100,9 +101,9 @@ namespace exchange{
                         atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * Jij[0] * imus;
                      }
                      else{
-                        std::cerr     << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
-                        zlog << zTs() << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
-                        err::vexit();
+                        std::ostringstream message;
+                        message << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting";
+                        err::fatal(message.str());
                      }
                    //  if (imaterial == 4) std::cout << imaterial << '\t' << jmaterial << "\t" << d << '\t' << J  << "\t" << atoms::v_exchange_list[nn].Jij[0] <<  std::endl;
                      // reset interaction id to neighbour number - causes segfault if nn out of range
@@ -160,9 +161,9 @@ namespace exchange{
                      atoms::t_exchange_list[nn].Jij[2][2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * Jij[0] * imus;
                   }
                   else{
-                     std::cerr     << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
-                     zlog << zTs() << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
-                     err::vexit();
+                     std::ostringstream message;
+                     message << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting";
+                     err::fatal(message.str());
                   }
 
                   // reset interaction id to neighbour number - causes segfault if nn out of range

@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <sstream>
 
 // Vampire headers
 #include "exchange.hpp"
@@ -50,11 +51,9 @@ namespace exchange{
             internal::minimum_needed_exchange_type = exchange::vectorial;
          }
          else{
-            terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << material_i << "]:exchange_matrix[" << material_j << "] must have one or three values." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error in input file - material[" << material_i << "]:exchange_matrix[" << material_j << "] must have one or three values." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error in input file - material[" << material_i << "]:exchange_matrix[" << material_j << "] must have one or three values.";
+            err::fatal(message.str());
          }
 
          return;
