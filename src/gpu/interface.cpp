@@ -9,6 +9,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -93,10 +94,9 @@ namespace gpu{
 
       //--------------------------------------------------------------------
       else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - Unknown control statement \'"<< prefix << ":" << word << "\' on line " << line << " of input file" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         std::ostringstream message;
+         message << "Error - Unknown control statement \'" << prefix << ":" << word << "\' on line " << line << " of input file";
+         err::fatal(message.str());
       }
       return false;
    }
