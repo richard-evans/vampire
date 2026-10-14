@@ -34,36 +34,36 @@ namespace mtrandom
 //==========================================================
 {
 
-	int voronoi_seed=1951218893;
-	int integration_seed=2137082040;
+   int voronoi_seed=1951218893;
+   int integration_seed=2137082040;
 
-	double x1,x2,w;
-	double number1;
-	double number2;
-	bool logic=false;
-	MTRand grnd; // single sequence of random numbers
+   double x1,x2,w;
+   double number1;
+   double number2;
+   bool logic=false;
+   MTRand grnd; // single sequence of random numbers
 
 
 double gaussian_old(){
-	using namespace mtrandom;
+   using namespace mtrandom;
 
-	if(logic==false){
-		for(;;){
-			x1 = 2.0*grnd() - 1.0;
-			x2 = 2.0*grnd() - 1.0;
-			w = x1*x1 + x2*x2;
-			if(w<1.0) break;
-		}
-		w=sqrt((-2.0*log(w))/w);
-		number1 = w*x1;
-		number2 = w*x2;
-		logic=true;
-		return number1;
-	}
-	else {
-		logic=false;
-		return number2;
-		}
+   if(logic==false){
+      for(;;){
+         x1 = 2.0*grnd() - 1.0;
+         x2 = 2.0*grnd() - 1.0;
+         w = x1*x1 + x2*x2;
+         if(w<1.0) break;
+      }
+      w=sqrt((-2.0*log(w))/w);
+      number1 = w*x1;
+      number2 = w*x2;
+      logic=true;
+      return number1;
+   }
+   else {
+      logic=false;
+      return number2;
+      }
 }
 
   // Here is a revised version which is ~ 10x faster! gaussian() above takes ~ 30%
@@ -222,9 +222,9 @@ double gaussian(){
 
   while (1) {
     U = mtrandom::grnd.i32();
-    i = U & 0x0000007F;		/* 7 bit to choose the step */
-    sign = U & 0x00000080;	/* 1 bit for the sign */
-    j = U>>8;			/* 24 bit for the x-value */
+    i = U & 0x0000007F;    /* 7 bit to choose the step */
+    sign = U & 0x00000080; /* 1 bit for the sign */
+    j = U>>8;        /* 24 bit for the x-value */
 
     x = j*wtab[i];
     if (j < ktab[i])  break;
@@ -250,9 +250,9 @@ double gaussianc(MTRand& grnd){
 
   while (1) {
     U = grnd.i32();
-    i = U & 0x0000007F;		/* 7 bit to choose the step */
-    sign = U & 0x00000080;	/* 1 bit for the sign */
-    j = U>>8;			/* 24 bit for the x-value */
+    i = U & 0x0000007F;    /* 7 bit to choose the step */
+    sign = U & 0x00000080; /* 1 bit for the sign */
+    j = U>>8;        /* 24 bit for the x-value */
 
     x = j*wtab[i];
     if (j < ktab[i])  break;
