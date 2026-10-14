@@ -1,0 +1,27 @@
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+sim:time-step=1.0E-16
+sim:integrator-random-seed=12345
+output:precision=16
+cells:macro-cell-size=1.0 !nm
+sim:program=time-series
+sim:integrator=llg-heun
+sim:temperature=300.0
+sim:equilibration-time-steps=100
+sim:time-steps-increment=50
+sim:total-time-steps=200
+config:atoms=continuous
+config:atoms-output-rate=2
+config:macro-cells=continuous
+config:macro-cells-output-rate=2
+config:output-format=text
+config:output-mode=file-per-node
+output:time-steps
+output:magnetisation
