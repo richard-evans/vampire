@@ -31,6 +31,7 @@ lagrange.o \
 LLB_Boltzmann.o \
 micromagnetic_A_calculation.o \
 partial_hysteresis.o \
+run.o \
 static_hysteresis.o \
 setting.o \
 time_series.o \

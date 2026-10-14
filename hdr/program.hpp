@@ -73,6 +73,11 @@ namespace program
    extern double fractional_electric_field_strength; // factor controlling strength of stt/sot and voltage
 
    //---------------------------------------------------------------------------
+   // Function to run the program selected with the sim:program keyword
+   //---------------------------------------------------------------------------
+   void run();
+
+   //---------------------------------------------------------------------------
    // Function to initialise program module
    //---------------------------------------------------------------------------
    void initialize();
