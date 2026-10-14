@@ -9,7 +9,7 @@ They do not check that the results are physically right; that is the job of the 
 ./run_regression.sh --case 'integrate/*' # only cases matching a glob
 ./run_regression.sh --exact              # byte-for-byte, for changes that must not alter any bits
 ```
-or from the repository root, `./tests.sh -r` (serial) and `./tests.sh -m [N]` (MPI).
+or from the repository root, `developers/tests.sh -r` (serial) and `developers/tests.sh -m [N]` (MPI).
 
 ## Cases
 

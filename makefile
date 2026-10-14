@@ -314,8 +314,8 @@ tidy:
 	@rm -f src/*/*~
 
 tests:
-	$(MAKE) -C test/integration/
-	$(MAKE) -C test/unit/
+	$(MAKE) -C developers/test/integration/
+	$(MAKE) -C developers/test/unit/
 
 vdc:
 	$(MAKE) -C util/vdc/

@@ -57,8 +57,8 @@ if [ "$integration" = false ] && [ "$extended" = false ] && [ "$unit" = false ] 
    unit=true
 fi
 
-# work relative to the location of this script
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# work relative to the vampire root, the parent of this script's directory
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 status=0
 
@@ -85,8 +85,8 @@ if [ "$integration" = true ] || [ "$extended" = true ]; then
       echo "Error: $root/vampire-serial not found - build it first with 'make serial-llvm' (macOS) or 'make serial'"
       exit 1
    fi
-   make -C "$root/test/integration" || exit 1
-   cd "$root/test/integration" || exit 1
+   make -C "$root/developers/test/integration" || exit 1
+   cd "$root/developers/test/integration" || exit 1
    if [ "$integration" = true ] && [ "$extended" = true ]; then
       time ./integration_tests --all || status=1
    elif [ "$extended" = true ]; then
@@ -97,17 +97,17 @@ if [ "$integration" = true ] || [ "$extended" = true ]; then
 fi
 
 if [ "$unit" = true ]; then
-   make -C "$root/test/unit" || exit 1
-   cd "$root/test/unit" || exit 1
+   make -C "$root/developers/test/unit" || exit 1
+   cd "$root/developers/test/unit" || exit 1
    time ./unit_tests || status=1
 fi
 
 if [ "$regression" = true ]; then
-   time "$root/test/regression/run_regression.sh" --serial || status=1
+   time "$root/developers/test/regression/run_regression.sh" --serial || status=1
 fi
 
 if [ "$mpi_processes" -gt 0 ]; then
-   time "$root/test/regression/run_regression.sh" --mpi "$mpi_processes" || status=1
+   time "$root/developers/test/regression/run_regression.sh" --mpi "$mpi_processes" || status=1
 fi
 
 #------------------------------------------------------
@@ -175,9 +175,9 @@ if [ "$coverage" = true ]; then
    make -C "$dir" -j 8 serial-debug > "$dir/build.log" 2>&1 || { echo "Error: build failed, see $dir/build.log"; exit 1; }
    ln -s vampire-serial-debug "$dir/vampire-serial"
 
-   make -C "$dir/test/integration" > /dev/null || exit 1
-   ( cd "$dir/test/integration" && ./integration_tests --all )
-   "$dir/test/regression/run_regression.sh" --serial
+   make -C "$dir/developers/test/integration" > /dev/null || exit 1
+   ( cd "$dir/developers/test/integration" && ./integration_tests --all )
+   "$dir/developers/test/regression/run_regression.sh" --serial
 
    mkdir -p "$dir/coverage"
    ( cd "$dir" && $gcovr --root . --filter src/ --exclude src/qvoronoi/ --object-directory obj \

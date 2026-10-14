@@ -11,7 +11,7 @@ GCC=g++
 LIBS= #-lstdc++
 
 # Flags
-GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/ -I../../src/
+GCC_CFLAGS=-O3 -std=c++17 -I../../../hdr/ -I../../../src/
 
 # Objects
 TEST_OBJECTS= \
@@ -32,25 +32,25 @@ obj/integrate/rotations_test.o
 
 
 VAMPIRE_OBJECTS= \
-../../obj/main/githash.o \
-../../obj/main/version.o \
-../../obj/material/material.o \
-../../obj/utility/errors.o \
-../../obj/utility/units.o \
-../../obj/utility/vmath.o \
-../../obj/vio/data.o \
-../../obj/vio/globalio.o \
-../../obj/vio/timestamp.o\
-../../obj/constants/constants.o\
-../../obj/spinlattice/temperatures.o\
-../../obj/spinlattice/data.o\
-../../obj/random/mtrand.o\
-../../obj/random/random.o\
-../../obj/grains/grain_geometry.o\
-../../obj/grains/grain_packing.o\
-../../obj/grains/grain_seeds.o\
-../../obj/grains/grain_shape.o\
-../../obj/grains/grain_tessellation.o
+../../../obj/main/githash.o \
+../../../obj/main/version.o \
+../../../obj/material/material.o \
+../../../obj/utility/errors.o \
+../../../obj/utility/units.o \
+../../../obj/utility/vmath.o \
+../../../obj/vio/data.o \
+../../../obj/vio/globalio.o \
+../../../obj/vio/timestamp.o\
+../../../obj/constants/constants.o\
+../../../obj/spinlattice/temperatures.o\
+../../../obj/spinlattice/data.o\
+../../../obj/random/mtrand.o\
+../../../obj/random/random.o\
+../../../obj/grains/grain_geometry.o\
+../../../obj/grains/grain_packing.o\
+../../../obj/grains/grain_seeds.o\
+../../../obj/grains/grain_shape.o\
+../../../obj/grains/grain_tessellation.o
 
 
 EXECUTABLE=unit_tests
@@ -66,7 +66,7 @@ $(TEST_OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
 # compile vampire objects to vampire object folder
-$(VAMPIRE_OBJECTS): ../../obj/%.o: ../../src/%.cpp
+$(VAMPIRE_OBJECTS): ../../../obj/%.o: ../../../src/%.cpp
 	@mkdir -p $(@D)
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 

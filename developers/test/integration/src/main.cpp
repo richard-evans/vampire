@@ -52,8 +52,10 @@ int main(int argc, char* argv[]){
 
    // Get vampire path and command
    //std::string path = std::filesystem::current_path();
-   std::filesystem::path wd=std::filesystem::current_path();
-   std::string path_string = std::filesystem::current_path().parent_path().parent_path();
+   // the vampire root is the first directory above this one that contains hdr/
+   std::filesystem::path root = std::filesystem::current_path();
+   while(!std::filesystem::is_directory(root/"hdr") && root != root.parent_path()) root = root.parent_path();
+   std::string path_string = root.string();
 
    std::string exe = path_string+"/vampire-serial 1>/dev/null";
    if(mpi_processes > 0){

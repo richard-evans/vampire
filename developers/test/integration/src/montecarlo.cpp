@@ -33,7 +33,7 @@
 //
 // Adding new Monte Carlo tests
 // ----------------------------
-// 1. Create a subdirectory under test/integration/data/ with an input file
+// 1. Create a subdirectory under developers/test/integration/data/ with an input file
 //    and material file.
 // 2. Choose a physical observable whose final value has a known analytic
 //    result (e.g. magnetisation length = 1 for a T=0 ferromagnet).
@@ -56,7 +56,7 @@
 // reported on its own line.
 //
 // Parameters:
-//   dir        - path relative to test/integration/data/
+//   dir        - path relative to developers/test/integration/data/
 //   values     - list of {label, column, expected, tol[, abs_tol]} to check,
 //                where column is the 0-based index of the column in the output
 //                and abs_tol (default 0) is needed when expected is zero
@@ -152,7 +152,7 @@ bool final_values_test(const std::string dir, const std::vector<expected_value_t
 // within a relative tolerance 'tol' (i.e. |value/expected - 1| < tol).
 //
 // Parameters:
-//   dir        - path relative to test/integration/data/
+//   dir        - path relative to developers/test/integration/data/
 //   expected   - the value the last output line should converge to
 //   tol        - relative tolerance for the comparison (e.g. 1e-4)
 //   executable - full shell command used to invoke vampire-serial

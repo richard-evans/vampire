@@ -79,8 +79,8 @@ vampire-serial
 vampire-parallel
 vampire*
 util/vdc/vdc
-test/integration/integration_tests
-test/unit/unit_tests
+developers/test/integration/integration_tests
+developers/test/unit/unit_tests
 #----------------------------------------------
 # Obsolete
 #----------------------------------------------

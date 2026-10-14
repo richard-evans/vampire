@@ -46,25 +46,25 @@ Run the compiled binary with an input file in the working directory:
 
 ```bash
 # Run standard integration and unit tests (default, fast)
-./tests.sh
+developers/tests.sh
 
 # Run all tests, including extended (long running) integration tests
-./tests.sh -a
+developers/tests.sh -a
 
 # Standard integration tests only
-./tests.sh -i
-# or: cd test/integration && make && ./integration_tests
+developers/tests.sh -i
+# or: cd developers/test/integration && make && ./integration_tests
 
 # Extended integration tests only (statistical tests against exact results, several seconds each)
-./tests.sh -e
+developers/tests.sh -e
 # or: ./integration_tests --extended   (--all runs standard and extended)
 
 # Unit tests only
-./tests.sh -u
-# or: cd test/unit && make && ./unit_tests
+developers/tests.sh -u
+# or: cd developers/test/unit && make && ./unit_tests
 ```
 
-Integration tests are compiled separately with C++17 (`test/integration/makefile`). Unit tests link against a subset of Vampire object files (`test/unit/makefile`).
+Integration tests are compiled separately with C++17 (`developers/test/integration/makefile`). Unit tests link against a subset of Vampire object files (`developers/test/unit/makefile`).
 
 ## Architecture
 

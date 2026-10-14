@@ -67,7 +67,7 @@ fi
 
 # work relative to the location of this script
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-root="$(cd "$here/../.." && pwd)"
+root="$(cd "$here/../../.." && pwd)"
 
 if [ "$mode" = serial ]; then
    executable="$root/vampire-serial"
