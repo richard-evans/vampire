@@ -30,15 +30,13 @@
 // Vampire headers
 #include "environment.hpp"
 
-using namespace std;
-
 namespace environment{
 
    namespace internal{
 
      extern int num_shields;
 
-     extern std::vector <string> shield_shape;
+     extern std::vector <std::string> shield_shape;
      extern std::vector <double> shield_ms;
      extern std::vector <double> shield_Tc;
      extern std::vector< std::vector <double> > shield_A;
@@ -56,7 +54,7 @@ namespace environment{
      extern std::vector <double> shield_Hext_z;
      extern std::vector <double> shield_max_cell_size;
      extern std::vector <double> shield_min_cell_size;
-     extern std::vector <string> pos_or_neg;
+     extern std::vector <std::string> pos_or_neg;
      extern std::vector <int> shield_number;
      extern std::vector <int> H_strength;
 
@@ -141,7 +139,7 @@ namespace environment{
       extern std::vector<double> neighbour_list_end_index;
       extern std::vector<double> neighbour_list_array;
 
-      extern ofstream o_file;
+      extern std::ofstream o_file;
       #ifdef FFT
       extern fftw_complex *Mx_in; //3D Array for m_in
       extern fftw_complex *My_in;

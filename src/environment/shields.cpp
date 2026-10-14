@@ -238,7 +238,7 @@ int read_in_shield_info(){
   ifile.open("shield_geom");
 
   //int shield_number;
-  string shield_type;
+  std::string shield_type;
 
   if (ifile.good()){
     std::cout << "Creating shields" << std::endl;
