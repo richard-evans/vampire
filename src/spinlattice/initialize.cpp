@@ -60,7 +60,7 @@ namespace sld{
           const double epsilon = 1.0e-12; // A small number to prevent division by zero
           const double two_pi = 6.28318530718;
 
-          
+
           // The formula is k = (2*pi / lambda) * direction_vector.
           if (std::abs(sld::internal::phonon_wave_lambda[0]) > epsilon) {
               sld::internal::phonon_wavevector[0] = two_pi / sld::internal::phonon_wave_lambda[0] * sld::internal::phonon_wave_direction[0];
@@ -292,7 +292,7 @@ namespace sld{
 
        for(int atom=0;atom<atoms::num_atoms;atom++){
 
-   		int mat=atoms::type_array[atom];
+         int mat=atoms::type_array[atom];
         atoms::mass_spin_array[atom]=mp::material[mat].mass;
         }
 

@@ -157,8 +157,8 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
 
          //vectors for thermal noise spin plus lattice
          std::vector <double> Hx_th(atoms::x_spin_array.size());
-      	  std::vector <double> Hy_th(atoms::x_spin_array.size());
-      	  std::vector <double> Hz_th(atoms::x_spin_array.size());
+           std::vector <double> Hy_th(atoms::x_spin_array.size());
+           std::vector <double> Hz_th(atoms::x_spin_array.size());
 
          generate (Hx_th.begin(),Hx_th.end(), mtrandom::gaussian);
          generate (Hy_th.begin(),Hy_th.end(), mtrandom::gaussian);
@@ -210,9 +210,9 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
  }
 
       vmpi::barrier();
-	// start first octant loop onwards both core and boundary atoms
-	//all fields set to 0
-	std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+   // start first octant loop onwards both core and boundary atoms
+   //all fields set to 0
+   std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
     std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
     std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
 
@@ -338,11 +338,11 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
       vmpi::barrier();
 
 
-      }	// end first octant loop onwards
+      }  // end first octant loop onwards
 
 
       //all fields set to 0
-  	  std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+     std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
       std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
 
@@ -517,12 +517,12 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
                        sld::internal::potential_eng);
 
      //update position, Velocity
-     		for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
+         for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
 
 
 
-     		     const unsigned int imat = atoms::type_array[atom];
- 		         double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
+              const unsigned int imat = atoms::type_array[atom];
+               double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
                  double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
                  double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
 
@@ -592,11 +592,11 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
 
 
       //update position, Velocity for boundary atoms
-      		for(int atom=post_comm_si;atom<post_comm_ei;atom++){
+            for(int atom=post_comm_si;atom<post_comm_ei;atom++){
 
 
-     		     const unsigned int imat = atoms::type_array[atom];
- 		         double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
+              const unsigned int imat = atoms::type_array[atom];
+               double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
                  double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
                  double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
 
@@ -622,13 +622,13 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
 
 
             //----------------------------------------
-    		// Copy new positions array (all)
-    		//----------------------------------------
-    		for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
-    			atoms::x_coord_array[atom]=sld::internal::x_coord_storage_array[atom];
-    			atoms::y_coord_array[atom]=sld::internal::y_coord_storage_array[atom];
-    			atoms::z_coord_array[atom]=sld::internal::z_coord_storage_array[atom];
-    		}
+         // Copy new positions array (all)
+         //----------------------------------------
+         for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
+            atoms::x_coord_array[atom]=sld::internal::x_coord_storage_array[atom];
+            atoms::y_coord_array[atom]=sld::internal::y_coord_storage_array[atom];
+            atoms::z_coord_array[atom]=sld::internal::z_coord_storage_array[atom];
+         }
 
             //reset forces to 0 for v integration
             vmpi::mpi_init_halo_swap_coords();
@@ -684,8 +684,8 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
            for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
 
 
-     		     const unsigned int imat = atoms::type_array[atom];
- 		         double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
+              const unsigned int imat = atoms::type_array[atom];
+               double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
                  double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
                  double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
 
@@ -749,8 +749,8 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
            for(int atom=post_comm_si;atom<post_comm_ei;atom++){
 
 
-     		     const unsigned int imat = atoms::type_array[atom];
- 		         double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
+              const unsigned int imat = atoms::type_array[atom];
+               double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
                  double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
                  double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
 
@@ -768,11 +768,11 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
             }
 
 
-       		vmpi::barrier();
+            vmpi::barrier();
 
       //spin update
       //all fields set to 0
-  	  std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+     std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
       std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
 
@@ -898,10 +898,10 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
     vmpi::barrier();
 
 
-          }	// end second octant loop onwards
+          } // end second octant loop onwards
 
 
-  	  std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+     std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
       std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
 

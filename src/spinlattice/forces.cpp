@@ -71,14 +71,14 @@ namespace sld{
                                                              x_coord_array, y_coord_array, z_coord_array,
                                                              forces_array_x, forces_array_y, forces_array_z, potential_eng);
       }
-      
+
       // calculate THz pulse force
       if(sld::internal::linear_pump_enabled){
 
         internal::compute_thz(start_index, end_index,
                                 x_coord_array, y_coord_array, z_coord_array,
                                 forces_array_x, forces_array_y, forces_array_z);
-      
+
         }
 
       return;
@@ -147,16 +147,16 @@ void compute_forces_harmonic(const int start_index,
 
 
 
-        	      int nbr_start = neighbour_list_start_index[i];
-        	      int nbr_end = neighbour_list_end_index[i]+1;
+               int nbr_start = neighbour_list_start_index[i];
+               int nbr_end = neighbour_list_end_index[i]+1;
 
-        	      for( int n = nbr_start; n < nbr_end; ++n){
-        	        j = neighbour_list_array[n];
+               for( int n = nbr_start; n < nbr_end; ++n){
+                 j = neighbour_list_array[n];
 
-        	        if ( j != i){
-        		       dx = -x_coord_array[j] + rx;
-        		       dy = -y_coord_array[j] + ry;
-        		       dz = -z_coord_array[j] + rz;
+                 if ( j != i){
+                   dx = -x_coord_array[j] + rx;
+                   dy = -y_coord_array[j] + ry;
+                   dz = -z_coord_array[j] + rz;
                    dx0 = -x0_coord_array[j] + rx0;
                    dy0 = -y0_coord_array[j] + ry0;
                    dz0 = -z0_coord_array[j] + rz0;
@@ -170,35 +170,35 @@ void compute_forces_harmonic(const int start_index,
 
 
 
-        		       rji_sqr = dx*dx + dy*dy + dz*dz;
+                   rji_sqr = dx*dx + dy*dy + dz*dz;
 
-        		       if( rji_sqr < r_sqr_cut){
+                   if( rji_sqr < r_sqr_cut){
 
-        		          //total_int++;
+                      //total_int++;
 
 
-        		           rji = sqrt(rji_sqr);
+                       rji = sqrt(rji_sqr);
                            rji0 = sqrt(dx0*dx0 + dy0*dy0 + dz0*dz0);
-        		           inv_rji = 1.0/ rji;
+                       inv_rji = 1.0/ rji;
 
                        energy += (rji-rji0)*(rji-rji0);
 
 
-		               fx -=  (rji-rji0)*dx*inv_rji ; //2 (rji-rj0)*dx*inv_rji -> 2 went at the end
+                     fx -=  (rji-rji0)*dx*inv_rji ; //2 (rji-rj0)*dx*inv_rji -> 2 went at the end
                        fy -=  (rji-rji0)*dy*inv_rji ;
                        fz -=  (rji-rji0)*dz*inv_rji ;
 
 
                      }
-        	   	}
-        	    }
+               }
+             }
              const unsigned int imat = type_array[i];
 
              double V0=sld::internal::mp[imat].V0.get(); //0.15
 
-        	    forces_array_x[i] += V0 * 2.0 * fx;
-        	    forces_array_y[i] += V0  * 2.0 * fy;
-        	    forces_array_z[i] += V0  * 2.0 * fz;
+             forces_array_x[i] += V0 * 2.0 * fx;
+             forces_array_y[i] += V0  * 2.0 * fy;
+             forces_array_z[i] += V0  * 2.0 * fz;
                 potential_eng[i] = 0.5 * V0 * energy;
 
 
@@ -256,16 +256,16 @@ void compute_forces_morse(const int start_index,
                rz = z_coord_array[i];
 
 
-        	      int nbr_start = neighbour_list_start_index[i];
-        	      int nbr_end = neighbour_list_end_index[i]+1;
+               int nbr_start = neighbour_list_start_index[i];
+               int nbr_end = neighbour_list_end_index[i]+1;
 
-        	      for( int n = nbr_start; n < nbr_end; ++n){
-        	        j = neighbour_list_array[n];
+               for( int n = nbr_start; n < nbr_end; ++n){
+                 j = neighbour_list_array[n];
 
-        	        if ( j != i){
-        		       dx = x_coord_array[j] -rx;
-        		       dy = y_coord_array[j]- ry;
-        		       dz = z_coord_array[j]- rz;
+                 if ( j != i){
+                   dx = x_coord_array[j] -rx;
+                   dy = y_coord_array[j]- ry;
+                   dz = z_coord_array[j]- rz;
 
                    dx = sld::PBC_wrap( dx, cs::system_dimensions[0], cs::pbc[0]);
                    dy = sld::PBC_wrap( dy, cs::system_dimensions[1], cs::pbc[1]);
@@ -273,21 +273,21 @@ void compute_forces_morse(const int start_index,
 
 
 
-        		       rji_sqr = dx*dx + dy*dy + dz*dz;
+                   rji_sqr = dx*dx + dy*dy + dz*dz;
 
-        		       if( rji_sqr < r_sqr_cut){
+                   if( rji_sqr < r_sqr_cut){
 
-        		           rji = sqrt(rji_sqr);
-    		               inv_rji = 1.0/ rji;
+                       rji = sqrt(rji_sqr);
+                        inv_rji = 1.0/ rji;
 
-		                   double y = morse_beta * exp( - alpha_m * rji);
-  		                   double f_morse = y * ( y - 1.0);
+                         double y = morse_beta * exp( - alpha_m * rji);
+                         double f_morse = y * ( y - 1.0);
 
-        		           //std::cout<<"embedded "<<i<<"\t"<<j<<"\t"<<rji<<"\t"<<position_rij<<"\t"<<int(position_rij)<<"\t"<<v_rij<<"\t"<<rho_rij<<std::endl;
+                       //std::cout<<"embedded "<<i<<"\t"<<j<<"\t"<<rji<<"\t"<<position_rij<<"\t"<<int(position_rij)<<"\t"<<v_rij<<"\t"<<rho_rij<<std::endl;
 
 
 
-		                 fx +=  f_morse*dx*inv_rji;
+                       fx +=  f_morse*dx*inv_rji;
                          fy +=  f_morse*dy*inv_rji;
                          fz +=  f_morse*dz*inv_rji;
 
@@ -300,18 +300,18 @@ void compute_forces_morse(const int start_index,
                      }
 
 
-        	   	}
+               }
 
 
-        	    }
+             }
 
 
 
 
 
-        	    forces_array_x[i] += fx*morse_factor;
-        	    forces_array_y[i] += fy*morse_factor;
-        	    forces_array_z[i] += fz*morse_factor;
+             forces_array_x[i] += fx*morse_factor;
+             forces_array_y[i] += fy*morse_factor;
+             forces_array_z[i] += fz*morse_factor;
 
               potential_eng[i] = morse_D * energy;
 
@@ -338,15 +338,15 @@ void compute_thz(const int start_index,
 
     // Calculate the Current Physical Time
     // Converts the current step number into the actual time in seconds.
-    uint64_t current_step = sim::time; 
-    double dt = mp::dt_SI;             // Get the duration of one step in seconds 
+    uint64_t current_step = sim::time;
+    double dt = mp::dt_SI;             // Get the duration of one step in seconds
     double current_time = static_cast<double>(current_step) * dt; // Total elapsed time (seconds)
 
 
     if (current_time < sld::internal::phonon_pulse_start_time || current_time > sld::internal::phonon_pulse_end_time) {
         return; // The pulse is off, so do nothing.
     }
- 
+
     // Calculate the Raw Force for Each Atom
     // Loop through each atom to calculate the
     // force from the THz pulse and add it to a running total for later averaging.
@@ -369,7 +369,7 @@ void compute_thz(const int start_index,
         double arg = current_time * twopi_niu - kr;
         double cos_factor = std::cos(arg); // The oscillating part of the force
         double sin_factor = std::sin(arg);
-        
+
         // Calculate the raw force and store it temporarily
         int local_index = i - start_index;
         f_thz_temp_x[local_index] = sld::internal::phonon_force_amplitude[0] * cos_factor;
@@ -381,7 +381,7 @@ void compute_thz(const int start_index,
         sumy += f_thz_temp_y[local_index];
         sumz += f_thz_temp_z[local_index];
 
-        
+
       }
 
     // Calculate the Center-of-Mass Correction
@@ -393,9 +393,9 @@ void compute_thz(const int start_index,
         avg_fy = sumy / static_cast<double>(counter);
         avg_fz = sumz / static_cast<double>(counter);
     }
-  
-    
-    // Apply the Final, Corrected Force 
+
+
+    // Apply the Final, Corrected Force
     // Loop through the atoms again, retrieve the
     // temporarily stored raw force, subtract the average
     for (int i = start_index; i < end_index; ++i) {
@@ -411,11 +411,11 @@ void compute_thz(const int start_index,
 
         if (i == 0 && current_step % 200 == 0) {
         std::cout << "  Corrected Force X : " << corrected_fx << " N" << std::endl;
-       
+
       }
     }
 
     return;
 }
 }
-} 
+}

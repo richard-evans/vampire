@@ -46,10 +46,10 @@ namespace sld{
       double phonon_wavevector[3];
       double phonon_pulse_start_time;
       double phonon_pulse_end_time;
-      double phonon_wave_lambda[3];   
-      double phonon_wave_direction[3]; 
-      std::vector<double> coupling_field_x; 
-      std::vector<double> coupling_field_y; 
+      double phonon_wave_lambda[3];
+      double phonon_wave_direction[3];
+      std::vector<double> coupling_field_x;
+      std::vector<double> coupling_field_y;
       std::vector<double> coupling_field_z;
 
 

@@ -97,8 +97,8 @@ namespace sld{
 
       //vectors for thermal noise spin plus lattice
       std::vector <double> Hx_th(atoms::x_spin_array.size());
-   	  std::vector <double> Hy_th(atoms::x_spin_array.size());
-   	  std::vector <double> Hz_th(atoms::x_spin_array.size());
+        std::vector <double> Hy_th(atoms::x_spin_array.size());
+        std::vector <double> Hz_th(atoms::x_spin_array.size());
 
       generate (Hx_th.begin(),Hx_th.end(), mtrandom::gaussian);
       generate (Hy_th.begin(),Hy_th.end(), mtrandom::gaussian);
