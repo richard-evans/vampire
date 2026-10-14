@@ -15,6 +15,7 @@
 #include <list>
 #include <vector>
 #include <fstream>
+#include <sstream>
 
 // Vampire headers
 #include "atoms.hpp"
@@ -470,10 +471,7 @@ namespace create{
       // check for num_atoms > num_CPUS
       const int catom_size = catom_array.size();
       if( catom_size < vmpi::num_processors ){
-         terminaltextcolor(RED);
-         std::cerr << "Error! - number of atoms is less than number of CPUs - replicated data parallelisation is not possible!" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         err::fatal("Error! - number of atoms is less than number of CPUs - replicated data parallelisation is not possible!");
       }
 
       // arrays to store atom ranges on each CPU
@@ -934,10 +932,9 @@ namespace create{
             int old_atom_num=catom_array[atom].mpi_old_atom_number;
             //std::cout << "Rank: " << vmpi::my_rank << " Old: " << old_atom_num << " New: " << atom << " Highest: " << highest << std::endl;
             if((old_atom_num>highest) || (old_atom_num < 0)){ // || (old_atom_num>catom_array.size())){
-               terminaltextcolor(RED);
-               std::cerr << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom << std::endl;
-               terminaltextcolor(WHITE);
-               err::vexit();
+               std::ostringstream message;
+               message << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom;
+               err::fatal(message.str());
             }
             inv_atom_translation_array[old_atom_num]=atom;
          }

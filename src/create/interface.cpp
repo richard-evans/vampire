@@ -10,6 +10,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include <sstream>
 #include "errors.hpp"
 #include "create.hpp"
 #include "spininitialize.hpp"
@@ -148,25 +149,19 @@ namespace create{
          vin::check_for_valid_three_vector(u, word, line, prefix, "input");
          // check for sensible values
          if(u.at(0) < 1.0 || u.at(0) > 1000.0){
-            terminaltextcolor(RED);
-            std::cerr << "Error: 100 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error: 100 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error: 100 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000.";
+            err::fatal(message.str());
          }
          if(u.at(1) < 1.0 || u.at(1) > 1000.0){
-            terminaltextcolor(RED);
-            std::cerr << "Error: 110 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error: 110 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error: 110 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000.";
+            err::fatal(message.str());
          }
          if(u.at(2) < 1.0 || u.at(2) > 1000.0){
-            terminaltextcolor(RED);
-            std::cerr << "Error: 111 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
-            terminaltextcolor(WHITE);
-            zlog << zTs() << "Error: 111 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error: 111 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000.";
+            err::fatal(message.str());
          }
          create::internal::faceted_particle_100_radius = u.at(0);
          create::internal::faceted_particle_110_radius = u.at(1);
@@ -274,11 +269,9 @@ namespace create{
          }
          // check for unknown junk in value
          if( value.find_first_not_of("xyz,") != std::string::npos){
-            terminaltextcolor(RED);
-            std::cerr << "Error - value for \'create:" << word << "\' must be a combination of x,y,z only" << std::endl;
-            zlog << zTs() << "Error - value for \'create:" << word << "\' must be a combination of x,y,z only" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
+            std::ostringstream message;
+            message << "Error - value for \'create:" << word << "\' must be a combination of x,y,z only";
+            err::fatal(message.str());
             return false;
          }
          return true;
@@ -782,8 +775,9 @@ namespace create{
          // check for a sensible number of points
          //------------------------------------------------------------------
          if( (num_points < 3) || (num_points > 1000) ){
-            std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
-            err::vexit();
+            std::ostringstream message;
+            message << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100";
+            err::fatal(message.str());
          }
 
          //------------------------------------------------------------------
@@ -803,13 +797,15 @@ namespace create{
                gfile >> var;
                // check for no end of file
                if(gfile.eof()){
-                  std::cerr << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates" << std::endl;
-                  err::vexit();
+                  std::ostringstream message;
+                  message << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates";
+                  err::fatal(message.str());
                }
                // check for sensible coordinate
                if((var<0.0) || (var > 1.0)){
-                  std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
-                  err::vexit();
+                  std::ostringstream message;
+                  message << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)";
+                  err::fatal(message.str());
                }
                // now save sanitised input
                pts[xy] = var;

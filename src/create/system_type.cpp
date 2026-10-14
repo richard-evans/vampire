@@ -120,8 +120,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
          break;
 
       default:{
-         std::cerr << "Unknown system type requested in create module, exiting" << std::endl;
-         err::vexit();
+         err::fatal("Unknown system type requested in create module, exiting");
       }
    }
 
@@ -182,10 +181,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
    #else
       // Check for zero atoms generated
       if(catom_array.size()==0){
-         terminaltextcolor(RED);
-         std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         err::fatal("Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!");
       }
    #endif
 

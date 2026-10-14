@@ -10,6 +10,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include <sstream>
 #include "create.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
@@ -40,9 +41,9 @@ namespace internal{
 
       // check file is open
       if(!ifile.is_open()){
-         std::cerr << "Error opening file with agglomorate data in file " << agg_file_name << std::endl;
-         zlog << zTs() << "Error opening file with agglomorate data in file " << agg_file_name << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Error opening file with agglomorate data in file " << agg_file_name;
+         err::fatal(message.str());
       }
 
       // Read number of grains from agglomorate file
@@ -51,9 +52,9 @@ namespace internal{
 
       // check number of grains is sensible
       if( !( num_grains > 0 ) ){
-         std::cerr << "Error with agglomorate file " << agg_file_name << " : number of grain must be at least 1" << std::endl;
-         zlog << zTs() << "Error with agglomorate file " << agg_file_name << " : number of grain must be at least 1" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Error with agglomorate file " << agg_file_name << " : number of grain must be at least 1";
+         err::fatal(message.str());
       }
 
       // Read data from agglomorate file
@@ -87,9 +88,9 @@ namespace internal{
 
       // check actual and expected number of grains is the same
       if( num_grains != x.size() ){
-         std::cerr << "Error - number of grains in agglomorate file " << x.size() << " is different from expected number of " << num_grains << ". Exiting" << std::endl;
-         zlog << zTs() << "Error - number of grains in agglomorate file " << x.size() << " is different from expected number of " << num_grains << ". Exiting" << std::endl;
-         err::vexit();
+         std::ostringstream message;
+         message << "Error - number of grains in agglomorate file " << x.size() << " is different from expected number of " << num_grains << ". Exiting";
+         err::fatal(message.str());
       }
 
       // set vector to store particle origin
