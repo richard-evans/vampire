@@ -154,6 +154,11 @@ int main(int argc, char* argv[]){
       // DMI energy tests
       if( !energy_test("energy/dmi", -2.0e-18, exe, "dmi" ) ) fail += 1;
 
+      // Exchange energy tests on a chain of alternating A and B spins (chain.ucf) along general
+      // directions S_A = (0.3,-0.5,0.8) and S_B = (0.5,0.4,0.7) (normalised)
+      // isotropic exchange: E = -N J (S_A.S_B), J = 1e-21 J, for N = 2000 spins
+      if( !final_values_test("exchange/isotropic", { {"exchange energy", 0, -1.086090160499898e-18, 1.0e-10} }, exe ) ) fail += 1;
+
       // Integrator tests
       if( serial_only("dynamics/heun") && !integrator_test("dynamics/heun",    9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
       if( serial_only("dynamics/midpoint") && !integrator_test("dynamics/midpoint",9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;

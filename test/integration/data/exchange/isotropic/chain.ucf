@@ -1,0 +1,17 @@
+# Unit cell size:
+6.0	3.0	3.0
+# Unit cell vectors:
+1.0 0.0 0.0
+0.0 1.0 0.0
+0.0 0.0 1.0
+# Atoms num, id cx cy cz mat lc hc
+2
+0	0.0	0.0	0.0	0	0	0
+1	0.5	0.0	0.0	1	1	0
+# Interactions n exctype, id i j dx dy dz J..
+# Chain of alternating A and B spins, two bonds per atom, so that E = -N J (S_A.S_B), J = 1e-21 J
+4	isotropic
+0	0	1	0	0	0	1e-21
+1	0	1	-1	0	0	1e-21
+2	1	0	0	0	0	1e-21
+3	1	0	1	0	0	1e-21
