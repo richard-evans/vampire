@@ -1,0 +1,14 @@
+material:num-materials=2
+material[1]:material-name=A
+material[1]:damping-constant=1.0
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:initial-spin-direction=0.3030457633656632,-0.5050762722761053,0.8081220356417687
+material[2]:material-name=B
+material[2]:damping-constant=1.0
+material[2]:atomic-spin-moment=1.72 !muB
+material[2]:unit-cell-category=2
+material[2]:initial-spin-direction=0.5270462766947299,0.4216370213557840,0.7378647873726218
+material[1]:exchange-matrix[2]=1.0e-21
+material[2]:exchange-matrix[1]=1.0e-21
+material[1]:kitaev-constant[2]=0.5e-21
+material[2]:kitaev-constant[1]=0.5e-21

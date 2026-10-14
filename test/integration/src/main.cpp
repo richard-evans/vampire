@@ -164,6 +164,9 @@ int main(int argc, char* argv[]){
       if( !final_values_test("exchange/tensorial", { {"exchange energy", 0, -2.606616385199755e-18, 1.0e-10} }, exe ) ) fail += 1;
       // biquadratic exchange: E = -N Jbq (S_A.S_B)^2, Jbq = 1e-21 J, bilinear J = 0, for N = 2000 spins
       if( !final_values_test("exchange/biquadratic", { {"exchange energy", 0, -5.897959183673468e-19, 1.0e-10} }, exe ) ) fail += 1;
+      // kitaev exchange: E = -N J (S_A.S_B) + N K S_A,x S_B,x for bonds along x, J = 1e-21 J, K = 0.5e-21 J,
+      // for N = 2000 spins (nearest neighbour bonds only, all within the Kitaev cutoff)
+      if( !final_values_test("exchange/kitaev", { {"exchange energy", 0, -9.263710192499127e-19, 1.0e-10} }, exe ) ) fail += 1;
 
       // Integrator tests
       if( serial_only("dynamics/heun") && !integrator_test("dynamics/heun",    9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;
