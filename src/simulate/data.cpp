@@ -44,7 +44,7 @@ namespace sim{
    int track_num_tracks = 1;
 
    double track_bit_gap = 10.0;
-	 double track_track_gap = 10.0;
+    double track_track_gap = 10.0;
 
    // distance of tracks from read head
    double track_fly_height = 100.0; // Angstroms
