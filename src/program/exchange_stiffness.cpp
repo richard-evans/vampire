@@ -105,9 +105,7 @@ void exchange_stiffness(){
       if(mp::material[m].constrained){
          // check for previous constrained material
          if(found){
-            std::cerr     << "Error: more than one constrained material defined in exchange stiffness program, where only one constrained material is allowed. Please define only a single constrained material." << std::endl;
-            zlog << zTs() << "Error: more than one constrained material defined in exchange stiffness program, where only one constrained material is allowed. Please define only a single constrained material." << std::endl;
-            err::vexit();
+            err::fatal("Error: more than one constrained material defined in exchange stiffness program, where only one constrained material is allowed. Please define only a single constrained material.");
          }
          // ok this is the first constrained material
          found = true;
@@ -118,9 +116,7 @@ void exchange_stiffness(){
 
    // now check that at least one material is constrained
    if(!found){
-      std::cerr     << "Error: no constrained material defined for exchange stiffness program, where one constrained material is required. Please define a single constrained material." << std::endl;
-      zlog << zTs() << "Error: no constrained material defined for exchange stiffness program, where one constrained material is required. Please define a single constrained material." << std::endl;
-      err::vexit();
+      err::fatal("Error: no constrained material defined for exchange stiffness program, where one constrained material is required. Please define a single constrained material.");
    }
 
    //---------------------------------------------------------------------------
@@ -451,9 +447,7 @@ void set_constraint_mask(const std::vector<double>& coordinates, // atomic coord
    const double separation_B = max_coord - mid_coord;
 
    if( fabs(separation_A) < 1.0 || fabs(separation_B) < 1.0 ){
-      std::cerr     << "Error: insufficent separation between atoms along domain wall direction to enable sensible calculation of exchange stiffness. Please increase system size along domain wall direction." << std::endl;
-      zlog << zTs() << "Error: insufficent separation between atoms along domain wall direction to enable sensible calculation of exchange stiffness. Please increase system size along domain wall direction." << std::endl;
-      err::vexit();
+      err::fatal("Error: insufficent separation between atoms along domain wall direction to enable sensible calculation of exchange stiffness. Please increase system size along domain wall direction.");
    }
 
    //---------------------------------------------------------------------------

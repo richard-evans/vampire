@@ -26,8 +26,7 @@ namespace program{
    // Check localised temperature pulse is enabled
    if(!ltmp::is_enabled()){
       zlog << zTs() << "Fatal Error: Localised temperature pulse is not initialised. Exiting" << std::endl;
-      std::cerr << "Fatal Error: Localised temperature pulse is not initialised. Exiting" << std::endl;
-      err::vexit();
+      err::fatal("Fatal Error: Localised temperature pulse is not initialised. Exiting");
    }
 
    // Set equilibration temperature and field

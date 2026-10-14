@@ -74,10 +74,7 @@ void hybrid_cmc(){
 
    // Check integrator is CMC, if not then exit disgracefully
    if(integrate::integrator != integrate::integrator_t::hybrid_cmc){
-      terminaltextcolor(RED);
-      std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl;
-      terminaltextcolor(WHITE);
-      err::vexit();
+      err::fatal("Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting.");
    }
 
    // resize cmc array to include correct number of materials
@@ -188,10 +185,7 @@ void reverse_hybrid_cmc(){
 
    // Check integrator is CMC, if not then exit disgracefully
    if(integrate::integrator != integrate::integrator_t::hybrid_cmc){
-     terminaltextcolor(RED);
-      std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl;
-     terminaltextcolor(WHITE);
-      err::vexit();
+     err::fatal("Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting.");
    }
 
    // resize cmc array to include correct number of materials
