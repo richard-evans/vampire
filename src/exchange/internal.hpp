@@ -169,6 +169,7 @@ namespace exchange{
       extern exchange_matrix_4D_t biquadratic_exchange_constants; // array of biquadratic exchange constants
 
       extern bool enable_dmi; // flag to enable dmi calculation
+      extern bool output_dmi_vectors; // flag to write net dmi vectors for each pair to file
       extern bool enable_kitaev; // flag to enable kitaev calculation
       extern bool enable_fourspin;
 

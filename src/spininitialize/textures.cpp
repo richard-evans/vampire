@@ -196,6 +196,22 @@ namespace spininitialize{
       // mat.chirality (+/-1) sets the sense (clockwise/anticlockwise) of the
       // in-plane curling.
       //-----------------------------------------------------------------------------
+      //-----------------------------------------------------------------------------
+      // cycloid: Neel-type spin spiral propagating along x or y.
+      //
+      // The spin rotates in the plane containing the propagation axis and z,
+      // m = (sin k, 0, cos k) for propagation along x, completing one full turn
+      // over mat.width (the wavelength as a fraction of the system size along
+      // the axis). A negative wavelength reverses the sense of rotation.
+      //-----------------------------------------------------------------------------
+      void cycloid_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz){
+         const double pos[2] = {fx, fy};
+         const double k = 2.0 * pi * pos[mat.axis] / mat.width;
+         sx = (mat.axis == 0) ? sin(k) : 0.0;
+         sy = (mat.axis == 1) ? sin(k) : 0.0;
+         sz = cos(k);
+      }
+
       void vortex_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz){
 
          // (dx,dy) is the in-plane displacement of this atom from the
@@ -270,6 +286,10 @@ namespace spininitialize{
 
             case spin_spiral:
                spin_spiral_spin(material, fx, fy, fz, sx, sy, sz);
+               break;
+
+            case cycloid:
+               cycloid_spin(material, fx, fy, fz, sx, sy, sz);
                break;
 
             case vortex:

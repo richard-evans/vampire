@@ -38,6 +38,7 @@ namespace exchange{
       exchange_matrix_4D_t four_spin_exchange_constants; // array of biquadratic exchange constants
 
       bool enable_dmi = false; // flag to enable dmi calculation
+      bool output_dmi_vectors = false; // flag to write net dmi vectors for each pair to file
       bool enable_kitaev = false; // flag to enable Kitaev calculation
       bool enable_fourspin=false; //flag to enable Four-spin exchange
 

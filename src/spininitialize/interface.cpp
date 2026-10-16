@@ -148,6 +148,30 @@ namespace spininitialize{
             return true;
          }
          //---------------------------------------------------------------
+         // cycloid-x / cycloid-y, wavelength
+         // syntax: initial-spin-direction = cycloid-x, wavelength
+         // Neel-type spin spiral propagating along x (y) with the spin
+         // rotating in the x-z (y-z) plane. wavelength is a fraction of the
+         // system size along the axis; a negative value reverses the sense
+         // of rotation. see cycloid_spin() in textures.cpp
+         //---------------------------------------------------------------
+         else if(key == "cycloid-x" || key == "cycloid-y"){
+            if(tokens.size() != 2){
+               std::ostringstream message;
+               message << "Error on line " << line << " of material file - " << prefix << "[" << super_index+1 << "]:" << word << " = " << key << " requires exactly 1 numerical parameter (wavelength).";
+               err::fatal(message.str());
+            }
+            mat.texture = internal::cycloid;
+            mat.axis = (key == "cycloid-x") ? 0 : 1;
+            mat.width = atof(tokens[1].c_str());
+            if(mat.width == 0.0){
+               std::ostringstream message;
+               message << "Error on line " << line << " of material file - " << prefix << "[" << super_index+1 << "]:" << word << " cycloid wavelength must be non-zero.";
+               err::fatal(message.str());
+            }
+            return true;
+         }
+         //---------------------------------------------------------------
          // spin-spiral-x / spin-spiral-y / spin-spiral-z, wavelength
          // syntax: initial-spin-direction = spin-spiral-x, wavelength
          // wavelength is a fraction (0-1) of the system size along the

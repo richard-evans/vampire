@@ -81,6 +81,12 @@ namespace exchange{
           return true;
       }
       //-------------------------------------------------------------------
+      test="output-dmi-vectors";
+      if(word==test){
+          internal::output_dmi_vectors = vin::check_for_valid_bool(value, word, line, prefix,"input");
+          return true;
+      }
+      //-------------------------------------------------------------------
       test="kitaev-cutoff-range";
       if(word==test){
           double cr = atof(value.c_str());

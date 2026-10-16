@@ -52,7 +52,8 @@ namespace spininitialize{
          skyrmion       = 3, // radially symmetric skyrmion texture in the x-y plane
          spin_spiral    = 4, // helical spin spiral propagating along x, y or z
          vortex         = 5, // in-plane curling vortex texture in the x-y plane
-         vector_field   = 6  // texture interpolated from a user-supplied vector field file
+         vector_field   = 6, // texture interpolated from a user-supplied vector field file
+         cycloid        = 7  // Neel-type (cycloidal) spin spiral propagating in the x-y plane
       };
 
       //-----------------------------------------------------------------------------
@@ -164,6 +165,7 @@ namespace spininitialize{
       void random_spin(MTRand& prng, double& sx, double& sy, double& sz);
       void domain_wall_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
       void skyrmion_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
+      void cycloid_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
       void spin_spiral_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
       void vortex_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
       void vector_field_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
