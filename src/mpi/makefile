@@ -10,6 +10,7 @@ interface.o \
 mpi_generic.o \
 mpi_comms.o \
 parallel_rng_seed.o \
+shmem.o \
 wrapper.o
 
 # Append module objects to global tree

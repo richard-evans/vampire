@@ -46,6 +46,55 @@ namespace vmpi{
    extern MPI_Comm io_comm;         ///< MPI Communicator for IO
 #endif
 
+   // ranks sharing a region of memory (NUMA region, or node), see src/mpi/shmem.cpp
+#ifdef MPICF
+   extern MPI_Comm shared_comm;     // ranks sharing a NUMA region (or node) of memory
+   extern MPI_Comm leader_comm;     // rank 0 of each shared_comm (MPI_COMM_NULL on other ranks)
+#endif
+   extern int my_shared_rank;       // rank within shared_comm (0 in serial)
+   extern int num_shared_ranks;     // number of ranks in shared_comm (1 in serial)
+
+   //---------------------------------------------------------------------------
+   // Contiguous array held once per shared memory region (NUMA region or node)
+   // and read and written directly by every rank in shared_comm. Usage:
+   //
+   //    vmpi::shared_array_t<double> table;
+   //    table.allocate(n);                       // collective, set to zero
+   //    if(table.is_writer()) table[i] = value;  // or each rank writes its own part
+   //    table.synchronise();                     // collective, writes now visible
+   //    double x = table[i];                     // read on any rank
+   //    table.free();                            // collective, before vmpi::finalise
+   //
+   // Implemented for double, int and uint64_t in src/mpi/shmem.cpp. In the serial
+   // build the array is ordinary memory.
+   //---------------------------------------------------------------------------
+   template <typename T>
+   class shared_array_t{
+
+      public:
+         shared_array_t() = default;
+         shared_array_t(const shared_array_t&) = delete;            // copies would share the MPI window
+         shared_array_t& operator=(const shared_array_t&) = delete;
+
+         void allocate(uint64_t num_elements);
+         void synchronise();
+         void free();
+
+         T& operator[](uint64_t i){ return ptr[i]; }
+         const T& operator[](uint64_t i) const { return ptr[i]; }
+         T* data(){ return ptr; }
+         uint64_t size() const { return num_elements; }
+         bool is_writer() const { return my_shared_rank == 0; } // one rank per region, for filling the array
+
+      private:
+         T* ptr = nullptr;                // start of the array, valid on every rank in shared_comm
+         uint64_t num_elements = 0;
+         #ifdef MPICF
+            MPI_Win window = MPI_WIN_NULL;
+         #endif
+         std::vector<T> serial_data;      // storage for the serial build
+
+   };
 
    extern bool replicated_data_staged; ///< Flag for staged system generation
 
@@ -114,6 +163,10 @@ namespace vmpi{
    extern void counts_and_displacements(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
    extern void fast_collate(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
    extern void broadcast(std::vector<char>& message, int source_rank);
+
+   // functions to create and free the shared memory communicators (initialise is called by shared_array_t::allocate)
+   extern void initialise_shared_memory();
+   extern void finalise_shared_memory();
 
    // function to seed random numbers in parallel
    uint32_t parallel_rng_seed(int seed);

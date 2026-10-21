@@ -185,6 +185,9 @@ int finalise(){
    // std::cout << "MPI Simulation Time: " << vmpi::end_time-vmpi::start_time << std::endl;
    //}
 
+   // Free shared memory communicators
+   vmpi::finalise_shared_memory();
+
    // Finalise MPI
    MPI_Finalize();
 
