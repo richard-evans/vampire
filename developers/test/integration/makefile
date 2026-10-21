@@ -18,6 +18,7 @@ OBJECTS= \
 obj/main.o \
 obj/checkpoint.o \
 obj/convergence.o \
+obj/dipole.o \
 obj/energy.o \
 obj/integrator.o \
 obj/montecarlo.o \

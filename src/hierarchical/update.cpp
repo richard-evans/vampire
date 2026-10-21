@@ -22,6 +22,7 @@
 #include "cells.hpp" // needed for cells::cell_id_array but to be removed
 #include "dipole.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 #include "vutil.hpp"
 #include "sim.hpp"
 #include "vutil.hpp"
@@ -148,6 +149,16 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       if (dipole::cells_field_array_y[i] < -1000) dipole::cells_field_array_y[i] = 0.0;
       if (dipole::cells_field_array_z[i] < -1000) dipole::cells_field_array_z[i] = 0.0;
       //  std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
+   }
+
+   // Copy B-field from macrocell to atomistic spins
+   for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
+      if( magnetic[atom] ){
+         const int cell = cells::atom_cell_id_array[atom];
+         dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
+         dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
+         dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
+      }
    }
 
    timer.stop();

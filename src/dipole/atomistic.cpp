@@ -132,9 +132,6 @@ namespace dipole{
 
       #endif
 
-      // If enabled, output calculated atomistic dipole field coordinates and moments (passing local values)
-      if(dp::output_atomistic_dipole_field) output_atomistic_coordinates(num_atoms, x_coord_array, y_coord_array, z_coord_array, moments_array_copy);
-
       // Inform user of successful initialisation
       zlog << zTs() << "Atomistic dipole field calculation initialised" << std::endl;
       std::cout     << "Atomistic dipole field calculation initialised" << std::endl;
@@ -295,8 +292,6 @@ namespace dipole{
          dipole::atom_dipolar_field_array_z[atom_i] = prefactor * (bz + bz_self);
 
       }
-
-      if(dp::output_atomistic_dipole_field) output_atomistic_dipole_fields();
 
       return;
 

@@ -192,6 +192,12 @@ int main(int argc, char* argv[]){
       if( !material_atoms_test("structure/core-shell", 3474, 485, 0, 0, exe ) ) fail += 1;
       if( !material_atoms_test("structure/multilayer", 1000, 1000, 0, 0, exe ) ) fail += 1;
 
+      // Dipole solver test: tensor and hierarchical fields against the atomistic solver for a 10 nm
+      // diameter, two atom thick cylinder. Measured rms differences (2026-10-21): atoms 0.0864 (each
+      // atom takes its cell field), cells 0.0077, hierarchical-tensor 3e-16 (the cylinder lies within
+      // the hierarchical level 0 interaction range)
+      if( !dipole_solver_test("dipole/cylinder", 0.1, 0.01, 1.0e-10, exe ) ) fail += 1;
+
       // Monte Carlo equilibration test
       if( !final_value_test("montecarlo/equilibrium", 1.0, 1.0e-4, exe ) ) fail += 1;
 

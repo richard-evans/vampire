@@ -23,6 +23,7 @@ namespace ut{
       bool create = false;
       bool grains = false;
       bool integrate = false;
+      bool mpi = false;
    };
 
    // module level functions
@@ -30,5 +31,6 @@ namespace ut{
    int create_tests(const bool verbose);
    int grains_tests(const bool verbose);
    int integrate_tests(const bool verbose);
+   int mpi_tests(const bool verbose);
 
 }

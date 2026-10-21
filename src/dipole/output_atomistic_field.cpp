@@ -10,6 +10,7 @@
 
 // C++ standard library headers
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 
 // Vampire headers
@@ -93,6 +94,7 @@ namespace dipole{
          if(vmpi::master){
             std::ofstream ofile;
             ofile.open("atomistic_dipole_positions.txt");
+            ofile << std::setprecision(16);
             for(uint64_t atom = 0; atom < total_num_atoms; atom++){
                ofile << data_from_all_atoms[ 4 * atom + 0 ] - mean_x << "\t" <<
                         data_from_all_atoms[ 4 * atom + 1 ] - mean_y << "\t" <<
@@ -145,7 +147,9 @@ namespace dipole{
          if(vmpi::master){
             std::ofstream ofile;
             ofile.open("atomistic_dipole_field.txt");
-            for(int atom = 0; atom < total_num_atoms; atom++){
+            ofile << std::setprecision(16);
+            const uint64_t total_num_atoms = data_from_all_atoms.size() / 3; // dp::total_num_atoms is only set by the atomistic solver
+            for(uint64_t atom = 0; atom < total_num_atoms; atom++){
                ofile << data_from_all_atoms[ 3 * atom + 0 ] << "\t" <<
                         data_from_all_atoms[ 3 * atom + 1 ] << "\t" <<
                         data_from_all_atoms[ 3 * atom + 2 ] << "\t\n";

@@ -17,6 +17,7 @@
 #include "cells.hpp"
 #include "dipole.hpp"
 #include "gpu.hpp"
+#include "material.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 #include "vutil.hpp"
@@ -178,6 +179,18 @@ namespace dipole{
               << " build_time_s=" << dipole_scaling_build_time
               << " mem_total_kb=" << dipole_scaling_mem_total_kb
               << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb << std::endl;
+      }
+
+      // If enabled, output atomic coordinates and moments for the atomistic dipole field output (any solver
+      // except atomistic fft, which has its own output)
+      if(dipole::internal::output_atomistic_dipole_field && dipole::internal::solver != dipole::internal::atomisticfft){
+         // Zero all moments for non-magnetic materials by using copy of moments array
+         std::vector<double> moments_array_copy = atom_moments;
+         const int num_local_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
+         for(int atom = 0; atom < num_local_atoms; atom++){
+            if(mp::material[atom_type_array[atom]].non_magnetic != 0) moments_array_copy[atom] = 0.0;
+         }
+         dipole::internal::output_atomistic_coordinates(num_atoms, atom_coords_x, atom_coords_y, atom_coords_z, moments_array_copy);
       }
 
       // Set initialised flag

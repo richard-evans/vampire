@@ -136,6 +136,14 @@ namespace dipole{
                     << " update_time_s=" << dipole_scaling_max_time << std::endl;
             }
 
+            // If enabled, output atomistic dipole fields (the atomistic fft solver has its own output)
+            if(dipole::internal::output_atomistic_dipole_field && dipole::internal::solver != dipole::internal::atomisticfft){
+               dipole::internal::output_atomistic_dipole_fields();
+            }
+
+            // Output cell dipole fields for the atomistic solver (the cell solvers output them in their update)
+            if(dipole::internal::solver == dipole::internal::atomistic) dipole::output_dipole_fields();
+
          } // End of check for update rate
       } // end of check for update time
 
