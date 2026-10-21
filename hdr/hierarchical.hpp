@@ -54,6 +54,13 @@ namespace hierarchical{
                std::vector <double>& m_spin_array, // atomic spin moment
                std::vector < bool >& magnetic);    // is magnetic);
 
+   //---------------------------------------------------------------------------
+   // Function returning the time of each phase of the last update (slowest
+   // process) as " upward_s=... reduce_s=... field_s=... distribute_s=...".
+   // Collective: must be called on all processes.
+   //---------------------------------------------------------------------------
+   std::string update_phase_times();
+
 } // end of hierarchical namespace
 
 #endif //HIERARCHICAL_H_

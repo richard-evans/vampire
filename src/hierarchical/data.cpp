@@ -52,6 +52,8 @@ namespace hierarchical{
 
       double av_cell_size;                               // weighted average of cell_size_x, cell_size_y, cell_size_z
 
+      std::vector<double> phase_time(num_phases, 0.0);   // time (s) of each phase of the last update on this process
+
       std::vector<double> mag_array_x;       // arrays to store cell magnetisation
       std::vector<double> mag_array_y;
       std::vector<double> mag_array_z;

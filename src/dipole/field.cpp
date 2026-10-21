@@ -125,15 +125,17 @@ namespace dipole{
             dipole_scaling_timer.stop();
             const double dipole_scaling_local_time = dipole_scaling_timer.elapsed_time();
             const double dipole_scaling_max_time = vmpi::reduce_max(dipole_scaling_local_time);
+            // time of each phase of the update (hierarchical solver only, collective)
+            const std::string dipole_scaling_phases = dipole::internal::solver == dipole::internal::hierarchical ? hierarchical::update_phase_times() : "";
             if(vmpi::master){
                std::cout << "DIPOLE_SCALING UPDATE solver=" << dipole::internal::dipole_solver_name()
                           << " nprocs=" << vmpi::num_processors
                           << " sim_time=" << sim_time
-                          << " update_time_s=" << dipole_scaling_max_time << std::endl;
+                          << " update_time_s=" << dipole_scaling_max_time << dipole_scaling_phases << std::endl;
                zlog << zTs() << "DIPOLE_SCALING UPDATE solver=" << dipole::internal::dipole_solver_name()
                     << " nprocs=" << vmpi::num_processors
                     << " sim_time=" << sim_time
-                    << " update_time_s=" << dipole_scaling_max_time << std::endl;
+                    << " update_time_s=" << dipole_scaling_max_time << dipole_scaling_phases << std::endl;
             }
 
             // If enabled, output atomistic dipole fields (the atomistic fft solver has its own output)

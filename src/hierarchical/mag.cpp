@@ -17,6 +17,7 @@
 // Vampire headers
 #include "cells.hpp" // needed for dp::cell_id_array but to be removed
 #include "vmpi.hpp"
+#include "vutil.hpp"
 #include "atoms.hpp"
 
 // hierarchical module headers
@@ -42,6 +43,10 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
                                           std::vector <double>& z_spin_array,
                                           std::vector <double>& m_spin_array, // atomic spin moment
                                           std::vector < bool >& magnetic){ // is magnetic
+
+   // time the local accumulation and upward pass, then the reduction
+   vutil::vtimer_t timer;
+   timer.start();
 
    // initialise all cells to zero on all processors
    for(size_t cell_index = 0; cell_index < ha::mag_array_x.size() ; ++cell_index ) {
@@ -127,10 +132,17 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
 
    } // end of hierarchical cell loop
 
+   timer.stop();
+   ha::phase_time[ha::upward_pass] = timer.elapsed_time();
+   timer.start();
+
    // Finally accumulate and sum moments for all cells on all processors
    vmpi::all_reduce_sum(ha::mag_array_x);
    vmpi::all_reduce_sum(ha::mag_array_y);
    vmpi::all_reduce_sum(ha::mag_array_z);
+
+   timer.stop();
+   ha::phase_time[ha::moment_reduction] = timer.elapsed_time();
 
    return;
 

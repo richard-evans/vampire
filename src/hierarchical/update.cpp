@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 
 // C library headers
 #include <fenv.h>
@@ -48,11 +49,17 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
 
    // update hierarchical magnetization in cells
    hierarchical::internal::calculate_hierarchical_magnetisation(x_spin_array, y_spin_array, z_spin_array, m_spin_array, magnetic);
-   cells::mag();
+
    // instantiate timer
    vutil::vtimer_t timer;
 
-   // start timer
+   // cell magnetisations for the self term (counted as part of the moment reduction)
+   timer.start();
+   cells::mag();
+   timer.stop();
+   ha::phase_time[ha::moment_reduction] += timer.elapsed_time();
+
+   // start timer for the field loop
    timer.start();
 
    // initialise cell fields to a large negative number for MPI reduction
@@ -121,6 +128,10 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
 
    }
 
+   timer.stop();
+   ha::phase_time[ha::field_loop] = timer.elapsed_time();
+   timer.start();
+
    #ifdef MPICF
       // Reduce fields on all processors so all have correct field values
       MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], dipole::cells_num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
@@ -152,6 +163,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    }
 
    timer.stop();
+   ha::phase_time[ha::field_distribution] = timer.elapsed_time();
 
    // Optionally output dipole update time to log file (commented due to call frequency of this function)
    //std::cout << "\tdone! [ " << timer.elapsed_time() << " s ]" << std::endl;
@@ -163,5 +175,20 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    return;
 
 } // end of update function
+
+//------------------------------------------------------------------------------
+// Function returning the time of each phase of the last update (slowest process)
+//------------------------------------------------------------------------------
+std::string update_phase_times(){
+
+   std::ostringstream times;
+   times << " upward_s="     << vmpi::reduce_max(ha::phase_time[ha::upward_pass])
+         << " reduce_s="     << vmpi::reduce_max(ha::phase_time[ha::moment_reduction])
+         << " field_s="      << vmpi::reduce_max(ha::phase_time[ha::field_loop])
+         << " distribute_s=" << vmpi::reduce_max(ha::phase_time[ha::field_distribution]);
+
+   return times.str();
+
+}
 
 } // end of hierarchical namespace
