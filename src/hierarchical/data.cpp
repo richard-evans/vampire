@@ -46,6 +46,7 @@ namespace hierarchical{
       std::vector <int> interaction_list;                // list of interacting hierarchical cells
       std::vector < int > interaction_list_start_index;  // index of first neighbour in interactions list
       std::vector < int > interaction_list_end_index;    // index of last  neighbour in interactions list
+      std::vector < int > upward_pass_cells;          // coarse cells (level >= 1, by level) holding this process's cells
       std::vector < int > num_atoms_in_cell;             // list of number of atoms within each cell
       std::vector < int > proc_cell_index_array1D;       //
       std::vector < int > cells_num_atoms_in_cell;       //

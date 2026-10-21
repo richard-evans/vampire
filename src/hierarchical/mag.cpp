@@ -99,38 +99,30 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
    }
 
    //--------------------------------------------------------------------------------------
-   // loop over all hierarchical levels, computing partial cell magnetizations at level L
+   // loop over the hierarchical levels in order, computing partial cell magnetizations at
+   // level L for the cells holding local cells (partial sums in other cells are zero)
    //--------------------------------------------------------------------------------------
-   for (int level = 1; level < ha::num_levels; level++ ){
+   for (const int cell : ha::upward_pass_cells){
 
-      // determine starting and end indices for level in 1D hierarchical cell array
-      int start = ha::cells_level_start_index[level];
-      int end   = ha::cells_level_end_index[level];
+      // determine which lower level cells L-1 are in each higher level cell
+      int start_cell_in_cell = ha::cells_in_cells_start_index[cell];
+      int end_cell_in_cell = ha::cells_in_cells_end_index[cell];
 
-      // loop over all cells in level L
-      for (int cell = start; cell < end; cell++){
+      // loop over all L-1 level cells and accumulate magnetization
+      for (int cell_in_cell = start_cell_in_cell; cell_in_cell < end_cell_in_cell; cell_in_cell++){
 
-         // determine which lower level cells L-1 are in each higher level cell
-         int start_cell_in_cell = ha::cells_in_cells_start_index[cell];
-         int end_cell_in_cell = ha::cells_in_cells_end_index[cell];
+         // get local cell ID of subcell
+         int subcell = ha::cells_in_cells[cell_in_cell];
 
-         // loop over all L-1 level cells and accumulate magnetization
-         for (int cell_in_cell = start_cell_in_cell; cell_in_cell < end_cell_in_cell; cell_in_cell++){
+         // accumulate cell magnetizations up the hierarchical tree
+         ha::mag_array_x[cell] += ha::mag_array_x[subcell];
+         ha::mag_array_y[cell] += ha::mag_array_y[subcell];
+         ha::mag_array_z[cell] += ha::mag_array_z[subcell];
+      //   std::cout << ha::mag_array_z[cell] <<std::endl;
+      }
+      //  std::cout << ha::mag_array_x[cell] << '\t' << ha::mag_array_y[cell] << '\t' << ha::mag_array_z[cell] << '\t' << std::endl;
 
-            // get local cell ID of subcell
-            int subcell = ha::cells_in_cells[cell_in_cell];
-
-            // accumulate cell magnetizations up the hierarchical tree
-            ha::mag_array_x[cell] += ha::mag_array_x[subcell];
-            ha::mag_array_y[cell] += ha::mag_array_y[subcell];
-            ha::mag_array_z[cell] += ha::mag_array_z[subcell];
-         //   std::cout << ha::mag_array_z[cell] <<std::endl;
-         }
-         //  std::cout << ha::mag_array_x[cell] << '\t' << ha::mag_array_y[cell] << '\t' << ha::mag_array_z[cell] << '\t' << std::endl;
-
-      } // end of cell loop
-
-   } // end of hierarchical cell loop
+   } // end of cell loop
 
    timer.stop();
    ha::phase_time[ha::upward_pass] = timer.elapsed_time();

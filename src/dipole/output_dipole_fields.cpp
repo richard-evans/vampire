@@ -52,6 +52,9 @@ void output_dipole_fields(){
 
    // The atomistic solver does not calculate cell fields, so use the mean field of the magnetic atoms in each cell
    const bool atomistic_solver = dipole::internal::solver == dipole::internal::atomistic;
+
+   // cell solvers calculate the fields of local cells only, so collect all cells for output
+   if(!atomistic_solver) dipole::gather_cell_fields();
    std::vector<double> mean_field_x(0);
    std::vector<double> mean_field_y(0);
    std::vector<double> mean_field_z(0);

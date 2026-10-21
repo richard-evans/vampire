@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 //#include <string>
+#include <algorithm>
 #include <cmath>
 //#include <cstdlib>
 #include <iostream>
@@ -23,6 +24,7 @@
 #include "vutil.hpp"
 #include "atoms.hpp"
 #include "hierarchical.hpp"
+#include "micromagnetic.hpp"
 
 // hierarchical module headers
 #include "internal.hpp"
@@ -479,6 +481,21 @@ void initialize(const double system_dimensions_x,
       }
    }
 
+   // list the coarse cells holding level 0 cells whose moments this process accumulates (its local cells, or its
+   // micromagnetic cells), level by level, so that the upward pass skips cells where its partial sums are zero
+   std::vector<bool> has_local_cells(ha::total_num_cells, false);
+   for (int lc = 0; lc < cells_num_local_cells; lc++) has_local_cells[cells::cell_id_array[lc]] = true;
+   for (int lc = 0; lc < micromagnetic::number_of_micromagnetic_cells; lc++) has_local_cells[micromagnetic::list_of_micromagnetic_cells[lc]] = true;
+   ha::upward_pass_cells.clear();
+   for (int level = 1; level < ha::num_levels; level ++ ){
+      for (int cell = ha::cells_level_start_index[level]; cell < ha::cells_level_end_index[level]; cell++){
+         for (int interaction = ha::cells_in_cells_start_index[cell]; interaction < ha::cells_in_cells_end_index[cell]; interaction ++ ){
+            if (has_local_cells[ha::cells_in_cells[interaction]]) has_local_cells[cell] = true;
+         }
+         if (has_local_cells[cell]) ha::upward_pass_cells.push_back(cell);
+      }
+   }
+
    // stop the timer for segment 6 and save it
    timer.stop();
    segment_time[5] = timer.elapsed_time();
@@ -497,85 +514,88 @@ void initialize(const double system_dimensions_x,
    // restart the timer
    timer.start();
 
-   // data sturcture to store corner positions for each cell
-   std::vector < std::vector < double> >corners;
-   corners.resize(8);
-   for (int i = 0; i < 8; ++i) corners[i].resize(3,0.0);
+   // level of each cell, and the roots of the hierarchy (cells that are not a subcell of another cell)
+   std::vector<int> cell_level(ha::total_num_cells, 0);
+   std::vector<bool> is_root(ha::total_num_cells, true);
+   for (int level = 0; level < ha::num_levels; level ++ ){
+      for (int cell = ha::cells_level_start_index[level]; cell < ha::cells_level_end_index[level]; cell++){
+         cell_level[cell] = level;
+         if (level > 0){
+            for (int interaction = ha::cells_in_cells_start_index[cell]; interaction < ha::cells_in_cells_end_index[cell]; interaction ++ ){
+               is_root[ha::cells_in_cells[interaction]] = false;
+            }
+         }
+      }
+   }
+   std::vector<int> roots;
+   for (int cell = 0; cell < ha::total_num_cells; cell++) if (is_root[cell]) roots.push_back(cell);
 
-   // determine the interaction list for local cells
+   // determine the interaction list for local cells by descending the hierarchy from the roots: a cell at level
+   // L > 0 interacts as a whole if all its corners are beyond the level L interaction range, otherwise its subcells
+   // are considered; level 0 cells always interact. The list is ordered by level (highest first) and by cell id
+   // within a level.
+   std::vector < std::vector <int> > level_interactions_lc(ha::num_levels);
+   std::vector <int> stack;
    int interaction_num = 0;
    for (int lc = 0; lc < cells_num_local_cells; lc ++){
 
-      std::vector < bool > interacted(ha::total_num_cells,false);
       ha::interaction_list_start_index[lc] = interaction_num;
       int cell_i = cells::cell_id_array[lc];
       double xi = ha::cell_positions[cell_i*3 + 0];
       double yi = ha::cell_positions[cell_i*3 + 1];
       double zi = ha::cell_positions[cell_i*3 + 2];
-      for (int level = ha::num_levels - 1; level > -1; level -- ){
 
-         int start = ha::cells_level_start_index[level];
-         int end   = ha::cells_level_end_index[level];
-         for (int cell_j = start; cell_j < end; cell_j++){
+      for (int level = 0; level < ha::num_levels; level ++ ) level_interactions_lc[level].clear();
+      stack = roots;
+      while (!stack.empty()){
 
-            if (interacted[cell_j] == false && level != 0){
+         const int cell_j = stack.back();
+         stack.pop_back();
+         const int level = cell_level[cell_j];
 
-               double xj = ha::cell_positions[cell_j*3 + 0];
-               double yj = ha::cell_positions[cell_j*3 + 1];
-               double zj = ha::cell_positions[cell_j*3 + 2];
-               double size_xj = ha::cell_dimensions[cell_j*3 + 0];
-               double size_yj = ha::cell_dimensions[cell_j*3 + 1];
-               double size_zj = ha::cell_dimensions[cell_j*3 + 2];
+         if (level == 0){
+            level_interactions_lc[0].push_back(cell_j);
+            continue;
+         }
 
-               corners = ha::calculate_corners(xj,yj,zj,size_xj,size_yj,size_zj);
+         // count the corners of cell j beyond the interaction range (corners as in ha::calculate_corners)
+         const double min_x = ha::cell_positions[cell_j*3 + 0] - ha::cell_dimensions[cell_j*3 + 0]/2.0;
+         const double min_y = ha::cell_positions[cell_j*3 + 1] - ha::cell_dimensions[cell_j*3 + 1]/2.0;
+         const double min_z = ha::cell_positions[cell_j*3 + 2] - ha::cell_dimensions[cell_j*3 + 2]/2.0;
+         const double max_x = ha::cell_positions[cell_j*3 + 0] + ha::cell_dimensions[cell_j*3 + 0]/2.0;
+         const double max_y = ha::cell_positions[cell_j*3 + 1] + ha::cell_dimensions[cell_j*3 + 1]/2.0;
+         const double max_z = ha::cell_positions[cell_j*3 + 2] + ha::cell_dimensions[cell_j*3 + 2]/2.0;
+         const double corner_x[2] = {min_x, max_x};
+         const double corner_y[2] = {min_y, max_y};
+         const double corner_z[2] = {min_z, max_z};
 
-               int is_corner_outside_range = 0;
-               for (int corner = 0; corner < 8; corner ++){
+         int is_corner_outside_range = 0;
+         for (int corner = 0; corner < 8; corner ++){
+            const double cx = corner_x[(corner >> 2) & 1];
+            const double cy = corner_y[(corner >> 1) & 1];
+            const double cz = corner_z[corner & 1];
+            double dx_2 = (xi - cx)*(xi - cx);
+            double dy_2 = (yi - cy)*(yi - cy);
+            double dz_2 = (zi - cz)*(zi - cz);
+            double r = sqrt(dx_2 + dy_2 + dz_2);
+            if (r > ha::interaction_range[level]) is_corner_outside_range ++;
+         }
 
-                  double dx_2 = (xi - corners[corner][0])*(xi-corners[corner][0]);
-                  double dy_2 = (yi - corners[corner][1])*(yi-corners[corner][1]);
-                  double dz_2 = (zi - corners[corner][2])*(zi-corners[corner][2]);
-
-                  double r = sqrt(dx_2 + dy_2 + dz_2);
-                  if (r > ha::interaction_range[level]) is_corner_outside_range ++;
-               }
-
-               if (is_corner_outside_range == 8){
-                  interaction_num ++;
-                  ha::interaction_list_end_index[lc] = interaction_num;
-                  interacted[cell_j] = true;
-                  int start_cell_in_cell = ha::cells_in_cells_start_index[cell_j];
-                  int end_cell_in_cell = ha::cells_in_cells_end_index[cell_j];
-                  ha::interaction_list.push_back(cell_j);
-
-                  //if (cell_i == 0 ha::cell_positions[cell_j*3 + 0]  == 115)  std::cout <<"interacted" << std::endl;//std::cout << cell_j <<  "\t" << ha::cell_positions[cell_j*3 + 0] << "\t" << ha::cell_positions[cell_j*3 + 1] << "\t" << ha::cell_positions[cell_j*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_j*3 + 0] << "\t" <<ha::cell_dimensions[cell_j*3 + 1] <<"\t" <<ha::cell_dimensions[cell_j*3 + 2] << std::endl;
-                  ha::interaction_list_end_index[lc] = interaction_num;
-                  // if (cell_i == 0) std::cout << "CELL POSITION\t" << start_cell_in_cell << '\t' << end_cell_in_cell << '\t' << cell_j << '\t' << ha::cell_positions[cell_j*3 + 0] << "\t" << ha::cell_positions[cell_j*3 + 1] << "\t" << ha::cell_positions[cell_j*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_j*3 + 0] << "\t" <<ha::cell_dimensions[cell_j*3 + 1] <<"\t" <<ha::cell_dimensions[cell_j*3 + 2] << std::endl;
-                  for (int interaction = start_cell_in_cell; interaction < end_cell_in_cell; interaction ++ ){
-                     int sub_cell = ha::cells_in_cells[interaction];
-                     interacted[sub_cell] = true;
-                     //    if (cell_i == 0)     std::cout << "SUBCELL POSITION\t" << sub_cell <<  "\t" << ha::cell_positions[sub_cell*3 + 0] << "\t" << ha::cell_positions[sub_cell*3 + 1] << "\t" << ha::cell_positions[sub_cell*3 + 2] <<  "\t" <<ha::cell_dimensions[sub_cell*3 + 0] << "\t" <<ha::cell_dimensions[sub_cell*3 + 1] <<"\t" <<ha::cell_dimensions[sub_cell*3 + 2] << std::endl;
-                  }
-               }
-               //if (cell_i == 0)  std::cout << '\t' << std::endl;
-            }
-            else if (level != 0){
-               int start_cell_in_cell = ha::cells_in_cells_start_index[cell_j];
-               int end_cell_in_cell = ha::cells_in_cells_end_index[cell_j];
-
-               for (int interaction = start_cell_in_cell; interaction < end_cell_in_cell; interaction ++ ){
-                  int sub_cell = ha::cells_in_cells[interaction];
-                  interacted[sub_cell] = true;
-               }
-            }
-            else if (level == 0 && interacted[cell_j] == false){
-               ha::interaction_list.push_back(cell_j);
-               interaction_num ++;
-               ha::interaction_list_end_index[lc] = interaction_num;
+         if (is_corner_outside_range == 8) level_interactions_lc[level].push_back(cell_j);
+         else {
+            for (int interaction = ha::cells_in_cells_start_index[cell_j]; interaction < ha::cells_in_cells_end_index[cell_j]; interaction ++ ){
+               stack.push_back(ha::cells_in_cells[interaction]);
             }
          }
 
       }
+
+      for (int level = ha::num_levels - 1; level > -1; level -- ){
+         std::sort(level_interactions_lc[level].begin(), level_interactions_lc[level].end());
+         for (const int cell_j : level_interactions_lc[level]) ha::interaction_list.push_back(cell_j);
+         interaction_num += level_interactions_lc[level].size();
+      }
+      ha::interaction_list_end_index[lc] = interaction_num;
 
    }
 

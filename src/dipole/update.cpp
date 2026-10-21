@@ -20,6 +20,7 @@
 
 // Vampire headers
 #include "dipole.hpp"
+#include "micromagnetic.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 #include "cells.hpp"
@@ -48,12 +49,6 @@ namespace dipole{
 
       // Define constant imuB = 1/muB to normalise to unitarian values the cell magnetisation
       const double imuB = constants::i_muB;
-
-       for (int i = 0 ; i < cells::num_cells; i ++){
-         dipole::cells_field_array_x[i] = -100000.0;
-         dipole::cells_field_array_y[i] = -100000.0;
-         dipole::cells_field_array_z[i] = -100000.0;
-       }
 
       // loop over local cells
       for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
@@ -114,18 +109,8 @@ namespace dipole{
          }
       }
 
-      #ifdef MPICF
-         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
-      #endif
-
-       for (int i = 0 ; i < dipole::internal::cells_num_cells; i ++){
-         if (dipole::cells_field_array_x[i] < -1000) dipole::cells_field_array_x[i] = 0.0;
-         if (dipole::cells_field_array_y[i] < -1000) dipole::cells_field_array_y[i] = 0.0;
-         if (dipole::cells_field_array_z[i] < -1000) dipole::cells_field_array_z[i] = 0.0;
-       //  std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
-       }
+      // Each process has the fields of the cells holding its atoms; micromagnetic cells need all cells
+      if(micromagnetic::discretisation_type > 0) dipole::gather_cell_fields();
 
       dipole::output_dipole_fields();
 

@@ -49,6 +49,7 @@ namespace hierarchical{
       extern std::vector <int> interaction_list;
       extern std::vector < int > interaction_list_start_index;
       extern std::vector < int > interaction_list_end_index;
+      extern std::vector < int > upward_pass_cells; // coarse cells (level >= 1, by level) holding this process's cells
       extern std::vector < int > num_atoms_in_cell;
 
       extern std::vector < int > proc_cell_index_array1D;

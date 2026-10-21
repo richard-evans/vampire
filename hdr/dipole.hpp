@@ -80,6 +80,13 @@ namespace dipole{
    void output_dipole_fields();
 
    //--------------------------------------------------------
+   // Function to make the cell fields of all cells available on
+   // all processes (each process calculates only the fields of
+   // its local cells). Collective.
+   //--------------------------------------------------------
+   void gather_cell_fields();
+
+   //--------------------------------------------------------
    // Function to send cells field to be output in cfg file
    //--------------------------------------------------------
    int send_cells_field(std::vector<int>& cells_cell_id_array,

@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <vector>
 #include <string>
 
@@ -148,6 +149,40 @@ namespace dipole{
 
          } // End of check for update rate
       } // end of check for update time
+
+      return;
+
+   }
+
+   //-----------------------------------------------------------------------------
+   // Function to make the cell fields of all cells available on all processes.
+   // Each process calculates the field of its local cells (the cells holding
+   // its atoms), so cells spanning processes are calculated on each of them
+   // with identical results. Other cells are set to the lowest double, the
+   // maximum taken over all processes, and cells no process holds set to zero.
+   //-----------------------------------------------------------------------------
+   void gather_cell_fields(){
+
+      #ifdef MPICF
+         const double unset = std::numeric_limits<double>::lowest();
+         std::vector<bool> local(dipole::cells_field_array_x.size(), false);
+         for(int lc = 0; lc < cells::num_local_cells; lc++) local[cells::cell_id_array[lc]] = true;
+         for(size_t i = 0; i < local.size(); i++){
+            if(!local[i]){
+               dipole::cells_field_array_x[i] = unset;
+               dipole::cells_field_array_y[i] = unset;
+               dipole::cells_field_array_z[i] = unset;
+            }
+         }
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], dipole::cells_field_array_x.size(), MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0], dipole::cells_field_array_y.size(), MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0], dipole::cells_field_array_z.size(), MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+         for(size_t i = 0; i < local.size(); i++){
+            if(dipole::cells_field_array_x[i] == unset) dipole::cells_field_array_x[i] = 0.0;
+            if(dipole::cells_field_array_y[i] == unset) dipole::cells_field_array_y[i] = 0.0;
+            if(dipole::cells_field_array_z[i] == unset) dipole::cells_field_array_z[i] = 0.0;
+         }
+      #endif
 
       return;
 
