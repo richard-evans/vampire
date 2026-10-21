@@ -27,3 +27,5 @@ sim:time-step = 1.0e-16
 sim:integrator-random-seed = 12345
 output:time-steps
 output:magnetisation
+output:magnetostatic-energy
+output:precision = 10

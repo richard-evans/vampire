@@ -196,7 +196,7 @@ int main(int argc, char* argv[]){
       // diameter, two atom thick cylinder. Measured rms differences (2026-10-21): atoms 0.0864 (each
       // atom takes its cell field), cells 0.0077, hierarchical-tensor 3e-16 (the cylinder lies within
       // the hierarchical level 0 interaction range)
-      if( !dipole_solver_test("dipole/cylinder", 0.1, 0.01, 1.0e-10, exe ) ) fail += 1;
+      if( !dipole_solver_test("dipole/cylinder", 0.1, 0.01, 1.0e-10, 0.01, exe ) ) fail += 1;
 
       // Monte Carlo equilibration test
       if( !final_value_test("montecarlo/equilibrium", 1.0, 1.0e-4, exe ) ) fail += 1;

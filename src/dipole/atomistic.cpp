@@ -151,6 +151,7 @@ namespace dipole{
 
        const double prefactor = constants::dipole_prefactor; // mu_0*muB/(4*pi*Ang^3) — see constants::dipole_prefactor
        const double eight_pi_o_three = 8.0 * M_PI / 3.0;
+       const double four_pi = 4.0 * M_PI;
 
        // cast number of local atoms to a local constant
        const int num_atoms_on_my_processor = dp::num_local_atoms;
@@ -186,9 +187,9 @@ namespace dipole{
          #endif
 
          // self term for atom  i (+2/3 mu_s * V_atom) * mu_0 / 4 pi
-         const double bx_self = eight_pi_o_three * dp::sx[atom_i] * dp::sm[atom_i] / cells::atomic_volume;
-         const double by_self = eight_pi_o_three * dp::sy[atom_i] * dp::sm[atom_i] / cells::atomic_volume;
-         const double bz_self = eight_pi_o_three * dp::sz[atom_i] * dp::sm[atom_i] / cells::atomic_volume;
+         const double bx_self = eight_pi_o_three * dp::sx[atom_i_in_total_list_j] * dp::sm[atom_i_in_total_list_j] / cells::atomic_volume;
+         const double by_self = eight_pi_o_three * dp::sy[atom_i_in_total_list_j] * dp::sm[atom_i_in_total_list_j] / cells::atomic_volume;
+         const double bz_self = eight_pi_o_three * dp::sz[atom_i_in_total_list_j] * dp::sm[atom_i_in_total_list_j] / cells::atomic_volume;
 
          // get coordinates of atom i
          const double xi = dp::cx[atom_i_in_total_list_j];
@@ -290,6 +291,11 @@ namespace dipole{
          dipole::atom_dipolar_field_array_x[atom_i] = prefactor * (bx + bx_self);
          dipole::atom_dipolar_field_array_y[atom_i] = prefactor * (by + by_self);
          dipole::atom_dipolar_field_array_z[atom_i] = prefactor * (bz + bz_self);
+
+         // save demagnetising field mu_0 H = B - mu_0 M for the magnetostatic energy (self term -1/3 mu_0 M)
+         dipole::atom_mu0demag_field_array_x[atom_i] = prefactor * (bx + bx_self - four_pi * dp::sx[atom_i_in_total_list_j] * dp::sm[atom_i_in_total_list_j] / cells::atomic_volume);
+         dipole::atom_mu0demag_field_array_y[atom_i] = prefactor * (by + by_self - four_pi * dp::sy[atom_i_in_total_list_j] * dp::sm[atom_i_in_total_list_j] / cells::atomic_volume);
+         dipole::atom_mu0demag_field_array_z[atom_i] = prefactor * (bz + bz_self - four_pi * dp::sz[atom_i_in_total_list_j] * dp::sm[atom_i_in_total_list_j] / cells::atomic_volume);
 
       }
 

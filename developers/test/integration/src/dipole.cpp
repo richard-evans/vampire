@@ -25,6 +25,7 @@ namespace{
 struct dipole_fields_t{
    std::vector<std::array<double,3>> atom_field; // atomistic fields, sorted by atomic position
    std::vector<std::array<double,3>> cell_field; // cell fields of cells containing atoms, in cell order
+   double energy = 0.0;                          // magnetostatic energy (J) at time 0
 };
 
 // read the atomistic and cell dipole fields written by a run. The atoms are sorted by position,
@@ -34,7 +35,8 @@ bool read_dipole_fields(dipole_fields_t& fields){
    std::ifstream positions("atomistic_dipole_positions.txt");
    std::ifstream atom_fields("atomistic_dipole_field.txt");
    std::ifstream cell_fields("dipole-field.txt");
-   if(!positions.is_open() || !atom_fields.is_open() || !cell_fields.is_open()) return false;
+   std::ifstream output("output");
+   if(!positions.is_open() || !atom_fields.is_open() || !cell_fields.is_open() || !output.is_open()) return false;
 
    // atomic positions rounded to 0.001 A as the sort key
    std::map<std::tuple<int64_t,int64_t,int64_t>, std::array<double,3>> sorted;
@@ -50,6 +52,13 @@ bool read_dipole_fields(dipole_fields_t& fields){
    while(cell_fields >> id >> num_atoms >> x >> y >> z >> m >> b[0] >> b[1] >> b[2]){
       if(num_atoms > 0) fields.cell_field.push_back(b);
    }
+
+   // first data line of output: time step, mx, my, mz, |m|, magnetostatic energy
+   std::string line;
+   while(std::getline(output, line) && (line.empty() || line[0] == '#'));
+   std::stringstream data(line);
+   int64_t step;
+   if(!(data >> step >> x >> y >> z >> m >> fields.energy)) return false;
 
    return !fields.atom_field.empty() && !fields.cell_field.empty();
 
@@ -88,8 +97,11 @@ void cleanup(){
 // and the hierarchical cell fields must agree with the tensor cell fields
 // within hierarchical_tol. The mean atomistic field must give demagnetising
 // factors with Nxx + Nyy + Nzz = 1 within 0.01, where Nxx = 1 - <Bx>/(mu0 Mx).
+// The magnetostatic energy must equal (1/2) mu0 Ms^2 V m.N.m with these
+// factors, within 1e-6 for the atomistic solver (where it is an identity) and
+// within energy_tol for the tensor and hierarchical solvers.
 //------------------------------------------------------------------------------
-bool dipole_solver_test(const std::string dir, double atom_tol, double cell_tol, double hierarchical_tol, const std::string executable){
+bool dipole_solver_test(const std::string dir, double atom_tol, double cell_tol, double hierarchical_tol, double energy_tol, const std::string executable){
 
    // get root directory
    std::string path = std::filesystem::current_path();
@@ -137,6 +149,12 @@ bool dipole_solver_test(const std::string dir, double atom_tol, double cell_tol,
    const double nzz = 1.0 - mean_b[2]/(mu0_ms*m);
    const double trace = 2.0*nxx + nzz; // Nyy = Nxx by symmetry
 
+   // magnetostatic energy (1/2) mu0 Ms^2 V (Nxx mx^2 + Nzz mz^2), with V = number of atoms * a^3
+   const double volume = double(fields[0].atom_field.size()) * 2.87e-10*2.87e-10*2.87e-10;
+   const double energy = 0.5 * mu0_ms*mu0_ms/(4.0e-7*M_PI) * volume * (nxx*m*m + nzz*m*m);
+   std::vector<double> energy_error(solvers.size());
+   for(size_t s = 0; s < solvers.size(); s++) energy_error[s] = std::abs(fields[s].energy/energy - 1.0);
+
    const double tensor_atom = relative_rms_difference(fields[1].atom_field, fields[0].atom_field);
    const double hierarchical_atom = relative_rms_difference(fields[2].atom_field, fields[0].atom_field);
    const double tensor_cell = relative_rms_difference(fields[1].cell_field, fields[0].cell_field);
@@ -144,14 +162,16 @@ bool dipole_solver_test(const std::string dir, double atom_tol, double cell_tol,
    const double hierarchical_tensor = relative_rms_difference(fields[2].cell_field, fields[1].cell_field);
 
    if(tensor_atom < atom_tol && hierarchical_atom < atom_tol && tensor_cell < cell_tol && hierarchical_cell < cell_tol &&
-      hierarchical_tensor < hierarchical_tol && std::abs(trace - 1.0) < 0.01){
+      hierarchical_tensor < hierarchical_tol && std::abs(trace - 1.0) < 0.01 &&
+      energy_error[0] < 1.0e-6 && energy_error[1] < energy_tol && energy_error[2] < energy_tol){
       std::cout << "OK" << std::endl;
       return true;
    }
    else{
       std::cout << "FAIL | rms difference from atomistic: atoms (tensor, hierarchical) " << tensor_atom << ", " << hierarchical_atom
                 << "; cells " << tensor_cell << ", " << hierarchical_cell << "; hierarchical-tensor cells " << hierarchical_tensor
-                << "; Nxx + Nyy + Nzz = " << trace << std::endl;
+                << "; Nxx + Nyy + Nzz = " << trace << "; relative energy error (atomistic, tensor, hierarchical) "
+                << energy_error[0] << ", " << energy_error[1] << ", " << energy_error[2] << std::endl;
       return false;
    }
 

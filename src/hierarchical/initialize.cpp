@@ -621,11 +621,6 @@ void initialize(const double system_dimensions_x,
    dipole::cells_field_array_y.resize(cells_num_cells,0.0);
    dipole::cells_field_array_z.resize(cells_num_cells,0.0);
 
-   // resize mu_0*Hd-field cells array
-   dipole::cells_mu0Hd_field_array_x.resize(cells_num_cells,0.0);
-   dipole::cells_mu0Hd_field_array_y.resize(cells_num_cells,0.0);
-   dipole::cells_mu0Hd_field_array_z.resize(cells_num_cells,0.0);
-
    // stop the timer for segment 8 and save it
    timer.stop();
    segment_time[7] = timer.elapsed_time();

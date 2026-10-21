@@ -36,7 +36,7 @@ namespace vt{
 //------------------------------------------------------------------------------
 bool checkpoint_test(const std::string dir, const std::string executable);
 bool convergence_test(const std::string dir, double alpha, double field, double expected_order, double tol, const std::string executable);
-bool dipole_solver_test(const std::string dir, double atom_tol, double cell_tol, double hierarchical_tol, const std::string executable);
+bool dipole_solver_test(const std::string dir, double atom_tol, double cell_tol, double hierarchical_tol, double energy_tol, const std::string executable);
 bool energy_test(std::string dir, double result, std::string executable, std::string energy_type);
 bool integrator_test(const std::string dir, double time, double rx, double ry, double rz, const std::string executable);
 bool material_atoms_test(const std::string dir, int n1, int n2, int n3, int n4, const std::string executable);

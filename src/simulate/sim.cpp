@@ -184,11 +184,6 @@ int run(){
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
 
-   // Precalculate initial statistics and then reset averages if not continuing a previous simulation
-   // RE technically this double counts the last data point in the statistics, need to implement a reset_counter to fix.
-   stats::update();
-   if(!load_checkpoint_continue_flag) stats::reset();
-
    // For continuous checkpoints inform user about I/O
    if(sim::save_checkpoint_continuous_flag) zlog << zTs() << "Continuously writing checkpoints to disk throughout simulation." << std::endl;
 
@@ -245,6 +240,12 @@ int run(){
    );
 
    if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
+
+   // Precalculate initial statistics and then reset averages if not continuing a previous simulation. Done after the
+   // dipole initialisation so that the initial magnetostatic energy includes the dipole field.
+   // RE technically this double counts the last data point in the statistics, need to implement a reset_counter to fix.
+   stats::update();
+   if(!load_checkpoint_continue_flag) stats::reset();
 
    // For MPI version, calculate initialisation time
    if(vmpi::my_rank==0){
