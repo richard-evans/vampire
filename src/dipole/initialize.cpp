@@ -82,7 +82,9 @@ namespace dipole{
       dipole::internal::cells_num_atoms_in_cell    = cells_num_atoms_in_cell;
       dipole::internal::cells_volume_array         = cells_volume_array;
 
-      dipole::internal::cells_pos_and_mom_array    = cells_pos_and_mom_array;
+      // the macrocell solver reorders the cell positions and moments in parallel, so it needs its own copy;
+      // the other solvers read the caller's array
+      if(dipole::internal::solver == dipole::internal::macrocell) dipole::internal::cells_pos_and_mom_array = cells_pos_and_mom_array;
 
       //----------------------------------------------------------
       // initialise dipole solver
@@ -117,7 +119,7 @@ namespace dipole{
             internal::output_dipole_solver_mem_info(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
             dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
             dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
-                                                       dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
+                                                       dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, cells_pos_and_mom_array,
                                                        cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
                                                        dipole::internal::atom_type_array, dipole::internal::atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
@@ -157,6 +159,10 @@ namespace dipole{
       const double dipole_scaling_mem_local_kb = vutil::peak_memory_usage_kb() - dipole_scaling_mem_before_kb;
       const double dipole_scaling_mem_total_kb = vmpi::reduce_sum(dipole_scaling_mem_local_kb);
       const double dipole_scaling_mem_max_kb = vmpi::reduce_max(dipole_scaling_mem_local_kb);
+      // memory held after initialisation counting shared memory once per region (Linux only, -1 elsewhere)
+      const double dipole_scaling_pss_local_kb = vutil::proportional_memory_usage_kb();
+      const double dipole_scaling_pss_total_kb = vmpi::reduce_sum(dipole_scaling_pss_local_kb);
+      const double dipole_scaling_pss_max_kb = vmpi::reduce_max(dipole_scaling_pss_local_kb);
       // dipole::internal::num_atoms is this rank's local (core + boundary
       // halo) atom count under MPI domain decomposition, so summing it
       // slightly over-counts shared boundary atoms rather than giving the
@@ -171,14 +177,18 @@ namespace dipole{
                     << " atoms=" << dipole_scaling_total_atoms
                     << " build_time_s=" << dipole_scaling_build_time
                     << " mem_total_kb=" << dipole_scaling_mem_total_kb
-                    << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb << std::endl;
+                    << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb
+                    << " pss_total_kb=" << dipole_scaling_pss_total_kb
+                    << " pss_max_rank_kb=" << dipole_scaling_pss_max_kb << std::endl;
          zlog << zTs() << "DIPOLE_SCALING BUILD solver=" << dipole::internal::dipole_solver_name()
               << " nprocs=" << vmpi::num_processors
               << " cells=" << dipole::internal::cells_num_cells
               << " atoms=" << dipole::internal::num_atoms
               << " build_time_s=" << dipole_scaling_build_time
               << " mem_total_kb=" << dipole_scaling_mem_total_kb
-              << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb << std::endl;
+              << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb
+              << " pss_total_kb=" << dipole_scaling_pss_total_kb
+              << " pss_max_rank_kb=" << dipole_scaling_pss_max_kb << std::endl;
       }
 
       // If enabled, output atomic coordinates and moments for the atomistic dipole field output (any solver

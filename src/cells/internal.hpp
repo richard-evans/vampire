@@ -42,8 +42,6 @@ namespace cells{
 //      extern bool enabled; // enable localised temperature pulse calculation
       extern bool initialised; /// flag set if initialised
       //extern int num_cells; /// number of macro-cells
-      extern std::vector<double> total_moment_array;
-      extern std::vector<double> cell_position_array; /// position of cells in x,y,z (3*n) MIRRORED on all CPUs // dont need this
 
       extern std::vector<double> spin_array_x;
       extern std::vector<double> spin_array_y;

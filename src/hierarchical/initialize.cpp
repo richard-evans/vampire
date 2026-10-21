@@ -21,6 +21,7 @@
 #include "cells.hpp" // needed for cells::cell_id_array but to be removed
 #include "dipole.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 #include "vutil.hpp"
 #include "atoms.hpp"
 #include "hierarchical.hpp"
@@ -63,8 +64,7 @@ int min(int x, int y, int z){
 
 namespace hierarchical{
 
-   // Forward declaration of cells_in_cells functions
-   void build_cells_in_cells_original();
+   // Forward declaration of cells_in_cells function
    void build_cells_in_cells(const std::vector<int>& cell_grid_i,
                              const std::vector<int>& cell_grid_j,
                              const std::vector<int>& cell_grid_k,
@@ -111,6 +111,9 @@ void initialize(const double system_dimensions_x,
    //  start timer
    timer.start();
 
+   // create the shared memory communicators (logs the region chosen: NUMA region or node)
+   vmpi::initialise_shared_memory();
+
    // calculate the number of cells in x, y and z rounding up to powers of 2 (RE-?)
    int A = ceil(std::log(2.0 * system_dimensions_x / cells::macro_cell_size_x ) / std::log(2.0));
    int B = ceil(std::log(2.0 * system_dimensions_y / cells::macro_cell_size_y ) / std::log(2.0));
@@ -134,51 +137,14 @@ void initialize(const double system_dimensions_x,
    ha::cells_level_end_index.resize(ha::num_levels,0.0);
    ha::interaction_range.resize(ha::num_levels,0.0);
 
-   std::vector < std::vector < int > > cells_index_atoms_array;
-
-   std::vector < int > cells_num_atoms_in_cell;
-   std::vector < int > cells_num_atoms_in_cell_global;
-   std::vector < int > cells_local_cell_array;
-   std::vector <  double > cells_pos_and_mom_array;
+   // cell data from the cells module, read only (initialise_atomistic_cell_data takes const references)
+   const std::vector < std::vector < int > >& cells_index_atoms_array = cells::index_atoms_array;
+   const std::vector < int >& cells_num_atoms_in_cell        = cells::num_atoms_in_cell;        // this process's atoms only
+   const std::vector < int >& cells_num_atoms_in_cell_global = cells::num_atoms_in_cell_global;
+   const std::vector < int >& cells_local_cell_array         = cells::local_cell_array;
+   const std::vector < double >& cells_pos_and_mom_array     = cells::pos_and_mom_array;
    int cells_num_cells = cells::num_cells;
    int cells_num_local_cells = cells::num_local_cells;
-
-   // allocate data for 2D arrays
-   cells_index_atoms_array.resize(cells::num_cells);
-
-   cells_num_atoms_in_cell.resize(cells::num_cells);
-   cells_num_atoms_in_cell_global.resize(cells::num_cells);
-   cells_local_cell_array.resize(cells::num_local_cells);
-   cells_pos_and_mom_array.resize(cells::num_cells*4);
-
-   // consider all cells
-   for(int i = 0; i < cells_num_cells; i++){
-
-      // copy number of atoms in each cell
-      cells_num_atoms_in_cell[i]        = cells::num_atoms_in_cell[i];
-      cells_num_atoms_in_cell_global[i] = cells::num_atoms_in_cell_global[i];
-
-
-      // populate cell and moment array
-      cells_pos_and_mom_array[4*i + 0] = cells::pos_and_mom_array[4*i + 0];
-      cells_pos_and_mom_array[4*i + 1] = cells::pos_and_mom_array[4*i + 1];
-      cells_pos_and_mom_array[4*i + 2] = cells::pos_and_mom_array[4*i + 2];
-      cells_pos_and_mom_array[4*i + 3] = cells::pos_and_mom_array[4*i + 3];
-
-      // resize second dimension of arrays
-      cells_index_atoms_array[i].resize(cells::num_atoms_in_cell[i]);
-
-      // copy a list of atoms in each cell
-      for (int atom = 0; atom <cells_num_atoms_in_cell[i]; atom ++ ){
-         cells_index_atoms_array[i][atom] = cells::index_atoms_array[i][atom];
-      }
-
-   }
-
-   //
-   for (int lc = 0; lc < cells_num_local_cells; lc ++){
-      cells_local_cell_array[lc] = cells::local_cell_array[lc];
-   }
 
    // stop the timer for segment 1 and save it
    timer.stop();
@@ -223,9 +189,6 @@ void initialize(const double system_dimensions_x,
                                                        atoms_in_cells_array             // list of cell IDs to enable parsing of atomistic data (output)
                                                       );
 
-   // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
-   dipole::dipole_cells_num_atoms_in_cell = cells_num_atoms_in_cell;
-
    // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
    for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
       //if(cells_num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
@@ -257,18 +220,13 @@ void initialize(const double system_dimensions_x,
    // incrementing 1D index counter separating cells from different levels
    int index = 0;
 
-   // per-cell grid indices (i,j,k) within their level, index-aligned with
-   // ha::cell_positions/ha::cell_dimensions, and per-level grid dimensions.
-   // Used by Segment 4 below to locate each cell's parent by direct index
-   // arithmetic instead of an O(N^2) bounding-box search.
-   std::vector<int> cell_grid_i;
-   std::vector<int> cell_grid_j;
-   std::vector<int> cell_grid_k;
+   // per-level grid dimensions, used to fill the cell positions and by Segment 4 to locate each cell's
+   // parent by direct index arithmetic instead of an O(N^2) bounding-box search
    std::vector<int> level_ncx(ha::num_levels,0);
    std::vector<int> level_ncy(ha::num_levels,0);
    std::vector<int> level_ncz(ha::num_levels,0);
 
-   //loop over all levels to calculate the positions and sizes of the cells in the levels.
+   //loop over all levels to calculate the number of cells and interaction range of each level
    for (int level = 0; level < ha::num_levels; level ++){
 
       // determine cell size at each level 2^L
@@ -289,77 +247,91 @@ void initialize(const double system_dimensions_x,
 
       // Calculate number of macrocells at each level
       // determine number of cells in x and y (global)
-      int ncx = static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cell_size_x));
-      int ncy = static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cell_size_y));
-      int ncz = static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cell_size_z));
+      level_ncx[level] = static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cell_size_x));
+      level_ncy[level] = static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cell_size_y));
+      level_ncz[level] = static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cell_size_z));
 
-      const int temp_num_cells = ncx*ncy*ncz;
-
-      // record per-level grid dimensions for Segment 4's parent lookup
-      level_ncx[level] = ncx;
-      level_ncy[level] = ncy;
-      level_ncz[level] = ncz;
+      const int temp_num_cells = level_ncx[level]*level_ncy[level]*level_ncz[level];
 
       //set the start and end index for the level
       ha::cells_level_start_index[level] = index;
       index = index + temp_num_cells;
       ha::cells_level_end_index[level] = index;
-      // std::cout << "l:\t" << level << '\t' <<  << "\t ha:\t" >> ha::cells_level_start_index[level] << '\t' << ha::cells_level_end_index[level] << '\t' << temp_num_cells << "\t" << cells_num_cells << "\t" << ncx << '\t' << ncy << '\t' << ncz << std::endl;
-      double size_x,size_y,size_z;
-      double x,y,z;
-      // loop over all cells in level in x,y,z (RE-complicated!)
-      for(int i=0;i<ncx;++i){
-         if (i < ncx -1)  size_x = cell_size_x;
-         else             size_x = system_dimensions_x - (ncx-1)*cell_size_x;
-         x = i*cell_size_x + size_x/2.0;
-         for(int j=0;j<ncy;++j){
-            if (j < ncy -1) size_y = cell_size_y;
-            else            size_y = system_dimensions_y - (ncy-1)*cell_size_y;
-            y = j*cell_size_y + size_y/2.0;
-            // store cell coordinates
-            for(int k=0; k<ncz; ++k){
-               if (k < ncz -1) size_z = cell_size_z;
-               else            size_z = system_dimensions_z - (ncz-1)*cell_size_z;
-               z = k*cell_size_z + size_z/2.0;
 
-               // now store cell positions and sizes
-               //    if (level == 0) {
-               ha::cell_positions.push_back(x);
-               ha::cell_positions.push_back(y);
-               ha::cell_positions.push_back(z);
-               ha::cell_dimensions.push_back(size_x);
-               ha::cell_dimensions.push_back(size_y);
-               ha::cell_dimensions.push_back(size_z);
-               cell_grid_i.push_back(i);
-               cell_grid_j.push_back(j);
-               cell_grid_k.push_back(k);
-               //    index++; - this part to delete
-               //    ha::cells_level_end_index[level] = index;
-               // }
-               // else if (size_x != 0 && size_y != 0 && size_z != 0) {
-               //    ha::cell_positions.push_back(x);
-               //    ha::cell_positions.push_back(y);
-               //    ha::cell_positions.push_back(z);
-               //    ha::cell_dimensions.push_back(size_x);
-               //    ha::cell_dimensions.push_back(size_y);
-               //    ha::cell_dimensions.push_back(size_z);
-               // }
-            }
-         }
-      }
    } //end of loop over levels
 
    // total number of cells is last value of the index
    ha::total_num_cells = index;
 
-   // std::cout << "total\t" << ha::total_num_cells <<std::endl;
-   // std::cout << ha::cells_level_start_index[0] << '\t'  << ha::cells_level_end_index[0] << std::endl;
-   // std::cout << "A" << '\t' << ha::num_levels << '\t' << ha::cells_level_end_index[0] << '\t' << ha::cells_level_start_index[0] << '\t' << ha::total_num_cells << '\t' << std::endl;
+   // allocate the hierarchical cell data shared by all processes in a shared memory region (collective).
+   // Every cell below the top level is in exactly one cell of the level above.
+   const int num_cells_in_cells = (ha::num_levels > 1) ? ha::cells_level_end_index[ha::num_levels - 2] : 0;
+   ha::cell_positions.allocate(3 * uint64_t(ha::total_num_cells));
+   ha::cell_dimensions.allocate(3 * uint64_t(ha::total_num_cells));
+   ha::cell_positions_mom.allocate(4 * uint64_t(ha::total_num_cells));
+   ha::cells_in_cells.allocate(num_cells_in_cells);
+   ha::cells_in_cells_start_index.allocate(ha::total_num_cells);
+   ha::cells_in_cells_end_index.allocate(ha::total_num_cells);
 
-   // resize arrays storing hierarchical cell data to correct size
-   ha::cells_in_cells_start_index.resize(ha::total_num_cells,0.0);
-   ha::cells_in_cells_end_index.resize(ha::total_num_cells,0.0);
-   ha::cell_positions_mom.resize(ha::total_num_cells*4,0.0);
+   // per-cell grid indices (i,j,k) within their level, index-aligned with ha::cell_positions/ha::cell_dimensions,
+   // used by Segment 4 below (on the process filling the shared arrays only)
+   std::vector<int> cell_grid_i;
+   std::vector<int> cell_grid_j;
+   std::vector<int> cell_grid_k;
+
+   //loop over all levels to calculate the positions and sizes of the cells in the levels (one process per region)
+   if (ha::cell_positions.is_writer()){
+
+      cell_grid_i.resize(ha::total_num_cells);
+      cell_grid_j.resize(ha::total_num_cells);
+      cell_grid_k.resize(ha::total_num_cells);
+
+      for (int level = 0; level < ha::num_levels; level ++){
+
+         // determine cell size at each level 2^L
+         double cell_size_x = pow(2,level) * cells::macro_cell_size_x;
+         double cell_size_y = pow(2,level) * cells::macro_cell_size_y;
+         double cell_size_z = pow(2,level) * cells::macro_cell_size_z;
+
+         const int ncx = level_ncx[level];
+         const int ncy = level_ncy[level];
+         const int ncz = level_ncz[level];
+
+         int cell = ha::cells_level_start_index[level];
+         double size_x,size_y,size_z;
+         double x,y,z;
+         // loop over all cells in level in x,y,z (RE-complicated!)
+         for(int i=0;i<ncx;++i){
+            if (i < ncx -1)  size_x = cell_size_x;
+            else             size_x = system_dimensions_x - (ncx-1)*cell_size_x;
+            x = i*cell_size_x + size_x/2.0;
+            for(int j=0;j<ncy;++j){
+               if (j < ncy -1) size_y = cell_size_y;
+               else            size_y = system_dimensions_y - (ncy-1)*cell_size_y;
+               y = j*cell_size_y + size_y/2.0;
+               // store cell coordinates
+               for(int k=0; k<ncz; ++k){
+                  if (k < ncz -1) size_z = cell_size_z;
+                  else            size_z = system_dimensions_z - (ncz-1)*cell_size_z;
+                  z = k*cell_size_z + size_z/2.0;
+
+                  // now store cell positions and sizes
+                  ha::cell_positions[3*cell + 0] = x;
+                  ha::cell_positions[3*cell + 1] = y;
+                  ha::cell_positions[3*cell + 2] = z;
+                  ha::cell_dimensions[3*cell + 0] = size_x;
+                  ha::cell_dimensions[3*cell + 1] = size_y;
+                  ha::cell_dimensions[3*cell + 2] = size_z;
+                  cell_grid_i[cell] = i;
+                  cell_grid_j[cell] = j;
+                  cell_grid_k[cell] = k;
+                  cell++;
+               }
+            }
+         }
+      } //end of loop over levels
+
+   }
 
    // stop the timer for segment 3 and save it
    timer.stop();
@@ -379,8 +351,7 @@ void initialize(const double system_dimensions_x,
    // restart the timer
    timer.start();
 
-   // build_cells_in_cells_original(); // reference implementation, O(N_level * N_sublevel) bounding-box search -- kept for readability, not used
-   build_cells_in_cells(cell_grid_i, cell_grid_j, cell_grid_k, level_ncy, level_ncz);
+   if (ha::cells_in_cells.is_writer()) build_cells_in_cells(cell_grid_i, cell_grid_j, cell_grid_k, level_ncy, level_ncz);
 
    // stop the timer for segment 4 and save it
    timer.stop();
@@ -404,7 +375,6 @@ void initialize(const double system_dimensions_x,
    //std::cout << ha::num_zero_level_cells << std::endl;
 
    // resize data structure to store
-   ha::num_atoms_in_cell.resize(ha::total_num_cells,0);
    ha::interaction_list_start_index.resize(ha::num_zero_level_cells,false);
    ha::interaction_list_end_index.resize(ha::num_zero_level_cells,false);
    ha::mag_array_x.resize(ha::total_num_cells,0);
@@ -415,24 +385,16 @@ void initialize(const double system_dimensions_x,
    if (ha::num_zero_level_cells != cells_num_cells) std::cout << "ERROR ZERO CELLS != NUM CELLS" << std::endl;
    //    std::cout << ha::num_zero_level_cells << '\t' << cells_num_cells << '\t' << ha::cell_positions_mom.size()/4. << '\t' << cells_pos_and_mom_array.size()/4. <<"\t" <<  ha::num_atoms_in_cell.size() << '\t' << cells_num_atoms_in_cell.size() <<std::endl;
 
-   // incrementing counter determining number of atoms in cell (RE- to remove?)
-   int n_cells = 0;
+   // cell positions and moments are the same on all processes (reduced in the cells module)
+   if (ha::cell_positions_mom.is_writer()){
+      for (int cell = 0; cell < cells_num_cells; cell ++){
 
-   for (int cell = 0; cell < cells_num_cells; cell ++){
+         ha::cell_positions_mom[4*cell+0] = cells_pos_and_mom_array[4*cell+0];
+         ha::cell_positions_mom[4*cell+1] = cells_pos_and_mom_array[4*cell+1];
+         ha::cell_positions_mom[4*cell+2] = cells_pos_and_mom_array[4*cell+2];
+         ha::cell_positions_mom[4*cell+3] = cells_pos_and_mom_array[4*cell+3];
 
-      ha::cell_positions_mom[4*cell+0] = cells_pos_and_mom_array[4*cell+0];
-      ha::cell_positions_mom[4*cell+1] = cells_pos_and_mom_array[4*cell+1];
-      ha::cell_positions_mom[4*cell+2] = cells_pos_and_mom_array[4*cell+2];
-      ha::cell_positions_mom[4*cell+3] = cells_pos_and_mom_array[4*cell+3];
-
-      //    std::cout << ha::cell_positions_mom[4*cell+2] << '\t' << ha::cell_positions[3*cell+2] << std::endl;
-
-      // determine number of atoms in each cell
-      ha::num_atoms_in_cell[cell] = cells_num_atoms_in_cell[cell];
-
-      //std::cout << ha::num_atoms_in_cell[cell] <<std::endl;
-      n_cells = n_cells+ ha::num_atoms_in_cell[cell];
-
+      }
    }
 
    // stop the timer for segment 5 and save it
@@ -452,8 +414,7 @@ void initialize(const double system_dimensions_x,
    // restart the timer
    timer.start();
 
-   for (int level = 1; level < ha::num_levels; level ++ ){
-      n_cells = 0;
+   for (int level = 1; level < ha::num_levels && ha::cell_positions_mom.is_writer(); level ++ ){
       int start = ha::cells_level_start_index[level];
       int end   = ha::cells_level_end_index[level];
       //   std::cout << "A" << level << '\t' << start << "\t" << end <<std::endl;
@@ -468,7 +429,6 @@ void initialize(const double system_dimensions_x,
             ha::cell_positions_mom[4*cell+1] += ha::cell_positions_mom[4*cell_in_cell+1];
             ha::cell_positions_mom[4*cell+2] += ha::cell_positions_mom[4*cell_in_cell+2];
             ha::cell_positions_mom[4*cell+3] += ha::cell_positions_mom[4*cell_in_cell+3];
-            ha::num_atoms_in_cell[cell] += ha::num_atoms_in_cell[cell_in_cell];
 
          }
          ha::cell_positions_mom[4*cell+0] = ha::cell_positions_mom[4*cell+0]/N_cells;
@@ -476,10 +436,16 @@ void initialize(const double system_dimensions_x,
          ha::cell_positions_mom[4*cell+2] = ha::cell_positions_mom[4*cell+2]/N_cells;
          ha::cell_positions_mom[4*cell+3] = ha::cell_positions_mom[4*cell+3]/N_cells;
          // std::cout << ha::cell_positions_mom[4*cell+0] << '\t' << ha::cell_positions[3*cell+0] << "\t" << N_cells <<  std::endl;
-
-         n_cells = n_cells + ha::num_atoms_in_cell[cell]; // this is never used (RE- to delete?)
       }
    }
+
+   // make the hierarchical cell data visible to all processes in the region
+   ha::cell_positions.synchronise();
+   ha::cell_dimensions.synchronise();
+   ha::cell_positions_mom.synchronise();
+   ha::cells_in_cells.synchronise();
+   ha::cells_in_cells_start_index.synchronise();
+   ha::cells_in_cells_end_index.synchronise();
 
    // list the coarse cells holding level 0 cells whose moments this process accumulates (its local cells, or its
    // micromagnetic cells), level by level, so that the upward pass skips cells where its partial sums are zero
@@ -630,6 +596,25 @@ void initialize(const double system_dimensions_x,
    zlog << zTs() << "\tNumber of local cells for hierarchical dipole calculation = " << cells_num_local_cells << std::endl;
    zlog << zTs() << "\tNumber of total cells for hierarchical dipole calculation = " << ha::total_num_cells << std::endl;
 
+   // memory held by each process for the arrays replicated on every process (O(total cells)) and for the
+   // distributed interaction arrays, the candidates for shared memory buffers (dp_plan step 4)
+   auto mb = [](const auto& v){ return double(v.size() * sizeof(v[0])) / 1.0e6; };
+   const double shared_ranks = double(vmpi::num_shared_ranks); // shared arrays counted as a share of the region's copy
+   const double geometry_mb = (mb(ha::cell_positions) + mb(ha::cell_positions_mom) + mb(ha::cell_dimensions)) / shared_ranks;
+   const double topology_mb = (mb(ha::cells_in_cells) + mb(ha::cells_in_cells_start_index) + mb(ha::cells_in_cells_end_index)) / shared_ranks;
+   const double moment_mb   = mb(ha::mag_array_x) + mb(ha::mag_array_y) + mb(ha::mag_array_z);
+   const double cells_mb    = mb(cells::pos_and_mom_array) + mb(cells::pos_array) + mb(cells::num_atoms_in_cell) + mb(cells::num_atoms_in_cell_global)
+                            + mb(cells::mag_array_x) + mb(cells::mag_array_y) + mb(cells::mag_array_z) + mb(cells::volume_array)
+                            + 4.0 * double(cells::index_atoms_array.size() * sizeof(std::vector<int>)) / 1.0e6; // empty inner vectors of index_atoms_array and atom_in_cell_coords_array_*
+   const double dipole_mb   = mb(dipole::cells_field_array_x) + mb(dipole::cells_field_array_y) + mb(dipole::cells_field_array_z)
+                            + mb(dipole::cells_volume_array) + mb(dipole::internal::cells_num_atoms_in_cell)
+                            + mb(dipole::internal::cells_pos_and_mom_array);
+   const double interaction_mb = mb(ha::interaction_list) + mb(ha::interaction_list_start_index) + mb(ha::interaction_list_end_index)
+                               + 6.0 * double(ha::interaction_list.size() * sizeof(double)) / 1.0e6; // tensors are resized below
+   zlog << zTs() << "\tHierarchical memory per process (MB): replicated geometry " << geometry_mb << ", topology " << topology_mb
+        << ", moments " << moment_mb << ", cells module " << cells_mb << ", dipole module " << dipole_mb
+        << "; distributed interactions " << vmpi::reduce_max(interaction_mb) << " (largest process)" << std::endl;
+
    //---------------------------------------------------------------------------
    // Segment 8
    //---------------------------------------------------------------------------
@@ -764,6 +749,11 @@ void initialize(const double system_dimensions_x,
    // Output detailed timings for the hierarchical initialisation
    //---------------------------------------------------------------------------
 
+   // cell geometry is needed only to build the interactions
+   ha::cell_positions.free();
+   ha::cell_dimensions.free();
+   ha::cell_positions_mom.free();
+
    // print out detailed hierarchical timings
    zlog << zTs() << "\tSegment times for hierarchical initialisation:" << std::endl;
    for(int i=0; i<9; i++) zlog << zTs() << "\t\t Segment time " << i+1 << ": " << segment_time[i] << " s" << std::endl;
@@ -774,69 +764,10 @@ void initialize(const double system_dimensions_x,
 }
 
 //----------------------------------------------------------------------------
-// Segment 4, original implementation: determine, for every cell, the list
-// of cells in the level below that it contains, by an O(N_level *
-// N_sublevel) bounding-box search over every level/sublevel cell pair.
-//
-// Kept here for reference only (not called) -- see build_cells_in_cells()
-// below for the O(N) replacement currently in use.
-//----------------------------------------------------------------------------
-void build_cells_in_cells_original(){
-
-   // incrementing 1D index counter separating cells from different levels
-   int index2 = 0;
-
-   // loop over all levels
-   for (int level = 1; level < ha::num_levels; level ++){
-
-      int sublevel         = level - 1;
-      int start_level      = ha::cells_level_start_index[level];
-      int start_sublevel   = ha::cells_level_start_index[sublevel];
-      int end_level        = ha::cells_level_end_index[level];
-      int end_sublevel     = ha::cells_level_end_index[sublevel];
-
-      // loop over all cells in level
-      for (int cell_l = start_level; cell_l < end_level; cell_l++){
-         ha::cells_in_cells_start_index[cell_l] = index2;
-         double x = ha::cell_positions[cell_l*3 + 0];
-         double y = ha::cell_positions[cell_l*3 + 1];
-         double z = ha::cell_positions[cell_l*3 + 2];
-         double size_x = ha::cell_dimensions[cell_l*3 + 0];
-         double size_y = ha::cell_dimensions[cell_l*3 + 1];
-         double size_z = ha::cell_dimensions[cell_l*3 + 2];
-
-         double min_x = x - size_x/2.0;
-         double min_y = y - size_y/2.0;
-         double min_z = z - size_z/2.0;
-
-         double max_x = x + size_x/2.0;
-         double max_y = y + size_y/2.0;
-         double max_z = z + size_z/2.0;
-
-         // loop over all cells in the level below
-         for (int cell_sl = start_sublevel; cell_sl < end_sublevel; cell_sl++){
-
-            double sc_x = ha::cell_positions[cell_sl*3 + 0];
-            double sc_y = ha::cell_positions[cell_sl*3 + 1];
-            double sc_z = ha::cell_positions[cell_sl*3 + 2];
-
-            // if cell is in cell at higher level, then add to the list
-            if ((sc_x >= min_x) && (sc_x <= max_x) && (sc_y >= min_y) && (sc_y <= max_y) && (sc_z >= min_z) && (sc_z <= max_z)){
-               ha::cells_in_cells.push_back(cell_sl);
-               index2 ++;
-               ha::cells_in_cells_end_index[cell_l] = index2;
-            }
-
-         }
-      }
-   }
-
-}
-
-//----------------------------------------------------------------------------
-// Segment 4, optimised implementation: determine the same parent -> children
-// cell map as build_cells_in_cells_original() above, but with O(N) index
-// arithmetic instead of an O(N_level * N_sublevel) bounding-box search.
+// Segment 4: determine, for every cell, the list of cells in the level below
+// that it contains, with O(N) index arithmetic (the original O(N_level *
+// N_sublevel) bounding-box search, build_cells_in_cells_original, was removed
+// with the move to shared memory arrays; see git history).
 //
 // Valid because macrocell size doubles exactly each level (Segment 3), so a
 // sublevel cell's grid index (i,j,k) always maps to parent grid index
@@ -846,13 +777,11 @@ void build_cells_in_cells_original(){
 //
 // Implemented as a three-pass counting sort per level pair: (1) find each
 // sublevel cell's parent and tally children per parent, (2) prefix-sum
-// those counts into contiguous slots of the shared, monotonically growing
-// ha::cells_in_cells array (preserving the exact start/end-index semantics
-// the original function produced), (3) scatter each sublevel cell into its
-// parent's slot. Order within a parent's slot differs from the original's
-// push_back order, but downstream readers (Segment 6/7 here,
-// hierarchical::mag.cpp) only ever sum/mark over a parent's full child
-// list, so order is immaterial.
+// those counts into contiguous slots of ha::cells_in_cells (allocated by the
+// caller with one slot per cell below the top level), (3) scatter each
+// sublevel cell into its parent's slot. Downstream readers (Segment 6/7 here,
+// hierarchical::mag.cpp) only ever sum/mark over a parent's full child list.
+// Called on the process filling the shared arrays only.
 //----------------------------------------------------------------------------
 void build_cells_in_cells(const std::vector<int>& cell_grid_i,
                            const std::vector<int>& cell_grid_j,
@@ -902,7 +831,6 @@ void build_cells_in_cells(const std::vector<int>& cell_grid_i,
          ha::cells_in_cells_end_index[start_level + p] = running;
       }
       index2 = running;
-      ha::cells_in_cells.resize(index2);
 
       // pass 3: scatter children into their parent's slot
       std::vector<int> fill_cursor = parent_offset;

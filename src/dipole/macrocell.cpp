@@ -139,9 +139,6 @@ namespace dipole{
 
          #endif
 
-         // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
-         dipole::dipole_cells_num_atoms_in_cell=cells_num_atoms_in_cell;
-
          // calculate matrix prefactors
          zlog << zTs() << "Precalculating rij matrix for dipole calculation using macrocell solver... " << std::endl;
          std::cout     << "Precalculating rij matrix for dipole calculation using macrocell solver"     << std::flush;

@@ -48,7 +48,6 @@ namespace dipole{
    std::vector<int> atomistic_dd_neighbourlist_start;
    std::vector<int> atomistic_dd_neighbourlist_end;
 
-   std::vector <int> dipole_cells_num_atoms_in_cell;
 
    double cutoff = 2.0;  /// cutoff distance between cells over which bare macro cell model can be applied
                          /// N.B.: after 12 cells inter-intra method is equivalent to bare macrocell method.

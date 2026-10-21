@@ -11,6 +11,8 @@
 
 // System headers
 #include <chrono>
+#include <fstream>
+#include <string>
 #include <sys/resource.h>
 
 // Program headers
@@ -35,6 +37,23 @@ namespace vutil{
       #else
          return double(usage.ru_maxrss);
       #endif
+
+   }
+
+   // Current proportional set size of this process, in kB: resident memory with each shared page divided
+   // between the processes mapping it, so that MPI shared memory arrays are counted once per region (the
+   // resident set size counts them in full in every process). Linux only (/proc/self/smaps_rollup), -1
+   // elsewhere.
+   inline double proportional_memory_usage_kb(){
+
+      std::ifstream smaps("/proc/self/smaps_rollup");
+      std::string key;
+      double value;
+      while(smaps >> key){
+         if(key == "Pss:" && smaps >> value) return value;
+         smaps.ignore(256, '\n');
+      }
+      return -1.0;
 
    }
 

@@ -52,15 +52,11 @@ namespace cells{
    std::vector<double> mag_array_x; /// arrays to store cells magnetisation
    std::vector<double> mag_array_y;
    std::vector<double> mag_array_z;
-   std::vector<double> field_array_x; /// arrays to store cells field
-   std::vector<double> field_array_y;
-   std::vector<double> field_array_z;
 
    std::vector<double> pos_and_mom_array; /// arrays to store cells positions
    std::vector<double> pos_array; /// arrays to store cells positions
 
    std::vector < double > num_macro_cells_fft(3,10.0); /// macro-cells size (A)
-   std::vector<double> fft_cell_id_array; /// arrays to store cells positions
 
    //---------------------------------------------------------------------------
    // Function to calculate magnetisation in cells
@@ -75,8 +71,6 @@ namespace cells{
       //bool enabled=false; // enable localised temperature pulse calculation
       bool initialised=false; /// flag set if initialised
       std::vector<double> volume_array;
-      std::vector<double> total_moment_array;
-      std::vector<double> cell_position_array;
 
       std::vector<double> spin_array_x;
       std::vector<double> spin_array_y;

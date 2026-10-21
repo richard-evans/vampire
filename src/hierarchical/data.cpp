@@ -34,20 +34,19 @@ namespace hierarchical{
       int num_levels; // number of levels for hierarchical expansion
 
       //create arrays for data storage
-      std::vector < double > cell_positions;             // positions of hierarchical cells 3N
-      std::vector < double > cell_positions_mom;         // positions and magnetic moments of hierarchical cells 4N
-      std::vector < double > cell_dimensions;            // shape and size of each cell
+      vmpi::shared_array_t < double > cell_positions;     // positions of hierarchical cells 3N
+      vmpi::shared_array_t < double > cell_positions_mom; // positions and magnetic moments of hierarchical cells 4N
+      vmpi::shared_array_t < double > cell_dimensions;    // shape and size of each cell
       std::vector < int > cells_level_start_index;       // first cell in Level
       std::vector < int > cells_level_end_index;         // last cell in Level
-      std::vector < int > cells_in_cells;                // 1D list of which cells in level L are contained within level L+1
+      vmpi::shared_array_t < int > cells_in_cells;       // 1D list of which cells in level L are contained within level L+1
       std::vector < int > interaction_range;             // a list of interaction ranges for each hierarchical level
-      std::vector < int > cells_in_cells_start_index;    // index of first cell in level L-1
-      std::vector < int > cells_in_cells_end_index;      // index of last  cell in level L-1
+      vmpi::shared_array_t < int > cells_in_cells_start_index; // index of first cell in level L-1
+      vmpi::shared_array_t < int > cells_in_cells_end_index;   // index of last  cell in level L-1
       std::vector <int> interaction_list;                // list of interacting hierarchical cells
       std::vector < int > interaction_list_start_index;  // index of first neighbour in interactions list
       std::vector < int > interaction_list_end_index;    // index of last  neighbour in interactions list
       std::vector < int > upward_pass_cells;          // coarse cells (level >= 1, by level) holding this process's cells
-      std::vector < int > num_atoms_in_cell;             // list of number of atoms within each cell
       std::vector < int > proc_cell_index_array1D;       //
       std::vector < int > cells_num_atoms_in_cell;       //
 

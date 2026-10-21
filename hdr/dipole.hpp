@@ -49,7 +49,6 @@ namespace dipole{
    extern std::vector<double> atom_mu0demag_field_array_y;
    extern std::vector<double> atom_mu0demag_field_array_z;
 
-   extern std::vector <int> dipole_cells_num_atoms_in_cell;             /// Array to store number of atoms in cells that will be needed to print the cell config file
 
    extern double cutoff;
    extern double atomistic_cutoff;

@@ -23,6 +23,7 @@
 
 // Vampire headers
 #include "hierarchical.hpp"
+#include "vmpi.hpp"
 
 // hierarchical module headers
 #include "vector"
@@ -36,21 +37,21 @@ namespace hierarchical{
       //-------------------------------------------------------------------------
 
       extern int num_levels;
-      //create arrays for data storage
-      extern std::vector < double > cell_positions;
-      extern std::vector < double > cell_positions_mom;
-      extern std::vector < double > cell_dimensions;
+      // arrays for data storage; the shared arrays are held once per shared memory region
+      // (cell geometry is needed only during initialisation and freed at its end)
+      extern vmpi::shared_array_t < double > cell_positions;
+      extern vmpi::shared_array_t < double > cell_positions_mom;
+      extern vmpi::shared_array_t < double > cell_dimensions;
       extern std::vector < int > cells_level_start_index;
       extern std::vector < int > cells_level_end_index;
-      extern std::vector < int > cells_in_cells;
+      extern vmpi::shared_array_t < int > cells_in_cells;
       extern std::vector < int > interaction_range;
-      extern std::vector < int > cells_in_cells_start_index;
-      extern std::vector < int > cells_in_cells_end_index;
+      extern vmpi::shared_array_t < int > cells_in_cells_start_index;
+      extern vmpi::shared_array_t < int > cells_in_cells_end_index;
       extern std::vector <int> interaction_list;
       extern std::vector < int > interaction_list_start_index;
       extern std::vector < int > interaction_list_end_index;
       extern std::vector < int > upward_pass_cells; // coarse cells (level >= 1, by level) holding this process's cells
-      extern std::vector < int > num_atoms_in_cell;
 
       extern std::vector < int > proc_cell_index_array1D;
       extern std::vector < int > cells_num_atoms_in_cell;

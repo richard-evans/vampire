@@ -77,9 +77,9 @@ namespace internal{
             const int cell_id = list_of_local_cells[lc];
 
             // load coordinates of local cell
-            const double cxi = cells_pos_and_mom_array[ 4*cell_id + 0 ];
-            const double cyi = cells_pos_and_mom_array[ 4*cell_id + 1 ];
-            const double czi = cells_pos_and_mom_array[ 4*cell_id + 2 ];
+            const double cxi = pos_and_mom_array[ 4*cell_id + 0 ];
+            const double cyi = pos_and_mom_array[ 4*cell_id + 1 ];
+            const double czi = pos_and_mom_array[ 4*cell_id + 2 ];
 
             // loop over all other cells in the system to determine if it is within
             // cutoff range for atomistic dipole tensor calculation
@@ -89,9 +89,9 @@ namespace internal{
                if( global_atoms_in_cell_count[cell] > 0 ){
 
                   // load coordinates of local cell
-                  const double cxj = cells_pos_and_mom_array[ 4*cell + 0 ];
-                  const double cyj = cells_pos_and_mom_array[ 4*cell + 1 ];
-                  const double czj = cells_pos_and_mom_array[ 4*cell + 2 ];
+                  const double cxj = pos_and_mom_array[ 4*cell + 0 ];
+                  const double cyj = pos_and_mom_array[ 4*cell + 1 ];
+                  const double czj = pos_and_mom_array[ 4*cell + 2 ];
 
                   // compute displacement
                   const double dx = cxi - cxj;

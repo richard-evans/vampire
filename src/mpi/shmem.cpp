@@ -12,7 +12,10 @@
 
 // C++ standard library headers
 #include <algorithm>
+#include <functional>
 #include <string>
+#include <utility>
+#include <vector>
 
 // Vampire headers
 #include "vio.hpp"
@@ -30,6 +33,23 @@ int num_shared_ranks = 1;
 
 namespace{
    bool shared_memory_initialised = false; // true once the shared memory communicators exist
+
+   // arrays currently allocated, in allocation order (the same on every rank, since allocation is
+   // collective), with a function freeing each one, so that finalise_shared_memory can free any left
+   std::vector< std::pair<const void*, std::function<void()> > > allocated_arrays;
+
+   void register_array(const void* array, std::function<void()> free_array){
+      allocated_arrays.push_back(std::make_pair(array, free_array));
+   }
+
+   void unregister_array(const void* array){
+      for(size_t i = 0; i < allocated_arrays.size(); i++){
+         if(allocated_arrays[i].first == array){
+            allocated_arrays.erase(allocated_arrays.begin() + i);
+            return;
+         }
+      }
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -106,11 +126,19 @@ void initialise_shared_memory(){
 
 //------------------------------------------------------------------------------
 // Function to free the shared memory communicators, called before MPI_Finalize.
-// All shared arrays must be freed first.
+// Shared arrays still allocated are freed first, newest first, and logged.
 //------------------------------------------------------------------------------
 void finalise_shared_memory(){
 
    if(!shared_memory_initialised) return;
+
+   if(!allocated_arrays.empty()){
+      zlog << zTs() << "Freeing " << allocated_arrays.size() << " shared memory arrays at finalisation" << std::endl;
+   }
+   while(!allocated_arrays.empty()){
+      std::function<void()> free_array = allocated_arrays.back().second;
+      free_array(); // removes the entry
+   }
 
    #ifdef MPICF
       if(vmpi::leader_comm != MPI_COMM_NULL) MPI_Comm_free(&vmpi::leader_comm);
@@ -168,6 +196,8 @@ void shared_array_t<T>::allocate(uint64_t n){
 
    #endif
 
+   register_array(this, [this](){ this->free(); });
+
    return;
 
 }
@@ -205,6 +235,7 @@ void shared_array_t<T>::free(){
       std::vector<T>().swap(serial_data);
    #endif
 
+   unregister_array(this);
    ptr = nullptr;
    num_elements = 0;
 

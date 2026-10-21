@@ -83,7 +83,6 @@ namespace cells{
       unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size_z));
 
       cells::num_cells = dx*dy*dz;
-      cells::internal::cell_position_array.resize(3*cells::num_cells);
 
       //std::cout << " variable cells::num_cells = " << cells::num_cells << std::endl;
       zlog << zTs() << "Macrocell size = " << cells::macro_cell_size_x<< "," <<cells::macro_cell_size_y<< "," <<cells::macro_cell_size_z<<  " Angstroms" << std::endl;
@@ -125,8 +124,6 @@ namespace cells{
       // Determine number of cells in x,y,z
       const int d[3]={ncx,ncy,ncz};
       const double cs[3] = {cells::macro_cell_size_x, cells::macro_cell_size_y, cells::macro_cell_size_z}; // cell size
-
-      std::vector < double > cell_lattice(3*cells::num_cells,0.0);
 
      // For MPI version, only add local atoms
       #ifdef MPICF
@@ -204,17 +201,10 @@ namespace cells{
       cells::mag_array_y.resize(cells::num_cells,0.0);
       cells::mag_array_z.resize(cells::num_cells,0.0);
 
-      cells::field_array_x.resize(cells::num_cells,0.0);
-      cells::field_array_y.resize(cells::num_cells,0.0);
-      cells::field_array_z.resize(cells::num_cells,0.0);
-
       cells::num_atoms_in_cell.resize(cells::num_cells,0);
       cells::num_atoms_in_cell_global.resize(0);
       cells::volume_array.resize(cells::num_cells,0.0);
 
-      cells::internal::total_moment_array.resize(cells::num_cells,0.0);
-
-      cells::fft_cell_id_array.resize(cells::num_cells,0.0);
       // Now add atoms to each cell as magnetic 'centre of mass'
       int num_atoms_magnetic = 0;  /// number of magnetic atoms
       for(int atom=0;atom<num_local_atoms;atom++){
