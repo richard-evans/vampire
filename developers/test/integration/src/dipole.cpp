@@ -29,7 +29,8 @@ struct dipole_fields_t{
 };
 
 // read the atomistic and cell dipole fields written by a run. The atoms are sorted by position,
-// as the order of atoms in the output depends on the number of processes.
+// as the order of atoms in the output depends on the number of processes. Non-magnetic atoms
+// (zero moment) are skipped.
 bool read_dipole_fields(dipole_fields_t& fields){
 
    std::ifstream positions("atomistic_dipole_positions.txt");
@@ -43,6 +44,7 @@ bool read_dipole_fields(dipole_fields_t& fields){
    double x, y, z, m;
    std::array<double,3> b;
    while(positions >> x >> y >> z >> m && atom_fields >> b[0] >> b[1] >> b[2]){
+      if(m == 0.0) continue;
       sorted[std::make_tuple(std::llround(x*1000.0), std::llround(y*1000.0), std::llround(z*1000.0))] = b;
    }
    for(const auto& atom : sorted) fields.atom_field.push_back(atom.second);
@@ -88,7 +90,8 @@ void cleanup(){
 // Test that the tensor and hierarchical dipole solvers agree with the exact
 // atomistic solver for a two atom thick cylinder (sc, a = 2.87 A, mu_s = 2.2 muB,
 // 1 nm cells) magnetised along (1,0,1), e.g. dipole/cylinder (10 nm diameter,
-// 1898 atoms) or dipole/disc (50 nm diameter, 47698 atoms).
+// 1898 atoms), dipole/cylinder-fill (the same in a kept non-magnetic fill) or
+// dipole/disc (50 nm diameter, 47698 atoms).
 //
 //    input-atomistic, input-tensor, input-hierarchical
 //

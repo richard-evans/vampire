@@ -1,0 +1,14 @@
+material:num-materials=2
+material[1]:material-name=Fe
+material[1]:damping-constant=0.1
+material[1]:exchange-matrix[1]=5.0e-21
+material[1]:atomic-spin-moment=2.2 !muB
+material[1]:uniaxial-anisotropy-constant=1.0e-23
+material[1]:uniaxial-anisotropy-direction=0,0,1
+material[1]:initial-spin-direction=1,0,1
+material[2]:material-name=Cu
+material[2]:damping-constant=0.1
+material[2]:exchange-matrix[2]=0.0
+material[2]:atomic-spin-moment=1.0 !muB
+material[2]:non-magnetic=keep
+material[2]:fill-space

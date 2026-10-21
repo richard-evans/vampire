@@ -135,16 +135,11 @@ namespace cells{
          int num_local_atoms = num_atoms;
       #endif
 
-      // Determine number of total atoms
+      // Determine number of atoms in the body (including removed non-magnetic atoms, excluding non-magnetic fill
+      // atoms), counted on each process for its own atoms in create::create_system_type()
+      int total_atoms_non_filler = create::num_total_atoms_non_filler;
       #ifdef MPICF
-         int num_total_atoms=0;
-         int total_non_mag_removed_atoms=0;
-         MPI_Reduce(&num_local_atoms,&num_total_atoms, 1,MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-         MPI_Reduce(&create::num_total_atoms_non_filler,&total_non_mag_removed_atoms, 1, MPI_INT, MPI_SUM, 0,MPI_COMM_WORLD);
-         int total_atoms_non_filler = num_total_atoms + total_non_mag_removed_atoms;
-         MPI_Bcast(&total_atoms_non_filler,1,MPI_INT,0,MPI_COMM_WORLD);
-      #else
-         int total_atoms_non_filler = atoms::num_atoms+create::num_total_atoms_non_filler;
+         MPI_Allreduce(MPI_IN_PLACE, &total_atoms_non_filler, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
       #endif
       // std::cout << "\nTotal number of atoms generated including non-magnetic atoms after Allreduce operation (all CPUs): " << total_atoms_non_filler << std::endl;
 

@@ -198,6 +198,9 @@ int main(int argc, char* argv[]){
       // the hierarchical level 0 interaction range; see dipole/disc in the extended tests for the far
       // field); relative energy error 4.7e-11 (atomistic), 0.0035 (tensor and hierarchical)
       if( !dipole_solver_test("dipole/cylinder", 0.1, 0.01, 1.0e-10, 0.01, exe ) ) fail += 1;
+      // the same cylinder in a non-magnetic fill (kept atoms), which must not change the fields of the
+      // magnetic atoms (fill atoms used to enlarge the atomic volume of the self term, Nxx+Nyy+Nzz = 1.3)
+      if( !dipole_solver_test("dipole/cylinder-fill", 0.1, 0.01, 1.0e-10, 0.01, exe ) ) fail += 1;
 
       // Monte Carlo equilibration test
       if( !final_value_test("montecarlo/equilibrium", 1.0, 1.0e-4, exe ) ) fail += 1;

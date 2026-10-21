@@ -1,0 +1,32 @@
+#------------------------------------------
+# Dipole field of a 10 nm diameter, two atom
+# thick cylinder in a non-magnetic fill
+# (kept atoms) with the atomistic solver
+#------------------------------------------
+create:crystal-structure = sc
+create:cylinder
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 10.5 !nm
+dimensions:system-size-y = 10.5 !nm
+dimensions:system-size-z = 0.5 !nm
+dimensions:particle-size = 10.0 !nm
+material:file = Fe.mat
+cells:macro-cell-size = 1.0 !nm
+dipole:solver = atomistic
+dipole:output-atomistic-dipole-field
+dipole:output-dipole-field
+#------------------------------------------
+# fields are calculated and written once
+# at initialisation for the initial spins
+#------------------------------------------
+sim:program = time-series
+sim:integrator = llg-heun
+sim:temperature = 0.0
+sim:equilibration-time-steps = 0
+sim:total-time-steps = 0
+sim:time-step = 1.0e-16
+sim:integrator-random-seed = 12345
+output:time-steps
+output:magnetisation
+output:magnetostatic-energy
+output:precision = 10
