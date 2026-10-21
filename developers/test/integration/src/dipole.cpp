@@ -86,8 +86,9 @@ void cleanup(){
 
 //------------------------------------------------------------------------------
 // Test that the tensor and hierarchical dipole solvers agree with the exact
-// atomistic solver for a 10 nm diameter, two atom thick cylinder (sc, a = 2.87 A,
-// mu_s = 2.2 muB, 1898 atoms, 1 nm cells) magnetised along (1,0,1).
+// atomistic solver for a two atom thick cylinder (sc, a = 2.87 A, mu_s = 2.2 muB,
+// 1 nm cells) magnetised along (1,0,1), e.g. dipole/cylinder (10 nm diameter,
+// 1898 atoms) or dipole/disc (50 nm diameter, 47698 atoms).
 //
 //    input-atomistic, input-tensor, input-hierarchical
 //

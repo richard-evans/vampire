@@ -579,6 +579,17 @@ void initialize(const double system_dimensions_x,
 
    }
 
+   // output the number of interactions with cells of each level (local cells on this process)
+   std::vector<uint64_t> level_interactions(ha::num_levels, 0);
+   for (size_t i = 0; i < ha::interaction_list.size(); i++){
+      for (int level = 0; level < ha::num_levels; level++){
+         if (ha::interaction_list[i] >= ha::cells_level_start_index[level] && ha::interaction_list[i] < ha::cells_level_end_index[level]) level_interactions[level]++;
+      }
+   }
+   for (int level = 0; level < ha::num_levels; level++){
+      zlog << zTs() << "\tHierarchical level " << level << " interactions (local cells): " << level_interactions[level] << std::endl;
+   }
+
    // stop the timer for segment 7 and save it
    timer.stop();
    segment_time[6] = timer.elapsed_time();

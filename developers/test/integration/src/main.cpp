@@ -195,7 +195,8 @@ int main(int argc, char* argv[]){
       // Dipole solver test: tensor and hierarchical fields against the atomistic solver for a 10 nm
       // diameter, two atom thick cylinder. Measured rms differences (2026-10-21): atoms 0.0864 (each
       // atom takes its cell field), cells 0.0077, hierarchical-tensor 3e-16 (the cylinder lies within
-      // the hierarchical level 0 interaction range)
+      // the hierarchical level 0 interaction range; see dipole/disc in the extended tests for the far
+      // field); relative energy error 4.7e-11 (atomistic), 0.0035 (tensor and hierarchical)
       if( !dipole_solver_test("dipole/cylinder", 0.1, 0.01, 1.0e-10, 0.01, exe ) ) fail += 1;
 
       // Monte Carlo equilibration test
@@ -242,6 +243,13 @@ int main(int argc, char* argv[]){
                                                         {"susceptibility x", 1, 0.401776, 5.0e-2},
                                                         {"susceptibility y", 2, 0.401776, 5.0e-2},
                                                         {"susceptibility z", 3, 0.323013, 5.0e-2} }, exe ) ) fail += 1;
+
+      // Dipole solver test as for dipole/cylinder, for a 50 nm diameter disc (47698 atoms, about 5 s
+      // for the three solvers) large enough for hierarchical levels 1-3 to contribute (the level L range
+      // is 6 nm x 2^L). Measured (2026-10-21): rms difference from atomistic, atoms 0.0404 (tensor),
+      // 0.0432 (hierarchical); cells 0.0117, 0.0188; hierarchical-tensor cells 0.0077; relative energy
+      // error 1.2e-10 (atomistic), 0.0054 (tensor), 0.0084 (hierarchical)
+      if( !dipole_solver_test("dipole/disc", 0.05, 0.025, 0.01, 0.011, exe ) ) fail += 1;
 
    }
 

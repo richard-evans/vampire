@@ -1,0 +1,21 @@
+create:crystal-structure = sc
+create:cylinder
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 50.5 !nm
+dimensions:system-size-y = 50.5 !nm
+dimensions:system-size-z = 0.5 !nm
+dimensions:particle-size = 50.0 !nm
+material:file = Fe.mat
+cells:macro-cell-size = 1.0 !nm
+dipole:solver = hierarchical
+dipole:output-dipole-field
+sim:program = time-series
+sim:integrator = llg-heun
+sim:temperature = 0.0
+sim:equilibration-time-steps = 0
+sim:total-time-steps = 0
+sim:time-step = 1.0e-16
+sim:integrator-random-seed = 12345
+output:time-steps
+output:magnetisation
+output:precision = 16
