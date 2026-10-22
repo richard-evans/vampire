@@ -154,11 +154,20 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
 //------------------------------------------------------------------------------
 std::string update_phase_times(){
 
+   // field loop time per interaction on this process (ns), to separate load imbalance from per-interaction cost
+   const double field_time = ha::phase_time[ha::field_loop];
+   const double num_interactions = ha::interaction_list.size();
+   const double ns_per_interaction = num_interactions > 0 ? 1.0e9 * field_time / num_interactions : 0.0;
+
    std::ostringstream times;
    times << " upward_s="     << vmpi::reduce_max(ha::phase_time[ha::upward_pass])
          << " reduce_s="     << vmpi::reduce_max(ha::phase_time[ha::moment_reduction])
-         << " field_s="      << vmpi::reduce_max(ha::phase_time[ha::field_loop])
-         << " distribute_s=" << vmpi::reduce_max(ha::phase_time[ha::field_distribution]);
+         << " field_s="      << vmpi::reduce_max(field_time)
+         << " distribute_s=" << vmpi::reduce_max(ha::phase_time[ha::field_distribution])
+         << " field_min_s="  << vmpi::reduce_min(field_time)
+         << " field_mean_s=" << vmpi::reduce_sum(field_time) / double(vmpi::num_processors)
+         << " field_ns_per_interaction_min=" << vmpi::reduce_min(ns_per_interaction)
+         << " field_ns_per_interaction_max=" << vmpi::reduce_max(ns_per_interaction);
 
    return times.str();
 

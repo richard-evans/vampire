@@ -576,6 +576,21 @@ void initialize(const double system_dimensions_x,
       zlog << zTs() << "\tHierarchical level " << level << " interactions (local cells): " << level_interactions[level] << std::endl;
    }
 
+   // spread over processes of the field loop work: local cells, interactions and distinct cells read from ha::mag_array
+   {
+      std::vector<int> distinct_cells(ha::interaction_list);
+      std::sort(distinct_cells.begin(), distinct_cells.end());
+      distinct_cells.erase(std::unique(distinct_cells.begin(), distinct_cells.end()), distinct_cells.end());
+      const double counts[3] = { double(dipole::cells_num_local_cells), double(ha::interaction_list.size()), double(distinct_cells.size()) };
+      const char* names[3] = { "local cells", "interactions", "distinct interacting cells" };
+      for(int i = 0; i < 3; i++){
+         const double min = vmpi::reduce_min(counts[i]);
+         const double mean = vmpi::reduce_sum(counts[i]) / double(vmpi::num_processors);
+         const double max = vmpi::reduce_max(counts[i]);
+         zlog << zTs() << "\tHierarchical " << names[i] << " per process (min, mean, max): " << min << ", " << mean << ", " << max << std::endl;
+      }
+   }
+
    // stop the timer for segment 7 and save it
    timer.stop();
    segment_time[6] = timer.elapsed_time();
