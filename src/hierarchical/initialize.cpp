@@ -380,6 +380,7 @@ void initialize(const double system_dimensions_x,
    ha::mag_array_x.resize(ha::total_num_cells,0);
    ha::mag_array_y.resize(ha::total_num_cells,0);
    ha::mag_array_z.resize(ha::total_num_cells,0);
+   if(vmpi::num_processors > 1) ha::mag_reduction_buffer.resize(3*ha::total_num_cells,0);
 
    // check that the number of zero levels cells is correct (must be the same for hierachical and cells structures)
    if (ha::num_zero_level_cells != cells_num_cells) std::cout << "ERROR ZERO CELLS != NUM CELLS" << std::endl;
@@ -617,7 +618,7 @@ void initialize(const double system_dimensions_x,
    const double shared_ranks = double(vmpi::num_shared_ranks); // shared arrays counted as a share of the region's copy
    const double geometry_mb = (mb(ha::cell_positions) + mb(ha::cell_positions_mom) + mb(ha::cell_dimensions)) / shared_ranks;
    const double topology_mb = (mb(ha::cells_in_cells) + mb(ha::cells_in_cells_start_index) + mb(ha::cells_in_cells_end_index)) / shared_ranks;
-   const double moment_mb   = mb(ha::mag_array_x) + mb(ha::mag_array_y) + mb(ha::mag_array_z);
+   const double moment_mb   = mb(ha::mag_array_x) + mb(ha::mag_array_y) + mb(ha::mag_array_z) + mb(ha::mag_reduction_buffer);
    const double cells_mb    = mb(cells::pos_and_mom_array) + mb(cells::pos_array) + mb(cells::num_atoms_in_cell) + mb(cells::num_atoms_in_cell_global)
                             + mb(cells::mag_array_x) + mb(cells::mag_array_y) + mb(cells::mag_array_z) + mb(cells::volume_array)
                             + 4.0 * double(cells::index_atoms_array.size() * sizeof(std::vector<int>)) / 1.0e6; // empty inner vectors of index_atoms_array and atom_in_cell_coords_array_*

@@ -128,10 +128,27 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
    ha::phase_time[ha::upward_pass] = timer.elapsed_time();
    timer.start();
 
-   // Finally accumulate and sum moments for all cells on all processors
-   vmpi::all_reduce_sum(ha::mag_array_x);
-   vmpi::all_reduce_sum(ha::mag_array_y);
-   vmpi::all_reduce_sum(ha::mag_array_z);
+   // Finally accumulate and sum moments for all cells on all processors, packing x, y and z
+   // into one buffer so that the reduction pays the collective latency once
+   if(vmpi::num_processors > 1){
+
+      const int num_cells = ha::total_num_cells;
+
+      for(int cell = 0; cell < num_cells; cell++){
+         ha::mag_reduction_buffer[3*cell+0] = ha::mag_array_x[cell];
+         ha::mag_reduction_buffer[3*cell+1] = ha::mag_array_y[cell];
+         ha::mag_reduction_buffer[3*cell+2] = ha::mag_array_z[cell];
+      }
+
+      vmpi::all_reduce_sum(ha::mag_reduction_buffer);
+
+      for(int cell = 0; cell < num_cells; cell++){
+         ha::mag_array_x[cell] = ha::mag_reduction_buffer[3*cell+0];
+         ha::mag_array_y[cell] = ha::mag_reduction_buffer[3*cell+1];
+         ha::mag_array_z[cell] = ha::mag_reduction_buffer[3*cell+2];
+      }
+
+   }
 
    timer.stop();
    ha::phase_time[ha::moment_reduction] = timer.elapsed_time();

@@ -57,6 +57,7 @@ namespace hierarchical{
       std::vector<double> mag_array_x;       // arrays to store cell magnetisation
       std::vector<double> mag_array_y;
       std::vector<double> mag_array_z;
+      std::vector<double> mag_reduction_buffer; // x, y, z cell moments packed for a single reduction (parallel only)
 
       int total_num_cells;
       int num_zero_level_cells;              // number of zero level cells
