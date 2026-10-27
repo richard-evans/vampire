@@ -6,7 +6,7 @@ The texture is set in each folder's `Co.mat`; the `input` files are the same.
 
 | Folder | Setting in Co.mat |
 |--------|-------------------|
-| `domain-wall` | `initial-spin-direction = domain-wall-x, 0.5, 0.2` (centre, width as fractions of the system size) |
+| `domain-wall` | `initial-spin-direction = domain-wall-x, 0.5, 0.2` (centre, width as fractions of the system size) and `domain-wall-magnetisation = z` (a +z to -z Neel wall through +x) |
 | `bloch-wall` | as `domain-wall`, plus `domain-wall-magnetisation = -z` and `domain-wall-type = bloch` (a -z to +z Bloch wall through +y) |
 | `skyrmion` | `initial-spin-direction = skyrmion, 0.5, 0.5, 0.3` (centre x, y and radius) |
 | `vector-field` | `initial-spin-direction = vector-field, field.dat` (points and directions in `field.dat`) |

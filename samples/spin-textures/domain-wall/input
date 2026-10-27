@@ -1,11 +1,13 @@
 #----------------------------------------------------------
 # Sample vampire input file demonstrating the
 # material:initial-spin-direction = domain-wall-x texture
+# with material:domain-wall-magnetisation
 #
 # A thin film is initialised with a 180 degree domain wall
 # centred at x = 0.5 of the system size, with a width of
 # 0.2 of the system size. Spins point along +z for x < centre
-# and along -z for x > centre, with a tanh profile in between.
+# and along -z for x > centre, rotating through +x at the
+# wall centre (a Neel wall) with a tanh profile in between.
 #----------------------------------------------------------
 
 #----------------------------------------------------------
