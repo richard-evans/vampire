@@ -63,49 +63,6 @@ namespace spininitialize{
       }
 
       //-----------------------------------------------------------------------------
-      // domain_wall: 1D tanh-profile Neel-type domain wall.
-      //
-      // Along the chosen axis the spin rotates from +<axis> (far below the wall
-      // centre) through the rotation axis itself (at the wall centre) to
-      // -<axis> (far above the wall centre). The rotation takes place in the
-      // plane spanned by <axis> and the next axis in cyclic order (x->y->z->x),
-      // i.e. for domain-wall-x the rotation plane is x-z, for domain-wall-y it
-      // is y-x and for domain-wall-z it is z-y.
-      //
-      // mat.centre[0] is the position of the wall centre (fraction of system
-      // size along axis) and mat.width controls the sharpness of the wall
-      // (fraction of system size); smaller values give a sharper wall.
-      //-----------------------------------------------------------------------------
-      void domain_wall_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz){
-
-         // pick out the fractional coordinate along the wall's propagation
-         // axis (0=x, 1=y, 2=z), as set by domain-wall-x/y/z
-         const double pos[3] = {fx, fy, fz};
-
-         // t is a dimensionless "distance from the wall centre" measured in
-         // units of the wall width: t = 0 at the centre, |t| >> 1 far away.
-         // mat.centre[0] and mat.width are both fractions of the system size.
-         const double t = (pos[mat.axis] - mat.centre[0]) / mat.width;
-
-         // standard tanh-profile domain wall: the polar angle theta of the
-         // spin (measured from the +axis direction) follows
-         //   theta(t) = 2*atan(exp(t))
-         // which smoothly varies from 0 (spin along +axis, t -> -inf)
-         // through pi/2 (spin perpendicular to axis, t = 0, the wall centre)
-         // to pi (spin along -axis, t -> +inf).
-         const double theta = 2.0 * atan(exp(t));
-
-         double m[3] = {0.0, 0.0, 0.0};
-         m[mat.axis]       = cos(theta); // component along the wall axis
-         m[(mat.axis+2)%3] = sin(theta); // in-plane rotation component
-
-         sx = m[0];
-         sy = m[1];
-         sz = m[2];
-
-      }
-
-      //-----------------------------------------------------------------------------
       // skyrmion: radially symmetric "cone" skyrmion in the x-y plane.
       //
       // mat.centre = (cx, cy) is the centre of the skyrmion (fraction of system

@@ -5,6 +5,7 @@
 # List module object filenames
 spininitialize_objects =\
 data.o \
+domain_wall.o \
 initialize.o \
 interface.o \
 parse.o \

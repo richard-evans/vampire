@@ -276,6 +276,104 @@ namespace spininitialize{
          }
 
       }
+      //------------------------------------------------------------------------
+      // material[#]:domain-wall-magnetisation = <direction(s)>
+      //
+      // Magnetisation at the two ends of a domain-wall-x/y/z texture.
+      // syntax: domain-wall-magnetisation = [+-]x / [+-]y / [+-]z    (m -> -m)
+      //     or: domain-wall-magnetisation = mx,my,mz                 (m -> -m)
+      //     or: domain-wall-magnetisation = mx1,my1,mz1, mx2,my2,mz2 (m1 -> m2)
+      // The first direction is the magnetisation at the low-coordinate end
+      // of the wall. Vectors are normalised; see set_domain_wall_rotation()
+      // in domain_wall.cpp
+      //------------------------------------------------------------------------
+      test = "domain-wall-magnetisation";
+      if(word == test){
+
+         std::vector<std::string> tokens = internal::split_csv(value);
+         internal::mp_t& mat = internal::mp[super_index];
+
+         double v[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+         // single axis label with optional sign, e.g. "z" or "-z"
+         if(tokens.size() == 1){
+            std::string label = tokens[0];
+            double sign = 1.0;
+            if(!label.empty() && (label[0] == '+' || label[0] == '-')){
+               if(label[0] == '-') sign = -1.0;
+               label = label.substr(1);
+            }
+            if(label != "x" && label != "y" && label != "z"){
+               std::ostringstream message;
+               message << "Error on line " << line << " of material file - " << prefix << "[" << super_index+1 << "]:" << word << " = " << value << " is not a valid direction. Use x, y, z (optionally signed), mx,my,mz or mx1,my1,mz1,mx2,my2,mz2.";
+               err::fatal(message.str());
+            }
+            v[(label == "x") ? 0 : (label == "y") ? 1 : 2] = sign;
+         }
+         // one or two vectors
+         else if(tokens.size() == 3 || tokens.size() == 6){
+            for(size_t i = 0; i < tokens.size(); i++) v[i] = atof(tokens[i].c_str());
+         }
+         else{
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - " << prefix << "[" << super_index+1 << "]:" << word << " requires a direction label (x, y, z), 3 numbers (mx,my,mz) or 6 numbers (mx1,my1,mz1,mx2,my2,mz2).";
+            err::fatal(message.str());
+         }
+
+         // a single direction gives a 180 degree wall to its reverse
+         if(tokens.size() != 6){
+            for(int i = 0; i < 3; i++) v[3+i] = -v[i];
+         }
+
+         if(!internal::normalise(v[0], v[1], v[2]) || !internal::normalise(v[3], v[4], v[5])){
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - " << prefix << "[" << super_index+1 << "]:" << word << " domain wall magnetisation must be non-zero.";
+            err::fatal(message.str());
+         }
+
+         if(v[0]*v[3] + v[1]*v[4] + v[2]*v[5] > 1.0 - 1.0e-10){
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - " << prefix << "[" << super_index+1 << "]:" << word << " start and end magnetisation of the domain wall must be different.";
+            err::fatal(message.str());
+         }
+
+         for(int i = 0; i < 3; i++){
+            mat.dw_start[i] = v[i];
+            mat.dw_end[i]   = v[3+i];
+         }
+         mat.dw_magnetisation_set = true;
+
+         return true;
+
+      }
+      //------------------------------------------------------------------------
+      // material[#]:domain-wall-type = neel / bloch [, rotation]
+      //
+      // Rotation type of a 180 degree domain-wall-x/y/z texture. rotation is
+      // +1 or -1 (default +1, the sign of the value given is used) and flips
+      // the spin direction at the wall centre; see domain_wall_type_t in
+      // internal.hpp and set_domain_wall_rotation() in domain_wall.cpp
+      //------------------------------------------------------------------------
+      test = "domain-wall-type";
+      if(word == test){
+
+         std::vector<std::string> tokens = internal::split_csv(value);
+         internal::mp_t& mat = internal::mp[super_index];
+
+         if((tokens.size() != 1 && tokens.size() != 2) || (tokens[0] != "neel" && tokens[0] != "bloch")){
+            std::ostringstream message;
+            message << "Error on line " << line << " of material file - " << prefix << "[" << super_index+1 << "]:" << word << " = " << value << " is not valid. Use neel or bloch, optionally followed by a rotation of +1 or -1.";
+            err::fatal(message.str());
+         }
+
+         mat.dw_type = (tokens[0] == "neel") ? internal::domain_wall_type_t::neel : internal::domain_wall_type_t::bloch;
+         mat.dw_rotation = 1;
+         if(tokens.size() == 2) mat.dw_rotation = (atof(tokens[1].c_str()) < 0.0) ? -1 : 1;
+         mat.dw_type_set = true;
+
+         return true;
+
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found

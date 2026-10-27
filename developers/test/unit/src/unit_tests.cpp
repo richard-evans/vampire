@@ -46,6 +46,7 @@ int main(int argc, char* argv[]){
    if( module.grains  || all ) error_count += ut::grains_tests(verbose);
    if( module.integrate || all ) error_count += ut::integrate_tests(verbose);
    if( module.mpi || all ) error_count += ut::mpi_tests(verbose);
+   if( module.spininitialize || all ) error_count += ut::spininitialize_tests(verbose);
 
 
    // Summary

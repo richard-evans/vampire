@@ -211,7 +211,7 @@ Initialises each spin in the material to an independent random direction, equiva
 \end{quote}
 
 \item \verb|domain-wall-x|, \verb|domain-wall-y|, \verb|domain-wall-z|, \emph{centre}, \emph{width} \\
-Initialises a 180$^\circ$ domain wall with a $\tanh$ profile, varying along the chosen axis. \emph{centre} and \emph{width} are given as a fraction of the system size along that axis. Example, for a domain wall centred at the middle of the system along $x$ with a width of half the system size:
+Initialises a domain wall with a $\tanh$ profile, varying along the chosen axis. \emph{centre} and \emph{width} are given as a fraction of the system size along that axis. By default the wall is a 180$^\circ$ wall from $+$axis to $-$axis, rotating through $+z$ for \verb|domain-wall-x|, $+x$ for \verb|domain-wall-y| and $+y$ for \verb|domain-wall-z|. The magnetisation at each end of the wall and the type of rotation can be set with \textit{material[n]:domain-wall-magnetisation} and \textit{material[n]:domain-wall-type}. Example, for a domain wall centred at the middle of the system along $x$ with a width of half the system size:
 \begin{quote}
 \verb|material[1]:initial-spin-direction = domain-wall-x, 0.5, 0.5|
 \end{quote}
@@ -241,6 +241,23 @@ Initialises the spin direction of each atom by interpolating a user-supplied vec
 \end{quote}
 
 \end{itemize}
+
+{\zicf material:domain-wall-magnetisation = direction(s) [default +axis]}\phantomsection\addcontentsline{toc}{subsection}{material:domain-wall-magnetisation} Sets the magnetisation at the two ends of a domain wall defined with \textit{material[n]:initial-spin-direction = domain-wall-x/y/z}. The first direction is the magnetisation at the low-coordinate end of the wall along the wall axis. Three forms are accepted:
+\begin{itemize}
+  \item[] \texttt{x}, \texttt{y} or \texttt{z}, optionally preceded by a sign (e.g. \texttt{-z}): a 180$^\circ$ wall from this direction to its reverse.
+  \item[] \emph{mx, my, mz}: a 180$^\circ$ wall from the vector $\mathbf{m}$ to $-\mathbf{m}$.
+  \item[] \emph{mx1, my1, mz1, mx2, my2, mz2}: a wall from $\mathbf{m}_1$ to $\mathbf{m}_2$, rotating smoothly along the shortest path in the plane containing both vectors (e.g. a 90$^\circ$ wall). If the two vectors are antiparallel the wall is treated as a 180$^\circ$ wall.
+\end{itemize}
+Vectors are normalised automatically, and the start and end directions must differ. The rotation path of a 180$^\circ$ wall is set by \textit{material[n]:domain-wall-type}. Example, for a wall along $x$ from $-z$ to $+z$:
+\begin{quote}
+\verb|material[1]:initial-spin-direction = domain-wall-x, 0.5, 0.1| \\
+\verb|material[1]:domain-wall-magnetisation = -z|
+\end{quote}
+
+{\zicf material:domain-wall-type = neel / bloch [, rotation] [default neel, +1]}\phantomsection\addcontentsline{toc}{subsection}{material:domain-wall-type} Sets the rotation type of a 180$^\circ$ domain wall defined with \textit{material[n]:initial-spin-direction = domain-wall-x/y/z}. For a wall varying along the unit axis $\hat{\mathbf{a}}$ with end magnetisation $\mathbf{m}$ and $-\mathbf{m}$, the spin at the wall centre points along $\hat{\mathbf{a}} - (\hat{\mathbf{a}}\cdot\mathbf{m})\mathbf{m}$ for a \texttt{neel} wall (rotation plane contains the wall axis) and along $\hat{\mathbf{a}}\times\mathbf{m}$ for a \texttt{bloch} wall (rotation plane perpendicular to the wall axis). The optional \emph{rotation} is $+1$ or $-1$ (the sign of the value given is used, default $+1$) and reverses the spin direction at the wall centre. For example, a wall along $x$ from $-z$ to $+z$ rotates through $+x$ (\texttt{neel}), $-x$ (\texttt{neel, -1}), $+y$ (\texttt{bloch}) or $-y$ (\texttt{bloch, -1}). If the end magnetisation lies along the wall axis neither type is defined and the wall rotates through the default direction given under \textit{material[n]:initial-spin-direction}, reversed for a rotation of $-1$. The type has no effect on walls whose end states are not antiparallel, which rotate in the plane of the two end states. Example:
+\begin{quote}
+\verb|material[1]:domain-wall-type = bloch, -1|
+\end{quote}
 
 {\zicf material:material-element string [default "Fe"]}\phantomsection\addcontentsline{toc}{subsection}{material:material-element} Defines a purely descriptive chemical element for the material, which gives visual contrast in a range of interactive atomic structure viewers such as jmol, rasmol etc. In rasmol, Fe is a gold colour, H is white, Li is a deep red, O is red, B is green and Ag is a medium grey. This parameter has no relevance to the simulation at all, and only appears when outputting atomic coordinates, which can be post-processed to be viewable in rasmol. The contrast is particularly useful in inspecting the generated structures, particularly ones with a high degree of complexity.
 

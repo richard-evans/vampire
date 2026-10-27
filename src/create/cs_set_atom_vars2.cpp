@@ -106,6 +106,9 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
    dipole::atom_mu0demag_field_array_y.resize(atoms::num_atoms,0.0);
    dipole::atom_mu0demag_field_array_z.resize(atoms::num_atoms,0.0);
 
+   // finalise material spin textures now all material keywords are read
+   spininitialize::initialize();
+
    // Set custom RNG for spin initialisation
    MTRand random_spin_rng;
    random_spin_rng.seed(vmpi::parallel_rng_seed(create::internal::spin_init_seed));

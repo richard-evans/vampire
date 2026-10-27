@@ -57,6 +57,20 @@ namespace spininitialize{
       };
 
       //-----------------------------------------------------------------------------
+      // Rotation type of a 180 degree domain wall, selected via
+      // material[#]:domain-wall-type (see interface.cpp). For a wall varying
+      // along axis a with end states +/-m, the spin at the wall centre is
+      //    neel  : along a with its m component removed (rotation plane contains a)
+      //    bloch : along a x m (rotation plane perpendicular to a)
+      // Non-collinear walls rotate in the plane of their two end states and
+      // ignore the type.
+      //-----------------------------------------------------------------------------
+      enum class domain_wall_type_t{
+         neel,
+         bloch
+      };
+
+      //-----------------------------------------------------------------------------
       // A single point of a user-defined vector field
       // (x,y,z) are fractional coordinates of the system size [0:1]
       // (mx,my,mz) is the (not necessarily normalised) spin direction at that point
@@ -109,6 +123,30 @@ namespace spininitialize{
              // vector_field: index into internal::vector_field_data / internal::vector_field_filenames
              int vector_field_id;
 
+             // domain_wall: unit magnetisation at the start (low coordinate)
+             // and end (high coordinate) of the wall, set via
+             // material[#]:domain-wall-magnetisation; if not set the wall
+             // runs from +axis to -axis
+             bool dw_magnetisation_set;
+             double dw_start[3];
+             double dw_end[3];
+
+             // domain_wall: rotation type and sense (+1 or -1) of a 180
+             // degree wall, set via material[#]:domain-wall-type
+             bool dw_type_set;
+             domain_wall_type_t dw_type;
+             int dw_rotation;
+
+             // domain_wall: resolved rotation of the wall, computed by
+             // set_domain_wall_rotation(). The spin at polar angle theta of
+             // the tanh profile is
+             //    m = cos(phi) dw_m0 + sin(phi) dw_m1,  phi = dw_angle * theta / pi
+             // with dw_m0 and dw_m1 orthonormal and dw_angle the total
+             // rotation angle (pi for a 180 degree wall)
+             double dw_m0[3];
+             double dw_m1[3];
+             double dw_angle;
+
              // constructor
              mp_t (const unsigned int max_materials = 100):
                 texture(uniform_vector),
@@ -116,13 +154,29 @@ namespace spininitialize{
                 width(0.1),
                 chirality(1),
                 polarity(1),
-                vector_field_id(-1)
+                vector_field_id(-1),
+                dw_magnetisation_set(false),
+                dw_type_set(false),
+                dw_type(domain_wall_type_t::neel),
+                dw_rotation(1),
+                dw_angle(3.14159265358979323846)
              {
                 initial_spin[0] = 0.0;
                 initial_spin[1] = 0.0;
                 initial_spin[2] = 1.0;
                 centre[0] = 0.5;
                 centre[1] = 0.5;
+                // default wall along x from +x to -x through +z
+                for(int i = 0; i < 3; i++){
+                   dw_start[i] = 0.0;
+                   dw_end[i]   = 0.0;
+                   dw_m0[i]    = 0.0;
+                   dw_m1[i]    = 0.0;
+                }
+                dw_start[0] =  1.0;
+                dw_end[0]   = -1.0;
+                dw_m0[0]    =  1.0;
+                dw_m1[2]    =  1.0;
              }; // end of constructor
 
        }; // end of internal::mp class
@@ -164,6 +218,10 @@ namespace spininitialize{
       void uniform_vector_spin(const mp_t& mat, double& sx, double& sy, double& sz);
       void random_spin(MTRand& prng, double& sx, double& sy, double& sz);
       void domain_wall_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
+
+      // resolve the rotation basis (dw_m0, dw_m1, dw_angle) of a domain wall
+      // from its axis, end states and type; returns true for a 180 degree wall
+      bool set_domain_wall_rotation(mp_t& mat);
       void skyrmion_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
       void cycloid_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);
       void spin_spiral_spin(const mp_t& mat, const double fx, const double fy, const double fz, double& sx, double& sy, double& sz);

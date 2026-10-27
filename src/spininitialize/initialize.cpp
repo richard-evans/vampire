@@ -11,9 +11,11 @@
 //
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
 #include "atoms.hpp"
+#include "errors.hpp"
 #include "spininitialize.hpp"
 
 // spininitialize module headers
@@ -25,6 +27,31 @@ namespace spininitialize{
    // Function to initialize spininitialize module
    //----------------------------------------------------------------------------
    void initialize(){
+
+      // resolve the rotation of each domain wall texture now that all
+      // material keywords have been read, in whatever order
+      for(size_t m = 0; m < internal::mp.size(); m++){
+
+         internal::mp_t& mat = internal::mp[m];
+
+         if(mat.texture != internal::domain_wall){
+            if(mat.dw_magnetisation_set || mat.dw_type_set){
+               std::ostringstream message;
+               message << "Warning - material[" << m+1 << "]:domain-wall-magnetisation/domain-wall-type is set but material[" << m+1 << "]:initial-spin-direction is not a domain wall, ignoring.";
+               err::warning(message.str());
+            }
+            continue;
+         }
+
+         const bool is_180 = internal::set_domain_wall_rotation(mat);
+
+         if(!is_180 && mat.dw_type_set){
+            std::ostringstream message;
+            message << "Warning - material[" << m+1 << "]:domain-wall-type is ignored as the domain wall end states are not antiparallel, the wall rotates in the plane of the end states.";
+            err::warning(message.str());
+         }
+
+      }
 
       return;
 
