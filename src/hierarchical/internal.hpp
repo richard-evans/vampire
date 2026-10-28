@@ -59,9 +59,15 @@ namespace hierarchical{
       extern int total_num_cells;
       extern int num_zero_level_cells;
 
-      extern std::vector<double> mag_array_x; /// arrays to store cells magnetisation
-      extern std::vector<double> mag_array_y;
-      extern std::vector<double> mag_array_z;
+      extern vmpi::shared_array_t<double> mag_array_x; /// cell magnetisations (all processes), one copy per region
+      extern vmpi::shared_array_t<double> mag_array_y;
+      extern vmpi::shared_array_t<double> mag_array_z;
+      extern std::vector<double> partial_mag_array_x;  /// this process's contribution to the cell magnetisations
+      extern std::vector<double> partial_mag_array_y;
+      extern std::vector<double> partial_mag_array_z;
+      extern std::vector<int> contributing_cells;      // cells (all levels, in order) with a contribution from this process
+      extern std::vector<double> mag_reduction_values; // contributions of this process, x then y then z
+      extern vmpi::shared_sum_t mag_reduction;         // sum of the contributions over processes
 
       extern std::vector<double> rij_tensor_xx;
       extern std::vector<double> rij_tensor_xy;

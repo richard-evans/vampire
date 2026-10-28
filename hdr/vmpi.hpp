@@ -85,6 +85,7 @@ namespace vmpi{
          T* data(){ return ptr; }
          uint64_t size() const { return num_elements; }
          bool is_writer() const { return my_shared_rank == 0; } // one rank per region, for filling the array
+         void memory_barrier();           // order this rank's loads and stores (no synchronisation)
 
       private:
          T* ptr = nullptr;                // start of the array, valid on every rank in shared_comm
@@ -93,6 +94,39 @@ namespace vmpi{
             MPI_Win window = MPI_WIN_NULL;
          #endif
          std::vector<T> serial_data;      // storage for the serial build
+
+   };
+
+   //---------------------------------------------------------------------------
+   // Sum over all ranks of values that each rank holds for a fixed list of
+   // indices, into shared arrays (one copy per region). The values are gathered
+   // to the first rank of each region, added there, and summed between regions
+   // over leader_comm only. Usage:
+   //
+   //    vmpi::shared_sum_t sum;
+   //    sum.initialise(indices, 3);          // collective, indices unique on each rank
+   //    sum.sum(values, {&x, &y, &z});       // collective, values[c*n + i] for indices[i]
+   //
+   // After sum() every element of each total is the sum over ranks (zero where no
+   // rank has a value), readable by every rank in the region. The totals must not
+   // be read between the start of the next sum() on any rank of the region and its
+   // end. In the serial build the totals are the values.
+   //---------------------------------------------------------------------------
+   class shared_sum_t{
+
+      public:
+         void initialise(const std::vector<int>& indices, int num_components);
+         void sum(const std::vector<double>& values, const std::vector< shared_array_t<double>* >& totals);
+
+      private:
+         std::vector<int> local_indices;       // this rank's indices
+         int num_components = 0;               // values per index
+         std::vector<int> region_indices;      // first rank of the region: indices of every rank, rank by rank
+         std::vector<int> index_counts;        // first rank of the region: number of indices of each rank
+         std::vector<int> index_displacements;
+         std::vector<int> value_counts;        // first rank of the region: number of values of each rank
+         std::vector<int> value_displacements;
+         std::vector<double> region_values;    // first rank of the region: gathered values
 
    };
 

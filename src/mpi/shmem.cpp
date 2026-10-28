@@ -243,9 +243,122 @@ void shared_array_t<T>::free(){
 
 }
 
+//------------------------------------------------------------------------------
+// Function to order this rank's loads and stores to the array with respect to
+// later communication, without synchronising with other ranks.
+//------------------------------------------------------------------------------
+template <typename T>
+void shared_array_t<T>::memory_barrier(){
+   #ifdef MPICF
+      MPI_Win_sync(window);
+   #endif
+   return;
+}
+
 // types available for shared arrays
 template class shared_array_t<double>;
 template class shared_array_t<int>;
 template class shared_array_t<uint64_t>;
+
+//------------------------------------------------------------------------------
+// Function to set up a shared sum of num_components values for each of this
+// rank's indices. The first rank of each region gathers the indices of every
+// rank in the region. Collective over MPI_COMM_WORLD.
+//------------------------------------------------------------------------------
+void shared_sum_t::initialise(const std::vector<int>& indices, int components){
+
+   vmpi::initialise_shared_memory();
+
+   local_indices = indices;
+   num_components = components;
+
+   #ifdef MPICF
+      const int num_indices = local_indices.size();
+      const bool leader = (vmpi::my_shared_rank == 0);
+      if(leader){
+         index_counts.resize(vmpi::num_shared_ranks);
+         index_displacements.resize(vmpi::num_shared_ranks);
+         value_counts.resize(vmpi::num_shared_ranks);
+         value_displacements.resize(vmpi::num_shared_ranks);
+      }
+      MPI_Gather(&num_indices, 1, MPI_INT, index_counts.data(), 1, MPI_INT, 0, vmpi::shared_comm);
+      int total = 0;
+      if(leader){
+         for(int r = 0; r < vmpi::num_shared_ranks; r++){
+            index_displacements[r] = total;
+            value_counts[r] = num_components * index_counts[r];
+            value_displacements[r] = num_components * total;
+            total += index_counts[r];
+         }
+         region_indices.resize(total);
+         region_values.resize(num_components * uint64_t(total));
+      }
+      MPI_Gatherv(local_indices.data(), num_indices, MPI_INT, region_indices.data(), index_counts.data(),
+                  index_displacements.data(), MPI_INT, 0, vmpi::shared_comm);
+   #endif
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------
+// Function to sum values[c*n + i] (component c of this rank's index i, n
+// indices) over all ranks into totals[c]. Collective over MPI_COMM_WORLD.
+//
+// Every rank calls this only after it has finished reading the totals of the
+// previous sum, so once the gather completes the first rank of the region may
+// overwrite them.
+//------------------------------------------------------------------------------
+void shared_sum_t::sum(const std::vector<double>& values, const std::vector< shared_array_t<double>* >& totals){
+
+   const uint64_t num_indices = local_indices.size();
+
+   #ifdef MPICF
+
+      // complete this rank's reads of the previous totals before the first rank of the region writes them
+      for(shared_array_t<double>* total : totals) total->memory_barrier();
+
+      MPI_Gatherv(values.data(), num_components * num_indices, MPI_DOUBLE, region_values.data(), value_counts.data(),
+                  value_displacements.data(), MPI_DOUBLE, 0, vmpi::shared_comm);
+
+      // the first rank of each region adds the values of its ranks, then the regions are summed
+      if(vmpi::my_shared_rank == 0){
+         for(int c = 0; c < num_components; c++){
+            shared_array_t<double>& total = *totals[c];
+            std::fill(total.data(), total.data() + total.size(), 0.0);
+            for(int r = 0; r < vmpi::num_shared_ranks; r++){
+               const int n = index_counts[r];
+               const int* index = &region_indices[index_displacements[r]];
+               const double* value = &region_values[value_displacements[r] + uint64_t(c) * n];
+               for(int i = 0; i < n; i++) total[index[i]] += value[i];
+            }
+         }
+         int num_regions = 1;
+         MPI_Comm_size(vmpi::leader_comm, &num_regions);
+         if(num_regions > 1){
+            for(shared_array_t<double>* total : totals){
+               MPI_Allreduce(MPI_IN_PLACE, total->data(), total->size(), MPI_DOUBLE, MPI_SUM, vmpi::leader_comm);
+            }
+         }
+      }
+
+      // make the totals visible to every rank in the region (one barrier for all arrays)
+      for(shared_array_t<double>* total : totals) total->memory_barrier();
+      MPI_Barrier(vmpi::shared_comm);
+      for(shared_array_t<double>* total : totals) total->memory_barrier();
+
+   #else
+
+      for(int c = 0; c < num_components; c++){
+         shared_array_t<double>& total = *totals[c];
+         std::fill(total.data(), total.data() + total.size(), 0.0);
+         for(uint64_t i = 0; i < num_indices; i++) total[local_indices[i]] += values[c * num_indices + i];
+      }
+
+   #endif
+
+   return;
+
+}
 
 } // end of namespace vmpi
