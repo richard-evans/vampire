@@ -380,7 +380,6 @@ void initialize(const double system_dimensions_x,
    ha::mag_array_x.resize(ha::total_num_cells,0);
    ha::mag_array_y.resize(ha::total_num_cells,0);
    ha::mag_array_z.resize(ha::total_num_cells,0);
-   if(vmpi::num_processors > 1) ha::mag_reduction_buffer.resize(3*ha::total_num_cells,0);
 
    // check that the number of zero levels cells is correct (must be the same for hierachical and cells structures)
    if (ha::num_zero_level_cells != cells_num_cells) std::cout << "ERROR ZERO CELLS != NUM CELLS" << std::endl;
@@ -422,21 +421,22 @@ void initialize(const double system_dimensions_x,
       for (int cell = start; cell < end; cell++){
          int start_cell_in_cell = ha::cells_in_cells_start_index[cell];
          int end_cell_in_cell = ha::cells_in_cells_end_index[cell];
-         int N_cells = end_cell_in_cell - start_cell_in_cell;
+         // centre of moment of the subcells (empty subcells have zero moment and position), and total moment
          for (int interaction = start_cell_in_cell; interaction < end_cell_in_cell; interaction ++ ){
             int cell_in_cell = ha::cells_in_cells[interaction];
-            // std::cout << "B" << level << '\t' << cell << '\t' << cell_in_cell << "\t" << ha::cell_positions[cell*3 + 2] <<  "\t" <<ha::cell_dimensions[cell*3 + 2] << "\t" << ha::cell_positions[cell_in_cell*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_in_cell*3 + 2] << "\t" << start_cell_in_cell << '\t' << end_cell_in_cell <<std::endl;
-            ha::cell_positions_mom[4*cell+0] += ha::cell_positions_mom[4*cell_in_cell+0];
-            ha::cell_positions_mom[4*cell+1] += ha::cell_positions_mom[4*cell_in_cell+1];
-            ha::cell_positions_mom[4*cell+2] += ha::cell_positions_mom[4*cell_in_cell+2];
-            ha::cell_positions_mom[4*cell+3] += ha::cell_positions_mom[4*cell_in_cell+3];
+            const double mom = ha::cell_positions_mom[4*cell_in_cell+3];
+            ha::cell_positions_mom[4*cell+0] += ha::cell_positions_mom[4*cell_in_cell+0] * mom;
+            ha::cell_positions_mom[4*cell+1] += ha::cell_positions_mom[4*cell_in_cell+1] * mom;
+            ha::cell_positions_mom[4*cell+2] += ha::cell_positions_mom[4*cell_in_cell+2] * mom;
+            ha::cell_positions_mom[4*cell+3] += mom;
 
          }
-         ha::cell_positions_mom[4*cell+0] = ha::cell_positions_mom[4*cell+0]/N_cells;
-         ha::cell_positions_mom[4*cell+1] = ha::cell_positions_mom[4*cell+1]/N_cells;
-         ha::cell_positions_mom[4*cell+2] = ha::cell_positions_mom[4*cell+2]/N_cells;
-         ha::cell_positions_mom[4*cell+3] = ha::cell_positions_mom[4*cell+3]/N_cells;
-         // std::cout << ha::cell_positions_mom[4*cell+0] << '\t' << ha::cell_positions[3*cell+0] << "\t" << N_cells <<  std::endl;
+         const double total_mom = ha::cell_positions_mom[4*cell+3];
+         for (int i = 0; i < 3; i++){
+            // cells with no moment use their geometric centre
+            if (total_mom > 0.0) ha::cell_positions_mom[4*cell+i] = ha::cell_positions_mom[4*cell+i] / total_mom;
+            else                 ha::cell_positions_mom[4*cell+i] = ha::cell_positions[3*cell+i];
+         }
       }
    }
 
@@ -618,7 +618,7 @@ void initialize(const double system_dimensions_x,
    const double shared_ranks = double(vmpi::num_shared_ranks); // shared arrays counted as a share of the region's copy
    const double geometry_mb = (mb(ha::cell_positions) + mb(ha::cell_positions_mom) + mb(ha::cell_dimensions)) / shared_ranks;
    const double topology_mb = (mb(ha::cells_in_cells) + mb(ha::cells_in_cells_start_index) + mb(ha::cells_in_cells_end_index)) / shared_ranks;
-   const double moment_mb   = mb(ha::mag_array_x) + mb(ha::mag_array_y) + mb(ha::mag_array_z) + mb(ha::mag_reduction_buffer);
+   const double moment_mb   = mb(ha::mag_array_x) + mb(ha::mag_array_y) + mb(ha::mag_array_z);
    const double cells_mb    = mb(cells::pos_and_mom_array) + mb(cells::pos_array) + mb(cells::num_atoms_in_cell) + mb(cells::num_atoms_in_cell_global)
                             + mb(cells::mag_array_x) + mb(cells::mag_array_y) + mb(cells::mag_array_z) + mb(cells::volume_array)
                             + 4.0 * double(cells::index_atoms_array.size() * sizeof(std::vector<int>)) / 1.0e6; // empty inner vectors of index_atoms_array and atom_in_cell_coords_array_*
@@ -691,10 +691,12 @@ void initialize(const double system_dimensions_x,
             // get global cell_j ID
             int cell_j = ha::interaction_list[j];
 
-            // only calculate interaction if there are atoms in remote cell - I dont understand either of these conditions!
-            // 1) why does the local number of atoms in the cell matter - surely the global number is more meaningful?
-            // 2) why would I only want to calculate interactions with zero-level cells??? surely we want all interactions?
-            if ( cells_num_atoms_in_cell_global[cell_j] != 0 && cell_j < ha::num_zero_level_cells){
+            // coarse cells (level >= 1) always use the bare dipole tensor: they are accepted only beyond the level
+            // interaction range, which exceeds the atomistic cutoff
+            const bool coarse = cell_j >= ha::num_zero_level_cells;
+
+            // only calculate interaction if there are atoms in a remote level 0 cell
+            if ( coarse || cells_num_atoms_in_cell_global[cell_j] != 0 ){
 
                //--------------------------------------------------------------
                // Calculation of inter part of dipolar tensor
@@ -703,7 +705,7 @@ void initialize(const double system_dimensions_x,
                //if ( cells_num_atoms_in_cell_global[cell_j] > 0 ){
 
                   // check if cell is not the same
-                  if( cell_i != cell_j ){
+                  if( coarse || cell_i != cell_j ){
                      // calculate inter term of dipolar tensor
                      internal::calc_inter(cell_i,
                                           cell_j,

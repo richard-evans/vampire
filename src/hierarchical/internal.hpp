@@ -62,7 +62,6 @@ namespace hierarchical{
       extern std::vector<double> mag_array_x; /// arrays to store cells magnetisation
       extern std::vector<double> mag_array_y;
       extern std::vector<double> mag_array_z;
-      extern std::vector<double> mag_reduction_buffer;
 
       extern std::vector<double> rij_tensor_xx;
       extern std::vector<double> rij_tensor_xy;

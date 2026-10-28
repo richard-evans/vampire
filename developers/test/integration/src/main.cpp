@@ -249,10 +249,11 @@ int main(int argc, char* argv[]){
 
       // Dipole solver test as for dipole/cylinder, for a 50 nm diameter disc (47698 atoms, about 5 s
       // for the three solvers) large enough for hierarchical levels 1-3 to contribute (the level L range
-      // is 6 nm x 2^L). Measured (2026-10-21): rms difference from atomistic, atoms 0.0404 (tensor),
-      // 0.0432 (hierarchical); cells 0.0117, 0.0188; hierarchical-tensor cells 0.0077; relative energy
-      // error 1.2e-10 (atomistic), 0.0054 (tensor), 0.0084 (hierarchical)
-      if( !dipole_solver_test("dipole/disc", 0.05, 0.025, 0.01, 0.011, exe ) ) fail += 1;
+      // is 6 nm x 2^L). Measured (2026-10-28, coarse level tensors included): rms difference from
+      // atomistic, atoms 0.0404 (tensor), 0.0404 (hierarchical); cells 0.0117, 0.0117;
+      // hierarchical-tensor cells 4.3e-5; relative energy error 1.2e-10 (atomistic), 0.0054 (tensor),
+      // 0.0054 (hierarchical)
+      if( !dipole_solver_test("dipole/disc", 0.045, 0.015, 1.0e-4, 0.007, exe ) ) fail += 1;
 
    }
 
