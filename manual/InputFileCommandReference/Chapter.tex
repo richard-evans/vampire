@@ -851,6 +851,25 @@ Gaussian width $\tau_\mathrm{elec}$ rather than a trapezoidal constant-phase dur
  away from the $z$-axis, at the start of the relaxation phase in the program
  \textit{effective-damping}. Valid values are in the range 0 -- 180 degrees.
 
+\section*{Spin transport}
+\phantomsection\addcontentsline{toc}{section}{Spin transport}
+The spin-transport module computes the resistance of the sample with a circuit model and applies spin-transfer torques between neighbouring cells. The sample is divided into cells, which are chained into stacks along the current direction. The spin polarisation acting on each cell is the magnetisation of the previous cell in its stack.
+
+{\zicf spin-transport:current-direction = +x, -x, +y, -y, +z, -z [default +z]}\phantomsection\addcontentsline{toc}{subsection}{spin-transport:current-direction}
+Defines the direction of \textit{electron} flow through the sample. The electrons carry the spin angular momentum, so the polariser of each cell is the cell upstream in the electron flow, and domain walls driven by the adiabatic torque move along this direction. The conventional (charge) current flows in the opposite direction. \textit{output:current} therefore reports a negative current for a positive applied voltage.
+
+{\zicf spin-transport:applied-voltage = float}\phantomsection\addcontentsline{toc}{subsection}{spin-transport:applied-voltage}
+Defines the voltage applied across the sample, with default units of volts.
+
+{\zicf spin-transport:cell-size-x, cell-size-y, cell-size-z = float}\phantomsection\addcontentsline{toc}{subsection}{spin-transport:cell-size}
+Defines the dimensions of the spin-transport cells, with default units of \AA. For an accurate spin-transfer torque the cell length along the current should be small compared with the domain-wall width, and the cells should tile the sample exactly.
+
+{\zicf spin-transport:update-rate = int}\phantomsection\addcontentsline{toc}{subsection}{spin-transport:update-rate}
+Defines how many time steps pass between updates of the resistance and spin-torque fields.
+
+{\zicf spin-transport:environment-resistivity = float}\phantomsection\addcontentsline{toc}{subsection}{spin-transport:environment-resistivity}
+Defines the resistivity of empty cells, with default units of $\Omega$m.
+
 \section*{Data output}
 \phantomsection\addcontentsline{toc}{section}{Data output}
 The following commands control what data is output to the \textit{output} file. The order in which they appear is the order in which they appear in the \textit{output} file. Most options output a single column of data, but some output multiple columns, particularly vector data or parameters related to materials, where one column per material is output. Note that this means that for vector data, one set of columns per material is output.

@@ -483,8 +483,11 @@ namespace vout{
    }
 
    // Output Function 66
+   // spin-transport:current-direction is the direction of electron flow (the electrons carry the
+   // spin torque), so the conventional (charge) current flows the opposite way and is output with
+   // a negative sign relative to the current-direction.
    void current(std::ostream& stream, bool header){
-      stream << generic_output_double("current", spin_transport::total_current, header);
+      stream << generic_output_double("current", -spin_transport::total_current, header);
    }
 
    // Output Function 67

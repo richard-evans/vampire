@@ -83,6 +83,12 @@ namespace spin_transport{
       if( word == test ){
          //-------------------------------------
          // Check for valid current directions
+         //
+         // The current direction is the direction of ELECTRON flow: the spin
+         // polarisation acting on each cell is taken from the previous cell
+         // along this direction (electron upstream), so domain walls move along
+         // it. The conventional (charge) current is in the opposite direction
+         // and is output with a negative sign (output:current).
          //-------------------------------------
          test = "+x";
          if( value == test ){
