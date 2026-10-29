@@ -318,11 +318,16 @@ void shared_sum_t::sum(const std::vector<double>& values, const std::vector< sha
       // complete this rank's reads of the previous totals before the first rank of the region writes them
       for(shared_array_t<double>* total : totals) total->memory_barrier();
 
+      double time = MPI_Wtime();
       MPI_Gatherv(values.data(), num_components * num_indices, MPI_DOUBLE, region_values.data(), value_counts.data(),
                   value_displacements.data(), MPI_DOUBLE, 0, vmpi::shared_comm);
+      phase_time[gather] = MPI_Wtime() - time;
+      phase_time[add] = 0.0;
+      phase_time[allreduce] = 0.0;
 
       // the first rank of each region adds the values of its ranks, then the regions are summed
       if(vmpi::my_shared_rank == 0){
+         time = MPI_Wtime();
          for(int c = 0; c < num_components; c++){
             shared_array_t<double>& total = *totals[c];
             std::fill(total.data(), total.data() + total.size(), 0.0);
@@ -333,6 +338,8 @@ void shared_sum_t::sum(const std::vector<double>& values, const std::vector< sha
                for(int i = 0; i < n; i++) total[index[i]] += value[i];
             }
          }
+         phase_time[add] = MPI_Wtime() - time;
+         time = MPI_Wtime();
          int num_regions = 1;
          MPI_Comm_size(vmpi::leader_comm, &num_regions);
          if(num_regions > 1){
@@ -340,12 +347,15 @@ void shared_sum_t::sum(const std::vector<double>& values, const std::vector< sha
                MPI_Allreduce(MPI_IN_PLACE, total->data(), total->size(), MPI_DOUBLE, MPI_SUM, vmpi::leader_comm);
             }
          }
+         phase_time[allreduce] = MPI_Wtime() - time;
       }
 
       // make the totals visible to every rank in the region (one barrier for all arrays)
+      time = MPI_Wtime();
       for(shared_array_t<double>* total : totals) total->memory_barrier();
       MPI_Barrier(vmpi::shared_comm);
       for(shared_array_t<double>* total : totals) total->memory_barrier();
+      phase_time[barrier] = MPI_Wtime() - time;
 
    #else
 

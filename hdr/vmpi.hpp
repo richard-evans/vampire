@@ -118,6 +118,10 @@ namespace vmpi{
          void initialise(const std::vector<int>& indices, int num_components);
          void sum(const std::vector<double>& values, const std::vector< shared_array_t<double>* >& totals);
 
+         // time (s) of each phase of the last sum on this rank (add and allreduce: first rank of the region only)
+         enum phase_t { gather = 0, add = 1, allreduce = 2, barrier = 3, num_phases = 4 };
+         double phase_time[num_phases] = {0.0, 0.0, 0.0, 0.0};
+
       private:
          std::vector<int> local_indices;       // this rank's indices
          int num_components = 0;               // values per index

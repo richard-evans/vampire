@@ -159,9 +159,22 @@ std::string update_phase_times(){
    const double num_interactions = ha::interaction_list.size();
    const double ns_per_interaction = num_interactions > 0 ? 1.0e9 * field_time / num_interactions : 0.0;
 
+   // phases of the moment reduction: the min over ranks (over region leaders for the allreduce) is the cost
+   // without waiting, the max includes the wait for the slowest rank
+   const vmpi::shared_sum_t& red = ha::mag_reduction;
+   const bool leader = vmpi::my_shared_rank == 0;
+   const double not_leader = 1.0e30; // excluded from the minimum
+
    std::ostringstream times;
    times << " upward_s="     << vmpi::reduce_max(ha::phase_time[ha::upward_pass])
          << " reduce_s="     << vmpi::reduce_max(ha::phase_time[ha::moment_reduction])
+         << " reduce_gather_s="        << vmpi::reduce_max(red.phase_time[red.gather])
+         << " reduce_gather_min_s="    << vmpi::reduce_min(red.phase_time[red.gather])
+         << " reduce_add_s="           << vmpi::reduce_max(red.phase_time[red.add])
+         << " reduce_allreduce_s="     << vmpi::reduce_max(red.phase_time[red.allreduce])
+         << " reduce_allreduce_min_s=" << vmpi::reduce_min(leader ? red.phase_time[red.allreduce] : not_leader)
+         << " reduce_barrier_s="       << vmpi::reduce_max(red.phase_time[red.barrier])
+         << " reduce_barrier_min_s="   << vmpi::reduce_min(red.phase_time[red.barrier])
          << " field_s="      << vmpi::reduce_max(field_time)
          << " distribute_s=" << vmpi::reduce_max(ha::phase_time[ha::field_distribution])
          << " field_min_s="  << vmpi::reduce_min(field_time)
