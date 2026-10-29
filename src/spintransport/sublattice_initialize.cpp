@@ -297,6 +297,11 @@ namespace spin_transport{
          const double iA = 1.0 / (cell_size[stack_x] * cell_size[stack_y]); // Angstroms^-2
          const double L = cell_size[stack_z];
 
+         // occupied cross-section and length of each cell
+         std::vector<double> area_fraction;
+         std::vector<double> length_fraction;
+         calculate_cell_geometry_factors(total_num_atoms_in_cell, cells3D, stack_x, stack_y, stack_z, area_fraction, length_fraction);
+
          // loop over all xy-cells (stacks)
          for(unsigned int i = 0; i < cells3D.size(); i++){
             for(unsigned int j = 0; j < cells3D[i].size(); j++){
@@ -379,8 +384,9 @@ namespace spin_transport{
                         const double sublattice_cell_spin_resistivity = spin_transport::internal::cell_sl_spin_resistance[idx];
 
                         // set cell resistance R = rho * L / (f * A)
-                        spin_transport::internal::cell_sl_resistance[idx]      = sublattice_cell_resistivity * L * iA / fractional_area;
-                        spin_transport::internal::cell_sl_spin_resistance[idx] = sublattice_cell_spin_resistivity * L * iA / fractional_area;
+                        const double geometry = L * length_fraction[cell] * iA / (fractional_area * area_fraction[cell]);
+                        spin_transport::internal::cell_sl_resistance[idx]      = sublattice_cell_resistivity * geometry;
+                        spin_transport::internal::cell_sl_spin_resistance[idx] = sublattice_cell_spin_resistivity * geometry;
 
                      } // end of if statement for cells containing atoms
 

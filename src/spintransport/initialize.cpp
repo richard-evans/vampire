@@ -12,6 +12,8 @@
 
 // C++ standard library headers
 
+#include <algorithm>
+
 // Vampire headers
 #include "create.hpp"
 #include "spintransport.hpp"
@@ -552,6 +554,11 @@ namespace spin_transport{
          const double iA = 1.0 / (cell_size[stack_x] * cell_size[stack_y]); // Angstroms^-2
          const double l = cell_size[stack_z];
 
+         // occupied cross-section and length of each cell
+         std::vector<double> area_fraction;
+         std::vector<double> length_fraction;
+         calculate_cell_geometry_factors(total_num_atoms_in_cell, cells3D, stack_x, stack_y, stack_z, area_fraction, length_fraction);
+
          // constant prefactor for STT components
          //const double one_o_gamma_e = 1.0 / (1.76e11 * 1.602e-19);  // muB / (gamma * e) but cell saturation already specified in muB's
 
@@ -570,8 +577,8 @@ namespace spin_transport{
 
                   // if cell is empty space assume uniform padding resistance
                   if(num_atoms_in_cell == 0){
-                     spin_transport::internal::cell_resistance[cell]      = spin_transport::internal::environment_resistivity * l * iA;
-                     spin_transport::internal::cell_spin_resistance[cell] = spin_transport::internal::environment_resistivity * l * iA;
+                     spin_transport::internal::cell_resistance[cell]      = spin_transport::internal::environment_resistivity * l * length_fraction[cell] * iA;
+                     spin_transport::internal::cell_spin_resistance[cell] = spin_transport::internal::environment_resistivity * l * length_fraction[cell] * iA;
                      spin_transport::internal::cell_isaturation[cell] = 0.0; // set inverse saturation to 0.0
                      spin_transport::internal::magnetic[cell] = false; // set cell as non-magnetic
                   }
@@ -602,8 +609,10 @@ namespace spin_transport{
                      if( spin_transport::internal::cell_spin_resistance[cell] > 0.0 ) mean_spin_resistivity = total_spin_resistivity_sq[cell] / spin_transport::internal::cell_spin_resistance[cell];
 
                      // set cell resistance
-                     spin_transport::internal::cell_resistance[cell]      = mean_resistivity * l * iA;
-                     spin_transport::internal::cell_spin_resistance[cell] = mean_spin_resistivity * l * iA;
+                     // set cell resistance R = rho l / A_eff from the occupied cell size
+                     const double geometry = l * length_fraction[cell] * iA / area_fraction[cell];
+                     spin_transport::internal::cell_resistance[cell]      = mean_resistivity * geometry;
+                     spin_transport::internal::cell_spin_resistance[cell] = mean_spin_resistivity * geometry;
 
                      // set inverse total moment
                      spin_transport::internal::cell_isaturation[cell] = 1.0/spin_transport::internal::cell_isaturation[cell]; // (1/mu_B)
@@ -686,6 +695,69 @@ namespace spin_transport{
       //------------------------------------------------------------------------
       // determine first and last stack to be computed on local processor
       //------------------------------------------------------------------------
+      //-----------------------------------------------------------------------------------------------
+      // Function to calculate the occupied cross-section and length of each cell
+      //
+      // The resistance of each cell R = rho l / A uses the nominal cell size. When the cell size does
+      // not divide the system, the stacks at the edge contain fewer atoms but would carry the current
+      // of a full stack, inflating both the current and the spin torque per atom. The occupied
+      // cross-section of each stack is instead determined from the number of atoms it contains,
+      //
+      //                A_eff = N_stack / (n L),
+      //
+      // where n is the atomic number density of the crystal and L is the system length along the
+      // current, so that every stack carries the same current density V / (rho L). A_eff equals the
+      // nominal area for completely filled stacks. Stacks without atoms keep the nominal area. The last
+      // cell in a stack may extend beyond the system, and its length is reduced to the part inside.
+      //-----------------------------------------------------------------------------------------------
+      void calculate_cell_geometry_factors(const std::vector<uint64_t>& total_num_atoms_in_cell, // number of atoms in each cell (all processors)
+                                           const v3cell3D_t& cells3D,                            // cell data
+                                           const int stack_x, const int stack_y, const int stack_z, // direction of stacks relative to current direction
+                                           std::vector<double>& area_fraction,                   // occupied fraction of nominal cell cross-section
+                                           std::vector<double>& length_fraction){                // fraction of nominal cell length inside the system
+
+         const double cell_size[3] = { spin_transport::internal::cell_size_x,
+                                       spin_transport::internal::cell_size_y,
+                                       spin_transport::internal::cell_size_z };
+
+         // atomic number density of the crystal (atoms / Angstrom^3), including non-magnetic atoms
+         const double uc_volume = cs::unit_cell.dimensions[0] * cs::unit_cell.dimensions[1] * cs::unit_cell.dimensions[2];
+         const double density = double(cs::unit_cell.atom.size()) / uc_volume;
+
+         // system length along the current and nominal cell cross-section
+         const double L = cs::system_dimensions[stack_z];
+         const double A = cell_size[stack_x] * cell_size[stack_y];
+         const double l = cell_size[stack_z];
+
+         area_fraction.assign(spin_transport::internal::total_num_cells, 1.0);
+         length_fraction.assign(spin_transport::internal::total_num_cells, 1.0);
+
+         for(unsigned int i = 0; i < cells3D.size(); i++){
+            for(unsigned int j = 0; j < cells3D[i].size(); j++){
+
+               // total number of atoms in stack
+               uint64_t num_atoms_in_stack = 0;
+               for(unsigned int k = 0; k < cells3D[i][j].size(); k++) num_atoms_in_stack += total_num_atoms_in_cell[cells3D[i][j][k].id];
+
+               // occupied fraction of nominal cross-section (unchanged for empty stacks)
+               double f = 1.0;
+               if(num_atoms_in_stack > 0 && density > 0.0) f = double(num_atoms_in_stack) / (density * L * A);
+
+               for(unsigned int k = 0; k < cells3D[i][j].size(); k++){
+                  const uint64_t cell = cells3D[i][j][k].id;
+                  area_fraction[cell] = f;
+                  // length of cell inside the system (only the last cell can be partial)
+                  const double inside = L - double(k) * l;
+                  if(inside < l) length_fraction[cell] = std::max(inside, 0.0) / l;
+               }
+
+            }
+         }
+
+         return;
+
+      }
+
       void determine_stack_order(){
 
          #ifdef MPICF

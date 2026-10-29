@@ -862,7 +862,7 @@ Defines the direction of \textit{electron} flow through the sample. The electron
 Defines the voltage applied across the sample, with default units of volts.
 
 {\zicf spin-transport:cell-size-x, cell-size-y, cell-size-z = float}\phantomsection\addcontentsline{toc}{subsection}{spin-transport:cell-size}
-Defines the dimensions of the spin-transport cells, with default units of \AA. For an accurate spin-transfer torque the cell length along the current should be small compared with the domain-wall width, and the cells should tile the sample exactly.
+Defines the dimensions of the spin-transport cells, with default units of \AA. For an accurate spin-transfer torque the cell length along the current should be small compared with the domain-wall width (about one fifth of the wall width or less for 1\% accuracy). The resistance of each stack is calculated from its occupied cross-section, $A_{\mathrm{eff}} = N_{\mathrm{stack}}/(nL)$ with $n$ the atomic density and $L$ the sample length along the current, so cells need not tile the sample exactly.
 
 {\zicf spin-transport:update-rate = int}\phantomsection\addcontentsline{toc}{subsection}{spin-transport:update-rate}
 Defines how many time steps pass between updates of the resistance and spin-torque fields.

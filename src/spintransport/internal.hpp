@@ -187,6 +187,12 @@ namespace spin_transport{
       void calculate_magnetoresistance();
       void calculate_sublattice_resistance();
 
+      void calculate_cell_geometry_factors(const std::vector<uint64_t>& total_num_atoms_in_cell, // number of atoms in each cell (all processors)
+                                           const v3cell3D_t& cells3D,                            // cell data
+                                           const int stack_x, const int stack_y, const int stack_z, // direction of stacks relative to current direction
+                                           std::vector<double>& area_fraction,                   // occupied fraction of nominal cell cross-section
+                                           std::vector<double>& length_fraction);                // fraction of nominal cell length inside the system
+
       /*void calculate_field(const unsigned int num_local_atoms,            // number of local atoms
                            std::vector<double>& atoms_x_field_array,      // x-field of atoms
                            std::vector<double>& atoms_y_field_array,      // y-field of atoms
