@@ -53,6 +53,7 @@ namespace vmpi{
 #endif
    extern int my_shared_rank;       // rank within shared_comm (0 in serial)
    extern int num_shared_ranks;     // number of ranks in shared_comm (1 in serial)
+   extern int numa_regions_per_node; // shared memory regions per node set by the user (0 = detect NUMA regions)
 
    //---------------------------------------------------------------------------
    // Contiguous array held once per shared memory region (NUMA region or node)

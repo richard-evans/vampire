@@ -70,6 +70,14 @@ namespace vmpi{
          return true;
       }
       //--------------------------------------------------------------------
+      test="mpi-numa-regions-per-node";
+      if(word==test){
+         int regions=atoi(value.c_str());
+         vin::check_for_valid_int(regions, word, line, prefix, 1, 1024,"input","1 - 1024");
+         vmpi::numa_regions_per_node=regions;
+         return true;
+      }
+      //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
       return false;

@@ -21,6 +21,7 @@ namespace vmpi{
 
    int mpi_mode=0;
    unsigned int ppn=1;  ///< Processors per node
+   int numa_regions_per_node = 0; // shared memory regions per node set by the user (0 = detect NUMA regions)
    int my_rank=0;
    int num_processors=1;
    int num_core_atoms;

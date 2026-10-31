@@ -759,6 +759,8 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
 
 %{\zicf  sim:mpi-ppn ()}\phantomsection\addcontentsline{toc}{subsection}{sim:mpi-ppn}\\
 
+{\zicf sim:mpi-numa-regions-per-node = integer [1-1024, default detected]}\phantomsection\addcontentsline{toc}{subsection}{sim:mpi-numa-regions-per-node} Sets the number of shared memory regions per node used by the hierarchical dipole solver, overriding the automatic detection of NUMA regions. The ranks on each node are divided into this many equal blocks in rank order, so the blocks only match the NUMA regions of the node if ranks are placed on cores in order (for example \texttt{srun --cpu-bind=cores --distribution=block:block}). Use it where the MPI library cannot detect NUMA regions, in which case memory is otherwise shared across the whole node. A value of 1 shares memory across the node. The split used is written to the log file. The setting has no effect on results or on the serial code.
+
 {\zicf sim:integrator-random-seed = integer [default 12345]}\phantomsection\addcontentsline{toc}{subsection}{sim:integrator-random-seed} Sets a seed for the psuedo random number generator. Simulations use a predictable sequence of psuedo random numbers to give repeatable results for the same simulation. The seed determines the actual sequence of numbers and is used to give a different realisation of the same simulation which is useful for determining statistical properties of the system.
 
 {\zicf sim:constraint-rotation-update}\phantomsection\addcontentsline{toc}{subsection}{sim:constraint-rotation-update}

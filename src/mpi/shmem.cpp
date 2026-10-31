@@ -57,7 +57,8 @@ namespace{
 //
 // shared_comm holds the ranks in the same NUMA region when the MPI library can
 // identify it (MPI 4 hardware guided split or Open MPI), otherwise the ranks on
-// the same node. leader_comm holds rank 0 of each shared_comm, for
+// the same node. sim:mpi-numa-regions-per-node instead divides each node into
+// that many blocks of ranks, in rank order. leader_comm holds rank 0 of each shared_comm, for
 // communication between regions, and is MPI_COMM_NULL on all other ranks.
 // Collective over MPI_COMM_WORLD; calls after the first do nothing.
 //------------------------------------------------------------------------------
@@ -67,21 +68,33 @@ void initialise_shared_memory(){
 
    #ifdef MPICF
 
-      // split by NUMA region where the library supports it
-      MPI_Comm numa_comm = MPI_COMM_NULL;
-      #if MPI_VERSION >= 4
-         MPI_Info info;
-         MPI_Info_create(&info);
-         MPI_Info_set(info, "mpi_hw_resource_type", "NUMANode");
-         MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_HW_GUIDED, vmpi::my_rank, info, &numa_comm);
-         MPI_Info_free(&info);
-      #elif defined(OPEN_MPI)
-         MPI_Comm_split_type(MPI_COMM_WORLD, OMPI_COMM_TYPE_NUMA, vmpi::my_rank, MPI_INFO_NULL, &numa_comm);
-      #endif
-
       // ranks on the same node
       MPI_Comm node_comm = MPI_COMM_NULL;
       MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, vmpi::my_rank, MPI_INFO_NULL, &node_comm);
+
+      MPI_Comm numa_comm = MPI_COMM_NULL;
+      const bool user_regions = (vmpi::numa_regions_per_node > 0);
+      if(user_regions){
+         // equal blocks of node ranks, which are NUMA regions only if ranks are placed in core order
+         int node_rank = 0;
+         int node_size = 1;
+         MPI_Comm_rank(node_comm, &node_rank);
+         MPI_Comm_size(node_comm, &node_size);
+         const int colour = (uint64_t(node_rank) * vmpi::numa_regions_per_node) / node_size;
+         MPI_Comm_split(node_comm, colour, node_rank, &numa_comm);
+      }
+      else{
+         // split by NUMA region where the library supports it
+         #if MPI_VERSION >= 4
+            MPI_Info info;
+            MPI_Info_create(&info);
+            MPI_Info_set(info, "mpi_hw_resource_type", "NUMANode");
+            MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_HW_GUIDED, vmpi::my_rank, info, &numa_comm);
+            MPI_Info_free(&info);
+         #elif defined(OPEN_MPI)
+            MPI_Comm_split_type(MPI_COMM_WORLD, OMPI_COMM_TYPE_NUMA, vmpi::my_rank, MPI_INFO_NULL, &numa_comm);
+         #endif
+      }
 
       // The NUMA split is not usable if any rank has no region, or if every region holds a single rank
       // while a node holds several, which is what Open MPI gives when ranks are not bound to cores. Then
@@ -92,9 +105,9 @@ void initialise_shared_memory(){
       MPI_Comm_size(node_comm, &sizes[2]);
       sizes[0] = -sizes[0]; // so that a max reduction gives the minimum
       MPI_Allreduce(MPI_IN_PLACE, sizes, 3, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-      const bool use_numa = (sizes[0] == -1) && !(sizes[1] == 1 && sizes[2] > 1);
+      const bool use_numa = user_regions || ((sizes[0] == -1) && !(sizes[1] == 1 && sizes[2] > 1));
 
-      std::string region = "NUMA region";
+      std::string region = user_regions ? "input file region" : "NUMA region";
       if(use_numa){
          vmpi::shared_comm = numa_comm;
          MPI_Comm_free(&node_comm);
