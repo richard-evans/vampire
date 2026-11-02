@@ -80,6 +80,8 @@ namespace hierarchical{
 
       extern double av_cell_size;
 
+      extern bool output_p2p_diagnostic; // log the cost of a point-to-point exchange of cell moments at initialisation
+
       // phases of the field update, timed separately for the scaling study (papers/dipole)
       enum phase_t { upward_pass = 0, moment_reduction = 1, field_loop = 2, field_distribution = 3, num_phases = 4 };
       extern std::vector<double> phase_time; // time (s) of each phase of the last update on this process
@@ -89,6 +91,9 @@ namespace hierarchical{
       //-------------------------------------------------------------------------
 
       std::vector < std::vector < double> > calculate_corners(double x, double y, double z, double cell_size_x, double cell_size_y, double cell_size_z);
+
+      // function to log the cost of a point-to-point exchange of cell moments
+      void write_p2p_diagnostic();
 
       // function to update hierarchical cell magnetizations
       void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, // atomic spin directions

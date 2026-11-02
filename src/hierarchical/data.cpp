@@ -50,6 +50,8 @@ namespace hierarchical{
       std::vector < int > proc_cell_index_array1D;       //
       std::vector < int > cells_num_atoms_in_cell;       //
 
+      bool output_p2p_diagnostic = false;                // log the cost of a point-to-point exchange of cell moments
+
       double av_cell_size;                               // weighted average of cell_size_x, cell_size_y, cell_size_z
 
       std::vector<double> phase_time(num_phases, 0.0);   // time (s) of each phase of the last update on this process

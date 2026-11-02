@@ -20,3 +20,4 @@ output:time-steps
 output:magnetisation
 output:precision = 16
 sim:mpi-numa-regions-per-node = 2
+hierarchical:output-p2p-diagnostic

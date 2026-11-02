@@ -33,6 +33,12 @@ namespace hierarchical{
       if(key!=prefix) return false;
 
       //--------------------------------------------------------------------
+      std::string test="output-p2p-diagnostic";
+      if(word==test){
+         hierarchical::internal::output_p2p_diagnostic = true;
+         return true;
+      }
+      //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
       return false;

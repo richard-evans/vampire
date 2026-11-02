@@ -409,6 +409,8 @@ Declares the solver to be used for the dipole calculation. Available options are
 
 {\zicf dipole:output-atomistic-dipole-field = flag}\phantomsection\addcontentsline{toc}{subsection}{dipole:output-atomistic-dipole-field} Writes the dipole field at every atom to the file \texttt{atomistic\_dipole\_field.txt} ($B_x$, $B_y$, $B_z$ in T) every time the field is recalculated, with the atomic positions (\AA, relative to the centre of the system) and moments ($\mu_B$) written once to \texttt{atomistic\_dipole\_positions.txt} in the same order. Available for all solvers; for the macro-cell solvers each atom has the field of its cell. The files can be large for big systems.
 
+{\zicf hierarchical:output-p2p-diagnostic = flag}\phantomsection\addcontentsline{toc}{subsection}{hierarchical:output-p2p-diagnostic} Writes to the log file, for the hierarchical dipole solver, the message count and data volume per process of a point-to-point exchange of cell moments, as \texttt{DIPOLE\_P2P} lines with one line for each hierarchical level. It is a development aid for assessing parallel performance on large systems: it has no effect on the results, and adds a short communication step to initialisation.
+
 \section*{HAMR calculation}
 {\zicf hamr:laser-FWHM-x = float [default $20.0$ nm]}\phantomsection\addcontentsline{toc}{subsubsection}{hamr:laser-FWHM-x}
 Defines the full width at half maximum of the Gaussian temperature profile in x-direction

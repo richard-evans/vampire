@@ -615,6 +615,9 @@ void initialize(const double system_dimensions_x,
    timer.stop();
    segment_time[6] = timer.elapsed_time();
 
+   // optionally log what a point-to-point exchange of cell moments would cost
+   if(ha::output_p2p_diagnostic) ha::write_p2p_diagnostic();
+
    //------------------------------------------------------
    // end of calculation of the interaction list
    //------------------------------------------------------
