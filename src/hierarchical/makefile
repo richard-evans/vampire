@@ -6,6 +6,7 @@
 hierarchical_objects =\
 corners.o \
 data.o \
+exchange.o \
 initialize.o \
 intra.o \
 inter.o \

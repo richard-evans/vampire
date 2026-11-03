@@ -618,6 +618,9 @@ void initialize(const double system_dimensions_x,
    // optionally log what a point-to-point exchange of cell moments would cost
    if(ha::output_p2p_diagnostic) ha::write_p2p_diagnostic();
 
+   // optionally sum the cell moments point to point between shared memory regions (exchange.cpp)
+   if(ha::moment_exchange == ha::moment_exchange_t::point_to_point) ha::initialise_moment_exchange();
+
    //------------------------------------------------------
    // end of calculation of the interaction list
    //------------------------------------------------------

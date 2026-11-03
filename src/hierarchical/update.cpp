@@ -167,15 +167,17 @@ std::string update_phase_times(){
 
    std::ostringstream times;
    times << " upward_s="     << vmpi::reduce_max(ha::phase_time[ha::upward_pass])
-         << " reduce_s="     << vmpi::reduce_max(ha::phase_time[ha::moment_reduction])
+         << " reduce_s="     << vmpi::reduce_max(ha::phase_time[ha::moment_reduction]);
+   if(ha::moment_exchange == ha::moment_exchange_t::point_to_point) times << ha::moment_exchange_phase_times(); // exchange.cpp
+   else times
          << " reduce_gather_s="        << vmpi::reduce_max(red.phase_time[red.gather])
          << " reduce_gather_min_s="    << vmpi::reduce_min(red.phase_time[red.gather])
          << " reduce_add_s="           << vmpi::reduce_max(red.phase_time[red.add])
          << " reduce_allreduce_s="     << vmpi::reduce_max(red.phase_time[red.allreduce])
          << " reduce_allreduce_min_s=" << vmpi::reduce_min(leader ? red.phase_time[red.allreduce] : not_leader)
          << " reduce_barrier_s="       << vmpi::reduce_max(red.phase_time[red.barrier])
-         << " reduce_barrier_min_s="   << vmpi::reduce_min(red.phase_time[red.barrier])
-         << " field_s="      << vmpi::reduce_max(field_time)
+         << " reduce_barrier_min_s="   << vmpi::reduce_min(red.phase_time[red.barrier]);
+   times << " field_s="      << vmpi::reduce_max(field_time)
          << " distribute_s=" << vmpi::reduce_max(ha::phase_time[ha::field_distribution])
          << " field_min_s="  << vmpi::reduce_min(field_time)
          << " field_mean_s=" << vmpi::reduce_sum(field_time) / double(vmpi::num_processors)

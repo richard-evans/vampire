@@ -137,7 +137,8 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
       ha::mag_reduction_values[i +     num_contributing_cells] = ha::partial_mag_array_y[cell];
       ha::mag_reduction_values[i + 2 * num_contributing_cells] = ha::partial_mag_array_z[cell];
    }
-   ha::mag_reduction.sum(ha::mag_reduction_values, {&ha::mag_array_x, &ha::mag_array_y, &ha::mag_array_z});
+   if(ha::moment_exchange == ha::moment_exchange_t::point_to_point) ha::exchange_moments(); // exchange.cpp
+   else ha::mag_reduction.sum(ha::mag_reduction_values, {&ha::mag_array_x, &ha::mag_array_y, &ha::mag_array_z});
 
    timer.stop();
    ha::phase_time[ha::moment_reduction] = timer.elapsed_time();

@@ -51,6 +51,8 @@ namespace hierarchical{
       std::vector < int > cells_num_atoms_in_cell;       //
 
       bool output_p2p_diagnostic = false;                // log the cost of a point-to-point exchange of cell moments
+      moment_exchange_t moment_exchange = moment_exchange_t::all_reduce; // how cell moments are summed between regions
+      int moment_exchange_level = 1;                     // highest level exchanged point to point
 
       double av_cell_size;                               // weighted average of cell_size_x, cell_size_y, cell_size_z
 

@@ -20,6 +20,7 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
+#include <string>
 
 // Vampire headers
 #include "hierarchical.hpp"
@@ -82,6 +83,11 @@ namespace hierarchical{
 
       extern bool output_p2p_diagnostic; // log the cost of a point-to-point exchange of cell moments at initialisation
 
+      // how the cell moments are summed between shared memory regions (hierarchical:moment-exchange)
+      enum class moment_exchange_t { all_reduce, point_to_point };
+      extern moment_exchange_t moment_exchange;
+      extern int moment_exchange_level; // highest level exchanged point to point (hierarchical:moment-exchange-level)
+
       // phases of the field update, timed separately for the scaling study (papers/dipole)
       enum phase_t { upward_pass = 0, moment_reduction = 1, field_loop = 2, field_distribution = 3, num_phases = 4 };
       extern std::vector<double> phase_time; // time (s) of each phase of the last update on this process
@@ -94,6 +100,11 @@ namespace hierarchical{
 
       // function to log the cost of a point-to-point exchange of cell moments
       void write_p2p_diagnostic();
+
+      // function to set up the point-to-point exchange of cell moments between regions (exchange.cpp)
+      void initialise_moment_exchange();
+      void exchange_moments();                   // sum of the cell moments, point to point (in place of mag_reduction.sum)
+      std::string moment_exchange_phase_times(); // phase times of the last exchange for the DIPOLE_SCALING line
 
       // function to update hierarchical cell magnetizations
       void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, // atomic spin directions
