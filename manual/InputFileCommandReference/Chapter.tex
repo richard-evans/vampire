@@ -397,7 +397,7 @@ Declares the solver to be used for the dipole calculation. Available options are
   \item[] \texttt{tensor} (default): computes a dipole-dipole interaction tensor at the macro-cell level. Exact for uniformly magnetised cells and recommended for most simulations.
   \item[] \texttt{atomistic}: computes dipole interactions at the atomic level. Most accurate but computationally expensive; only practical for small systems.
   %\item[] \texttt{fft}: FFT-accelerated macro-cell dipole calculation. Efficient for large periodic systems.
-  %\item[] \texttt{hierarchical}: hierarchical (Barnes-Hut style) macro-cell solver. Scales well for very large non-periodic systems.
+  \item[] \texttt{hierarchical}: hierarchical (Barnes-Hut style) macro-cell solver. Nearby cells interact through exact macro-cell tensors and distant cells through progressively coarser cells, so the cost and memory scale well for very large non-periodic systems run in parallel.
   %\item[] \texttt{atomistic-fft}: FFT-accelerated atomistic dipole calculation.
 \end{itemize}
 

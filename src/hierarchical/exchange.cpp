@@ -414,7 +414,7 @@ void exchange_moments(){
          largest = vmpi::reduce_max(largest);
          const double relative = largest > 0.0 ? difference / largest : difference;
          zlog << zTs() << "\tHierarchical moment exchange check: largest difference from all-reduce " << difference
-              << " (relative to the largest moment " << relative << ")" << std::endl;
+              << ", largest moment " << largest << ", relative difference " << relative << std::endl;
          if(!(relative <= 1.0e-10)){ // also catches NaN
             err::warning("Warning - the point-to-point exchange of hierarchical cell moments differs from the all-reduce by " +
                          std::to_string(relative) + " of the largest moment.");
