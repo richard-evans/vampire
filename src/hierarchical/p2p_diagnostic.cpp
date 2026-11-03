@@ -20,6 +20,7 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "dipole.hpp"
 #include "micromagnetic.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -66,6 +67,122 @@ namespace{
       #endif
       return total;
    }
+
+   #ifdef MPICF
+
+   // minimum, mean and maximum of a value over the processes of a communicator as min/mean/max
+   std::string spread_over(const double value, MPI_Comm comm){
+      int size = 1;
+      MPI_Comm_size(comm, &size);
+      double min = value, sum = value, max = value;
+      MPI_Allreduce(MPI_IN_PLACE, &min, 1, MPI_DOUBLE, MPI_MIN, comm);
+      MPI_Allreduce(MPI_IN_PLACE, &sum, 1, MPI_DOUBLE, MPI_SUM, comm);
+      MPI_Allreduce(MPI_IN_PLACE, &max, 1, MPI_DOUBLE, MPI_MAX, comm);
+      std::ostringstream text;
+      text << min << "/" << sum / double(size) << "/" << max;
+      return text.str();
+   }
+
+   //---------------------------------------------------------------------------
+   // The same exchange between shared memory regions (5a + 5b, dp_plan.md
+   // section 5ab): each region leader sends and receives for all ranks of its
+   // region. A cell is owned by the region with most of its atoms, a region
+   // contributes to the cells holding atoms of any of its ranks, and reads the
+   // cells read by any of its ranks. Values are min/mean/max over leaders.
+   // Collective over all processes.
+   //---------------------------------------------------------------------------
+   void write_region_diagnostic(const std::vector<int>& atoms_in_cell,       // this process, all levels
+                                const std::vector<int>& read_list,           // cells read by this process, sorted
+                                const std::vector<uint64_t>& cells_above_level){
+
+      const bool leader = (vmpi::my_shared_rank == 0);
+      const int num_cells = ha::total_num_cells;
+
+      // atoms of the region in each cell, and the cells read by the region, summed on the leader
+      std::vector<int> region_atoms(leader ? num_cells : 0, 0);
+      std::vector<int> read_by_rank(num_cells, 0);
+      for(const int cell : read_list) read_by_rank[cell] = 1;
+      for(int lc = 0; lc < dipole::cells_num_local_cells; lc++) read_by_rank[cells::cell_id_array[lc]] = 1; // self term, field distribution
+      std::vector<int> read_by_region(leader ? num_cells : 0, 0);
+      MPI_Reduce(atoms_in_cell.data(), region_atoms.data(), num_cells, MPI_INT, MPI_SUM, 0, vmpi::shared_comm);
+      MPI_Reduce(read_by_rank.data(), read_by_region.data(), num_cells, MPI_INT, MPI_MAX, 0, vmpi::shared_comm);
+      read_by_rank.clear();
+      read_by_rank.shrink_to_fit();
+
+      if(!leader) return;
+
+      int my_region = 0;
+      int num_regions = 1;
+      MPI_Comm_rank(vmpi::leader_comm, &my_region);
+      MPI_Comm_size(vmpi::leader_comm, &num_regions);
+
+      // owner region of each cell (ties go to the lower region)
+      struct owner_t{ int atoms; int region; };
+      std::vector<owner_t> owner(num_cells);
+      for(int cell = 0; cell < num_cells; cell++) owner[cell] = {region_atoms[cell], my_region};
+      MPI_Allreduce(MPI_IN_PLACE, owner.data(), num_cells, MPI_2INT, MPI_MAXLOC, vmpi::leader_comm);
+
+      zlog << zTs() << "\tHierarchical P2P region diagnostic: " << num_regions << " regions of up to "
+           << vmpi::num_shared_ranks << " processes" << std::endl;
+
+      // cells of levels up to L exchanged with each region, added to level by level
+      std::vector<int> cells_read_from(num_regions, 0);
+      std::vector<int> cells_contributed_to(num_regions, 0);
+      const double bytes_per_cell = 3.0 * sizeof(double);
+      int cell = 0;
+
+      for(int level = 0; level < ha::num_levels; level++){
+
+         for(; cell < ha::cells_level_end_index[level]; cell++){
+            const owner_t& cell_owner = owner[cell];
+            if(cell_owner.atoms == 0 || cell_owner.region == my_region) continue;
+            if(read_by_region[cell]) cells_read_from[cell_owner.region]++;
+            if(region_atoms[cell] > 0) cells_contributed_to[cell_owner.region]++;
+         }
+
+         // regions this region hears from and sends to in each stage
+         std::vector<int> reads_from_region(num_regions, 0);
+         std::vector<int> contributes_to_region(num_regions, 0);
+         for(int region = 0; region < num_regions; region++){
+            reads_from_region[region] = (cells_read_from[region] > 0);
+            contributes_to_region[region] = (cells_contributed_to[region] > 0);
+         }
+         int served[2] = {0, 0};   // cells, readers
+         int received[2] = {0, 0}; // cells, contributors
+         MPI_Reduce_scatter_block(cells_read_from.data(), &served[0], 1, MPI_INT, MPI_SUM, vmpi::leader_comm);
+         MPI_Reduce_scatter_block(reads_from_region.data(), &served[1], 1, MPI_INT, MPI_SUM, vmpi::leader_comm);
+         MPI_Reduce_scatter_block(cells_contributed_to.data(), &received[0], 1, MPI_INT, MPI_SUM, vmpi::leader_comm);
+         MPI_Reduce_scatter_block(contributes_to_region.data(), &received[1], 1, MPI_INT, MPI_SUM, vmpi::leader_comm);
+
+         const double read_cells = sum_of(cells_read_from);
+         const double read_sources = count_nonzero(cells_read_from);
+         const double contributed_cells = sum_of(cells_contributed_to);
+         const double contributed_owners = count_nonzero(cells_contributed_to);
+
+         const double messages = read_sources + served[1] + contributed_owners + received[1];
+         const double megabytes = (read_cells + served[0] + contributed_cells + received[0]) * bytes_per_cell / 1.0e6;
+
+         zlog << zTs() << "DIPOLE_P2P_REGION level=" << level
+              << " regions=" << num_regions
+              << " allreduce_cells=" << cells_above_level[level]
+              << " read_cells=" << spread_over(read_cells, vmpi::leader_comm)
+              << " read_sources=" << spread_over(read_sources, vmpi::leader_comm)
+              << " serve_cells=" << spread_over(served[0], vmpi::leader_comm)
+              << " serve_readers=" << spread_over(served[1], vmpi::leader_comm)
+              << " contribute_cells=" << spread_over(contributed_cells, vmpi::leader_comm)
+              << " contribute_owners=" << spread_over(contributed_owners, vmpi::leader_comm)
+              << " receive_cells=" << spread_over(received[0], vmpi::leader_comm)
+              << " receive_contributors=" << spread_over(received[1], vmpi::leader_comm)
+              << " messages=" << spread_over(messages, vmpi::leader_comm)
+              << " mb=" << spread_over(megabytes, vmpi::leader_comm) << std::endl;
+
+      }
+
+      return;
+
+   }
+
+   #endif
 
 }
 
@@ -180,6 +297,11 @@ void write_p2p_diagnostic(){
            << " mb=" << spread(megabytes) << std::endl;
 
    }
+
+   // the same between shared memory regions
+   #ifdef MPICF
+      write_region_diagnostic(atoms_in_cell, read_list, cells_above_level);
+   #endif
 
    timer.stop();
    zlog << zTs() << "\tHierarchical P2P diagnostic took " << timer.elapsed_time() << " s" << std::endl;

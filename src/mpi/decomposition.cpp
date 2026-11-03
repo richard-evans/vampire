@@ -88,8 +88,20 @@ namespace vmpi{
             node_dimensions.maxx << " " << node_dimensions.maxy << " " << node_dimensions.maxz << "nd" << std::endl;
          }*/
 
-         // sub-decompose by number of processes
-         local_dimensions = decompose(node_rank, num_processors_on_my_node, node_dimensions, "Nodes", "processors");
+         // With shared memory regions set by the user, decompose each node by region and then each region by
+         // process, so that the ranks of a region (equal blocks of node ranks, as in initialise_shared_memory)
+         // hold a compact block of the system. A node whose ranks do not divide into the regions is decomposed
+         // by process only.
+         const int regions = vmpi::numa_regions_per_node;
+         if(regions > 1 && num_processors_on_my_node % regions == 0){
+
+            const int ranks_per_region = num_processors_on_my_node / regions;
+            const dim_t region_dimensions = decompose(node_rank / ranks_per_region, regions, node_dimensions, "Nodes", "regions");
+            local_dimensions = decompose(node_rank % ranks_per_region, ranks_per_region, region_dimensions, "Regions", "processors");
+
+         }
+         // otherwise sub-decompose by number of processes
+         else local_dimensions = decompose(node_rank, num_processors_on_my_node, node_dimensions, "Nodes", "processors");
 
       }
 
