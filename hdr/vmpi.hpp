@@ -135,6 +135,65 @@ namespace vmpi{
 
    };
 
+#ifdef MPICF
+   //---------------------------------------------------------------------------
+   // Exchange of values at fixed lists of indices between the ranks of a
+   // communicator, point to point. Each rank names, for each other rank, either
+   // the indices it sends to it (lists_t::sent) or the indices it receives from
+   // it (lists_t::received); the other side learns the same lists at initialise.
+   // Usage:
+   //
+   //    vmpi::sparse_exchange_t serve;
+   //    serve.initialise(comm, indices, vmpi::sparse_exchange_t::lists_t::received, 3); // collective over comm
+   //    serve.exchange({x, y, z}, vmpi::sparse_exchange_t::combine_t::assign);          // collective over comm
+   //    serve.free();                             // collective over comm, before vmpi::finalise
+   //
+   // indices[p] is the list for rank p of comm (empty for no message, and empty
+   // for this rank).
+   //
+   // exchange() sends arrays[c][i] for every index i sent, then writes (assign)
+   // or adds (add) each value received into arrays[c] at its index. Values are
+   // packed before any are received, and are combined in order of source rank,
+   // so the result is the same from run to run. Implemented in
+   // src/mpi/sparse_exchange.cpp; MPI build only.
+   //---------------------------------------------------------------------------
+   class sparse_exchange_t{
+
+      public:
+         enum class lists_t { sent, received };   // which side of the exchange the lists given describe
+         enum class combine_t { assign, add };      // what to do with each value received
+
+         sparse_exchange_t() = default;
+         sparse_exchange_t(const sparse_exchange_t&) = delete;            // persistent requests hold buffer addresses
+         sparse_exchange_t& operator=(const sparse_exchange_t&) = delete;
+         ~sparse_exchange_t(){ free(); }
+
+         void initialise(MPI_Comm comm, const std::vector< std::vector<int> >& indices, lists_t lists, int num_components);
+         void exchange(const std::vector<double*>& arrays, combine_t combine);
+         void free();
+
+         // size of the exchange on this rank, for the log
+         int num_send_peers() const { return send_peers.size(); }
+         int num_recv_peers() const { return recv_peers.size(); }
+         uint64_t num_send_indices() const { return send_list.size(); }
+         uint64_t num_recv_indices() const { return recv_list.size(); }
+
+      private:
+         MPI_Comm comm = MPI_COMM_NULL;       // duplicate of the user's communicator, so messages cannot mix
+         int num_components = 0;              // values per index
+         std::vector<int> send_peers;         // ranks sent to, ascending
+         std::vector<int> send_offsets;       // send_list[send_offsets[p] .. send_offsets[p+1]) go to send_peers[p]
+         std::vector<int> send_list;
+         std::vector<int> recv_peers;         // ranks received from, ascending
+         std::vector<int> recv_offsets;
+         std::vector<int> recv_list;
+         std::vector<double> send_buffer;     // num_components values per index, index by index
+         std::vector<double> recv_buffer;
+         std::vector<MPI_Request> requests;   // persistent: receives, then sends
+
+   };
+#endif
+
    extern bool replicated_data_staged; ///< Flag for staged system generation
 
    extern std::string hostname;        ///< Hostname of local CPU
