@@ -18,6 +18,9 @@
 #include <vector>
 
 // Vampire headers
+#include "vmpi.hpp"
+
+// Vampire headers
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for cells module
@@ -36,6 +39,15 @@ namespace cells{
    extern std::vector <int> local_cell_array;
    extern std::vector <int> num_atoms_in_cell; /// number of atoms in each cell
    extern std::vector <int> num_atoms_in_cell_global; /// global number of atoms in each cell
+   // Full size cell arrays replicated on every process (pos_and_mom_array, pos_array, mag_array_*, volume_array,
+   // num_atoms_in_cell_global): built only if full_cell_arrays (set before initialize; false only for the hierarchical
+   // dipole solver when no other module reads them, see dipole::needs_full_cell_arrays). The shared arrays below are
+   // always built, held once per shared memory region, with the same values.
+   extern bool full_cell_arrays;
+   extern vmpi::shared_array_t<double> shared_pos_and_mom;     // 4 per cell: magnetic centre x, y, z (A), total moment (J/T)
+   extern vmpi::shared_array_t<double> shared_volume;          // magnetic volume of each cell (A^3)
+   extern vmpi::shared_array_t<int> shared_num_atoms_global;   // magnetic atoms in each cell, all processes
+
    extern bool build_atom_lists; // build index_atoms_array and atom_in_cell_coords_array_* (dipole solvers other than hierarchical)
    extern std::vector < std::vector <int> > index_atoms_array;
    extern std::vector<int> index_atoms_array1D;

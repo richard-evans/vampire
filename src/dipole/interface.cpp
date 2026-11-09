@@ -150,4 +150,14 @@ namespace dipole{
       return dipole::internal::solver != dipole::internal::hierarchical;
    }
 
+   //---------------------------------------------------------------------------
+   // Whether the full size cell arrays of the cells module (an array over every cell on every process) are needed.
+   // The hierarchical solver reads only the shared cell arrays, so they are needed with it only if another module
+   // reads every cell (dipole::full_cell_fields) or the cell dipole fields are written.
+   //---------------------------------------------------------------------------
+   bool needs_full_cell_arrays(){
+      return !dipole::activated || dipole::internal::solver != dipole::internal::hierarchical ||
+             dipole::full_cell_fields || dipole::internal::output_dipole_field;
+   }
+
 } // end of dipole namespace

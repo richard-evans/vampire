@@ -16,7 +16,12 @@
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
+#include "config.hpp"
 #include "dipole.hpp"
+#include "environment.hpp"
+#include "gpu.hpp"
+#include "micromagnetic.hpp"
+#include "../micromagnetic/internal.hpp"
 #include "hamr.hpp"
 #include "spinwaves.hpp" // jrh
 #include "ltmp.hpp"
@@ -60,7 +65,12 @@ void initialize_modules(){
    // Initialise cells data
    //----------------------------------------
    vmpi::memory_checkpoint("before_cells_initialize");
+   // modules other than the dipole solver that read the cell arrays or cell dipole fields of every cell
+   dipole::full_cell_fields = micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets ||
+                              config::outputs_cells() || gpu::acceleration || environment::enabled ||
+                              program::program == program::program_t::disk_tracks;
    cells::build_atom_lists = dipole::uses_cell_atom_lists();
+   cells::full_cell_arrays = dipole::needs_full_cell_arrays();
    cells::initialize(cs::system_dimensions[0],
                      cs::system_dimensions[1],
                      cs::system_dimensions[2],

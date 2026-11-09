@@ -98,28 +98,8 @@ namespace cells{
       int ncy = dy;
       int ncz = dz;
 
-      // Set cell and stack counters
-      int cell=0;
-      //int stack=0;
-
-      // Allocate space for 3D supercell array (ST coordinate system)
-      std::vector<std::vector<std::vector<int> > > supercell_array;
-      supercell_array.resize(ncx);
-      for(int i=0;i<ncx;++i){
-         supercell_array[i].resize(ncy);
-         for(int j=0;j<ncy;++j){
-            supercell_array[i][j].resize(ncz);
-            // store cell coordinates
-            for(int k=0; k<ncz; ++k){
-               // associate cell with position i,j,k
-               supercell_array[i][j][k]=cell;
-               // increment cell number
-
-
-               cell++;
-            }
-         }
-      }
+      // Cells are numbered (i * ncy + j) * ncz + k for cell coordinates i, j, k (formerly a 3D array of the ids,
+      // which held an inner vector for every column of cells on every process)
 
       // Determine number of cells in x,y,z
       const int d[3]={ncx,ncy,ncz};
@@ -177,7 +157,7 @@ namespace cells{
             }
          }
          // If no error for range then assign atom to cell
-         cells::atom_cell_id_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
+         cells::atom_cell_id_array[atom] = (scc[0] * ncy + scc[1]) * ncz + scc[2];
 
       //   if (scc[0] > num_macro_cells_fft[0]) num_macro_cells_fft[0] = scc[0];
       //   if (scc[1] > num_macro_cells_fft[1]) num_macro_cells_fft[1] = scc[1];
@@ -193,145 +173,156 @@ namespace cells{
       // Determine number of microcells computed locally
       //-------------------------------------------------------------------------------------
 
-      // Resize new cell arrays
-      cells::pos_and_mom_array.resize(4*cells::num_cells,0.0);
-      cells::pos_array.resize(3*cells::num_cells,0.0);
+      if(cells::full_cell_arrays){
 
-      cells::mag_array_x.resize(cells::num_cells,0.0);
-      cells::mag_array_y.resize(cells::num_cells,0.0);
-      cells::mag_array_z.resize(cells::num_cells,0.0);
+         // Resize new cell arrays
+         cells::pos_and_mom_array.resize(4*cells::num_cells,0.0);
+         cells::pos_array.resize(3*cells::num_cells,0.0);
 
-      cells::num_atoms_in_cell.resize(cells::num_cells,0);
-      cells::num_atoms_in_cell_global.resize(0);
-      cells::volume_array.resize(cells::num_cells,0.0);
+         cells::mag_array_x.resize(cells::num_cells,0.0);
+         cells::mag_array_y.resize(cells::num_cells,0.0);
+         cells::mag_array_z.resize(cells::num_cells,0.0);
 
-      // Now add atoms to each cell as magnetic 'centre of mass'
-      int num_atoms_magnetic = 0;  /// number of magnetic atoms
-      for(int atom=0;atom<num_local_atoms;atom++){
-         int local_cell=cells::atom_cell_id_array[atom];
-         //int type = cells::internal::atom_type_array[atom];
-         int type = atoms::type_array[atom];
-         const double mus = mp::material[type].mu_s_SI;
-         // Consider only magnetic elements
-         cells::pos_array[3*local_cell+0] += atom_coords_x[atom];
-         cells::pos_array[3*local_cell+1] += atom_coords_y[atom];
-         cells::pos_array[3*local_cell+2] += atom_coords_z[atom];
-         if(mp::material[type].non_magnetic==0){
+         cells::num_atoms_in_cell.resize(cells::num_cells,0);
+         cells::num_atoms_in_cell_global.resize(0);
+         cells::volume_array.resize(cells::num_cells,0.0);
 
-            cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
-            cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
-            cells::pos_and_mom_array[4*local_cell+2] += atom_coords_z[atom]*mus;
-            cells::pos_and_mom_array[4*local_cell+3] += mus;
-
-
-            cells::num_atoms_in_cell[local_cell]++;
-            num_atoms_magnetic++;
-         }
-      }
-
-      // Save local cells index
-      for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
-         if(cells::num_atoms_in_cell[local_cell]>0){
-            // add index of cell only if there are atoms inside
-            cells::cell_id_array.push_back(local_cell);
-         }
-      }
-
-
-      #ifdef MPICF
-         MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &cells::pos_array[0],     cells::pos_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         cells::num_atoms_in_cell_global.resize(cells::num_cells);
-         cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
-         MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-      #else
-         // copy num_atoms_in_cell to global version
-         cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
-      #endif
-
-      // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
-      // Atomic volume is corrected by a factor which makes it a magnetic atomic volume
-      const double factor_for_volume = double(total_atoms_non_filler)/double(num_atoms_magnetic);
-      const double atomic_volume =  factor_for_volume * unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/double(cells::num_atoms_in_unit_cell);
-
-      // Calculate local moment vloume for moment density in self term
-      cells::atomic_volume = atomic_volume;
-      zlog << zTs() << "Calculated (magnetic) atomic volume: " << cells::atomic_volume << " cubic Angstroms" << std::endl;
-
-      // std::cout << "\n\tnum_total_atoms_for_dipole\t" << total_atoms_non_filler << std::endl;
-      // std::cout << "\n\tnum_atoms_magnetic\t" << num_atoms_magnetic << std::endl;
-      // std::cout << "\n\tfactor_for_volume\t" << factor_for_volume << std::endl;
-
-      // Now find mean coordinates via magnetic 'centre of mass'
-      for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
-         if(cells::num_atoms_in_cell[local_cell]>0){
-            //std::cout << cells::num_atoms_in_cell[local_cell] << " in " << local_cell << std::endl;
-            cells::pos_and_mom_array[4*local_cell+0] = cells::pos_and_mom_array[4*local_cell+0]/(cells::pos_and_mom_array[4*local_cell+3]);
-            cells::pos_and_mom_array[4*local_cell+1] = cells::pos_and_mom_array[4*local_cell+1]/(cells::pos_and_mom_array[4*local_cell+3]);
-            cells::pos_and_mom_array[4*local_cell+2] = cells::pos_and_mom_array[4*local_cell+2]/(cells::pos_and_mom_array[4*local_cell+3]);
-
-            cells::volume_array[local_cell] = double(cells::num_atoms_in_cell[local_cell])*atomic_volume;
-            cells::pos_array[3*local_cell+0] = cells::pos_array[3*local_cell+0]/cells::num_atoms_in_cell[local_cell];
-            cells::pos_array[3*local_cell+1] = cells::pos_array[3*local_cell+1]/cells::num_atoms_in_cell[local_cell];
-            cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/cells::num_atoms_in_cell[local_cell];
-
-         }
-
-      }
-
-      // Resize 2D arrays to store cell - atom informations. They hold an inner vector for every cell in the system on
-      // every process, and only the tensor and macrocell dipole solvers read them (the hierarchical solver builds its
-      // own table of atoms per shared memory region), so they are built only when needed.
-      if(cells::build_atom_lists){
-         cells::atom_in_cell_coords_array_x.resize(cells::num_cells);
-         cells::atom_in_cell_coords_array_y.resize(cells::num_cells);
-         cells::atom_in_cell_coords_array_z.resize(cells::num_cells);
-         cells::index_atoms_array.resize(cells::num_cells);
-         // Initialise arrays to zero
+         // Now add atoms to each cell as magnetic 'centre of mass'
+         int num_atoms_magnetic = 0;  /// number of magnetic atoms
          for(int atom=0;atom<num_local_atoms;atom++){
             int local_cell=cells::atom_cell_id_array[atom];
-            cells::atom_in_cell_coords_array_x[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
-            cells::atom_in_cell_coords_array_y[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
-            cells::atom_in_cell_coords_array_z[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
-            cells::index_atoms_array[local_cell].resize(cells::num_atoms_in_cell[local_cell],0);
-         }
-         // Resize 1D array to store atom-cell informations
-         cells::index_atoms_array1D.resize(num_local_atoms);
-      }
+            //int type = cells::internal::atom_type_array[atom];
+            int type = atoms::type_array[atom];
+            const double mus = mp::material[type].mu_s_SI;
+            // Consider only magnetic elements
+            cells::pos_array[3*local_cell+0] += atom_coords_x[atom];
+            cells::pos_array[3*local_cell+1] += atom_coords_y[atom];
+            cells::pos_array[3*local_cell+2] += atom_coords_z[atom];
+            if(mp::material[type].non_magnetic==0){
 
-      //Set number of atoms in cell to zero
-      for(int cell=0;cell<cells::num_cells;cell++){
-         cells::num_atoms_in_cell[cell]=0;
-      }
+               cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
+               cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
+               cells::pos_and_mom_array[4*local_cell+2] += atom_coords_z[atom]*mus;
+               cells::pos_and_mom_array[4*local_cell+3] += mus;
 
-      // Now re-update num_atoms in cell for local atoms only
-      for(int atom=0;atom<num_local_atoms;atom++){
-         int local_cell=cells::atom_cell_id_array[atom];
-         int type = cells::internal::atom_type_array[atom];
-         // const double mus = mp::material[type].mu_s_SI; unused variable
-         // Consider only magnetic elements
-         if(mp::material[type].non_magnetic==0){
-            if(cells::build_atom_lists){
-               cells::atom_in_cell_coords_array_x[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_x[atom];
-               cells::atom_in_cell_coords_array_y[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_y[atom];
-               cells::atom_in_cell_coords_array_z[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_z[atom];
-               cells::index_atoms_array[local_cell][cells::num_atoms_in_cell[local_cell]]=atom;
+
+               cells::num_atoms_in_cell[local_cell]++;
+               num_atoms_magnetic++;
             }
-            cells::num_atoms_in_cell[local_cell]++;
          }
-      }
 
-      // Reorganise array that associate cell with atoms in 1D structure
-      // so to pass it easy in parallel
-      int counter_id_at=0;
-      for(unsigned int lc=0; lc<cells::cell_id_array.size() && cells::build_atom_lists; lc++){
-         for(int i=0; i<cells::num_atoms_in_cell[cells::cell_id_array[lc]]; i++){
-            int atom=cells::index_atoms_array[cells::cell_id_array[lc]][i];
-            //cells::index_atoms_array1D.push_back(atom);
-            cells::index_atoms_array1D[counter_id_at]=atom;
-            counter_id_at++;
+         // Save local cells index
+         for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
+            if(cells::num_atoms_in_cell[local_cell]>0){
+               // add index of cell only if there are atoms inside
+               cells::cell_id_array.push_back(local_cell);
+            }
          }
+
+
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &cells::pos_array[0],     cells::pos_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            cells::num_atoms_in_cell_global.resize(cells::num_cells);
+            cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
+            MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+         #else
+            // copy num_atoms_in_cell to global version
+            cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
+         #endif
+
+         // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
+         // Atomic volume is corrected by a factor which makes it a magnetic atomic volume
+         const double factor_for_volume = double(total_atoms_non_filler)/double(num_atoms_magnetic);
+         const double atomic_volume =  factor_for_volume * unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/double(cells::num_atoms_in_unit_cell);
+
+         // Calculate local moment vloume for moment density in self term
+         cells::atomic_volume = atomic_volume;
+         zlog << zTs() << "Calculated (magnetic) atomic volume: " << cells::atomic_volume << " cubic Angstroms" << std::endl;
+
+         // std::cout << "\n\tnum_total_atoms_for_dipole\t" << total_atoms_non_filler << std::endl;
+         // std::cout << "\n\tnum_atoms_magnetic\t" << num_atoms_magnetic << std::endl;
+         // std::cout << "\n\tfactor_for_volume\t" << factor_for_volume << std::endl;
+
+         // Now find mean coordinates via magnetic 'centre of mass'
+         for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
+            if(cells::num_atoms_in_cell[local_cell]>0){
+               //std::cout << cells::num_atoms_in_cell[local_cell] << " in " << local_cell << std::endl;
+               cells::pos_and_mom_array[4*local_cell+0] = cells::pos_and_mom_array[4*local_cell+0]/(cells::pos_and_mom_array[4*local_cell+3]);
+               cells::pos_and_mom_array[4*local_cell+1] = cells::pos_and_mom_array[4*local_cell+1]/(cells::pos_and_mom_array[4*local_cell+3]);
+               cells::pos_and_mom_array[4*local_cell+2] = cells::pos_and_mom_array[4*local_cell+2]/(cells::pos_and_mom_array[4*local_cell+3]);
+
+               cells::volume_array[local_cell] = double(cells::num_atoms_in_cell[local_cell])*atomic_volume;
+               cells::pos_array[3*local_cell+0] = cells::pos_array[3*local_cell+0]/cells::num_atoms_in_cell[local_cell];
+               cells::pos_array[3*local_cell+1] = cells::pos_array[3*local_cell+1]/cells::num_atoms_in_cell[local_cell];
+               cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/cells::num_atoms_in_cell[local_cell];
+
+            }
+
+         }
+
+         // Resize 2D arrays to store cell - atom informations. They hold an inner vector for every cell in the system on
+         // every process, and only the tensor and macrocell dipole solvers read them (the hierarchical solver builds its
+         // own table of atoms per shared memory region), so they are built only when needed.
+         if(cells::build_atom_lists){
+            cells::atom_in_cell_coords_array_x.resize(cells::num_cells);
+            cells::atom_in_cell_coords_array_y.resize(cells::num_cells);
+            cells::atom_in_cell_coords_array_z.resize(cells::num_cells);
+            cells::index_atoms_array.resize(cells::num_cells);
+            // Initialise arrays to zero
+            for(int atom=0;atom<num_local_atoms;atom++){
+               int local_cell=cells::atom_cell_id_array[atom];
+               cells::atom_in_cell_coords_array_x[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+               cells::atom_in_cell_coords_array_y[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+               cells::atom_in_cell_coords_array_z[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+               cells::index_atoms_array[local_cell].resize(cells::num_atoms_in_cell[local_cell],0);
+            }
+            // Resize 1D array to store atom-cell informations
+            cells::index_atoms_array1D.resize(num_local_atoms);
+         }
+
+         //Set number of atoms in cell to zero
+         for(int cell=0;cell<cells::num_cells;cell++){
+            cells::num_atoms_in_cell[cell]=0;
+         }
+
+         // Now re-update num_atoms in cell for local atoms only
+         for(int atom=0;atom<num_local_atoms;atom++){
+            int local_cell=cells::atom_cell_id_array[atom];
+            int type = cells::internal::atom_type_array[atom];
+            // const double mus = mp::material[type].mu_s_SI; unused variable
+            // Consider only magnetic elements
+            if(mp::material[type].non_magnetic==0){
+               if(cells::build_atom_lists){
+                  cells::atom_in_cell_coords_array_x[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_x[atom];
+                  cells::atom_in_cell_coords_array_y[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_y[atom];
+                  cells::atom_in_cell_coords_array_z[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_z[atom];
+                  cells::index_atoms_array[local_cell][cells::num_atoms_in_cell[local_cell]]=atom;
+               }
+               cells::num_atoms_in_cell[local_cell]++;
+            }
+         }
+
+         // Reorganise array that associate cell with atoms in 1D structure
+         // so to pass it easy in parallel
+         int counter_id_at=0;
+         for(unsigned int lc=0; lc<cells::cell_id_array.size() && cells::build_atom_lists; lc++){
+            for(int i=0; i<cells::num_atoms_in_cell[cells::cell_id_array[lc]]; i++){
+               int atom=cells::index_atoms_array[cells::cell_id_array[lc]][i];
+               //cells::index_atoms_array1D.push_back(atom);
+               cells::index_atoms_array1D[counter_id_at]=atom;
+               counter_id_at++;
+            }
+         }
+
+      }
+      else{
+
+         // cell sums from this process's local cells only, reduced into the shared arrays
+         cells::internal::initialise_shared_arrays_compact(num_local_atoms, atom_coords_x, atom_coords_y, atom_coords_z,
+                                                           total_atoms_non_filler, unit_cell_size_x, unit_cell_size_y, unit_cell_size_z);
+
       }
 
       // Calculate number of local cells
@@ -347,8 +338,15 @@ namespace cells{
       // Set initialised flag
       cells::internal::initialised=true;
 
-      // Precalculate cell magnetisation
-      cells::mag();
+      if(cells::full_cell_arrays){
+
+         // the shared arrays, with the values of the full size arrays
+         cells::internal::copy_full_arrays_to_shared();
+
+         // Precalculate cell magnetisation
+         cells::mag();
+
+      }
 
 //       for(int lc = 0; lc < cells::num_local_cells; lc++){
 //

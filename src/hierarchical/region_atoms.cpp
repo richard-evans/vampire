@@ -69,6 +69,7 @@ namespace{
       void add(const double* p){ for(int i = 0; i < 3; i++){ min[i] = std::min(min[i], p[i]); max[i] = std::max(max[i], p[i]); } }
    };
 
+   #ifdef MPICF
    // square of the distance from point p to box b (zero inside)
    double distance_sq(const double* p, const box_t& b){
       double d2 = 0.0;
@@ -88,12 +89,13 @@ namespace{
       }
       return d2;
    }
+   #endif
 
 }
 
 //------------------------------------------------------------------------------
 // Builds the table of the region (collective over all processes). cutoff is the
-// atomistic cutoff (Angstroms) between cell centres in cells::pos_and_mom_array.
+// atomistic cutoff (Angstroms) between cell centres in cells::shared_pos_and_mom.
 //------------------------------------------------------------------------------
 void region_atoms_t::build(const double cutoff,
                            const std::vector<double>& atom_coords_x,
@@ -147,7 +149,7 @@ void region_atoms_t::build(const double cutoff,
 
          // box bounding the centres of the region's cells with atoms
          box_t box;
-         for(int r = 0; r < num_region_atoms; r++) box.add(&cells::pos_and_mom_array[4 * int(region_records[record_size * r])]);
+         for(int r = 0; r < num_region_atoms; r++) box.add(&cells::shared_pos_and_mom[4 * int(region_records[record_size * r])]);
 
          int num_leaders = 1;
          int my_leader = 0;
@@ -170,7 +172,7 @@ void region_atoms_t::build(const double cutoff,
          std::vector< std::vector<double> > send(num_neighbours);
          for(int n = 0; n < num_neighbours; n++){
             for(int r = 0; r < num_region_atoms; r++){
-               const double* centre = &cells::pos_and_mom_array[4 * int(region_records[record_size * r])];
+               const double* centre = &cells::shared_pos_and_mom[4 * int(region_records[record_size * r])];
                if(distance_sq(centre, boxes[neighbours[n]]) <= range_sq){
                   send[n].insert(send[n].end(), &region_records[record_size * r], &region_records[record_size * (r + 1)]);
                }

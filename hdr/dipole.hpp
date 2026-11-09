@@ -27,7 +27,7 @@ namespace dipole{
    // Externally visible variables
    //------------------------------------------------------------------------------
    extern bool activated;
-   extern bool full_cell_fields; // cells_field_array_* must hold every cell (micromagnetic, cell output, GPU); set before initialize
+   extern bool full_cell_fields; // another module reads every cell's arrays or dipole field (micromagnetic, cell output, GPU, ...)
 
    extern int update_rate; /// timesteps between updates
    extern int update_time; /// last update time
@@ -61,6 +61,10 @@ namespace dipole{
 
    // true unless the solver is hierarchical, which does not read the per-cell atom lists of the cells module
    bool uses_cell_atom_lists();
+
+   // true unless the solver is hierarchical and nothing reads every cell (full_cell_fields false, no dipole field
+   // output): the cells module then builds only its shared cell arrays
+   bool needs_full_cell_arrays();
 
    //-----------------------------------------------------------------------------
    // Function to unroll cells dipolar field into atomic field

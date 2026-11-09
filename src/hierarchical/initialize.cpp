@@ -140,8 +140,8 @@ void initialize(const double system_dimensions_x,
 
    // cell data from the cells module, read only (initialise_atomistic_cell_data takes const references)
    const std::vector < int >& cells_num_atoms_in_cell        = cells::num_atoms_in_cell;        // this process's atoms only
-   const std::vector < int >& cells_num_atoms_in_cell_global = cells::num_atoms_in_cell_global;
-   const std::vector < double >& cells_pos_and_mom_array     = cells::pos_and_mom_array;
+   const vmpi::shared_array_t < int >& cells_num_atoms_in_cell_global = cells::shared_num_atoms_global; // one copy per region
+   const vmpi::shared_array_t < double >& cells_pos_and_mom_array     = cells::shared_pos_and_mom;
    int cells_num_cells = cells::num_cells;
    int cells_num_local_cells = cells::num_local_cells;
 
@@ -173,12 +173,6 @@ void initialize(const double system_dimensions_x,
       // memory region (region_atoms.cpp), for the near field tensors of Segment 9
       ha::region_atoms.build(real_cutoff, atom_coords_x, atom_coords_y, atom_coords_z);
 
-   // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
-   for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
-      //if(cells_num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
-         dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
-      //}
-   }
 
    // stop the timer for segment 2 and save it
    timer.stop();
@@ -665,7 +659,9 @@ void initialize(const double system_dimensions_x,
    const double topology_mb = (mb(ha::cells_in_cells) + mb(ha::cells_in_cells_start_index) + mb(ha::cells_in_cells_end_index)) / shared_ranks;
    const double moment_mb   = (mb(ha::mag_array_x) + mb(ha::mag_array_y) + mb(ha::mag_array_z)) / shared_ranks
                             + mb(ha::partial_mag_array_x) + mb(ha::partial_mag_array_y) + mb(ha::partial_mag_array_z);
-   const double cells_mb    = mb(cells::pos_and_mom_array) + mb(cells::pos_array) + mb(cells::num_atoms_in_cell) + mb(cells::num_atoms_in_cell_global)
+   const double cells_mb    = (double(cells::shared_pos_and_mom.size() + cells::shared_volume.size()) * sizeof(double)
+                               + double(cells::shared_num_atoms_global.size()) * sizeof(int)) / 1.0e6 / shared_ranks
+                            + mb(cells::pos_and_mom_array) + mb(cells::pos_array) + mb(cells::num_atoms_in_cell) + mb(cells::num_atoms_in_cell_global)
                             + mb(cells::mag_array_x) + mb(cells::mag_array_y) + mb(cells::mag_array_z) + mb(cells::volume_array)
                             + 4.0 * double(cells::index_atoms_array.size() * sizeof(std::vector<int>)) / 1.0e6; // empty inner vectors of index_atoms_array and atom_in_cell_coords_array_*
    const double dipole_mb   = mb(dipole::cells_field_array_x) + mb(dipole::cells_field_array_y) + mb(dipole::cells_field_array_z)

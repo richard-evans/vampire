@@ -48,7 +48,7 @@ namespace hierarchical{
   void ha::calc_intra(const int celli,
                       const int cellj,
                       const int interaction_no,
-                      const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                      const vmpi::shared_array_t<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
                       const region_atoms_t& atoms_table                               // atoms of the cells near this process's cells
                      ){
 

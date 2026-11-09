@@ -40,6 +40,10 @@ namespace cells{
    std::vector <int> local_cell_array;
    std::vector<int> num_atoms_in_cell; /// number of atoms in each cell
    std::vector<int> num_atoms_in_cell_global; /// global number of atoms in each cell
+   bool full_cell_arrays = true; // build the full size replicated cell arrays
+   vmpi::shared_array_t<double> shared_pos_and_mom;   // cell centres and moments, one copy per shared memory region
+   vmpi::shared_array_t<double> shared_volume;        // cell volumes, one copy per shared memory region
+   vmpi::shared_array_t<int> shared_num_atoms_global; // magnetic atoms in each cell, one copy per shared memory region
    bool build_atom_lists = true; // build the per-cell atom lists (not needed by the hierarchical dipole solver)
    std::vector < std::vector <int> > index_atoms_array; /// array to store list of atoms associated with cells in 2D structure
    std::vector<int> index_atoms_array1D; /// array to store list of atoms associated with cells in 1D structure

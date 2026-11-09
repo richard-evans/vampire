@@ -65,7 +65,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       const int end = ha::interaction_list_end_index[lc];
 
       // Self demagnetisation factor multiplying m(i)
-      const double V = dipole::cells_volume_array[cell_i];
+      const double V = cells::shared_volume[cell_i];
       const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
       const double self_demag = eightPI_three_cell_volume;
       //std::cout << self_demag << std::endl;
@@ -141,7 +141,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
          dipole::atom_dipolar_field_array_x[atom] = bx;
          dipole::atom_dipolar_field_array_y[atom] = by;
          dipole::atom_dipolar_field_array_z[atom] = bz;
-         const double mu0_m = 4.0 * M_PI * constants::dipole_prefactor / dipole::cells_volume_array[cell];
+         const double mu0_m = 4.0 * M_PI * constants::dipole_prefactor / cells::shared_volume[cell];
          dipole::atom_mu0demag_field_array_x[atom] = bx - mu0_m * ha::mag_array_x[cell];
          dipole::atom_mu0demag_field_array_y[atom] = by - mu0_m * ha::mag_array_y[cell];
          dipole::atom_mu0demag_field_array_z[atom] = bz - mu0_m * ha::mag_array_z[cell];
