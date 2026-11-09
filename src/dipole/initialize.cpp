@@ -95,6 +95,7 @@ namespace dipole{
       // evaluation timed below, for the ARCHER2 weak/strong scaling study
       // (papers/dipole). Barrier before sampling so all ranks start the
       // clock together and slow ranks aren't hidden by fast ones.
+      vmpi::memory_checkpoint("dipole_build_start");
       vmpi::barrier();
       const double dipole_scaling_mem_before_kb = vutil::peak_memory_usage_kb();
       vutil::vtimer_t dipole_scaling_build_timer;

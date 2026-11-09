@@ -59,6 +59,7 @@ void initialize_modules(){
    //----------------------------------------
    // Initialise cells data
    //----------------------------------------
+   vmpi::memory_checkpoint("before_cells_initialize");
    cells::initialize(cs::system_dimensions[0],
                      cs::system_dimensions[1],
                      cs::system_dimensions[2],
@@ -73,6 +74,7 @@ void initialize_modules(){
                      create::num_total_atoms_non_filler,
                      atoms::num_atoms
       );
+   vmpi::memory_checkpoint("after_cells_initialize");
 
    //----------------------------------------
    // Initialise spin torque data

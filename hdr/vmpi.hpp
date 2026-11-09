@@ -263,6 +263,9 @@ namespace vmpi{
    extern void fast_collate(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
    extern void broadcast(std::vector<char>& message, int source_rank);
 
+   // collective: log the worst-rank and mean peak/current memory under a label (MEMORY_CHECKPOINT line)
+   extern void memory_checkpoint(const std::string& label);
+
    // functions to create and free the shared memory communicators (initialise is called by shared_array_t::allocate)
    extern void initialise_shared_memory();
    extern void finalise_shared_memory();

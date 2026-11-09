@@ -190,6 +190,8 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
+   vmpi::memory_checkpoint("after_modules_initialize");
+
    if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
    micromagnetic::initialize(cells::num_local_cells,
                              cells::num_cells,
@@ -211,6 +213,7 @@ int run(){
                              cs::system_dimensions[1],
                              cs::system_dimensions[2],
                              cells::local_cell_array);
+   vmpi::memory_checkpoint("after_micromagnetic_initialize");
 
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,
@@ -238,6 +241,7 @@ int run(){
                      atoms::magnetic,
                      atoms::num_atoms
    );
+   vmpi::memory_checkpoint("after_dipole_initialize");
 
    // the lists of atoms in each cell are only needed to initialise the dipole solvers; free them, as they hold an
    // inner vector for every cell in the system on every process
@@ -245,6 +249,7 @@ int run(){
    std::vector < std::vector <double> >().swap(cells::atom_in_cell_coords_array_x);
    std::vector < std::vector <double> >().swap(cells::atom_in_cell_coords_array_y);
    std::vector < std::vector <double> >().swap(cells::atom_in_cell_coords_array_z);
+   vmpi::memory_checkpoint("after_cell_atom_lists_freed");
 
    if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
 
@@ -253,6 +258,7 @@ int run(){
    // RE technically this double counts the last data point in the statistics, need to implement a reset_counter to fix.
    stats::update();
    if(!load_checkpoint_continue_flag) stats::reset();
+   vmpi::memory_checkpoint("end_of_initialisation");
 
    // For MPI version, calculate initialisation time
    if(vmpi::my_rank==0){

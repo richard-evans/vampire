@@ -150,6 +150,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 1 and save it
    timer.stop();
    segment_time[0] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_1");
 
    //------------------------------------------------
    // end of data copying
@@ -200,6 +201,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 2 and save it
    timer.stop();
    segment_time[1] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_2");
 
    //------------------------------------------------
    // end of parallel data rationalisation
@@ -337,6 +339,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 3 and save it
    timer.stop();
    segment_time[2] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_3");
 
    //------------------------------------------------
    // end of hierarchical cell position calculation
@@ -357,6 +360,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 4 and save it
    timer.stop();
    segment_time[3] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_4");
 
    //------------------------------------------------
    // end of determination of cells in cells
@@ -405,6 +409,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 5 and save it
    timer.stop();
    segment_time[4] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_5");
 
    //------------------------------------------------------
    // end of zero level cell data population
@@ -485,6 +490,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 6 and save it
    timer.stop();
    segment_time[5] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_6");
 
    //------------------------------------------------------
    // end of other level cell data population
@@ -614,6 +620,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 7 and save it
    timer.stop();
    segment_time[6] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_7");
 
    // optionally log what a point-to-point exchange of cell moments would cost
    if(ha::output_p2p_diagnostic) ha::write_p2p_diagnostic();
@@ -682,6 +689,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 8 and save it
    timer.stop();
    segment_time[7] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_8");
 
 
    //---------------------------------------------------------------------------
@@ -788,6 +796,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 9 and save it
    timer.stop();
    segment_time[8] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_9");
 
    //---------------------------------------------------------------------------
    // Output detailed timings for the hierarchical initialisation
@@ -797,6 +806,7 @@ void initialize(const double system_dimensions_x,
    ha::cell_positions.free();
    ha::cell_dimensions.free();
    ha::cell_positions_mom.free();
+   vmpi::memory_checkpoint("hierarchical_geometry_freed");
 
    // print out detailed hierarchical timings
    zlog << zTs() << "\tSegment times for hierarchical initialisation:" << std::endl;

@@ -7,6 +7,7 @@ mpi_objects =\
 data.o \
 decomposition.o \
 interface.o \
+memory_checkpoint.o \
 mpi_generic.o \
 mpi_comms.o \
 parallel_rng_seed.o \
