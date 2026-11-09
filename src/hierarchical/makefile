@@ -13,6 +13,7 @@ inter.o \
 interface.o \
 mag.o \
 p2p_diagnostic.o \
+region_atoms.o \
 update.o
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/hierarchical/,$(hierarchical_objects))

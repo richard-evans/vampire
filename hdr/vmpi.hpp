@@ -84,6 +84,7 @@ namespace vmpi{
          T& operator[](uint64_t i){ return ptr[i]; }
          const T& operator[](uint64_t i) const { return ptr[i]; }
          T* data(){ return ptr; }
+         const T* data() const { return ptr; }
          uint64_t size() const { return num_elements; }
          bool is_writer() const { return my_shared_rank == 0; } // one rank per region, for filling the array
          void memory_barrier();           // order this rank's loads and stores (no synchronisation)

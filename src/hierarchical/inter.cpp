@@ -23,6 +23,7 @@
 // Vampire headers
 #include "cells.hpp" // needed for cells::cell_id_array but to be removed
 #include "dipole.hpp"
+#include "errors.hpp"
 #include "vio.hpp"
 #include "vutil.hpp"
 #include "atoms.hpp"
@@ -49,9 +50,7 @@ namespace hierarchical{
                        const int interaction_no,                                       // ID of interaction in 1D list
                        const double cutoff,                                            // cutoff range for dipole tensor construction (Angstroms)
                        const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
-                       const std::vector<double>& cells_pos_and_mom_array,             // array of positions and cell moments
-                       const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
-                       const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                       const region_atoms_t& atoms_table                               // atoms of the cells near this process's cells
                        ){
 
         // create temporary variables to store components of tensor
@@ -104,38 +103,31 @@ namespace hierarchical{
            const int num_i_atoms = global_atoms_in_cell_count[celli];
            const int num_j_atoms = global_atoms_in_cell_count[cellj];
 
-           // search for cells i and j in local atom-cells list
-           int cell_with_atoms_index_i = -1;
-           int cell_with_atoms_index_j = -1;
-           for(size_t idx = 0; idx < atoms_in_cells_array.size(); idx++){
-              const int cell = list_of_cells_with_atoms[idx];
-              if( cell == celli ) cell_with_atoms_index_i = idx;
-              if( cell == cellj ) cell_with_atoms_index_j = idx;
+           // find cells i and j in the atom table of the region
+           const int ki = atoms_table.find(celli);
+           const int kj = atoms_table.find(cellj);
+           if( ki == -1 || atoms_table.cell_starts[ki+1] - atoms_table.cell_starts[ki] != num_i_atoms ){
+              err::fatal("Programmer error: cell " + std::to_string(celli) + " is not complete in the hierarchical atom table");
            }
-
-           // check that proper cell is found
-           if( cell_with_atoms_index_i == -1 ){
-              std::cerr << "Programmer error! cell " << celli << " is not found in list of local cells with atomic positions!" << std::endl;
+           if( kj == -1 || atoms_table.cell_starts[kj+1] - atoms_table.cell_starts[kj] != num_j_atoms ){
+              err::fatal("Programmer error: cell " + std::to_string(cellj) + " is not complete in the hierarchical atom table");
            }
-           if( cell_with_atoms_index_j == -1 ){
-              std::cerr << "Programmer error! cell " << cellj << " is not found in list of local cells with atomic positions!" << std::endl;
-           }
-           const int ci = cell_with_atoms_index_i;
-           const int cj = cell_with_atoms_index_j;
+           const double* ci = &atoms_table.coords[3*atoms_table.cell_starts[ki]]; // coordinates of the atoms in cell i
+           const double* cj = &atoms_table.coords[3*atoms_table.cell_starts[kj]]; // coordinates of the atoms in cell j
 
            // loop over all atoms in cell i
            for(int pi = 0; pi < num_i_atoms; pi++){
 
-              const double cix = atoms_in_cells_array[ci][4*pi+0];
-              const double ciy = atoms_in_cells_array[ci][4*pi+1];
-              const double ciz = atoms_in_cells_array[ci][4*pi+2];
+              const double cix = ci[3*pi+0];
+              const double ciy = ci[3*pi+1];
+              const double ciz = ci[3*pi+2];
 
               // loop over all atoms in cell j
               for( int qj = 0; qj < num_j_atoms; qj++){
 
-                 const double rx = atoms_in_cells_array[cj][4*qj+0] - cix;
-                 const double ry = atoms_in_cells_array[cj][4*qj+1] - ciy;
-                 const double rz = atoms_in_cells_array[cj][4*qj+2] - ciz;
+                 const double rx = cj[3*qj+0] - cix;
+                 const double ry = cj[3*qj+1] - ciy;
+                 const double rz = cj[3*qj+2] - ciz;
 
                  const double dist = sqrt(rx*rx+ry*ry+rz*rz);
                  const double rij = 1.0/dist;  //Reciprocal of the distance

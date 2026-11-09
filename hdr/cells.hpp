@@ -36,6 +36,7 @@ namespace cells{
    extern std::vector <int> local_cell_array;
    extern std::vector <int> num_atoms_in_cell; /// number of atoms in each cell
    extern std::vector <int> num_atoms_in_cell_global; /// global number of atoms in each cell
+   extern bool build_atom_lists; // build index_atoms_array and atom_in_cell_coords_array_* (dipole solvers other than hierarchical)
    extern std::vector < std::vector <int> > index_atoms_array;
    extern std::vector<int> index_atoms_array1D;
 

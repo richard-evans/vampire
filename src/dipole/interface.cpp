@@ -141,4 +141,13 @@ namespace dipole{
 
    }
 
+   //---------------------------------------------------------------------------
+   // Whether the dipole solver reads the per-cell atom lists of the cells module (cells::index_atoms_array and
+   // cells::atom_in_cell_coords_array_*). The hierarchical solver builds its own table of atoms per shared memory
+   // region instead (hierarchical/region_atoms.cpp).
+   //---------------------------------------------------------------------------
+   bool uses_cell_atom_lists(){
+      return dipole::internal::solver != dipole::internal::hierarchical;
+   }
+
 } // end of dipole namespace

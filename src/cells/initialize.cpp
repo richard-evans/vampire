@@ -280,21 +280,25 @@ namespace cells{
 
       }
 
-      // Resize 2D arrays to store cell - atom informations
-      cells::atom_in_cell_coords_array_x.resize(cells::num_cells);
-      cells::atom_in_cell_coords_array_y.resize(cells::num_cells);
-      cells::atom_in_cell_coords_array_z.resize(cells::num_cells);
-      cells::index_atoms_array.resize(cells::num_cells);
-      // Initialise arrays to zero
-      for(int atom=0;atom<num_local_atoms;atom++){
-         int local_cell=cells::atom_cell_id_array[atom];
-         cells::atom_in_cell_coords_array_x[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
-         cells::atom_in_cell_coords_array_y[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
-         cells::atom_in_cell_coords_array_z[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
-         cells::index_atoms_array[local_cell].resize(cells::num_atoms_in_cell[local_cell],0);
+      // Resize 2D arrays to store cell - atom informations. They hold an inner vector for every cell in the system on
+      // every process, and only the tensor and macrocell dipole solvers read them (the hierarchical solver builds its
+      // own table of atoms per shared memory region), so they are built only when needed.
+      if(cells::build_atom_lists){
+         cells::atom_in_cell_coords_array_x.resize(cells::num_cells);
+         cells::atom_in_cell_coords_array_y.resize(cells::num_cells);
+         cells::atom_in_cell_coords_array_z.resize(cells::num_cells);
+         cells::index_atoms_array.resize(cells::num_cells);
+         // Initialise arrays to zero
+         for(int atom=0;atom<num_local_atoms;atom++){
+            int local_cell=cells::atom_cell_id_array[atom];
+            cells::atom_in_cell_coords_array_x[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+            cells::atom_in_cell_coords_array_y[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+            cells::atom_in_cell_coords_array_z[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+            cells::index_atoms_array[local_cell].resize(cells::num_atoms_in_cell[local_cell],0);
+         }
+         // Resize 1D array to store atom-cell informations
+         cells::index_atoms_array1D.resize(num_local_atoms);
       }
-      // Resize 1D array to store atom-cell informations
-      cells::index_atoms_array1D.resize(num_local_atoms);
 
       //Set number of atoms in cell to zero
       for(int cell=0;cell<cells::num_cells;cell++){
@@ -308,10 +312,12 @@ namespace cells{
          // const double mus = mp::material[type].mu_s_SI; unused variable
          // Consider only magnetic elements
          if(mp::material[type].non_magnetic==0){
-            cells::atom_in_cell_coords_array_x[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_x[atom];
-            cells::atom_in_cell_coords_array_y[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_y[atom];
-            cells::atom_in_cell_coords_array_z[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_z[atom];
-            cells::index_atoms_array[local_cell][cells::num_atoms_in_cell[local_cell]]=atom;
+            if(cells::build_atom_lists){
+               cells::atom_in_cell_coords_array_x[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_x[atom];
+               cells::atom_in_cell_coords_array_y[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_y[atom];
+               cells::atom_in_cell_coords_array_z[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_z[atom];
+               cells::index_atoms_array[local_cell][cells::num_atoms_in_cell[local_cell]]=atom;
+            }
             cells::num_atoms_in_cell[local_cell]++;
          }
       }
@@ -319,7 +325,7 @@ namespace cells{
       // Reorganise array that associate cell with atoms in 1D structure
       // so to pass it easy in parallel
       int counter_id_at=0;
-      for(unsigned int lc=0; lc<cells::cell_id_array.size(); lc++){
+      for(unsigned int lc=0; lc<cells::cell_id_array.size() && cells::build_atom_lists; lc++){
          for(int i=0; i<cells::num_atoms_in_cell[cells::cell_id_array[lc]]; i++){
             int atom=cells::index_atoms_array[cells::cell_id_array[lc]][i];
             //cells::index_atoms_array1D.push_back(atom);

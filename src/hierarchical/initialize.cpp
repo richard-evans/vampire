@@ -139,10 +139,8 @@ void initialize(const double system_dimensions_x,
    ha::interaction_range.resize(ha::num_levels,0.0);
 
    // cell data from the cells module, read only (initialise_atomistic_cell_data takes const references)
-   const std::vector < std::vector < int > >& cells_index_atoms_array = cells::index_atoms_array;
    const std::vector < int >& cells_num_atoms_in_cell        = cells::num_atoms_in_cell;        // this process's atoms only
    const std::vector < int >& cells_num_atoms_in_cell_global = cells::num_atoms_in_cell_global;
-   const std::vector < int >& cells_local_cell_array         = cells::local_cell_array;
    const std::vector < double >& cells_pos_and_mom_array     = cells::pos_and_mom_array;
    int cells_num_cells = cells::num_cells;
    int cells_num_local_cells = cells::num_local_cells;
@@ -171,25 +169,9 @@ void initialize(const double system_dimensions_x,
       // get realspace cutoff distance
       const double real_cutoff = dipole::cutoff * cells::macro_cell_size;
 
-      std::vector< std::vector<double> > atoms_in_cells_array; // 2D list of [cell][atom] for local cells needed for computing dipole tensor
-      std::vector<int> list_of_atoms_with_cells; // list of cell IDs to enable parsing of atomistic data
-
-      // distribute atomistic data to enable hierarchical dipole calculation
-      dipole::internal::initialise_atomistic_cell_data(cells_num_cells,
-                                                       cells_num_local_cells,
-                                                       real_cutoff,                     // cutoff range for dipole tensor construction (Angstroms)
-                                                       cells_num_atoms_in_cell,         // number of atoms in each cell (local CPU)
-                                                       cells_local_cell_array,          // numerical list of cells containing atoms on local processor
-                                                       cells_num_atoms_in_cell_global,  // number of atoms in each cell
-                                                       cells_pos_and_mom_array,         // array of positions and cell moments
-                                                       cells_index_atoms_array,         // 2D array of [cells][atomID]
-                                                       atom_coords_x,                   // input arrays of atom coordinates
-                                                       atom_coords_y,                   //
-                                                       atom_coords_z,                   //
-                                                       atoms::m_spin_array,             // input array of atom moments (Bohr magnetons)
-                                                       list_of_atoms_with_cells,        // 2D list of [cell][atom] for local cells needed for computing dipole tensor (output)
-                                                       atoms_in_cells_array             // list of cell IDs to enable parsing of atomistic data (output)
-                                                      );
+      // table of the atoms of the cells within the atomistic cutoff of the region's cells, held once per shared
+      // memory region (region_atoms.cpp), for the near field tensors of Segment 9
+      ha::region_atoms.build(real_cutoff, atom_coords_x, atom_coords_y, atom_coords_z);
 
    // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
    for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
@@ -777,9 +759,7 @@ void initialize(const double system_dimensions_x,
                                           j,
                                           real_cutoff,
                                           cells_num_atoms_in_cell_global,
-                                          cells_pos_and_mom_array,
-                                          list_of_atoms_with_cells,
-                                          atoms_in_cells_array);
+                                          ha::region_atoms);
 
                   } // End of Inter part
 
@@ -793,8 +773,7 @@ void initialize(const double system_dimensions_x,
                                           cell_j,
                                           j,
                                           cells_num_atoms_in_cell_global,
-                                          list_of_atoms_with_cells,
-                                          atoms_in_cells_array);
+                                          ha::region_atoms);
 
                   }
                   // End of Intra part
@@ -833,7 +812,8 @@ void initialize(const double system_dimensions_x,
    // Output detailed timings for the hierarchical initialisation
    //---------------------------------------------------------------------------
 
-   // cell geometry is needed only to build the interactions
+   // cell geometry and the atom table are needed only to build the interactions
+   ha::region_atoms.free();
    ha::cell_positions.free();
    ha::cell_dimensions.free();
    ha::cell_positions_mom.free();

@@ -58,6 +58,9 @@ namespace dipole{
    extern int cells_num_local_cells; // number of local macrocells
    extern std::vector < double > cells_volume_array; // volume of each macrocell
 
+   // true unless the solver is hierarchical, which does not read the per-cell atom lists of the cells module
+   bool uses_cell_atom_lists();
+
    //-----------------------------------------------------------------------------
    // Function to unroll cells dipolar field into atomic field
    //-----------------------------------------------------------------------------

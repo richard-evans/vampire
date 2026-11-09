@@ -60,6 +60,7 @@ void initialize_modules(){
    // Initialise cells data
    //----------------------------------------
    vmpi::memory_checkpoint("before_cells_initialize");
+   cells::build_atom_lists = dipole::uses_cell_atom_lists();
    cells::initialize(cs::system_dimensions[0],
                      cs::system_dimensions[1],
                      cs::system_dimensions[2],
