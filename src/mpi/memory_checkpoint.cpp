@@ -13,7 +13,11 @@
 
 // System headers for the current resident set size
 #if defined(__APPLE__)
-   #include <mach/mach.h>
+   // proc_pid_rusage is declared in libproc.h, but that header pulls in mach headers which GCC cannot parse with
+   // recent macOS SDKs, so declare it here; rusage_info_v0 and RUSAGE_INFO_V0 come from sys/resource.h
+   #include <sys/resource.h>
+   #include <unistd.h>
+   extern "C" int proc_pid_rusage(int pid, int flavor, rusage_info_t* buffer);
 #elif defined(__linux__)
    #include <unistd.h>
 #endif
@@ -28,16 +32,15 @@ namespace vmpi{
 namespace{
 
 //------------------------------------------------------------------------------
-// Current (not peak) resident set size of this process in kB: /proc/self/statm on Linux, the task's resident size
-// on macOS, -1 elsewhere
+// Current (not peak) resident set size of this process in kB: /proc/self/statm on Linux, proc_pid_rusage on
+// macOS, -1 elsewhere
 //------------------------------------------------------------------------------
 double current_memory_usage_kb(){
 
    #if defined(__APPLE__)
-      mach_task_basic_info_data_t info;
-      mach_msg_type_number_t count = MACH_TASK_BASIC_INFO_COUNT;
-      if(task_info(mach_task_self(), MACH_TASK_BASIC_INFO, reinterpret_cast<task_info_t>(&info), &count) == KERN_SUCCESS){
-         return double(info.resident_size) / 1024.0;
+      rusage_info_v0 info;
+      if(proc_pid_rusage(getpid(), RUSAGE_INFO_V0, reinterpret_cast<rusage_info_t*>(&info)) == 0){
+         return double(info.ri_resident_size) / 1024.0;
       }
       return -1.0;
    #elif defined(__linux__)
