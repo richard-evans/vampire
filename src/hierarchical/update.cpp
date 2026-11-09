@@ -77,9 +77,9 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       // std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
 
       // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
-      dipole::cells_field_array_x[cell_i] = self_demag * mx_i; //*0.0
-      dipole::cells_field_array_y[cell_i] = self_demag * my_i; //*0.0
-      dipole::cells_field_array_z[cell_i] = self_demag * mz_i; //*0.0
+      double field_x = self_demag * mx_i;
+      double field_y = self_demag * my_i;
+      double field_z = self_demag * mz_i;
 
       // Loop over all cells
       for(int j = start; j<end;j++){
@@ -95,18 +95,25 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
          //if (cell_i == 0)std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
 
          // Compute dipole field contribution using dipole tensor
-         dipole::cells_field_array_x[cell_i]      +=(mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j]);
-         dipole::cells_field_array_y[cell_i]      +=(mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
-         dipole::cells_field_array_z[cell_i]      +=(mx*ha::rij_tensor_xz[j] + my*ha::rij_tensor_yz[j] + mz*ha::rij_tensor_zz[j]);
+         field_x += (mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j]);
+         field_y += (mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
+         field_z += (mx*ha::rij_tensor_xz[j] + my*ha::rij_tensor_yz[j] + mz*ha::rij_tensor_zz[j]);
          // std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << rij_tensor_yy[j] << '\t' << rij_tensor_yz[j] << '\t' << rij_tensor_zz[j] << '\t' <<std::endl;
 
       }
       //   std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
 
       // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation of magnetisation and volume in angstrom
-      dipole::cells_field_array_x[cell_i] = dipole::cells_field_array_x[cell_i] * constants::dipole_prefactor;
-      dipole::cells_field_array_y[cell_i] = dipole::cells_field_array_y[cell_i] * constants::dipole_prefactor;
-      dipole::cells_field_array_z[cell_i] = dipole::cells_field_array_z[cell_i] * constants::dipole_prefactor;
+      ha::cell_field_x[lc] = field_x * constants::dipole_prefactor;
+      ha::cell_field_y[lc] = field_y * constants::dipole_prefactor;
+      ha::cell_field_z[lc] = field_z * constants::dipole_prefactor;
+
+      // full size arrays for the modules that read every cell
+      if(ha::full_cell_fields){
+         dipole::cells_field_array_x[cell_i] = ha::cell_field_x[lc];
+         dipole::cells_field_array_y[cell_i] = ha::cell_field_y[lc];
+         dipole::cells_field_array_z[cell_i] = ha::cell_field_z[lc];
+      }
       //std::cout << sim::time << '\t' << cell_i << '\t' << dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
       //std::cout << "SP" << dipole::cells_field_array_x[cell_i] << "\t" << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i]<< std::endl;
       //if (cell_i == 0) std::cout << sim::time << '\t' << cell_i << '\t' <<  dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
@@ -125,13 +132,19 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
       if( magnetic[atom] ){
          const int cell = cells::atom_cell_id_array[atom];
-         dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
-         dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
-         dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
+         const int lc = ha::atom_local_cell[atom];
+         // field of the atom's cell: local cell arrays, or the gathered full arrays for a cell that is not local
+         // (micromagnetic cells only)
+         const double bx = lc >= 0 ? ha::cell_field_x[lc] : dipole::cells_field_array_x[cell];
+         const double by = lc >= 0 ? ha::cell_field_y[lc] : dipole::cells_field_array_y[cell];
+         const double bz = lc >= 0 ? ha::cell_field_z[lc] : dipole::cells_field_array_z[cell];
+         dipole::atom_dipolar_field_array_x[atom] = bx;
+         dipole::atom_dipolar_field_array_y[atom] = by;
+         dipole::atom_dipolar_field_array_z[atom] = bz;
          const double mu0_m = 4.0 * M_PI * constants::dipole_prefactor / dipole::cells_volume_array[cell];
-         dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_field_array_x[cell] - mu0_m * ha::mag_array_x[cell];
-         dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_field_array_y[cell] - mu0_m * ha::mag_array_y[cell];
-         dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_field_array_z[cell] - mu0_m * ha::mag_array_z[cell];
+         dipole::atom_mu0demag_field_array_x[atom] = bx - mu0_m * ha::mag_array_x[cell];
+         dipole::atom_mu0demag_field_array_y[atom] = by - mu0_m * ha::mag_array_y[cell];
+         dipole::atom_mu0demag_field_array_z[atom] = bz - mu0_m * ha::mag_array_z[cell];
       }
    }
 

@@ -694,10 +694,35 @@ void initialize(const double system_dimensions_x,
    ha::rij_tensor_yz.resize(interaction_num,0.0);
    ha::rij_tensor_zz.resize(interaction_num,0.0);
 
-   // resize B-field cells array
-   dipole::cells_field_array_x.resize(cells_num_cells,0.0);
-   dipole::cells_field_array_y.resize(cells_num_cells,0.0);
-   dipole::cells_field_array_z.resize(cells_num_cells,0.0);
+   // full size B-field cells arrays, only for the modules that read every cell (dipole::full_cell_fields) and the
+   // dipole field output; the field calculation and distribution use the local cell arrays above
+   ha::full_cell_fields = dipole::full_cell_fields || dipole::internal::output_dipole_field;
+   // B-field of the local cells, and the local cell of each local magnetic atom (for the field distribution)
+   ha::cell_field_x.assign(cells_num_local_cells, 0.0);
+   ha::cell_field_y.assign(cells_num_local_cells, 0.0);
+   ha::cell_field_z.assign(cells_num_local_cells, 0.0);
+   {
+      std::vector< std::pair<int,int> > local_cell_of(cells_num_local_cells); // (cell id, local cell index), sorted
+      for(int lc = 0; lc < cells_num_local_cells; lc++) local_cell_of[lc] = {cells::cell_id_array[lc], lc};
+      std::sort(local_cell_of.begin(), local_cell_of.end());
+      ha::atom_local_cell.assign(vmpi::num_local_atoms, -1);
+      for(int atom = 0; atom < vmpi::num_local_atoms; atom++){
+         if(!atoms::magnetic[atom]) continue;
+         const int cell = cells::atom_cell_id_array[atom];
+         auto it = std::lower_bound(local_cell_of.begin(), local_cell_of.end(), std::make_pair(cell, -1));
+         if(it == local_cell_of.end() || it->first != cell){
+            if(ha::full_cell_fields) continue; // micromagnetic cells: the field is read from the gathered full arrays
+            err::fatal("Programmer error: magnetic atom " + std::to_string(atom) + " is in cell " + std::to_string(cell) + ", which is not a local cell of the hierarchical dipole solver");
+         }
+         ha::atom_local_cell[atom] = it->second;
+      }
+   }
+
+   if(ha::full_cell_fields){
+      dipole::cells_field_array_x.resize(cells_num_cells,0.0);
+      dipole::cells_field_array_y.resize(cells_num_cells,0.0);
+      dipole::cells_field_array_z.resize(cells_num_cells,0.0);
+   }
 
    // stop the timer for segment 8 and save it
    timer.stop();

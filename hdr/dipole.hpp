@@ -27,6 +27,7 @@ namespace dipole{
    // Externally visible variables
    //------------------------------------------------------------------------------
    extern bool activated;
+   extern bool full_cell_fields; // cells_field_array_* must hold every cell (micromagnetic, cell output, GPU); set before initialize
 
    extern int update_rate; /// timesteps between updates
    extern int update_time; /// last update time

@@ -70,6 +70,11 @@ namespace hierarchical{
       std::vector<int> upward_pass_index;       // index in contributing_cells of each of upward_pass_cells
       std::vector<int> upward_children_start;   // children of each upward pass cell that are in contributing_cells (CSR)
       std::vector<int> upward_children;
+      std::vector<double> cell_field_x;   // field of each local cell (indexed like cells::cell_id_array)
+      std::vector<double> cell_field_y;
+      std::vector<double> cell_field_z;
+      std::vector<int> atom_local_cell;   // local cell index of each local magnetic atom's cell (-1 otherwise)
+      bool full_cell_fields = false; // also fill dipole::cells_field_array_* (sized for all cells)
       std::vector<double> mag_reduction_values; // contributions of this process, x then y then z
       vmpi::shared_sum_t mag_reduction;         // sum of the contributions over processes
 

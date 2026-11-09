@@ -34,6 +34,7 @@
 #include "cells.hpp"
 #include "../cells/internal.hpp"
 #include "../micromagnetic/internal.hpp"
+#include "config.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
@@ -214,6 +215,10 @@ int run(){
                              cs::system_dimensions[2],
                              cells::local_cell_array);
    vmpi::memory_checkpoint("after_micromagnetic_initialize");
+
+   // full size cell dipole field arrays are needed only by micromagnetic cells, cell configuration output and the GPU
+   dipole::full_cell_fields = micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets ||
+                              config::outputs_cells() || gpu::acceleration;
 
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,

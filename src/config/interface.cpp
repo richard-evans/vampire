@@ -304,4 +304,12 @@ namespace config{
 
    }
 
+//------------------------------------------------------------------------------
+// Whether cell configurations are written (read by the hierarchical dipole solver, which keeps full size cell field
+// arrays only when something reads them)
+//------------------------------------------------------------------------------
+bool outputs_cells(){
+   return internal::output_cells_config;
+}
+
 } // end of config namespace

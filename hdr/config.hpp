@@ -28,6 +28,9 @@ namespace config{
    //-----------------------------------------------------------------------------
    void output();
 
+   // true if cell configurations (cells-*.cfg, which include the cell dipole fields) are written
+   bool outputs_cells();
+
    //---------------------------------------------------------------------------
    // Function to process input file parameters for config module
    //---------------------------------------------------------------------------

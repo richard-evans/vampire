@@ -25,6 +25,7 @@ namespace dipole{
    int update_time=-1; /// last update time
 
    bool activated=false;
+   bool full_cell_fields = true; // cells_field_array_* must hold every cell (the hierarchical solver reads this)
 
    //std::ofstream field("dipole-field");
 
