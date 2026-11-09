@@ -61,10 +61,15 @@ namespace hierarchical{
       vmpi::shared_array_t<double> mag_array_x; // cell magnetisations (all processes), one copy per region
       vmpi::shared_array_t<double> mag_array_y;
       vmpi::shared_array_t<double> mag_array_z;
-      std::vector<double> partial_mag_array_x;  // this process's contribution to the cell magnetisations
+      std::vector<int> contributing_cells;      // cells (all levels, in order) with a contribution from this process
+      std::vector<double> partial_mag_array_x;  // this process's contribution to the moment of each of contributing_cells
       std::vector<double> partial_mag_array_y;
       std::vector<double> partial_mag_array_z;
-      std::vector<int> contributing_cells;      // cells (all levels, in order) with a contribution from this process
+      std::vector<int> atom_contributing_index;          // index in contributing_cells of each local atom's cell (-1 if not magnetic)
+      std::vector<int> micromagnetic_contributing_index; // index in contributing_cells of each micromagnetic cell
+      std::vector<int> upward_pass_index;       // index in contributing_cells of each of upward_pass_cells
+      std::vector<int> upward_children_start;   // children of each upward pass cell that are in contributing_cells (CSR)
+      std::vector<int> upward_children;
       std::vector<double> mag_reduction_values; // contributions of this process, x then y then z
       vmpi::shared_sum_t mag_reduction;         // sum of the contributions over processes
 

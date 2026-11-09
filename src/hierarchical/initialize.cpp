@@ -386,9 +386,6 @@ void initialize(const double system_dimensions_x,
    ha::mag_array_x.allocate(ha::total_num_cells);
    ha::mag_array_y.allocate(ha::total_num_cells);
    ha::mag_array_z.allocate(ha::total_num_cells);
-   ha::partial_mag_array_x.assign(ha::total_num_cells,0.0);
-   ha::partial_mag_array_y.assign(ha::total_num_cells,0.0);
-   ha::partial_mag_array_z.assign(ha::total_num_cells,0.0);
 
    // check that the number of zero levels cells is correct (must be the same for hierachical and cells structures)
    if (ha::num_zero_level_cells != cells_num_cells) std::cout << "ERROR ZERO CELLS != NUM CELLS" << std::endl;
@@ -477,12 +474,46 @@ void initialize(const double system_dimensions_x,
    // of the contributions over processes. Every magnetic atom of this process must be in one of these cells.
    ha::contributing_cells.clear();
    for (int cell = 0; cell < ha::total_num_cells; cell++) if (has_local_cells[cell]) ha::contributing_cells.push_back(cell);
+
+   // The partial moments are stored only for the contributing cells, in the order of contributing_cells (the
+   // order in which they are reduced), so that they cost O(contributing cells) and not O(all cells) per process.
+   // Map each atom, micromagnetic cell and upward pass cell to its compact index once here. contributing_cells
+   // is sorted, so the compact index of a cell is found by binary search.
+   auto compact_index = [](const int cell){
+      return int(std::lower_bound(ha::contributing_cells.begin(), ha::contributing_cells.end(), cell) - ha::contributing_cells.begin());
+   };
+   const size_t num_contributing_cells = ha::contributing_cells.size();
+   ha::partial_mag_array_x.assign(num_contributing_cells, 0.0);
+   ha::partial_mag_array_y.assign(num_contributing_cells, 0.0);
+   ha::partial_mag_array_z.assign(num_contributing_cells, 0.0);
+
+   ha::atom_contributing_index.assign(vmpi::num_local_atoms, -1);
    if( micromagnetic::discretisation_type != 1 ){
       for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
-         if( atoms::magnetic[atom] && !has_local_cells[cells::atom_cell_id_array[atom]] ){
+         if( !atoms::magnetic[atom] ) continue;
+         if( !has_local_cells[cells::atom_cell_id_array[atom]] ){
             err::fatal("Programmer error: magnetic atom " + std::to_string(atom) + " is in cell " + std::to_string(cells::atom_cell_id_array[atom]) + ", which is not a local cell of the hierarchical dipole solver");
          }
+         ha::atom_contributing_index[atom] = compact_index(cells::atom_cell_id_array[atom]);
       }
+   }
+   ha::micromagnetic_contributing_index.resize(micromagnetic::number_of_micromagnetic_cells);
+   for (int lc = 0; lc < micromagnetic::number_of_micromagnetic_cells; lc++){
+      ha::micromagnetic_contributing_index[lc] = compact_index(micromagnetic::list_of_micromagnetic_cells[lc]);
+   }
+
+   // children of each upward pass cell that are contributing cells. The others hold no contribution from this
+   // process (zero), so leaving them out of the sum changes no result, and the order of the rest is kept.
+   ha::upward_pass_index.clear();
+   ha::upward_children_start.assign(1, 0);
+   ha::upward_children.clear();
+   for (const int cell : ha::upward_pass_cells){
+      ha::upward_pass_index.push_back(compact_index(cell));
+      for (int interaction = ha::cells_in_cells_start_index[cell]; interaction < ha::cells_in_cells_end_index[cell]; interaction ++ ){
+         const int subcell = ha::cells_in_cells[interaction];
+         if (has_local_cells[subcell]) ha::upward_children.push_back(compact_index(subcell));
+      }
+      ha::upward_children_start.push_back(ha::upward_children.size());
    }
    ha::mag_reduction_values.assign(3 * ha::contributing_cells.size(), 0.0);
    ha::mag_reduction.initialise(ha::contributing_cells, 3);
