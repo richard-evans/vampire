@@ -355,9 +355,9 @@ void initialize(const double system_dimensions_x,
    ha::num_zero_level_cells = ha::cells_level_end_index[0];
    //std::cout << ha::num_zero_level_cells << std::endl;
 
-   // resize data structure to store
-   ha::interaction_list_start_index.resize(ha::num_zero_level_cells,false);
-   ha::interaction_list_end_index.resize(ha::num_zero_level_cells,false);
+   // first and last interaction of each local cell (indexed by local cell, lc), filled in Segment 7
+   ha::interaction_list_start_index.assign(cells_num_local_cells, 0);
+   ha::interaction_list_end_index.assign(cells_num_local_cells, 0);
    // cell magnetisations, shared by the processes of a region (collective), and this process's contributions
    ha::mag_array_x.allocate(ha::total_num_cells);
    ha::mag_array_y.allocate(ha::total_num_cells);
@@ -513,21 +513,27 @@ void initialize(const double system_dimensions_x,
    // restart the timer
    timer.start();
 
-   // level of each cell, and the roots of the hierarchy (cells that are not a subcell of another cell)
-   std::vector<int> cell_level(ha::total_num_cells, 0);
-   std::vector<bool> is_root(ha::total_num_cells, true);
-   for (int level = 0; level < ha::num_levels; level ++ ){
-      for (int cell = ha::cells_level_start_index[level]; cell < ha::cells_level_end_index[level]; cell++){
-         cell_level[cell] = level;
-         if (level > 0){
+   // level of a cell, from the level index ranges (cells are numbered level by level), so that no array over
+   // every cell is kept on each process
+   auto cell_level = [](const int cell){
+      int level = 0;
+      while (cell >= ha::cells_level_end_index[level]) level++;
+      return level;
+   };
+
+   // the roots of the hierarchy (cells that are not a subcell of another cell), with a temporary bit per cell
+   std::vector<int> roots;
+   {
+      std::vector<bool> is_root(ha::total_num_cells, true);
+      for (int level = 1; level < ha::num_levels; level ++ ){
+         for (int cell = ha::cells_level_start_index[level]; cell < ha::cells_level_end_index[level]; cell++){
             for (int interaction = ha::cells_in_cells_start_index[cell]; interaction < ha::cells_in_cells_end_index[cell]; interaction ++ ){
                is_root[ha::cells_in_cells[interaction]] = false;
             }
          }
       }
+      for (int cell = 0; cell < ha::total_num_cells; cell++) if (is_root[cell]) roots.push_back(cell);
    }
-   std::vector<int> roots;
-   for (int cell = 0; cell < ha::total_num_cells; cell++) if (is_root[cell]) roots.push_back(cell);
 
    // determine the interaction list for local cells by descending the hierarchy from the roots: a cell at level
    // L > 0 interacts as a whole if all its corners are beyond the level L interaction range, otherwise its subcells
@@ -550,7 +556,7 @@ void initialize(const double system_dimensions_x,
 
          const int cell_j = stack.back();
          stack.pop_back();
-         const int level = cell_level[cell_j];
+         const int level = cell_level(cell_j);
 
          if (level == 0){
             level_interactions_lc[0].push_back(cell_j);
