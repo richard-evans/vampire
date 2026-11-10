@@ -62,7 +62,7 @@ namespace anisotropy{
       test="enable-bulk-neel-anisotropy";
       if(word==test){
           // Enable large threshold to force calculation of Neel anisotropy for all atoms
-          internal::neel_anisotropy_threshold = 1000000000;
+          internal::neel_anisotropy_threshold = internal::bulk_neel_anisotropy_threshold;
           return true;
       }
       //-------------------------------------------------------------------
@@ -1129,6 +1129,16 @@ namespace anisotropy{
          vin::check_for_valid_value(kij, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
          internal::mp[super_index].kij[sub_index] = kij;
          internal::enable_neel_anisotropy = true;
+         return true;
+      }
+      //------------------------------------------------------------
+      test="neel-fourth-order-anisotropy-constant"; // quartic pair constant q, enables the fourth order Neel model for collinear spins
+      if(word == test){
+         double qij = atof(value.c_str());
+         vin::check_for_valid_value(qij, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
+         internal::mp[super_index].qij[sub_index] = qij;
+         internal::enable_neel_anisotropy = true;
+         internal::enable_neel_fourth_order_anisotropy = true;
          return true;
       }
       //------------------------------------------------------------

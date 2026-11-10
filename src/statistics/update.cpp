@@ -21,6 +21,9 @@
 #include "stats.hpp"
 #include "vmpi.hpp"
 
+// statistics module headers
+#include "internal.hpp"
+
 namespace stats{
 
    //-----------------------------------------------------------------------------
@@ -178,6 +181,10 @@ namespace stats{
             // update binder cumulant statistics
             if(stats::calculate_system_binder_cumulant)         stats::system_binder_cumulant.calculate(stats::system_magnetization.get_magnetization());
             if(stats::calculate_material_binder_cumulant)       stats::material_binder_cumulant.calculate(stats::material_magnetization.get_magnetization());
+
+            // update per-spin geofencing statistics
+            if(stats::calculate_cubic_per_spin_geofencing)      stats::internal::update_per_spin_geofencing(stats::cubic_geofencing, sx, sy, sz);
+            if(stats::calculate_uniaxial_per_spin_geofencing)   stats::internal::update_per_spin_geofencing(stats::uniaxial_geofencing, sx, sy, sz);
 
          }
 

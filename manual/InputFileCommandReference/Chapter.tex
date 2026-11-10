@@ -630,7 +630,8 @@ Program to calculate the effective Gilbert damping of the system from the
 relaxation of the magnetisation [M O A Ellis et al, Phys. Rev. B 86, 174418 (2012)].
 The system is first equilibrated for \textit{sim:equilibration-time-steps} time
 steps at \textit{sim:equilibration-temperature}, with the magnetisation along
-the $z$-axis. All spins are then rotated around the $x$-axis by an angle
+the $z$-axis. All spins are then rotated around
+\textit{sim:effective-damping-rotation-axis} (default $x$-axis) by an angle
 defined by \textit{sim:effective-damping-rotation-angle} (default 30 degrees),
 the temperature is set to \textit{sim:temperature} and the system is integrated
 for \textit{sim:total-time-steps} time steps while the magnetisation relaxes
@@ -855,9 +856,15 @@ Gaussian width $\tau_\mathrm{elec}$ rather than a trapezoidal constant-phase dur
  units of seconds and a default pulse time of 1 ns.
 
  {\zicf sim:effective-damping-rotation-angle = float [default $30$ degrees]}\phantomsection\addcontentsline{toc}{subsection}{sim:effective-damping-rotation-angle}
- Defines the angle in degrees by which all spins are rotated around the $x$-axis,
- away from the $z$-axis, at the start of the relaxation phase in the program
+ Defines the angle in degrees by which all spins are rotated around
+ \textit{sim:effective-damping-rotation-axis} (default $x$-axis), away from the $z$-axis,
+ at the start of the relaxation phase in the program
  \textit{effective-damping}. Valid values are in the range 0 -- 180 degrees.
+
+ {\zicf sim:effective-damping-rotation-axis = float vector [default (1,0,0)]}\phantomsection\addcontentsline{toc}{subsection}{sim:effective-damping-rotation-axis}
+ Vector defining the axis about which the spins are rotated in the program
+ \textit{effective-damping}. The vector is normalised internally. For example,
+ $(1,0,0)$ rotates about the $x$-axis.
 
 \section*{Data output}
 \phantomsection\addcontentsline{toc}{section}{Data output}
@@ -901,6 +908,28 @@ Note that obtaining the actual macroscopic magnetization length from this data i
 Outputs the time-averaged normalized magnetization length for each material, e.g. $\langle|m_1|\rangle$, $\langle|m_2|\rangle$...$\langle|m_n|\rangle$.
 
 {\zicf output:material-mean-magnetisation}\phantomsection\addcontentsline{toc}{subsection}{output:material-mean-magnetisation} Outputs the time-averaged normalized magnetization length for each material, e.g. $\langle|\mathbf{m}_1|\rangle$, $\langle|\mathbf{m}_2|\rangle$...$\langle|\mathbf{m}_n|\rangle$.
+
+{\zicf output:geofencing-cubic}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-cubic} Outputs the cubic magnetic state of the system magnetisation direction $\hat{\mathbf{m}}$ using the geofencing method, where $\hat{\mathbf{m}}$ is in the state of the closest easy axis $\hat{\mathbf{e}}_a$ if $\hat{\mathbf{m}}\cdot\hat{\mathbf{e}}_a \ge$ \textit{output:geofencing-cubic-threshold}, and is otherwise lost between states. By default the eight $\langle 111 \rangle$ directions are the easy axes, with states 1 = $[+,+,+]$, 2 = $[-,+,+]$, 3 = $[+,-,+]$, 4 = $[-,-,+]$, 5 = $[+,+,-]$, 6 = $[-,+,-]$, 7 = $[+,-,-]$ and 8 = $[-,-,-]$. If the $\langle 111 \rangle$ directions are hard, \textit{output:geofencing-cubic-mode = 111-hard} instead uses the six $\langle 100 \rangle$ easy axes, with states 1 = $[+1,0,0]$, 2 = $[-1,0,0]$, 3 = $[0,+1,0]$, 4 = $[0,-1,0]$, 5 = $[0,0,+1]$ and 6 = $[0,0,-1]$. A lost state is output as 0X, where X is the closest state. A material magnetisation can be selected instead with \textit{output:geofencing-cubic-material-id}. By default two columns are output: the state and $\hat{\mathbf{m}}\cdot\hat{\mathbf{e}}_a$ for the closest axis. Setting \textit{output:geofencing-cubic = no-product} outputs only the state column.
+
+{\zicf output:geofencing-uniaxial}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-uniaxial} Outputs the uniaxial magnetic state of the system magnetisation direction using the geofencing method, with state 1 parallel and state 2 antiparallel to \textit{output:geofencing-uniaxial-axis} (default $[001]$). The magnetisation is in a state if $\hat{\mathbf{m}}\cdot\hat{\mathbf{e}}_a \ge$ \textit{output:geofencing-uniaxial-threshold}, and is otherwise lost, which is output as 0X where X is the closest state. A material magnetisation can be selected instead with \textit{output:geofencing-uniaxial-material-id}. By default two columns are output: the state and $\hat{\mathbf{m}}\cdot\hat{\mathbf{e}}_a$ for the closest axis. Setting \textit{output:geofencing-uniaxial = no-product} outputs only the state column.
+
+{\zicf output:geofencing-cubic-per-spin}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-cubic-per-spin} Enables cubic geofencing of each magnetic spin separately, using the easy axes selected by \textit{output:geofencing-cubic-mode}. This is useful for simulations of many independent macrospins with the same properties, where the desired statistic is the mean switching time over all macrospins. For each threshold in \textit{output:geofencing-per-spin-thresholds}, three groups of columns are output: the mean switching time $\tau$ over all spins (s), the mean percentage of samples in which a spin is lost, and the total number of transitions between states. For each spin, $\tau$ is the time between its first and last transitions divided by its number of transitions, and is zero for a spin with no transitions. The statistics are accumulated from the last reset of the statistics, for example after equilibration in the \textit{time-series} program.
+
+{\zicf output:geofencing-uniaxial-per-spin}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-uniaxial-per-spin} Enables uniaxial geofencing of each magnetic spin separately, using \textit{output:geofencing-uniaxial-axis}, with the same output as \textit{output:geofencing-cubic-per-spin}. Cubic and uniaxial per-spin geofencing can be used together.
+
+{\zicf output:geofencing-per-spin-thresholds = float list [default 0.95]}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-per-spin-thresholds} Sets one or more thresholds of $\hat{\mathbf{S}}\cdot\hat{\mathbf{e}}_a$ (range 0 -- 1) for cubic and uniaxial per-spin geofencing, separated by commas.
+
+{\zicf output:geofencing-cubic-threshold = float [default 0.95]}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-cubic-threshold} Sets the threshold of $\hat{\mathbf{m}}\cdot\hat{\mathbf{e}}_a$ (range 0 -- 1) for the magnetisation to be in a cubic state.
+
+{\zicf output:geofencing-cubic-mode = 111-easy or 111-hard [default 111-easy]}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-cubic-mode} Selects the easy axes for cubic geofencing: \textit{111-easy} uses the eight $\langle 111 \rangle$ axes and \textit{111-hard} uses the six $\langle 100 \rangle$ axes.
+
+{\zicf output:geofencing-cubic-material-id = int [default none]}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-cubic-material-id} Selects the magnetisation of material 1, 2, ... for \textit{output:geofencing-cubic}. If not specified, the system magnetisation is used.
+
+{\zicf output:geofencing-uniaxial-threshold = float [default 0.95]}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-uniaxial-threshold} Sets the threshold of $\hat{\mathbf{m}}\cdot\hat{\mathbf{e}}_a$ (range 0 -- 1) for the magnetisation to be in a uniaxial state.
+
+{\zicf output:geofencing-uniaxial-material-id = int [default none]}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-uniaxial-material-id} Selects the magnetisation of material 1, 2, ... for \textit{output:geofencing-uniaxial}. If not specified, the system magnetisation is used.
+
+{\zicf output:geofencing-uniaxial-axis = float vector [default (0,0,1)]}\phantomsection\addcontentsline{toc}{subsection}{output:geofencing-uniaxial-axis} Sets the easy axis for uniaxial geofencing, which is normalised internally.
 
 {\zicf output:total-torque}\phantomsection\addcontentsline{toc}{subsection}{output:total-torque} Outputs the instantaneous components of the torque on the system $\tau = \sum_i\mu_i \mathbf{S}_i \times \mathbf{H}_i$ in three columns $\tau_x$, $\tau_y$, $\tau_z$ (units of Joules). In equilibrium the total torque will be close to zero, but is useful for testing convergence to an equilibrium state for zero temperature simulations.
 

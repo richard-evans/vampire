@@ -17,6 +17,7 @@ initialize_neel.o \
 interface.o \
 lattice.o \
 neel.o \
+neel_fourth_order.o \
 uniaxial_order_2.o \
 rotational_order_2_1.o\
 rotational_order_2_1_odd.o\
