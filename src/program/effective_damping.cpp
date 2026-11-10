@@ -9,6 +9,7 @@
 
 // C++ standard library headers
 #include <iostream>
+#include <cmath>
 
 // Vampire Header files
 #include "atoms.hpp"
@@ -19,38 +20,46 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
-#include "vmath.hpp"
 #include "vmpi.hpp"
 
 // program module headers
 #include "internal.hpp"
 
-/// Function to rotate all spin around the x-axis
-void rotate_spins_around_x_axis(double ddx){
+namespace program{
 
-   std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix;
+//------------------------------------------------------------------------------
+// Function to rotate all spins by angle (degrees) around a unit vector axis
+// using the Rodrigues rotation formula
+//
+//    S' = S cos(phi) + (u x S) sin(phi) + u (u . S) (1 - cos(phi))
+//
+//------------------------------------------------------------------------------
+void rotate_spins_around_axis(const std::vector<double>& axis, const double angle){
 
-   // determine rotational matrices for phi, theta rotation
-   vmath::set_rotational_matrix(ddx, 0.0, 0.0, x_rotation_matrix,y_rotation_matrix,z_rotation_matrix);
+   const double phi = angle * M_PI / 180.0;
+   const double cos_phi = cos(phi);
+   const double sin_phi = sin(phi);
+   const double one_minus_cos_phi = 1.0 - cos_phi;
 
-   // Vectors to hold spins
-   std::vector<double> Sold(3), Snew(3);
+   // unit vector axis components (normalised on input)
+   const double u = axis[0];
+   const double v = axis[1];
+   const double w = axis[2];
 
-   // loop over all spins and rotate by phi around x
-   for(int atom =0;atom<atoms::num_atoms;atom++){
+   // loop over all spins and rotate by phi around the axis
+   for(int atom = 0; atom < atoms::num_atoms; atom++){
 
       // Load spin coordinates
-      Sold[0]=atoms::x_spin_array[atom];
-      Sold[1]=atoms::y_spin_array[atom];
-      Sold[2]=atoms::z_spin_array[atom];
+      const double x = atoms::x_spin_array[atom];
+      const double y = atoms::y_spin_array[atom];
+      const double z = atoms::z_spin_array[atom];
 
-      // Calculate new spin positions
-      Snew = vmath::matmul(Sold,x_rotation_matrix);
+      const double dot = x*u + y*v + z*w;
 
       // Set new spin positions
-      atoms::x_spin_array[atom]=Snew[0];
-      atoms::y_spin_array[atom]=Snew[1];
-      atoms::z_spin_array[atom]=Snew[2];
+      atoms::x_spin_array[atom] = u * dot * one_minus_cos_phi + x * cos_phi + (-w * y + v * z) * sin_phi;
+      atoms::y_spin_array[atom] = v * dot * one_minus_cos_phi + y * cos_phi + ( w * x - u * z) * sin_phi;
+      atoms::z_spin_array[atom] = w * dot * one_minus_cos_phi + z * cos_phi + (-v * x + u * y) * sin_phi;
 
    }
 
@@ -58,15 +67,13 @@ void rotate_spins_around_x_axis(double ddx){
 
 }
 
-namespace program{
-
 //-----------------------------------------------------------------------------
 //
 //   Program to calculate effective gilbert damping from the atomistic model.
 //
 //   System is first equilibrated at sim:temperature along the z-axis. All
-//   spins are then rotated around the x-axis by sim:effective-damping-rotation-angle
-//   (default 30 degrees) away from the z-axis and the magnetisation
+//   spins are then rotated around sim:effective-damping-rotation-axis (default x)
+//   by sim:effective-damping-rotation-angle (default 30 degrees) and the magnetisation
 //   then relaxes towards the z-direction under the application of a field
 //   or magnetocrystalline anisotropy. The magnetization trace can then be
 //   fitted to a macroscopic equation to extract the effective damping, alpha.
@@ -97,8 +104,8 @@ void effective_damping(){
       vout::data();
    }
 
-   // Rotate all spins away from z-axis by user defined angle (default 30 degrees)
-   rotate_spins_around_x_axis(program::internal::effective_damping_rotation_angle);
+   // Rotate all spins around the user defined axis by the user defined angle (default 30 degrees about the x-axis)
+   rotate_spins_around_axis(program::internal::effective_damping_rotation_axis, program::internal::effective_damping_rotation_angle);
 
    // reset system temperature
    sim::temperature=temp;
