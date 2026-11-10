@@ -84,6 +84,12 @@ namespace vout{
       // resuting output stringstream
       std::ostringstream res;
 
+      // set custom precision if enabled
+      if(vout::custom_precision){
+         res.precision(vout::precision);
+         if(vout::fixed) res.setf(std::ios::fixed, std::ios::floatfield);
+      }
+
       // set up fixed width if defined
       vout::fixed_width_output result(res,vout::fw_size);
 
