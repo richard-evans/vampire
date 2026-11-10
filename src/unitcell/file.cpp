@@ -147,13 +147,15 @@ namespace unitcell{
          ofile << uc.shape[1][0] << "\t" << uc.shape[1][1] << "\t" << uc.shape[1][2] << std::endl;
          ofile << uc.shape[2][0] << "\t" << uc.shape[2][1] << "\t" << uc.shape[2][2] << std::endl;
          ofile << "#-----------------------------------------------------------------------------------------" << std::endl;
-         ofile << "# Total number of atoms; atom id, cx cy cz, material, lattice category, height category" << std::endl;
+         ofile << "# Total number of atoms; atom id, cx cy cz, material, lattice category, height category" << (uc.surface_flags_present ? ", surface flag" : "") << std::endl;
          ofile << "#-----------------------------------------------------------------------------------------" << std::endl;
          const int uc_atom_size = uc.atom.size();
          ofile << uc_atom_size << std::endl;
          for(int a = 0 ; a < uc_atom_size ; a++ ){
             ofile << fw(a) << "\t" << fw(uc.atom[a].x) << "\t" << fw(uc.atom[a].y) << "\t" << fw(uc.atom[a].z) << "\t" <<
-                     fw5(uc.atom[a].mat) << "\t" << fw5(uc.atom[a].lc) << "\t" << fw5(uc.atom[a].hc) << std::endl;
+                     fw5(uc.atom[a].mat) << "\t" << fw5(uc.atom[a].lc) << "\t" << fw5(uc.atom[a].hc);
+            if(uc.surface_flags_present) ofile << "\t" << fw5(int(uc.atom[a].is_surface));
+            ofile << std::endl;
          }
          ofile << "#-----------------------------------------------------------------------------------------" << std::endl;
          ofile << "# Number of exchange interactions, exchange type; id, i j dx dy dz Jxx Jxy.. " << std::endl;

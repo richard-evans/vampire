@@ -62,7 +62,7 @@ namespace anisotropy{
       test="enable-bulk-neel-anisotropy";
       if(word==test){
           // Enable large threshold to force calculation of Neel anisotropy for all atoms
-          internal::neel_anisotropy_threshold = 1000000000;
+          internal::neel_anisotropy_threshold = internal::bulk_neel_anisotropy_threshold;
           return true;
       }
       //-------------------------------------------------------------------

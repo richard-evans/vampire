@@ -37,7 +37,7 @@ namespace internal{
                                           std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
 
       // Print informative message to log file
-      zlog << zTs() << "Using Néel pair anisotropy for atoms with < threshold number of neighbours." << std::endl;
+      zlog << zTs() << "Using Néel pair anisotropy for surface atoms." << std::endl;
 
       // allocate memory for neel anisotropy tensor
       internal::neel_tensor.resize( 9 * atoms::num_atoms, 0.0 );

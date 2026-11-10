@@ -4,8 +4,10 @@
 //   Free BSD licence (see licence file for details).
 //
 //   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Lennon Sivaruban 2026. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
+//          lennon.sivaruban@manchester.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -20,6 +22,7 @@
 
 #include "anisotropy.hpp"
 #include "errors.hpp"
+#include "material.hpp"
 #include "units.hpp"
 #include "vio.hpp"
 
@@ -36,14 +39,19 @@ namespace anisotropy{
       // initialise surface threshold if not overidden by input file
       if(internal::neel_anisotropy_threshold == 123456789) internal::neel_anisotropy_threshold = cs::unit_cell.surface_threshold;
 
+      // use surface flags from the unit cell file if present, unless Neel anisotropy is enabled for all atoms
+      const bool bulk_neel_anisotropy = internal::neel_anisotropy_threshold >= internal::bulk_neel_anisotropy_threshold;
+      const bool use_unit_cell_surface_flags = cs::unit_cell.surface_flags_present && !bulk_neel_anisotropy;
+
       //-------------------------------------------------
       // Optionally set up surface anisotropy
       //-------------------------------------------------
 
       // create temporary array for storing surface threshold
       std::vector<unsigned int> surface_anisotropy_threshold_array(atoms::num_atoms, internal::neel_anisotropy_threshold);
+      if(use_unit_cell_surface_flags) zlog << zTs() << "Identifying surface atoms using unit cell surface flags." << std::endl;
       // if using native (local) surface threshold then repopulate threshold array
-      if(internal::native_neel_anisotropy_threshold){
+      else if(internal::native_neel_anisotropy_threshold){
          zlog << zTs() << "Identifying surface atoms using native (site dependent) threshold." << std::endl;
          for(int atom=0; atom < atoms::num_atoms; atom++){
             unsigned int atom_uc_id = catom_array.at(atom).uc_id;
@@ -145,6 +153,15 @@ namespace anisotropy{
          // Check for local MPI atoms only
          if(catom_array[atom].mpi_type!=2){
 
+            // surface atoms defined by the unit cell file flags
+            if(use_unit_cell_surface_flags){
+               if(cs::unit_cell.atom[catom_array[atom].uc_id].is_surface){
+                  atoms::surface_array[atom]=true;
+                  num_surface_atoms++;
+               }
+               continue;
+            }
+
             // Initialise counter for number of nearest neighbour interactions
             unsigned int nnn_int=0;
 
@@ -167,6 +184,15 @@ namespace anisotropy{
 
       // Output statistics to log file
       zlog << zTs() << num_surface_atoms << " surface atoms found." << std::endl;
+
+      // Output number of surface atoms for each material to log file
+      std::vector<unsigned int> num_surface_atoms_per_material(mp::num_materials, 0);
+      for(int atom = 0; atom < atoms::num_atoms; atom++){
+         if(atoms::surface_array[atom]) num_surface_atoms_per_material[atoms::type_array[atom]]++;
+      }
+      zlog << zTs() << "Number of surface atoms for each material:";
+      for(int mat = 0; mat < mp::num_materials; mat++) zlog << " " << num_surface_atoms_per_material[mat];
+      zlog << std::endl;
 
       //----------------------------------------------------------------
       // If neel surface anisotropy is enabled, calculate necessary data
