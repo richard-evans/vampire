@@ -16,6 +16,9 @@
 #include "gpu.hpp"
 #include "stats.hpp"
 
+// statistics module headers
+#include "internal.hpp"
+
 namespace stats{
 
    //------------------------------------------------------------------------------------------------------
@@ -83,6 +86,10 @@ namespace stats{
          // reset binder cumulant statistics
          if(stats::calculate_system_binder_cumulant)   stats::system_binder_cumulant.reset_averages();
          if(stats::calculate_material_binder_cumulant) stats::material_binder_cumulant.reset_averages();
+
+         // reset per-spin geofencing statistics
+         if(stats::calculate_cubic_per_spin_geofencing)    stats::internal::reset_per_spin_geofencing(stats::cubic_geofencing);
+         if(stats::calculate_uniaxial_per_spin_geofencing) stats::internal::reset_per_spin_geofencing(stats::uniaxial_geofencing);
 
       }
 

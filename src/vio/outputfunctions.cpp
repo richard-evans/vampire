@@ -628,4 +628,24 @@ namespace vout{
    stream << stats::material_lattice_temp.output_mean_lattice_temp(header);
     }
 
+   // Cubic geofencing state of the magnetisation - with Header
+   void cubic_geofencing(std::ostream& stream, bool header){
+      stream << stats::output_geofencing_state(stats::cubic_geofencing, header);
+   }
+
+   // Uniaxial geofencing state of the magnetisation - with Header
+   void uniaxial_geofencing(std::ostream& stream, bool header){
+      stream << stats::output_geofencing_state(stats::uniaxial_geofencing, header);
+   }
+
+   // Cubic per-spin geofencing - with Header
+   void cubic_per_spin_geofencing(std::ostream& stream, bool header){
+      stream << stats::output_per_spin_geofencing(stats::cubic_geofencing, header);
+   }
+
+   // Uniaxial per-spin geofencing - with Header
+   void uniaxial_per_spin_geofencing(std::ostream& stream, bool header){
+      stream << stats::output_per_spin_geofencing(stats::uniaxial_geofencing, header);
+   }
+
 }

@@ -221,6 +221,11 @@ namespace vout{
    void mean_sld_coupling_energy(std::ostream& stream, bool header);
    void mean_sld_total_energy(std::ostream& stream, bool header);
 
+   void cubic_geofencing(std::ostream& stream, bool header);
+   void uniaxial_geofencing(std::ostream& stream, bool header);
+   void cubic_per_spin_geofencing(std::ostream& stream, bool header);
+   void uniaxial_per_spin_geofencing(std::ostream& stream, bool header);
+
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp
    //-------------------------------------------------------------------------
