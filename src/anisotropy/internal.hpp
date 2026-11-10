@@ -120,6 +120,7 @@ namespace anisotropy{
             double k_lattice; // uniaxial lattice anisotropy constant
 
             std::vector< double > kij; // surface/Neel anisotropy pair constant
+            std::vector< double > qij; // fourth order Neel anisotropy pair constant (quartic term) for collinear spins
 
             std::vector< double > ku_vector; // unit vector defining axis for uniaxial anisotropy
             std::vector< double > kr_vector; // unit vector defining axis for rotational anisotropy
@@ -180,6 +181,7 @@ namespace anisotropy{
             {
                // resize arrays to correct size
                kij.resize( max_materials, 0.0 ); // initialise pair anisotropy constants to zero
+               qij.resize( max_materials, 0.0 ); // initialise quartic Neel pair anisotropy constants to zero
 
                // set default uniaxial and cubic directions
                ku_vector.resize( 3 ); // resize to three elements
@@ -293,12 +295,17 @@ namespace anisotropy{
 
       // Flags for other anisotropies
       extern bool enable_neel_anisotropy; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
+      extern bool enable_neel_fourth_order_anisotropy; // Flag to use fourth order Neel anisotropy model for collinear spins
       extern bool enable_lattice_anisotropy; // Flag to turn on lattice anisotropy calculation
       extern bool enable_random_anisotropy; // Flag to enable random anisitropy initialisation
       extern bool enable_rotational_anisotropy; // Flag for CUDA to store rotational data
 
       // arrays for storing 1D collapsed Neel tensor
       extern std::vector< double > neel_tensor;
+
+      // arrays for storing 15 independent components of the fourth order Neel tensor and its constant energy per atom
+      extern std::vector< double > neel_fourth_order_tensor;
+      extern std::vector< double > neel_fourth_order_energy_constant;
 
       // arrays for storing unrolled spherical-harmonic anisotropy constants in Tesla
       extern std::vector< double > ku2;
@@ -752,6 +759,16 @@ namespace anisotropy{
                         const int start_index,
                         const int end_index);
 
+      void neel_fourth_order_fields(std::vector<double>& spin_array_x,
+                                    std::vector<double>& spin_array_y,
+                                    std::vector<double>& spin_array_z,
+                                    std::vector<int>&    atom_material_array,
+                                    std::vector<double>& field_array_x,
+                                    std::vector<double>& field_array_y,
+                                    std::vector<double>& field_array_z,
+                                    const int start_index,
+                                    const int end_index);
+
       void lattice_fields(std::vector<double>& spin_array_x,
                           std::vector<double>& spin_array_y,
                           std::vector<double>& spin_array_z,
@@ -982,10 +999,18 @@ namespace anisotropy{
                           const double sy,
                           const double sz);
 
+      double neel_fourth_order_energy(const int atom,
+                                      const int mat,
+                                      const double sx,
+                                      const double sy,
+                                      const double sz);
+
       double lattice_energy(const int atom, const int mat, const double sx, const double sy, const double sz, const double temperature);
 
       void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
                                              std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
+
+      void add_neel_fourth_order_pair(const int atom, const double l, const double q, const double eij[3]);
 
    } // end of internal namespace
 

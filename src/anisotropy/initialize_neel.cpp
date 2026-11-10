@@ -4,8 +4,10 @@
 //   Free BSD licence (see licence file for details).
 //
 //   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Lennon Sivaruban 2026. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
+//          lennon.sivaruban@manchester.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -41,6 +43,13 @@ namespace internal{
 
       // allocate memory for neel anisotropy tensor
       internal::neel_tensor.resize( 9 * atoms::num_atoms, 0.0 );
+
+      // allocate memory for fourth order (collinear spin) neel anisotropy tensor and energy constant
+      if(internal::enable_neel_fourth_order_anisotropy){
+         zlog << zTs() << "Using fourth order Néel pair anisotropy for collinear spins." << std::endl;
+         internal::neel_fourth_order_tensor.resize( 15 * atoms::num_atoms, 0.0 );
+         internal::neel_fourth_order_energy_constant.resize( atoms::num_atoms, 0.0 );
+      }
 
       // temporary tensor for calculating sum
       std::vector<double> tmp_tensor(9,0.0);
@@ -85,14 +94,24 @@ namespace internal{
                   eij[1] = eij[1] * invrij;
                   eij[2] = eij[2] * invrij;
 
-                  // get pair anisotropy constant between atom i and j in Tesla
+                  // get pair anisotropy constants between atom i and j in Tesla
                   double kij = anisotropy::internal::mp[imat].kij[jmat]*i_mu_s;
+                  double qij = anisotropy::internal::mp[imat].qij[jmat]*i_mu_s;
 
-                  // Adjust kij by exponential factor if needed
+                  // Adjust kij (and qij) by exponential factor if needed
                   if(internal::neel_range_dependent){
                      // Normalised exponential e(r0) = 1.0
-                     kij = kij*exp(-neel_exponential_factor*( rij - neel_exponential_range )/neel_exponential_range);
+                     const double range_factor = exp(-neel_exponential_factor*( rij - neel_exponential_range )/neel_exponential_range);
+                     kij = kij*range_factor;
+                     qij = qij*range_factor;
                   };
+
+                  // For the fourth order model add the quartic and constant terms, and use the
+                  // quadratic pair constant (l - 6/7 q)/2 with l = kij (see neel_fourth_order.cpp)
+                  if(internal::enable_neel_fourth_order_anisotropy){
+                     internal::add_neel_fourth_order_pair(atom, kij, qij, eij);
+                     kij = 0.5*(kij - (6.0/7.0)*qij);
+                  }
 
                   // loop over tensor components and sum total including local anisotropy constant
                   // note inclusion of factor - 2 . 1/2 = -1 in tensor field compared to energy due to derivative

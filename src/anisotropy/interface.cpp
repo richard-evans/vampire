@@ -1132,6 +1132,16 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      test="neel-fourth-order-anisotropy-constant"; // quartic pair constant q, enables the fourth order Neel model for collinear spins
+      if(word == test){
+         double qij = atof(value.c_str());
+         vin::check_for_valid_value(qij, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
+         internal::mp[super_index].qij[sub_index] = qij;
+         internal::enable_neel_anisotropy = true;
+         internal::enable_neel_fourth_order_anisotropy = true;
+         return true;
+      }
+      //------------------------------------------------------------
       test = "lattice-anisotropy-constant";
       if( word == test ){
          double kl = atof(value.c_str());
