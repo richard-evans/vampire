@@ -155,13 +155,8 @@ namespace dipole{
                      }
                      // End of Intra part
 
-                     // check for close to zero value tensors and round down to zero
-                     if (dipole::internal::rij_tensor_xx[lc][cellj]*dipole::internal::rij_tensor_xx[lc][cellj] < 1e-15) dipole::internal::rij_tensor_xx[lc][cellj] = 0.0;
-                     if (dipole::internal::rij_tensor_xy[lc][cellj]*dipole::internal::rij_tensor_xy[lc][cellj] < 1e-15) dipole::internal::rij_tensor_xy[lc][cellj] = 0.0;
-                     if (dipole::internal::rij_tensor_xz[lc][cellj]*dipole::internal::rij_tensor_xz[lc][cellj] < 1e-15) dipole::internal::rij_tensor_xz[lc][cellj] = 0.0;
-                     if (dipole::internal::rij_tensor_yy[lc][cellj]*dipole::internal::rij_tensor_yy[lc][cellj] < 1e-15) dipole::internal::rij_tensor_yy[lc][cellj] = 0.0;
-                     if (dipole::internal::rij_tensor_yz[lc][cellj]*dipole::internal::rij_tensor_yz[lc][cellj] < 1e-15) dipole::internal::rij_tensor_yz[lc][cellj] = 0.0;
-                     if (dipole::internal::rij_tensor_zz[lc][cellj]*dipole::internal::rij_tensor_zz[lc][cellj] < 1e-15) dipole::internal::rij_tensor_zz[lc][cellj] = 0.0;
+                     // No threshold on small tensor components: an absolute threshold (T^2 < 1e-15 A^-6, removed
+                     // 2026-11-11) zeroed every interaction beyond ~32 nm, dropping the far field of large systems.
                //   std::cout << i<< '\t' <<j << '\t' <<   dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_yz[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
                }
                }
