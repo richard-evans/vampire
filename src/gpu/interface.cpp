@@ -55,46 +55,26 @@ namespace gpu{
          }
       }
       //--------------------------------------------------------------------
-      // multi-GPU version only: sum exchange contributions in atom key order, so
-      // that results are bit for bit identical on any number of GPUs (testing)
-      #ifdef CUDA_MULTIGPU
+      // multi-GPU version: sum exchange contributions in atom key order, so that
+      // results are bit for bit identical on any number of GPUs (testing); accepted
+      // and without effect in the other versions
       test="decomposition-independent-order";
       if(word==test){
-         if(value=="" || value=="true"){
-            mgpu::decomposition_independent_order = true;
-            return true;
-         }
-         if(value=="false"){
-            mgpu::decomposition_independent_order = false;
-            return true;
-         }
-         terminaltextcolor(RED);
-         std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
-         std::cerr << "\t\"true\"" << std::endl;
-         std::cerr << "\t\"false\"" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         const bool order = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         #ifdef CUDA_MULTIGPU
+            mgpu::decomposition_independent_order = order;
+         #else
+            (void)order;
+         #endif
+         return true;
       }
-      #endif
       //--------------------------------------------------------------------
       // Atoms of non-magnetic=keep materials are not integrated and keep their
       // initial spin directions; they enter no field or statistic of the other atoms
       test="skip-non-magnetic-atoms";
       if(word==test){
-         if(value=="" || value=="true"){
-            gpu::skip_non_magnetic_atoms = true;
-            return true;
-         }
-         if(value=="false"){
-            gpu::skip_non_magnetic_atoms = false;
-            return true;
-         }
-         terminaltextcolor(RED);
-         std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
-         std::cerr << "\t\"true\"" << std::endl;
-         std::cerr << "\t\"false\"" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         gpu::skip_non_magnetic_atoms = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         return true;
       }
       //--------------------------------------------------------------------
       test="calculate-statistics-on-cpu";

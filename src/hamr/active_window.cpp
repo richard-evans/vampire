@@ -187,7 +187,7 @@ namespace hamr{
    } // end of internal namespace
 
    bool active_window_requested(){
-      return internal::active_window;
+      return internal::active_window && program::program == program::program_t::hamr_simulation;
    }
 
    bool active_window_enabled(){

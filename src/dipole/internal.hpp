@@ -361,6 +361,7 @@ namespace dipole{
        // Function to output solver memory information
        //-----------------------------------------------------------------
        void output_dipole_solver_mem_info(int num_cells, int num_local_cells);
+       void check_tensor_solver_memory(int num_cells, int num_local_cells);
 
    } // end of internal namespace
 

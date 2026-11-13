@@ -129,6 +129,7 @@ namespace dipole{
             }
             else{
             internal::output_dipole_solver_mem_info(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
+            internal::check_tensor_solver_memory(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
             dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
             }
             dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,

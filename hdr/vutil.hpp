@@ -74,6 +74,23 @@ namespace vutil{
 
    }
 
+   // Function to read the memory available for new allocations on this node from /proc/meminfo
+   // (linux only) in kB; returns -1 if it cannot be read
+   inline double available_memory_kb(){
+
+      std::ifstream meminfo("/proc/meminfo");
+      std::string key;
+      while(meminfo >> key){
+         if(key == "MemAvailable:"){
+            double kb = -1.0;
+            meminfo >> kb;
+            return kb;
+         }
+      }
+      return -1.0;
+
+   }
+
    // simple class for performing code timing
    class vtimer_t{
 

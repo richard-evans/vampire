@@ -13,11 +13,9 @@
 #include <vector>
 
 // Vampire headers
-#include "environment.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
 #include "mgpu.hpp"
-#include "micromagnetic.hpp"
 #include "program.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -49,8 +47,6 @@ void initialize(){
    // version does not support at all are checked in gpu::initialize). Remove an
    // entry once the multi-GPU version supports it and a test confirms it.
    if(vmpi::mpi_mode != 0) unsupported("MPI modes other than geometric decomposition");
-   if(micromagnetic::discretisation_type > 0) unsupported("Micromagnetic discretisation");
-   if(environment::enabled) unsupported("The environment module");
 
    // refuses programs that are not confirmed to work on several GPUs
    if(vmpi::num_processors > 1){

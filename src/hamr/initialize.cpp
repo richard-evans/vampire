@@ -42,6 +42,14 @@ namespace hamr{
                    const int num_local_atoms
                   ){
 
+      // the active window options act only in the HAMR program, and the sub-options only with the window
+      if(hamr::internal::active_window && !hamr::active_window_requested()){
+         err::warning("Warning - hamr:active-window has no effect outside sim:program = hamr-simulation and is ignored");
+      }
+      if(hamr::internal::active_window_options_set && !hamr::active_window_requested()){
+         err::warning("Warning - hamr:active-window-temperature and hamr:active-window-full-snapshots have no effect without hamr:active-window and are ignored");
+      }
+
       // If program:hamr-simulation not requested, then stop
       if(!hamr::internal::enabled){
          return;

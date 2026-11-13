@@ -72,6 +72,7 @@ namespace hamr{
       bool active_window = false;
       double active_window_dT = 1.0; // K
       bool active_window_full_snapshots = false;
+      bool active_window_options_set = false; // a window sub-option is set in the input file
 
    } // end of internal namespace
 } // end of hamr namespace

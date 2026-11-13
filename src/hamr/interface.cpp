@@ -202,38 +202,15 @@ namespace hamr{
       //--------------------------------------------------------------------
       test="active-window";
       if(word==test){
-         if(value=="" || value=="true"){
-            hamr::internal::active_window = true;
-            return true;
-         }
-         if(value=="false"){
-            hamr::internal::active_window = false;
-            return true;
-         }
-         terminaltextcolor(RED);
-         std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
-         std::cerr << "\t\"true\"" << std::endl;
-         std::cerr << "\t\"false\"" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         hamr::internal::active_window = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         return true;
       }
       //--------------------------------------------------------------------
       test="active-window-full-snapshots";
       if(word==test){
-         if(value=="" || value=="true"){
-            hamr::internal::active_window_full_snapshots = true;
-            return true;
-         }
-         if(value=="false"){
-            hamr::internal::active_window_full_snapshots = false;
-            return true;
-         }
-         terminaltextcolor(RED);
-         std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
-         std::cerr << "\t\"true\"" << std::endl;
-         std::cerr << "\t\"false\"" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
+         hamr::internal::active_window_full_snapshots = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         hamr::internal::active_window_options_set = true;
+         return true;
       }
       //--------------------------------------------------------------------
       test="active-window-temperature";
@@ -242,6 +219,7 @@ namespace hamr{
          // 0 integrates every grain
          vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
          hamr::internal::active_window_dT = T;
+         hamr::internal::active_window_options_set = true;
          return true;
       }
       //--------------------------------------------------------------------

@@ -20,9 +20,11 @@
 #include "integrate.hpp"
 #include "cuda.hpp"
 #include "dipole.hpp"
+#include "environment.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
 #include "material.hpp"
+#include "micromagnetic.hpp"
 #include "mgpu.hpp"
 #include "program.hpp"
 #include "sim.hpp"
@@ -78,6 +80,9 @@ namespace gpu{
       if(sim::local_applied_field)        unsupported.push_back("material specific applied fields");
       if(sim::ext_demag)                  unsupported.push_back("the thin film demagnetising field (sim:demagnetisation-factor)");
       if(sim::local_temperature)          unsupported.push_back("material specific temperatures");
+      if(::environment::enabled)          unsupported.push_back("the environment module");
+      if(::micromagnetic::discretisation_type > 0) unsupported.push_back("micromagnetic and multiscale simulations");
+      if(::micromagnetic::bias_magnets_enabled()) unsupported.push_back("micromagnetic bias magnets");
       if(program::program == program::program_t::localised_temperature_pulse) unsupported.push_back("the localised-temperature-pulse program");
       if(::dipole::activated)             unsupported.push_back("dipole fields");
       if(sim::spin_torque_fields_enabled()) unsupported.push_back("spin transfer and spin orbit torque fields");
@@ -104,6 +109,8 @@ namespace gpu{
       if(gpu::skip_non_magnetic_atoms){
          if(::stats::calculate_system_energy || ::stats::calculate_grain_energy || ::stats::calculate_material_energy)
             unsupported.push_back("energy statistics with gpu:skip-non-magnetic-atoms (they include the atoms that are not integrated)");
+         if(integrate::integrator == integrate::integrator_t::monte_carlo)
+            unsupported.push_back("gpu:skip-non-magnetic-atoms with the monte-carlo integrator");
          if(::exchange::get_exchange_type() != 0){
             unsupported.push_back("gpu:skip-non-magnetic-atoms with vectorial or tensorial exchange");
          }
