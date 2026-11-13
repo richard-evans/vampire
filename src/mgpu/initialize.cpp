@@ -13,6 +13,7 @@
 #include <vector>
 
 // Vampire headers
+#include "create.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
 #include "mgpu.hpp"
@@ -48,21 +49,16 @@ void initialize(){
    // entry once the multi-GPU version supports it and a test confirms it.
    if(vmpi::mpi_mode != 0) unsupported("MPI modes other than geometric decomposition");
 
-   // refuses programs that are not confirmed to work on several GPUs
-   if(vmpi::num_processors > 1){
-      switch(program::program){
-         case program::program_t::time_series:
-         case program::program_t::hysteresis_loop:
-         case program::program_t::curie_temperature:
-         case program::program_t::field_cool:
-         case program::program_t::laser_pulse:
-         case program::program_t::hamr_simulation:
-         case program::program_t::partial_hysteresis_loop:
-         case program::program_t::fmr:
-            break;
-         default:
-            unsupported("Program " + std::to_string(static_cast<int>(program::program)) + " (sim:program) on more than one GPU");
-      }
+   // every local atom needs its own key (create::set_atom_keys)
+   if(!create::atom_keys_valid){
+      err::fatal("Error: atoms on rank " + std::to_string(vmpi::my_rank) + " cannot be identified by their unit cell (at most " +
+                 std::to_string(1 << 16) + " unit cells along each axis and atoms per unit cell), which the multi-GPU version requires");
+   }
+
+   // on several GPUs the host has no up to date spins while the simulation runs, so only
+   // programs that use just statistics of the spins are supported
+   if(vmpi::num_processors > 1 && gpu::program_reads_host_spins()){
+      unsupported("Program " + std::to_string(static_cast<int>(program::program)) + " (sim:program) on more than one GPU");
    }
 
    // rank within this node

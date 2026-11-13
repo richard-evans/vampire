@@ -120,6 +120,37 @@ inline __device__ float atomicAdd(float *address, float value) {
   return ::atomicAdd(address, value);
 }
 
+// width of the thermal field of a material at a temperature (with the material's temperature
+// rescaling); shared by the thermal field kernels of the CUDA and multi-GPU versions
+inline __device__ cu_real_t thermal_field_sigma(const material_parameters_t &mat, const cu_real_t temp) {
+   const cu_real_t alpha = mat.temperature_rescaling_alpha;
+   const cu_real_t tc = mat.temperature_rescaling_Tc;
+   const cu_real_t sigma = mat.H_th_sigma;
+   #ifdef CUDA_DP
+      const double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
+      return sigma * sqrt(resc_temp);
+   #else
+      const float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
+      return sigma * sqrtf(resc_temp);
+   #endif
+}
+
+// temperature of the Gaussian HAMR laser profile centred on the head (px, py) at (cx, cy)
+inline __device__ cu_real_t laser_temperature(const cu_real_t cx, const cu_real_t cy, const cu_real_t px, const cu_real_t py,
+                                              const cu_real_t Tmin, const cu_real_t DeltaT,
+                                              const cu_real_t one_over_denx, const cu_real_t one_over_deny) {
+   const cu_real_t cx2 = (cx - px) * (cx - px);
+   const cu_real_t cy2 = (cy - py) * (cy - py);
+   #ifdef CUDA_DP
+      const cu_real_t exp_x = exp(-cx2 * one_over_denx);
+      const cu_real_t exp_y = exp(-cy2 * one_over_deny);
+   #else
+      const cu_real_t exp_x = __expf(-cx2 * one_over_denx);
+      const cu_real_t exp_y = __expf(-cy2 * one_over_deny);
+   #endif
+   return Tmin + DeltaT * exp_x * exp_y;
+}
+
 /*
  * Shared kernel definitions
  */

@@ -19,6 +19,7 @@
 #include "cuda.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
+#include "gpu.hpp"
 #include "integrate.hpp"
 #include "program.hpp"
 #include "spintorque.hpp"
@@ -302,29 +303,6 @@ namespace {
    }
 
    //---------------------------------------------------------------------------
-   // Function to determine whether the program may read the spins on the host
-   // directly during the simulation
-   //---------------------------------------------------------------------------
-   bool program_reads_host_spins(){
-
-      // programs which only use statistics of the spins during the simulation
-      switch(::program::program){
-         case ::program::program_t::time_series:
-         case ::program::program_t::hysteresis_loop:
-         case ::program::program_t::curie_temperature:
-         case ::program::program_t::field_cool:
-         case ::program::program_t::laser_pulse:
-         case ::program::program_t::hamr_simulation:
-         case ::program::program_t::partial_hysteresis_loop:
-         case ::program::program_t::fmr:
-            return false;
-         default:
-            return true;
-      }
-
-   }
-
-   //---------------------------------------------------------------------------
    // Function to determine whether the host needs an up to date copy of the
    // spins at every statistics update, in which case all statistics are
    // calculated on the CPU
@@ -340,7 +318,7 @@ namespace {
       // only the GPU integrators keep the spins on the device up to date
       if(::integrate::integrator != ::integrate::integrator_t::llg_heun && ::integrate::integrator != ::integrate::integrator_t::monte_carlo) return true;
 
-      return program_reads_host_spins();
+      return ::gpu::program_reads_host_spins();
 
    }
 
@@ -543,7 +521,7 @@ namespace {
 // read them there directly (programs that do not use the GPU statistics)
 //------------------------------------------------------------------------------
 void update_host_spins(){
-   if(program_reads_host_spins()) transfer_spin_positions_from_gpu_to_cpu();
+   if(::gpu::program_reads_host_spins()) transfer_spin_positions_from_gpu_to_cpu();
 }
 
 namespace stats{

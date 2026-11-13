@@ -36,8 +36,9 @@ namespace cu = ::vcuda::internal;
 
 //------------------------------------------------------------------------------
 // Thermal and HAMR fields of the multi-GPU version. The physics is that of the
-// CUDA module (src/cuda/thermal_fields.cu and src/cuda/hamr_fields.cu, keep
-// both in step); only the random numbers differ. The CUDA module draws them
+// CUDA module (src/cuda/thermal_fields.cu and src/cuda/hamr_fields.cu, with the
+// field width and laser profile shared through src/cuda/internal.hpp); only the
+// random numbers differ. The CUDA module draws them
 // from a random number state per GPU thread, which would repeat the same
 // numbers on every GPU. Here they are computed from the integration seed, the
 // key of the atom and the number of the time step with the counter-based
@@ -82,17 +83,7 @@ namespace internal{
 
          const cu::material_parameters_t mat = material_params[material[i]];
          if(mat.skip) continue; // atoms that are not integrated need no field (their noise depends on no other atom)
-         const cu::cu_real_t alpha = mat.temperature_rescaling_alpha;
-         const cu::cu_real_t sigma = mat.H_th_sigma;
-         const cu::cu_real_t tc = mat.temperature_rescaling_Tc;
-
-         #ifdef CUDA_DP
-            const double resc_temp = (temperature < tc) ? tc * pow(temperature / tc, alpha) : temperature;
-            const double rsigma = sigma*sqrt(resc_temp);
-         #else
-            const float resc_temp = (temperature < tc) ? tc * __powf(temperature / tc, alpha) : temperature;
-            const float rsigma = sigma*sqrtf(resc_temp);
-         #endif
+         const cu::cu_real_t rsigma = cu::thermal_field_sigma(mat, temperature);
 
          const float3 n = thermal_noise(atom_key[i], step, seed);
          x_field_array[i] = rsigma * n.x;
@@ -129,31 +120,11 @@ namespace internal{
          const cu::material_parameters_t mat = material_params[material[i]];
          if(mat.skip) continue; // atoms that are not integrated need no field (their noise depends on no other atom)
 
-         // temperature of the Gaussian laser profile centred on the head
+         // temperature of the Gaussian laser profile and thermal field with the material's temperature rescaling
          const cu::cu_real_t cx = atoms_coord_x[i];
          const cu::cu_real_t cy = atoms_coord_y[i];
-         const cu::cu_real_t cx2 = (cx-px)*(cx-px);
-         const cu::cu_real_t cy2 = (cy-py)*(cy-py);
-         #ifdef CUDA_DP
-            const cu::cu_real_t exp_x = exp(-cx2*one_over_denx);
-            const cu::cu_real_t exp_y = exp(-cy2*one_over_deny);
-         #else
-            const cu::cu_real_t exp_x = __expf(-cx2*one_over_denx);
-            const cu::cu_real_t exp_y = __expf(-cy2*one_over_deny);
-         #endif
-         const cu::cu_real_t temp = Tmin + DeltaT * exp_x * exp_y;
-
-         // material dependent temperature rescaling
-         const cu::cu_real_t alpha = mat.temperature_rescaling_alpha;
-         const cu::cu_real_t Tc    = mat.temperature_rescaling_Tc;
-         const cu::cu_real_t sigma = mat.H_th_sigma;
-         #ifdef CUDA_DP
-            const double resc_temp = (temp < Tc) ? Tc * pow(temp / Tc, alpha) : temp;
-            const double rsigma = sigma*sqrt(resc_temp);
-         #else
-            const float resc_temp = (temp < Tc) ? Tc * __powf(temp / Tc, alpha) : temp;
-            const float rsigma = sigma*sqrtf(resc_temp);
-         #endif
+         const cu::cu_real_t temp = cu::laser_temperature(cx, cy, px, py, Tmin, DeltaT, one_over_denx, one_over_deny);
+         const cu::cu_real_t rsigma = cu::thermal_field_sigma(mat, temp);
 
          const float3 n = thermal_noise(atom_key[i], step, seed);
          cu::cu_real_t field_x = rsigma * n.x;

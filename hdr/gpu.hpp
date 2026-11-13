@@ -22,6 +22,9 @@ namespace gpu{
 
    extern int device; // int specifying gpu device to use for simulation
 
+   // exchange interactions with |J| at or below this value are left out of the device neighbour list
+   const double exchange_tolerance = 1e-10;
+
 
    //-----------------------------------------------------------------------------
    // Functions for GPU acceleration
@@ -38,6 +41,8 @@ namespace gpu{
    extern void transfer_dipole_cells_fields_from_gpu_to_cpu();
    extern void update_dipolar_fields();
    extern void mc_step();
+   extern bool skipped_material(const int material); // material not integrated (gpu:skip-non-magnetic-atoms)
+   extern bool program_reads_host_spins(); // false for programs that use only statistics of the spins while running
 
    //-----------------------------------------------------------------------------
    // Functions for GPU configuration output

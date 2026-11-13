@@ -12,6 +12,7 @@
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
+#include "gpu.hpp"
 #include "integrate.hpp"
 #include "sim.hpp"
 #include "vio.hpp"
@@ -171,7 +172,7 @@ namespace vcuda
             // NOTE: Below calculations have been left in double precision
             // for now !!
             // tolerance to ignore exchange components
-            const cu_real_t tol = 1e-10;
+            const cu_real_t tol = ::gpu::exchange_tolerance;
             // loop over all atoms
             for(int atom = 0; build_matrix && atom < ::atoms::num_atoms; ++atom){
 

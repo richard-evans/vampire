@@ -115,14 +115,12 @@ namespace gpu{
             unsupported.push_back("gpu:skip-non-magnetic-atoms with vectorial or tensorial exchange");
          }
          else{
-            // same tolerance as the device neighbour list, which leaves out smaller interactions
-            const double tol = 1e-10;
             bool coupled = false;
             for(int atom = 0; atom < atoms::num_atoms && !coupled; atom++){
-               const bool keep_i = mp::material[atoms::type_array[atom]].non_magnetic == 2;
+               const bool keep_i = gpu::skipped_material(atoms::type_array[atom]);
                for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; nn++){
-                  const bool keep_j = mp::material[atoms::type_array[atoms::neighbour_list_array[nn]]].non_magnetic == 2;
-                  if((keep_i || keep_j) && std::fabs(atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij) > tol){
+                  const bool keep_j = gpu::skipped_material(atoms::type_array[atoms::neighbour_list_array[nn]]);
+                  if((keep_i || keep_j) && std::fabs(atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij) > gpu::exchange_tolerance){
                      coupled = true;
                      break;
                   }
@@ -142,6 +140,14 @@ namespace gpu{
    }
 
    //-------------------------------------------------------------------------------
+   // Function to return true for a material whose atoms are not integrated
+   // (non-magnetic = keep with gpu:skip-non-magnetic-atoms)
+   //-------------------------------------------------------------------------------
+   bool skipped_material(const int material){
+      return gpu::skip_non_magnetic_atoms && mp::material[material].non_magnetic == 2;
+   }
+
+   //-------------------------------------------------------------------------------
    // Function to call correct initialization function depending on the backend (cuda)
    //-------------------------------------------------------------------------------
    void initialize(){
@@ -151,7 +157,7 @@ namespace gpu{
 
       if(gpu::skip_non_magnetic_atoms){
          int skipped = 0;
-         for(int atom = 0; atom < atoms::num_atoms; atom++) skipped += mp::material[atoms::type_array[atom]].non_magnetic == 2;
+         for(int atom = 0; atom < atoms::num_atoms; atom++) skipped += gpu::skipped_material(atoms::type_array[atom]);
          zlog << zTs() << "Not integrating " << skipped << " of " << atoms::num_atoms << " atoms of non-magnetic (keep) materials on rank " << vmpi::my_rank << " (gpu:skip-non-magnetic-atoms)" << std::endl;
       }
 

@@ -104,18 +104,7 @@ namespace vcuda{
             cu_real_t field_z = 0.0;
 
             // thermal field calculation
-            cu_real_t temp = temperature;
-            cu_real_t alpha = mat.temperature_rescaling_alpha;
-            cu_real_t sigma = mat.H_th_sigma;
-            cu_real_t tc = mat.temperature_rescaling_Tc;
-
-            #ifdef CUDA_DP
-               double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
-               double rsigma = sigma*sqrt(resc_temp);
-            #else
-               float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
-               float rsigma = sigma*sqrtf(resc_temp);
-            #endif
+            const cu_real_t rsigma = cu::thermal_field_sigma(mat, temperature);
 
             // Gaussian random numbers are generated in single precision in both builds, since double
             // precision generation is slow on GPUs with reduced double precision throughput

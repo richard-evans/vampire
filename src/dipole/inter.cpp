@@ -60,7 +60,8 @@ namespace dipole{
          const double r2 = rx*rx + ry*ry + rz*rz;
 
          // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
-         if( r2 > cutoff*cutoff ){
+         // a cell without magnetic atoms (cells:probe-non-magnetic-cells) has no atomistic data, so it is a point dipole at any distance
+         if( r2 > cutoff*cutoff || global_atoms_in_cell_count[celli] == 0 || global_atoms_in_cell_count[cellj] == 0 ){
 
             const double rij = 1.0/sqrt(r2); // Reciprocal of the distance
 
@@ -90,36 +91,6 @@ namespace dipole{
 
             const int num_i_atoms = global_atoms_in_cell_count[celli];
             const int num_j_atoms = global_atoms_in_cell_count[cellj];
-
-            // celli (or, defensively, cellj) has no magnetic atoms: this
-            // happens for a non-magnetic-only probe cell exposed by
-            // cells:probe-non-magnetic-cells. There is no atomistic position
-            // data collected for such a cell (initialise_atomistic_cell_data
-            // only gathers atoms for cells with global_atoms_in_cell_count>0),
-            // so an atomistic near-field sum is not possible here; fall back
-            // to the continuum point-dipole approximation between cell
-            // centroids instead (same formula as the r2>cutoff branch above)
-            // rather than dividing tmp_rij_inter_*(==0) by inorm=1/(0*num_j_atoms).
-            if( num_i_atoms == 0 || num_j_atoms == 0 ){
-
-               const double rij = 1.0/sqrt(r2);
-
-               const double ex = rx*rij;
-               const double ey = ry*rij;
-               const double ez = rz*rij;
-
-               const double rij3 = (rij*rij*rij); // Angstroms
-
-               dipole::internal::rij_tensor_xx[lc][cellj] = ((3.0*ex*ex - 1.0)*rij3);
-               dipole::internal::rij_tensor_xy[lc][cellj] = ( 3.0*ex*ey      )*rij3 ;
-               dipole::internal::rij_tensor_xz[lc][cellj] = ( 3.0*ex*ez      )*rij3 ;
-
-               dipole::internal::rij_tensor_yy[lc][cellj] = ((3.0*ey*ey - 1.0)*rij3);
-               dipole::internal::rij_tensor_yz[lc][cellj] = ( 3.0*ey*ez      )*rij3 ;
-               dipole::internal::rij_tensor_zz[lc][cellj] = ((3.0*ez*ez - 1.0)*rij3);
-
-               return;
-            }
 
             // search for cells i and j in local atom-cells list
             int cell_with_atoms_index_i = -1;

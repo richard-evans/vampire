@@ -34,34 +34,6 @@ namespace vcuda{
    // module internal namespace
    namespace internal{
 
-      // Function to calculate temperature of atom depending on Gaussian profile
-      __device__ cu_real_t calculate_gaussian_profile(
-         const int atom, const cu_real_t cx, const cu_real_t cy,
-         const cu_real_t px, const cu_real_t py,
-         const cu_real_t Tmin, const cu_real_t DeltaT,
-         const cu_real_t one_over_denx, const cu_real_t one_over_deny
-         )
-      {
-
-         const cu_real_t cx2 = (cx-px)*(cx-px);
-         const cu_real_t cy2 = (cy-py)*(cy-py);
-
-         #ifdef CUDA_DP
-            cu_real_t exp_x =  exp(-cx2*one_over_denx);
-            cu_real_t exp_y =  exp(-cy2*one_over_deny);
-         #else
-            cu_real_t exp_x =  __expf(-cx2*one_over_denx);
-            cu_real_t exp_y =  __expf(-cy2*one_over_deny);
-         #endif
-         // if(i<5){printf("  %d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-         //                   i, cx, cy, px, py, DeltaT, denx, deny, one_over_denx, one_over_deny, exp_x, exp_y); }
-
-         cu_real_t temperature = Tmin + DeltaT * exp_x * exp_y;
-
-         return temperature;
-      } // end calculate_gaussian_profile
-
-
       // Kernel to apply thermal field with local temperature and the head field inside the field box
       __global__ void apply_local_temperature_and_field_kernel(
             cu_real_t * atoms_coord_x, cu_real_t * atoms_coord_y,
@@ -109,41 +81,11 @@ namespace vcuda{
             cu_real_t field_y = 0.0;
             cu_real_t field_z = 0.0;
 
-            // Assign tempeerature to atoms according to Gaussian profile
-            // cu_real_t temp = calculate_gaussian_profile(i, atoms_coord_x[i], atoms_coord_y[i], px, py,
-            //                                     Tmin, DeltaT, one_over_denx, one_over_deny);
-            //-------------------------------------------//
+            // temperature of the Gaussian laser profile and thermal field with the material's temperature rescaling
             const cu_real_t cx = atoms_coord_x[i];
             const cu_real_t cy = atoms_coord_y[i];
-            const cu_real_t cx2 = (cx-px)*(cx-px);
-            const cu_real_t cy2 = (cy-py)*(cy-py);
-
-            #ifdef CUDA_DP
-               cu_real_t exp_x =  exp(-cx2*one_over_denx);
-               cu_real_t exp_y =  exp(-cy2*one_over_deny);
-            #else
-               cu_real_t exp_x =  __expf(-cx2*one_over_denx);
-               cu_real_t exp_y =  __expf(-cy2*one_over_deny);
-            #endif
-            const cu_real_t temp = Tmin + DeltaT * exp_x * exp_y;
-
-            //-------------------------------------------//
-
-            // material dependent temperature rescaling
-            const cu_real_t alpha = mat.temperature_rescaling_alpha;
-            const cu_real_t Tc    = mat.temperature_rescaling_Tc;
-            const cu_real_t sigma = mat.H_th_sigma;
-
-            // thermal field calculation
-
-            #ifdef CUDA_DP
-               double resc_temp = (temp < Tc) ? Tc * pow(temp / Tc, alpha) : temp;
-               double rsigma = sigma*sqrt(resc_temp);
-            #else
-               float resc_temp = (temp < Tc) ? Tc * __powf(temp / Tc, alpha) : temp;
-               float rsigma = sigma*sqrtf(resc_temp);
-            #endif
-            // if(fabs(cx-px)<10.0 && fabs(cy-py)<10.0){printf("  %d %lf %lf %lf %lf %lf %lf\n", i, cx, cy, Tmin, DeltaT+Tmin, temp, resc_temp);}
+            const cu_real_t temp = cu::laser_temperature(cx, cy, px, py, Tmin, DeltaT, one_over_denx, one_over_deny);
+            const cu_real_t rsigma = cu::thermal_field_sigma(mat, temp);
 
             // Gaussian random numbers are generated in single precision in both builds, since double
             // precision generation is slow on GPUs with reduced double precision throughput

@@ -590,7 +590,7 @@ namespace vcuda{
             _materials[i].temperature_rescaling_alpha = ::mp::material[i].temperature_rescaling_alpha;
             _materials[i].temperature_rescaling_Tc    = ::mp::material[i].temperature_rescaling_Tc;
             _materials[i].H_th_sigma = ::mp::material[i].H_th_sigma;
-            _materials[i].skip = gpu::skip_non_magnetic_atoms && ::mp::material[i].non_magnetic == 2;
+            _materials[i].skip = gpu::skipped_material(i);
 
          }
 

@@ -13,8 +13,6 @@
 #include <cstdint>
 #include <vector>
 
-namespace cs{ class catom_t; }
-
 //-----------------------------------------------------------------------------
 // Multi-GPU module (make cuda-multigpu): one MPI rank per GPU. The system is
 // decomposed geometrically as in the MPI version; each rank integrates its
@@ -32,13 +30,7 @@ namespace mgpu{
    // neighbours of each atom by atom key. Called after the CUDA module is initialised.
    void initialize_device();
 
-   // Checks that every atom has a key (create::atom_keys). Called when the
-   // atoms are created.
-   void set_atom_keys(const std::vector<cs::catom_t>& catom_array);
-
-   // Key of each atom: built from its unit cell (supercell coordinates, wrapped
-   // for periodic images) and its number within the unit cell, so it does not
-   // depend on how the system is decomposed
+   // Key of each atom (create::atom_keys)
    extern std::vector<uint64_t>& atom_key;
 
    // Sum the exchange contributions of each atom in atom key order

@@ -40,6 +40,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
+#include "gpu.hpp"
 #include "hamr.hpp"
 #include "integrate.hpp"
 #include "material.hpp"
@@ -101,9 +102,7 @@ namespace hamr{
          // every process changes the window at the same step, so the total can be summed here
          uint64_t num_atoms = 0;
          for(size_t r = 0; r < active_ranges.size(); r += 2) num_atoms += active_ranges[r+1] - active_ranges[r];
-         #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &num_atoms, 1, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
-         #endif
+         num_atoms = vmpi::all_reduce_sum(num_atoms);
          zlog << zTs() << "HAMR active window: " << num_grains << " grains, " << num_atoms << " atoms integrated, head at "
               << head_position_x*0.1 << " nm, " << head_position_y*0.1 << " nm" << std::endl;
       }
@@ -125,7 +124,7 @@ namespace hamr{
 
          // grains must evolve independently: no exchange between a magnetic atom and an atom outside its grain
          // (same tolerance as the GPU neighbour list); the neighbours of local atoms include halo atoms
-         const double tol = 1e-10;
+         const double tol = gpu::exchange_tolerance;
          const int num_local = num_owned_atoms();
          int bond_i = -1, bond_j = -1;
          for(int atom = 0; atom < num_local && bond_i < 0; atom++){

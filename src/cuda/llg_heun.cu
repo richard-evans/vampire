@@ -119,7 +119,7 @@ namespace vcuda{
                // save derived variables to host array
                h_heun_params.at(i).prefactor = -gamma / (1.0 + alpha * alpha);
                h_heun_params.at(i).lambda_times_prefactor = -gamma * alpha / (1.0 + alpha * alpha);
-               h_heun_params.at(i).skip = gpu::skip_non_magnetic_atoms && ::mp::material[i].non_magnetic == 2;
+               h_heun_params.at(i).skip = gpu::skipped_material(i);
 
                #ifdef CUDA_SPIN_DEBUG
                   // output variables to screen for debugging
