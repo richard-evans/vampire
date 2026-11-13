@@ -24,6 +24,7 @@ Which check to run:
 | meant to leave every result unchanged (refactoring, optimisation with the same arithmetic, new options that are off by default) | `identity_compare.sh` against the last commit that passed the full checks; if every run is identical, the results of those checks carry over |
 | touches the multi-GPU version (`src/mgpu`, halo, decomposition) | `mgpu_check.sh` as well |
 | changes results (new physics, different arithmetic or random numbers) | `run_gpu_suite.sh`, `mgpu_check.sh`, and `ab_compare.sh` for statistically equivalent changes |
+| anything that could change what an ordinary user of the serial or MPI version sees (input, output files, checkpoints, vdc) | `compat_check.sh` against the reference version (CPU only, no GPU needed) |
 | new feature or validation case | all of the above once, before committing |
 
 The GPU scripts start several validation runs at a time on the GPU (`GPU_JOBS`, default 4 processes, so 2 runs on 2
@@ -130,6 +131,35 @@ magnetised Co film (40 x 12 x 3 nm, 1 nm cells) with the tensor solver (with and
 `dipole:on-the-fly-tensors`, which must give identical fields) and the hierarchical solver: and the hierarchical field must agree with the
 tensor field to `TOL` tesla (default 1e-3; the film is longer than the range the hierarchical solver sums cell by cell,
 so its far-field approximation is tested).
+
+## Compatibility with a reference version
+
+`developers/test/validation/compat_check.sh [ref-commit]` (default `upstream/v8`) builds the serial and MPI versions and
+`vdc` of a reference commit and of the working tree, and checks on the CPU that the working tree behaves like the
+reference for an ordinary user: every output file must be identical byte for byte (comment lines starting with `#`,
+and the stdout and log files, are ignored). Its stages (`ONLY=stage,stage` selects some of them):
+
+- `samples`: every sample of `samples/` with both serial versions (a sample that needs a set-up step, such as the
+  unit cell generator, gets it; a run longer than 50000 steps is shortened for both versions)
+- `config`: a small system with two magnetic and one non-magnetic material, written with every combination of
+  `config:output-format` and `config:output-mode` (and one and two output nodes), serial and on `RANKS` MPI ranks
+  (default 2); combinations that both versions refuse are reported. Every file, and every product of each version's own
+  `vdc` (no option, `--xyz`, `--vtk`, `--povray`, `--text`, `--cells`, `--ssc`, `--grains`, `--povray-cells`,
+  `--povray-sticks`, `--cell-size`) must be identical; for legacy files, which `vdc` cannot read, both must give the
+  same error
+- `old-files`: `vdc` of the working tree on the files written by the reference version must give the products of the
+  reference `vdc`
+- `checkpoints`: a 300 K run writes a checkpoint half way; it is continued (`sim:load-checkpoint=continue`) and
+  restarted (`restart`) by every combination of writing and reading version, serial and parallel, and must give the
+  results of the reference version reading its own checkpoint
+- `window-snapshots` (working tree only): a granular HAMR write with `hamr:active-window` and spin configuration
+  files, with and without `hamr:active-window-full-snapshots`: output and the `vdc` products (`--xyz`, `--vtk`,
+  `--text`, `--povray`) must be identical
+- `warnings`: the compiler warnings of each target; fails if the working tree warns in a file the reference does not
+
+The binaries of a reference commit are cached in `results/compat-cache` (`CACHE`) and reused. Other variables: `JOBS`
+(build jobs), `MPIRUN`, `WORK` (scratch directory, kept; by default a temporary directory, kept with `KEEP=1`). The
+summary of PASS and FAIL lines and the times is written to `results/compat-<ref>-<date>/summary.txt`.
 
 ## Case format (`cases/<case>/case.json`)
 
