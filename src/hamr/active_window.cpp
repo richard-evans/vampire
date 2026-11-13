@@ -30,7 +30,9 @@
 // C++ standard library headers
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 // Vampire headers
 #include "atoms.hpp"
@@ -63,6 +65,10 @@ namespace hamr{
       uint64_t window_hold_steps = 0;
       uint64_t num_window_changes = 0;
       bool window_initialised = false;
+      std::vector<uint64_t> resume_grain_cool_steps; // steps since each grain was last hot, from a checkpoint
+
+      // marks the window state in a checkpoint file (older files end the HAMR state before it)
+      const uint64_t window_state_magic = 0x3157444e49575248ULL;
 
       bool is_magnetic(const int atom){
          return mp::material[atoms::type_array[atom]].non_magnetic == 0;
@@ -179,9 +185,46 @@ namespace hamr{
          snapshot_in_window = false;
          window_initialised = true;
 
+         // continued simulation: the grains integrated at the checkpoint, as in the simulation that wrote it
+         if(!resume_grain_cool_steps.empty()){
+            if(resume_grain_cool_steps.size() == grain_cool_steps.size()){
+               grain_cool_steps = resume_grain_cool_steps;
+               for(int g = 0; g < num_grains; g++) grain_active[g] = grain_cool_steps[g] < window_hold_steps;
+               zlog << zTs() << "HAMR active window state loaded from the checkpoint" << std::endl;
+            }
+            else{
+               err::warning("Warning - the checkpoint holds the active window of " + std::to_string(resume_grain_cool_steps.size()) +
+                            " grains but the system has " + std::to_string(num_grains) + ", so every grain is integrated for the first 10 ps");
+            }
+         }
+
          zlog << zTs() << "HAMR active window enabled: " << num_grains << " grains, temperature threshold " << active_window_dT
               << " K above the minimum, grains kept for " << window_hold_steps << " steps after leaving it" << std::endl;
          rebuild_active_ranges();
+      }
+
+      //------------------------------------------------------------------------
+      // Functions to write and read the window state (steps since each grain was
+      // last hot) after the head state in a checkpoint file, so that a continued
+      // simulation integrates the same grains as an uninterrupted one
+      //------------------------------------------------------------------------
+      void save_window_state(std::ostream& chkfile){
+         if(!window_initialised) return;
+         const uint64_t num_grains = grain_cool_steps.size();
+         chkfile.write(reinterpret_cast<const char*>(&window_state_magic), sizeof(uint64_t));
+         chkfile.write(reinterpret_cast<const char*>(&num_grains), sizeof(uint64_t));
+         chkfile.write(reinterpret_cast<const char*>(grain_cool_steps.data()), sizeof(uint64_t)*num_grains);
+      }
+
+      void load_window_state(std::istream& chkfile){
+         uint64_t magic = 0;
+         uint64_t num_grains = 0;
+         chkfile.read(reinterpret_cast<char*>(&magic), sizeof(uint64_t));
+         chkfile.read(reinterpret_cast<char*>(&num_grains), sizeof(uint64_t));
+         if(!chkfile || magic != window_state_magic) return;
+         std::vector<uint64_t> cool_steps(num_grains);
+         chkfile.read(reinterpret_cast<char*>(cool_steps.data()), sizeof(uint64_t)*num_grains);
+         if(chkfile) resume_grain_cool_steps.swap(cool_steps);
       }
 
    } // end of internal namespace

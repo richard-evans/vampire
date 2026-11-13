@@ -47,11 +47,13 @@ namespace hamr{
    //---------------------------------------------------------------------------
    // Function to write the state of the head to a checkpoint file: the head
    // position and field strength are accumulated step by step, so they are
-   // stored rather than recalculated when the simulation is continued
+   // stored rather than recalculated when the simulation is continued, followed
+   // by the active window state when the window is used
    //---------------------------------------------------------------------------
    void save_checkpoint(std::ostream& chkfile){
       chkfile.write(reinterpret_cast<const char*>(&internal::head_position_x), sizeof(double));
       chkfile.write(reinterpret_cast<const char*>(&sim::H_applied), sizeof(double));
+      internal::save_window_state(chkfile);
    }
 
    //---------------------------------------------------------------------------
@@ -62,6 +64,7 @@ namespace hamr{
       chkfile.read(reinterpret_cast<char*>(&internal::resume_head_position_x), sizeof(double));
       chkfile.read(reinterpret_cast<char*>(&internal::resume_H_applied), sizeof(double));
       internal::resume_state_loaded = bool(chkfile);
+      if(internal::resume_state_loaded) internal::load_window_state(chkfile);
    }
 
 } // end of hamr namespace

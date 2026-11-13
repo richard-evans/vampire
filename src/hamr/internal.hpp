@@ -11,6 +11,7 @@
 
 // C++ standard library headers
 #include <cstdint>
+#include <iostream>
 
 
 // Vampire headers
@@ -126,6 +127,8 @@ namespace hamr{
       extern bool active_window_full_snapshots; /// write every spin snapshot in full with the window
       extern bool active_window_options_set;    /// a window sub-option is set in the input file
       void initialize_active_window();
+      void save_window_state(std::ostream& chkfile);
+      void load_window_state(std::istream& chkfile);
 
    } // end of internal namespace
 } // end of hamr namespace
