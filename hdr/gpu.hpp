@@ -58,7 +58,7 @@ namespace gpu{
 
       extern void update();
       extern void reset();
-      extern void get();
+      extern void get(); // must be called before reading the statistics during a simulation
 
    }
 

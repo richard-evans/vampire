@@ -77,13 +77,7 @@ namespace cells{
 
       //----------------------------------
       // cells:probe-non-magnetic-cells (bool, default false)
-      //
-      // When enabled, macrocells containing only non-magnetic atoms (e.g. a
-      // dense non-magnetic "sensor" layer used to sample the stray field
-      // above a magnetic film) are exposed to the dipole-field solvers as
-      // valid field-evaluation points, without their (zero) moment ever
-      // contributing to the moment sums that drive the field felt by other
-      // cells. Default behaviour (flag off) is unchanged.
+      // keep cells with only non-magnetic atoms as points where the dipole field is evaluated
       //----------------------------------
       test="probe-non-magnetic-cells";
       if(word==test){

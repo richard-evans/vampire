@@ -265,10 +265,11 @@ int integrate_mpi(uint64_t n_steps){
                //sim::LLG_Heun_cuda_mpi();
             #else
                #ifdef CUDA_MULTIGPU
-               if(gpu::acceleration) mgpu::llg_heun();
-               else
+                  if(gpu::acceleration) mgpu::llg_heun();
+                  else internal::LLG_Heun_mpi();
+               #else
+                  internal::LLG_Heun_mpi();
                #endif
-               internal::LLG_Heun_mpi();
                //calcualte the field from the environment
                if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
                   environment::LLB(sim::temperature,

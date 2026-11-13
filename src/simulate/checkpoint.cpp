@@ -264,8 +264,8 @@ void save_checkpoint(){
    stats::grain_susceptibility.save_checkpoint(chkfile);
    stats::material_susceptibility.save_checkpoint(chkfile);
 
-   // write the decomposition (number of processes and region of this process): spins are
-   // stored in local atom order, so they can only be loaded into the same decomposition
+   // write the decomposition (number of processes and region of this process); the spins are
+   // stored in local atom order, so loading into another decomposition uses the atom keys written below
    const int64_t num_processors64 = vmpi::num_processors;
    chkfile.write(reinterpret_cast<const char*>(&num_processors64),sizeof(int64_t));
    chkfile.write(reinterpret_cast<const char*>(&vmpi::min_dimensions[0]),sizeof(double)*3);

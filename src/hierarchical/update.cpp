@@ -64,13 +64,8 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       const int start = ha::interaction_list_start_index[lc];
       const int end = ha::interaction_list_end_index[lc];
 
-      // Self demagnetisation factor multiplying m(i). Only meaningful for a
-      // cell that actually has magnetic atoms: a non-magnetic-only probe
-      // cell (cells:probe-non-magnetic-cells) has V==0 and zero
-      // magnetisation, so skip this term entirely rather than divide by
-      // zero volume (which would otherwise silently produce
-      // 8pi/(3*0)*0 = NaN). Such a cell is still a valid *receiver* below
-      // via the ha::interaction_list loop -- it just has no self term.
+      // Self demagnetisation factor multiplying m(i); a cell with no magnetic atoms (probe cell) has
+      // zero volume and magnetisation, so it has no self term but still receives the field of the others
       const double V = dipole::cells_volume_array[cell_i];
       double self_demag = 0.0;
       double mx_i = 0.0;
@@ -133,8 +128,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
 
    // Copy B-field from macrocell to atomistic spins, and the demagnetising field
    // mu_0 H = B - mu_0 M (self term -1/3 mu_0 M, as in the tensor solver) for the magnetostatic energy.
-   // With cells:probe-non-magnetic-cells non-magnetic atoms get the field of their cell too, as probes of the
-   // field (they have no moment, so mu_0 H = B, and cells with only non-magnetic atoms have no volume)
+   // With cells:probe-non-magnetic-cells non-magnetic atoms get the field of their cell too (mu_0 H = B)
    for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
       const int cell = cells::atom_cell_id_array[atom];
       if( !magnetic[atom] ){

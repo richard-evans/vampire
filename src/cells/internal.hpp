@@ -43,11 +43,8 @@ namespace cells{
       extern bool initialised; /// flag set if initialised
       //extern int num_cells; /// number of macro-cells
 
-      // Number of atoms of any kind (magnetic + non-magnetic) in each cell.
-      // Unlike cells::num_atoms_in_cell (which counts magnetic atoms only and
-      // must keep that meaning everywhere else), this is only used to build
-      // cells::cell_id_array / cells::local_cell_array / cells::pos_and_mom_array
-      // for non-magnetic-only cells when probe_non_magnetic_cells is enabled.
+      // Number of atoms of any kind (magnetic + non-magnetic) in each cell, used to keep
+      // non-magnetic-only cells when probe_non_magnetic_cells is enabled
       extern std::vector<int> num_any_atoms_in_cell;
 
 

@@ -10,9 +10,9 @@ MGPUEXECUTABLE=vampire-cuda-multigpu
 MGPU_NVCC=$(NVCC) -ccbin mpicxx -DMPICF -DCUDA_MULTIGPU
 
 MGPU_HOST_OBJECTS=$(OBJECTS:.o=_mgpu.o) \
+	obj/mgpu/data_mgpu.o \
 	obj/mgpu/halo_mgpu.o \
-	obj/mgpu/initialize_mgpu.o \
-	obj/mgpu/keys_mgpu.o
+	obj/mgpu/initialize_mgpu.o
 
 MGPU_CUDA_OBJECTS=$(CUDA_OBJECTS:.o=_mgpu.o) \
 	obj/mgpu/kernels_mgpu.o \

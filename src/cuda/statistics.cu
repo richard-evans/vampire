@@ -45,42 +45,16 @@ namespace vcuda{
 namespace {
 
    //---------------------------------------------------------------------------
-   // Magnetisation statistics calculated on the device. The atoms of each
-   // statistic are grouped by mask id and split into chunks of at most
-   // chunk_size atoms. Each chunk is summed by one thread block in a fixed
-   // order, so results are reproducible from run to run, and only the partial
-   // sums of each chunk are copied to the host.
-   //
-   // The partial sums are kept on the device in a buffer of ring_slots slots
-   // (the ring), each slot holding the partial sums of every chunk for one
-   // time step; successive steps write successive slots, going round the
-   // ring. Every batch_steps steps, and when the statistics are read
-   // (gpu::stats::get, reset, config and checkpoint output), the slots
-   // written since the last copy (a batch) are copied to the same slots of a
-   // pinned host copy of the ring, without waiting. The host processes the
-   // batches in order with the same arithmetic as a per-step update, so the
-   // statistics are unchanged: when a batch is copied while two older ones
-   // are waiting, the oldest is processed (its copy has normally finished,
-   // and the device still has later steps to work on), and reading the
-   // statistics processes all of them. The batches are processed at the same
-   // steps on every process, since the statistics are summed over processes.
-   // Code reading the statistics during a simulation must call
-   // gpu::stats::get() first.
-   //
-   // A statistic whose mask ids group the atoms of a finer
-   // statistic (system and grain from material-grain, for example) is not
-   // summed on the device: its sums are added from the sums of the finer one.
-   //
-   // With the HAMR active window (hamr:active-window) most atoms are not
-   // integrated, so their spins do not change, and a chunk holding none of
-   // the integrated atoms has the same partial sums at every step. Such a
-   // chunk need not be summed again: each slot still holds its partial sums
-   // from the last step that wrote that slot. This is only correct once every
-   // slot was last written after the chunk's spins stopped changing. Since
-   // the number of slots used between copies varies (outputs copy early), a
-   // chunk that leaves the window is summed until each of the ring_slots
-   // slots has been written once since it left; after that it is skipped.
-   // The statistics are identical to summing every chunk at every step.
+   // Magnetisation statistics summed on the device. Atoms are grouped by mask
+   // id and split into chunks of chunk_size atoms; each chunk is summed by one
+   // thread block in a fixed order. Only the per-chunk partial sums are copied
+   // to the host, in batches of batch_steps steps via a ring of ring_slots slots
+   // (one slot per time step), and processed there in order with the same
+   // arithmetic as a per-step update. A statistic whose mask ids group the atoms
+   // of a finer one is added from the sums of the finer one.
+   // With the HAMR active window, a chunk holding no integrated atoms keeps its
+   // partial sums, so it is skipped once every ring slot was written after the
+   // chunk left the window; results equal summing every chunk at every step.
    //---------------------------------------------------------------------------
    const int chunk_size = 2048;
    const int reduction_block_size = 256;
@@ -297,7 +271,6 @@ namespace {
             dm.sums.resize(4 * sizes[i]);
          }
       }
-      // This line might need better wording
       zlog << zTs() << "Magnetisation statistics: " << summed.size() << " of " << n << " summed on the GPU, the others added from their sums" << std::endl;
 
    }

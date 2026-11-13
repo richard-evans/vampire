@@ -40,12 +40,9 @@ namespace mgpu {
 
 namespace internal {
 
-// Halo spins a rank sends to itself (periodic boundaries in a direction that
-// is not divided between ranks) are copied on the device from their source
-// atom (d_self_source) to the halo atom (d_self_halo); only the spins of the
-// other ranks go through the host: the atoms sent (d_send_atoms) are packed
-// into d_send_buffer, and the atoms received (d_recv_atoms) are unpacked from
-// d_recv_buffer.
+// Halo spins a rank sends to itself are copied on the device (d_self_source to
+// d_self_halo); those of other ranks are packed from d_send_atoms into
+// d_send_buffer and unpacked from d_recv_buffer into d_recv_atoms.
 int *d_self_source = nullptr;
 int *d_self_halo = nullptr;
 int *d_send_atoms = nullptr;
@@ -211,12 +208,8 @@ void free_device_halo() {
 }
 
 //---------------------------------------------------------------------------
-// Function to choose the halo atoms to copy. Without the HAMR active window
-// every atom is copied. With it, a halo atom is copied while the grain of its
-// atom is integrated, and at the step after the grain leaves the window, as
-// its last corrector step changed the spin after the last copy; any other
-// halo spin equals its source spin already. The grains are the same on every
-// rank, so the sender and the receiver of each spin make the same choice.
+// Function to choose the halo atoms to copy: all of them, or with the HAMR
+// active window those whose grain is integrated or was at the previous step.
 //---------------------------------------------------------------------------
 void select_halo_atoms() {
 
@@ -279,7 +272,7 @@ void select_halo_atoms() {
 // chooses the halo atoms again when the grains of the window have changed at
 // this or the previous step (counted by the hamr module, so that every rank
 // chooses again at the same step, also when its own atoms are unaffected)
-void update_halo_selection() {
+static void update_halo_selection() {
    static bool window_seen = false;
    static uint64_t changes_seen = 0;
    static bool changed_last_step = false;
@@ -294,7 +287,7 @@ void update_halo_selection() {
 }
 
 // adds the times of the last update once it has finished
-void add_pending_times() {
+static void add_pending_times() {
    if (!unpack_pending)
       return;
    copy_time += elapsed(unpack_start, unpack_end);
@@ -377,10 +370,8 @@ double halo_wait_time() {
 }
 
 //---------------------------------------------------------------------------
-// Function to order the neighbours of each atom in the exchange list of the
-// CUDA module (built in local atom order) by atom key, so that the exchange
-// field of every atom is summed in the same order for any decomposition.
-// The list is only reordered: neighbours and exchange constants are unchanged.
+// Function to order the neighbours of each atom in the exchange list by atom
+// key, so that exchange fields are summed in the same order on any number of GPUs
 //---------------------------------------------------------------------------
 void sort_neighbours_by_key() {
 
@@ -428,12 +419,10 @@ void sort_neighbours_by_key() {
    zlog << zTs() << "Exchange neighbours of each atom ordered by atom key"
           << std::endl;
 }
+
 //---------------------------------------------------------------------------
-// Function to update the halo spins and the fields of the local atoms. Core
-// atoms have no halo neighbours, so their spin fields (and the external
-// fields, which need no spins) are calculated while the halo is updated, as
-// in the CPU-only MPI version; boundary atoms follow once the halo spins have
-// arrived.
+// Function to update the halo spins and the fields of the local atoms; the
+// fields of core atoms are calculated while the halo spins are exchanged
 //---------------------------------------------------------------------------
 void update_fields(const bool external) {
 
@@ -458,12 +447,11 @@ void update_fields(const bool external) {
 } // namespace internal
 
 //------------------------------------------------------------------------------
-// Function to perform a single LLG Heun step: Only the local (core and
-// boundary) atoms, which come first, are integrated and get spin fields; halo
-// atoms only change when they are received, so after a step they hold the
-// predicted spins of the last update, as in the CPU-only MPI version.
+// Function to perform a single LLG Heun step of the local (core and boundary) atoms
 //------------------------------------------------------------------------------
 void llg_heun() {
+
+   if(err::check==true) std::cout << "mgpu::llg_heun has been called" << std::endl;
 
    if (!cu::llg::initialized)
       cu::llg::__llg_init();

@@ -23,11 +23,6 @@ namespace hamr{
 
    namespace internal{
 
-      bool resume_state_loaded = false;
-      double resume_head_position_x = 0.0;
-      double resume_H_applied = 0.0;
-      uint64_t resume_steps = 0;
-
       //------------------------------------------------------------------------
       // Function to count down the steps of a continued simulation that were
       // simulated before the checkpoint was saved; after the last of them the

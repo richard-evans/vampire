@@ -15,6 +15,7 @@
 #include <vector>
 
 // Vampire headers
+#include "errors.hpp"
 #include "mgpu.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -36,10 +37,8 @@ namespace internal{
    double mpi_time = 0.0;  // wall time in seconds spent in MPI, including waiting for other ranks
 
    //---------------------------------------------------------------------------
-   // Function to exchange the packed halo spins with the other ranks, with the
-   // same messages as the MPI version (vmpi::mpi_init/complete_halo_swap) except
-   // when the spins are to be sent to their own rank, in which case they are copied on the device,
-   // and with the HAMR active window, which leaves out the atoms that have not changed
+   // Function to exchange the packed halo spins with the other ranks (the spins
+   // a rank sends to itself are copied on the device instead)
    //---------------------------------------------------------------------------
    void exchange_halo(){
 
@@ -103,13 +102,13 @@ namespace internal{
 
 } // end of internal namespace
 
-bool decomposition_independent_order = false;
-
 //------------------------------------------------------------------------------
 // Function to set up halo exchange on the device and, if requested, to order
 // the exchange neighbours of each atom by atom key
 //------------------------------------------------------------------------------
 void initialize_device(){
+
+   if(err::check==true) std::cout << "mgpu::initialize_device has been called" << std::endl;
 
    if(decomposition_independent_order) internal::sort_neighbours_by_key();
    internal::initialize_noise();
@@ -127,6 +126,7 @@ void initialize_device(){
 // Function to free buffers of the module
 //------------------------------------------------------------------------------
 void finalize(){
+   if(err::check==true) std::cout << "mgpu::finalize has been called" << std::endl;
    internal::report_halo_times();
    internal::free_device_halo();
    internal::free_noise();

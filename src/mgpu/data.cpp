@@ -20,4 +20,7 @@ namespace mgpu{
 // the keys are stored by the create module (create::set_atom_keys)
 std::vector<uint64_t>& atom_key = create::atom_keys;
 
+// sum the exchange contributions of each atom in atom key order (gpu:decomposition-independent-order)
+bool decomposition_independent_order = false;
+
 } // end of mgpu namespace

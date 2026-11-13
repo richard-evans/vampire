@@ -56,6 +56,8 @@ namespace hamr{
 
    namespace internal{
 
+      namespace{
+
       // per grain: bounding box of its magnetic atoms, steps since it was last hot, integrated or not
       std::vector<double> grain_min_x, grain_max_x, grain_min_y, grain_max_y;
       std::vector<uint64_t> grain_cool_steps;
@@ -107,11 +109,15 @@ namespace hamr{
               << head_position_x*0.1 << " nm, " << head_position_y*0.1 << " nm" << std::endl;
       }
 
+      } // end of anonymous namespace
+
       //------------------------------------------------------------------------
       // Refuses simulations the physics argument above does not cover and sets
       // up the grain bounding boxes; called when the HAMR write starts
       //------------------------------------------------------------------------
       void initialize_active_window(){
+
+         if(err::check==true) std::cout << "hamr::internal::initialize_active_window has been called" << std::endl;
 
          std::vector<std::string> unsupported;
          if(integrate::integrator != integrate::integrator_t::llg_heun) unsupported.push_back("integrators other than llg-heun");
@@ -250,6 +256,7 @@ namespace hamr{
    }
 
    void snapshot_written(){
+      if(err::check==true) std::cout << "hamr::snapshot_written has been called" << std::endl;
       if(!internal::window_initialised) return;
       internal::snapshot_in_window = true;
       std::fill(internal::grain_changed.begin(), internal::grain_changed.end(), 0);
@@ -264,7 +271,7 @@ namespace hamr{
    }
 
    // marks the grains integrated at the current step as changed since the last snapshot
-   void mark_changed_grains(){
+   static void mark_changed_grains(){
       for(size_t g = 0; g < internal::grain_active.size(); g++) if(internal::grain_active[g]) internal::grain_changed[g] = 1;
    }
 
@@ -273,6 +280,8 @@ namespace hamr{
    // and returns the [first, last+1) pairs of the atoms to integrate
    //---------------------------------------------------------------------------
    const std::vector<int>& update_active_window(){
+
+      if(err::check==true) std::cout << "hamr::update_active_window has been called" << std::endl;
 
       using namespace hamr::internal;
       if(!head_laser_on){

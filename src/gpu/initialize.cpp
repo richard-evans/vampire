@@ -38,14 +38,11 @@ namespace gpu{
 
    //-------------------------------------------------------------------------------
    // Function to stop with an error message if the simulation needs features the
-   // GPU version does not calculate. Without this check such simulations run to
-   // the end with these terms silently missing from the dynamics or the output.
-   //
-   // NOTE: this list is temporary. Remove each entry as soon as the GPU version
-   // implements the feature and a validation case shows that it agrees with the
-   // CPU version.
+   // GPU version does not calculate, which would otherwise be silently missing
    //-------------------------------------------------------------------------------
    void check_supported_features(){
+
+      if(err::check==true) std::cout << "gpu::check_supported_features has been called" << std::endl;
 
       std::vector<std::string> unsupported;
 

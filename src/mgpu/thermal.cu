@@ -9,13 +9,11 @@
 
 // C++ standard library headers
 #include <cstdint>
-#include <vector>
 
 // CUDA headers
 #include <curand_kernel.h>
 
 // Vampire headers
-#include "atoms.hpp"
 #include "hamr.hpp"
 #include "mgpu.hpp"
 #include "program.hpp"
@@ -35,15 +33,10 @@
 namespace cu = ::vcuda::internal;
 
 //------------------------------------------------------------------------------
-// Thermal and HAMR fields of the multi-GPU version. The physics is that of the
-// CUDA module (src/cuda/thermal_fields.cu and src/cuda/hamr_fields.cu, with the
-// field width and laser profile shared through src/cuda/internal.hpp); only the
-// random numbers differ. The CUDA module draws them
-// from a random number state per GPU thread, which would repeat the same
-// numbers on every GPU. Here they are computed from the integration seed, the
-// key of the atom and the number of the time step with the counter-based
-// Philox generator, so every atom receives the same thermal noise whatever the
-// decomposition, and no state is stored.
+// Thermal and HAMR fields as in src/cuda/thermal_fields.cu and hamr_fields.cu,
+// except that the random numbers come from the Philox generator seeded by the
+// integration seed, atom key and step number, so each atom has the same noise
+// on any number of GPUs.
 //------------------------------------------------------------------------------
 namespace mgpu{
 

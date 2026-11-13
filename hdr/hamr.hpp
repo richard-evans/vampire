@@ -87,13 +87,11 @@ namespace hamr{
    void load_checkpoint(std::istream& chkfile);
 
    //-----------------------------------------------------------------------------
-   // Active window (hamr:active-window): true once the write has started with it
-   // update for the current head position, returning the [first, last+1) pairs of
-   // the atoms to integrate
+   // Active window (hamr:active-window)
    //-----------------------------------------------------------------------------
    bool active_window_requested(); // hamr:active-window set for the HAMR program (for the decomposition)
-   bool active_window_enabled();
-   const std::vector<int>& update_active_window();
+   bool active_window_enabled(); // true once the write has started with the window
+   const std::vector<int>& update_active_window(); // update for the current head position; returns the [first, last+1) pairs of atoms to integrate
    bool atom_in_window(const int atom); // the atom (local or halo) belongs to a grain of the window
    uint64_t window_changes();           // number of times the grains of the window have changed (same on every process)
 

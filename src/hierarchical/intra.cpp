@@ -63,10 +63,7 @@ namespace hierarchical{
 
       const int num_atoms = global_atoms_in_cell_count[celli];
 
-      // A non-magnetic-only probe cell (cells:probe-non-magnetic-cells) has
-      // no magnetic atoms and therefore no intra-cell self term; leave the
-      // tensor entries at their default-initialised zero rather than
-      // dividing tmp_rij_intra_*(==0) by inorm=1/(0*0).
+      // a cell without magnetic atoms (cells:probe-non-magnetic-cells) has no self term
       if( num_atoms == 0 ) return;
 
       // search for cells i and j in local atom-cells list

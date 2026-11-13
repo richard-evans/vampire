@@ -706,14 +706,8 @@ void initialize(const double system_dimensions_x,
       // get the global cell ID
       int cell_i = cells::cell_id_array[lc];
 
-      // cell_i is guaranteed present in cells::cell_id_array only when it is
-      // a valid receiver: either a magnetic cell (the only case possible
-      // with cells:probe-non-magnetic-cells off, so this is behaviour-
-      // preserving by construction) or -- when that flag is enabled -- a
-      // non-magnetic-only probe cell. Either way it should get an
-      // interaction tensor built; ha::calc_inter/ha::calc_intra guard the
-      // case where cell_i itself has no magnetic atoms.
-      {
+      // only calculate interaction for local cells with atoms (or cells without magnetic atoms, which only receive the field)
+      if (cells_num_atoms_in_cell[cell_i] != 0 || cells::probe_non_magnetic_cells){
 
          // for each cell loop over cel-cell interactions for all levels, getting frirst and last interactions
          const int start = ha::interaction_list_start_index[lc];

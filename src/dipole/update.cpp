@@ -54,29 +54,19 @@ namespace dipole{
       for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
          int i = cells::cell_id_array[lc];
-         {
-            // Self demagnetisation factor multiplying m(i). Only meaningful
-            // for a cell that actually has magnetic atoms: a non-magnetic-
-            // only probe cell (cells:probe-non-magnetic-cells) has
-            // cells_volume_array[i]==0 and zero magnetisation, so skip this
-            // term entirely rather than divide by zero volume (which would
-            // otherwise silently produce 8pi/(3*0)*0 = NaN). Such a cell is
-            // still a valid *receiver* below -- it just has no self term.
-            double self_demag = 0.0;
-            double mx_i = 0.0;
-            double my_i = 0.0;
-            double mz_i = 0.0;
+         // cells without magnetic atoms (cells:probe-non-magnetic-cells) receive the field but have no volume or self term
+         if(dipole::internal::cells_num_atoms_in_cell[i]>0 || cells::probe_non_magnetic_cells){
 
-         if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+            const bool magnetic = dipole::internal::cells_num_atoms_in_cell[i]>0;
 
-            const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
-               self_demag = eightPI_three_cell_volume;
+            // Self demagnetisation factor multiplying m(i)
+            const double eightPI_three_cell_volume = magnetic ? 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]) : 0.0;
+            double self_demag = eightPI_three_cell_volume;
 
             // Normalise cell magnetisation by the Bohr magneton
-               mx_i = cells::mag_array_x[i]*imuB;
-               my_i = cells::mag_array_y[i]*imuB;
-               mz_i = cells::mag_array_z[i]*imuB;
-            }
+            const double mx_i = magnetic ? cells::mag_array_x[i]*imuB : 0.0;
+            const double my_i = magnetic ? cells::mag_array_y[i]*imuB : 0.0;
+            const double mz_i = magnetic ? cells::mag_array_z[i]*imuB : 0.0;
 
             // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
             dipole::cells_field_array_x[i] = self_demag * mx_i;//*0.0; //*0.0
@@ -109,7 +99,7 @@ namespace dipole{
                   dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[row][j] + my*internal::rij_tensor_yy[row][j] + mz*internal::rij_tensor_yz[row][j]);
                   dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[row][j] + my*internal::rij_tensor_yz[row][j] + mz*internal::rij_tensor_zz[row][j]);
                   // Demag field
-               // std::cout << "DEMAG\t" << cells::mag_array_x[j] << '\t' << imuB << '\t' <<  mx << '\t' << my << '\t' << mz << '\t' << internal::rij_tensor_xx[row][j] << '\t' << dipole::cells_field_array_x[i] << std::endl;
+               // std::cout << "DEMAG\t" << cells::mag_array_x[j] << '\t' << imuB << '\t' <<  mx << '\t' << my << '\t' << mz << '\t' << internal::rij_tensor_xx[lc][j] << '\t' << dipole::cells_field_array_x[i] << std::endl;
                   dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_tensor_xx[row][j] + my*internal::rij_tensor_xy[row][j] + mz*internal::rij_tensor_xz[row][j]);
                   dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_tensor_xy[row][j] + my*internal::rij_tensor_yy[row][j] + mz*internal::rij_tensor_yz[row][j]);
                   dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_tensor_xz[row][j] + my*internal::rij_tensor_yz[row][j] + mz*internal::rij_tensor_zz[row][j]);

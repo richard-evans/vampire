@@ -8,8 +8,10 @@
 //------------------------------------------------------------------------------
 //
 // C++ standard library headers
+#include <iostream>
 
 // Vampire headers
+#include "errors.hpp"
 #include "gpu.hpp"
 #include "cuda.hpp"
 
@@ -37,6 +39,8 @@ void transfer_spin_positions_from_gpu_to_cpu(){
 //------------------------------------------------------------------------------
 void invalidate_host_spins(){
 
+   if(err::check==true) std::cout << "gpu::invalidate_host_spins has been called" << std::endl;
+
    // check for gpu functions and data initialised
    if( !gpu::initialized ) return;
 
@@ -53,6 +57,8 @@ void invalidate_host_spins(){
 // program may read them there directly
 //------------------------------------------------------------------------------
 void update_host_spins(){
+
+   if(err::check==true) std::cout << "gpu::update_host_spins has been called" << std::endl;
 
    // check for gpu functions and data initialised
    if( !gpu::initialized ) return;

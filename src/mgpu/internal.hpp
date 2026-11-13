@@ -10,6 +10,7 @@
 #define MGPU_INTERNAL_H_
 
 // C++ standard library headers
+#include <string>
 #include <vector>
 
 namespace mgpu{
@@ -17,16 +18,8 @@ namespace mgpu{
    namespace internal{
 
       //------------------------------------------------------------------------
-      // Halo exchange buffers. Spins of the boundary atoms listed in
-      // vmpi::send_atom_translation_array are packed on the device into the
-      // send buffer, copied to pinned host memory and sent; received spins are
-      // copied to the device and unpacked into the halo atoms listed in
-      // vmpi::recv_atom_translation_array; the spins a rank sends to itself are
-      // copied on the device from atom to atom instead. Values are stored as
-      // x,y,z triplets in the precision of the CUDA build (cu_real_t). With the
-      // HAMR active window only the atoms of grains integrated at the current
-      // or the previous step are copied (the others have not changed), so the
-      // buffers hold the selected atoms of each rank one after the other.
+      // Halo exchange buffers: pinned host buffers of x,y,z triplets in the
+      // precision of the CUDA build, holding the selected atoms of each rank in turn
       //------------------------------------------------------------------------
       extern int num_send;        // number of atoms sent
       extern int num_recv;        // number of atoms received
@@ -37,14 +30,13 @@ namespace mgpu{
       extern std::vector<int> peer_send_start, peer_send_num, peer_recv_start, peer_recv_num;
 
       // device side (kernels.cu)
+      int device_count();
+      void device_pci_id(int device, char* id, int size);
       void allocate_device_halo(const std::vector<int>& send_atoms, const std::vector<int>& recv_atoms);
       void free_device_halo();
-      // The halo update runs on its own stream: start_halo() packs the spins and
-      // copies them to h_send_buffer; finish_halo() exchanges the buffers (MPI),
-      // copies the received spins back to the device and makes the default
-      // stream wait for them. Work launched in between overlaps the update.
-      // A rank whose halo spins all come from itself (device_only_halo) skips
-      // the host: the spins are copied on the device and the host does not wait.
+      // The halo update runs on its own stream: start_halo() packs the spins into
+      // h_send_buffer, finish_halo() exchanges the buffers and returns the received spins
+      // to the device; work launched in between overlaps. device_only_halo: all halo spins come from this rank.
       extern bool device_only_halo;
       void start_halo();
       void finish_halo();
@@ -72,6 +64,9 @@ namespace mgpu{
       void initialize_noise();
       void free_noise();
       void update_external_fields(); // external fields of one time step, incl. thermal and HAMR fields
+
+      // stops with an error message for unsupported simulations (initialize.cpp)
+      void unsupported(const std::string& feature);
 
    } // end of internal namespace
 
