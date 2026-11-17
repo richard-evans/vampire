@@ -25,6 +25,8 @@ Which check to run:
 | touches the multi-GPU version (`src/mgpu`, halo, decomposition) | `mgpu_check.sh` as well |
 | changes results (new physics, different arithmetic or random numbers) | `run_gpu_suite.sh`, `mgpu_check.sh`, and `ab_compare.sh` for statistically equivalent changes |
 | anything that could change what an ordinary user of the serial or MPI version sees (input, output files, checkpoints, vdc) | `compat_check.sh` against the reference version (CPU only, no GPU needed) |
+| any change to the CPU code | upstream's regression suite, `developers/tests.sh -r` and `-m 2` (about 30 s and 50 s); built with GCC 15 the serial cases `config/binary-continuous`, `integrate/constrained-monte-carlo`, `program/hamr-cool`, `vio/all-columns`, `vio/grain-columns` and the 2-process cases `config/binary-continuous`, `config/output-mode-mpi-io`, `program/hamr-cool`, `vio/grain-columns` fail for the reference version too (low order bits of their golden files), so only other failures point to a change |
+| the HAMR active window (`src/hamr/active_window.cpp`, window snapshots) | `hamr_window_check.sh` (below) |
 | new feature or validation case | all of the above once, before committing |
 
 The GPU scripts start several validation runs at a time on the GPU (`GPU_JOBS`, default 4 processes, so 2 runs on 2
@@ -131,6 +133,15 @@ magnetised Co film (40 x 12 x 3 nm, 1 nm cells) with the tensor solver (with and
 `dipole:on-the-fly-tensors`, which must give identical fields) and the hierarchical solver: and the hierarchical field must agree with the
 tensor field to `TOL` tesla (default 1e-3; the film is longer than the range the hierarchical solver sums cell by cell,
 so its far-field approximation is tested).
+
+## HAMR active window
+
+`developers/test/validation/hamr_window_check.sh [vampire binary]` checks `hamr:active-window` on small granular HAMR
+films: with every grain in the window the output is identical to the run without it; over `SEEDS` seeds (default 16)
+the magnetisation with and without the window agrees statistically (z-scores below `ZMAX`, default 4); window spin
+snapshots rebuilt into full ones equal the full snapshots, and `vdc` (`VDC`, default `vdc/vdc` next to the binary)
+writes identical files from both; and the run times. `FILM=small` runs every stage on a 30 x 8 nm film, small enough
+for one CPU; `RANKS=N` runs the MPI and multi-GPU versions on N processes, `JOBS` runs several seeds at a time.
 
 ## Compatibility with a reference version
 

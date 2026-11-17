@@ -7,7 +7,8 @@
 #------------------------------------------------------------------------------
 # Checks hamr:active-window on HAMR writes of 9 bits on a granular FePt film
 # (2 nm grain height, laser FWHM 8 nm, 1000 m/s): one track along a 60 x 8 nm
-# film, or three tracks of 3 bits on a 20 x 80 nm film (wide film):
+# film, or three tracks of 3 bits on a 20 x 80 nm film (wide film); with FILM=small
+# every stage uses one track of 4 bits on a 30 x 8 nm film (minutes on one CPU):
 #
 #   1. identity: on the wide film of magnetic grains only, the window with
 #      hamr:active-window-temperature = 0 (every grain integrated) gives output
@@ -22,7 +23,9 @@
 #      default 1e-10)
 #   3. window snapshots: one window run with spin snapshots every 5 ps, written
 #      as window snapshots and in full: the output is identical, and every
-#      snapshot rebuilt from the window snapshots is identical to the full one
+#      snapshot rebuilt from the window snapshots is identical to the full one;
+#      vdc (VDC, default vdc/vdc next to the binary, skipped if there is none)
+#      gives identical files from both
 #   4. the run times with and without the window
 #   5. with PERF=<seconds>: the speed on a 300 x 20 x 20 nm film (4.3 million
 #      atoms), each run stopped after PERF seconds (600 is enough on a small GPU)
@@ -30,7 +33,7 @@
 #    developers/test/validation/hamr_window_check.sh [vampire binary]
 #
 # The binary defaults to ./vampire-serial (CUDA binaries run on the GPU).
-# SEEDS defaults to 8, JOBS (runs at a time) to 1. With RANKS=N every run uses
+# SEEDS defaults to 16, JOBS (runs at a time) to 1. With RANKS=N every run uses
 # mpirun -np N, or $MPIRUN -np N (e.g. MPIRUN="mpirun --bind-to none" for
 # several runs at a time) (MPI and multi-GPU versions; the window then splits the film
 # across the track, while runs without it use the usual decomposition). The
@@ -43,10 +46,13 @@
 set -eu
 
 exe=$(realpath "${1:-./vampire-serial}")
-seeds=${SEEDS:-8}
+seeds=${SEEDS:-16}
 jobs=${JOBS:-1}
 zmax=${ZMAX:-4}
 film=${FILM:-narrow}
+# films of the identity and snapshot stages (all small with FILM=small)
+id_film=wide; snap_film=narrow
+[ "$film" = small ] && id_film=small && snap_film=small
 mpi=""
 [ -n "${RANKS:-}" ] && mpi="${MPIRUN:-mpirun} -np $RANKS"
 mgpu=0
@@ -69,8 +75,9 @@ grep -v '^material\[[45]\]' "$work/full.mat" | sed 's/^material:num-materials *=
 grep -q '^material:num-materials=3' "$work/grains.mat"
 
 run(){ # name material film (narrow or wide) seed [extra input lines]
-   local dir="$work/$1" mat=$2 size=60x8 seed=$4
+   local dir="$work/$1" mat=$2 size=60x8 bits=9 seed=$4
    [ "$3" = wide ] && size=20x80
+   [ "$3" = small ] && size=30x8 && bits=4
    shift 4
    mkdir "$dir"
    cp "$work/$mat" "$dir/FePt_sensor.mat"
@@ -81,7 +88,7 @@ run(){ # name material film (narrow or wide) seed [extra input lines]
        -e 's/laser-FWHM-\([xy]\) = 5/laser-FWHM-\1 = 8/' \
        -e 's/head-speed = 5000/head-speed = 1000/' \
        -e 's/bit-size = 4 !nm/bit-size = 6 !nm/' \
-       -e 's/number-of-bits = 1$/number-of-bits = 9/' \
+       -e "s/number-of-bits = 1\$/number-of-bits = $bits/" \
        -e 's/equilibration-time-steps = 0/equilibration-time-steps = 20000/' \
        -e 's/output-rate = 500/output-rate = 1000/' \
        "$here/cases/hamr-granular/input" > "$dir/input"
@@ -98,8 +105,8 @@ export work exe here mpi mgpu
 fail=0
 
 # 1. identity
-run id-off grains.mat wide 1
-run id-window grains.mat wide 1 "hamr:active-window" "hamr:active-window-temperature = 0"
+run id-off grains.mat $id_film 1
+run id-window grains.mat $id_film 1 "hamr:active-window" "hamr:active-window-temperature = 0"
 for f in output grain.txt; do
    if cmp -s <(grep -v '^#' "$work/id-off/$f") <(grep -v '^#' "$work/id-window/$f"); then
       echo "PASS identity: $f identical with every grain in the window"
@@ -134,6 +141,10 @@ w = np.abs(zs).argmax()
 print(f'   largest at t = {o["off"][0, w, 0]:.3g} s: off {mz["off"][:, w].mean():+.4f} sd {mz["off"][:, w].std(ddof=1):.4f}, window {mz["window"][:, w].mean():+.4f} sd {mz["window"][:, w].std(ddof=1):.4f}')
 print(f'final mz of {ngrains} grains: max |z| {np.abs(zg).max():.2f}, sum z^2 {np.sum(zg**2):.1f}')
 worst = max(np.abs(zs).max(), np.abs(zg).max())
+if seeds < 8:
+    # with so few seeds the standard deviations, and so the z-scores, are too uncertain to judge
+    print(f'NOTE statistics: largest |z| {worst:.2f} with {seeds} seeds, not judged (at least 8 needed)')
+    sys.exit(0)
 print(('PASS' if worst <= zmax else 'FAIL') + f' statistics: largest |z| {worst:.2f} (limit {zmax}, {seeds} seeds)')
 sys.exit(int(worst > zmax))
 EOF
@@ -152,8 +163,8 @@ EOF
 
 # 3. window snapshots
 snapshots=(config:atoms "config:output-format = binary" "config:atoms-output-rate = 5000")
-run snap-window-1 full.mat narrow 1 "hamr:active-window" "${snapshots[@]}"
-run snap-full-1 full.mat narrow 1 "hamr:active-window" "hamr:active-window-full-snapshots" "${snapshots[@]}"
+run snap-window-1 full.mat $snap_film 1 "hamr:active-window" "${snapshots[@]}"
+run snap-full-1 full.mat $snap_film 1 "hamr:active-window" "hamr:active-window-full-snapshots" "${snapshots[@]}"
 python3 - "$work" << 'EOF' || fail=1
 import sys, os, re, numpy as np
 work = sys.argv[1]
@@ -184,6 +195,25 @@ print(('PASS' if ok and same and nw > 0 else 'FAIL') + f' window snapshots: {len
       f'{sum(a[1] for a in w) / 1e6:.1f} MB instead of {sum(b[1] for b in f) / 1e6:.1f} MB')
 sys.exit(int(not (ok and same and nw > 0)))
 EOF
+
+# vdc on the window and the full snapshots: every file it writes must be identical
+vdc=$(realpath -m "${VDC:-$(dirname "$exe")/vdc/vdc}")
+if [ -f "$vdc" ] && [ -x "$vdc" ]; then
+   for d in snap-window-1 snap-full-1; do
+      ls "$work/$d" > "$work/$d.before"
+      (cd "$work/$d" && "$vdc" --xyz --vtk --text > vdc.log 2>&1) || { echo "FAIL vdc: stopped in $d (see $work/$d/vdc.log)"; fail=1; }
+   done
+   products=$(cd "$work/snap-full-1" && ls | grep -vxF -f ../snap-full-1.before | grep -vx vdc.log || true)
+   bad=""
+   for f in $products; do cmp -s "$work/snap-window-1/$f" "$work/snap-full-1/$f" || bad="$bad $f"; done
+   if [ -n "$products" ] && [ -z "$bad" ]; then
+      echo "PASS window snapshots through vdc: $(echo $products | wc -w) files identical"
+   else
+      echo "FAIL window snapshots through vdc: ${bad:- no files written}"; fail=1
+   fi
+else
+   echo "vdc not found ($vdc): skipped the vdc comparison"
+fi
 
 # 4. run times
 for m in off window; do

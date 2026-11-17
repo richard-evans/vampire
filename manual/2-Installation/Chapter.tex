@@ -59,7 +59,19 @@ ARCHER is the UK national supercomputer and includes custom compilers developed 
 
 \subsection*{Compiling for GPU acceleration with CUDA (beta)}
 \phantomsection\addcontentsline{toc}{subsection}{Compiling for GPU}
-The latest release includes a CUDA implementation for GPU accelerated atomistic spin dynamics. To compile the CUDA version of the code, you need to install the CUDA drivers and runtime. Once installed, compilation should be straightforward using \textit{make gcc-cuda}. By default, the binary includes device code for a wide range of architectures. Depending on your device/card, you may need to modify the device code generation option in the makefile.
+The latest release includes a CUDA implementation for GPU accelerated atomistic spin dynamics. To compile the CUDA version of the code, you need to install the CUDA drivers and runtime (including the \textit{nvcc} compiler). Once installed, \textit{make cuda} compiles the executable \textit{vampire-cuda} in double precision, and \textit{make cuda CUDA\_PR=-DCUDA\_SP} in single precision, which is much faster on consumer GPUs with reduced double precision throughput. By default, the binary includes device code for every major architecture supported by the installed \textit{nvcc}; \textit{CUDA\_ARCH=-arch=native} compiles for the GPU of the build machine only, which is faster to compile. The serial and CUDA versions share their object files, so run \textit{make clean} when switching between them.
+
+\textit{make cuda-multigpu} compiles \textit{vampire-cuda-multigpu}, which needs MPI as well as CUDA and runs one MPI process per GPU (\textit{mpirun -np 4 vampire-cuda-multigpu} for four GPUs). The system is decomposed between the processes as in the parallel version, and the processes on a node use its GPUs in turn unless \textit{gpu:device} is set. The GPU versions run the same input files as the CPU versions; features they do not support are listed at start-up and the simulation stops (see the GPU acceleration section of the input file reference), and \textit{gpu:acceleration = off} runs them on the CPU.
+
+\subsection*{Changes in results}
+\phantomsection\addcontentsline{toc}{subsection}{Changes in results}
+This version corrects the following, which change results compared with earlier versions:
+\begin{itemize}
+\item Dipole fields (tensor and hierarchical solvers): interaction tensors between distant cells are no longer set to zero below a fixed threshold, which left out cell pairs further apart than about 32 nm, and cell pairs exactly at the near-field cutoff are always calculated from the atomic positions, so that the fields no longer depend on the number of processes. Fields change slightly in every simulation with dipole fields.
+\item HAMR simulations: the head field rises and falls over an exact number of time steps, and the number of bits written per track is corrected.
+\item The double precision CUDA version draws the random numbers of the thermal field in single precision (as the single precision version does); results are statistically equivalent to drawing them in double precision.
+\end{itemize}
+Results of simulations without dipole fields, HAMR or GPU acceleration are unchanged.
 
 %------------------------------------------------------------------------
 %
