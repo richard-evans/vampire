@@ -125,6 +125,22 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
                getline(inputfile,atom_line);
                std::istringstream atom_iss(atom_line,std::istringstream::in);
                atom_iss >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
+
+               // read optional surface flag column (1 for a surface atom, 0 otherwise), which must be given for all atoms or none
+               int surface_flag = 0;
+               const bool surface_flag_on_line = bool(atom_iss >> surface_flag);
+               if(i == 0) unit_cell.surface_flags_present = surface_flag_on_line;
+               else if(surface_flag_on_line != unit_cell.surface_flags_present){
+                  std::ostringstream message;
+                  message << "Error! Optional surface flag column for atom " << id << " on line " << line_counter << " of unit cell input file " << filename.c_str() << " must be given for all atoms or none. Exiting";
+                  err::fatal(message.str());
+               }
+               if(surface_flag != 0 && surface_flag != 1){
+                  std::ostringstream message;
+                  message << "Error! Surface flag " << surface_flag << " for atom " << id << " on line " << line_counter << " of unit cell input file " << filename.c_str() << " must be 0 or 1. Exiting";
+                  err::fatal(message.str());
+               }
+               unit_cell.atom[i].is_surface = (surface_flag == 1);
                //std::cout << id << "\t" << cx << "\t" << cy << "\t" << cz<< "\t"  << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
                //inputfile >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
                // now check for mostly sane input

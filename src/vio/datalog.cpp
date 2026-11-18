@@ -325,6 +325,18 @@ namespace vout{
          case output_t::mean_coupling_field_vec:
             vout::mean_coupling_field_vec(stream,header);
             break;
+         case output_t::cubic_geofencing:
+            vout::cubic_geofencing(stream,header);
+            break;
+         case output_t::uniaxial_geofencing:
+            vout::uniaxial_geofencing(stream,header);
+            break;
+         case output_t::cubic_per_spin_geofencing:
+            vout::cubic_per_spin_geofencing(stream,header);
+            break;
+         case output_t::uniaxial_per_spin_geofencing:
+            vout::uniaxial_per_spin_geofencing(stream,header);
+            break;
          case output_t::material_binder_cumulant:
             vout::material_binder_cumulant(stream,header);
             break;

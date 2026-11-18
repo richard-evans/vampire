@@ -15,6 +15,7 @@
 #include <sstream>
 #include <cmath>
 #include <cctype>
+#include <cstdlib>
 #include <vector>
 #include <algorithm>
 #include <fstream>
@@ -38,6 +39,7 @@ void command( int argc, char* argv[] ){
 // Command line options for utility to be implemented:
 //    --xyz - generate xyz file
 //    --povray - generate povray files
+//    --povray-single-N - generate povray output for the single snapshot N (e.g. 25 for 00000025)
 //    --vector - generate raw xyz vector data
 //    --vtk - generate vtk files
 //    --cells - collate data into cells
@@ -65,6 +67,27 @@ void command( int argc, char* argv[] ){
       //------------------------------------------------------------------------
       if      (sw == "--xyz"          ){ vdc::xyz    = true;    } // xyz coordinate file output
       else if (sw == "--povray"       ){ vdc::povray = true;    } // pov coordinate file output
+      else if (sw.find("--povray-single-") == 0){ // povray single frame output
+         vdc::povray = true; //enable povray output
+
+         const std::string prefix = "--povray-single-";
+         const std::string id_str = sw.substr(prefix.size()); // snapshot number, e.g. 25 for spins-00000025.data
+
+         // require a number of 1 to 8 digits (snapshot files are numbered with 8 digits)
+         const bool valid = !id_str.empty() && id_str.size() <= 8 &&
+                            std::all_of(id_str.begin(), id_str.end(), [](const char c){ return std::isdigit(static_cast<unsigned char>(c)) != 0; });
+         if(!valid){
+            std::cerr << "Error - invalid snapshot number in '" << sw << "'. Expected --povray-single-N with N a snapshot number of up to 8 digits, e.g. --povray-single-25." << std::endl;
+            std::exit(EXIT_FAILURE);
+         }
+
+         // convert just this snapshot, and declare it as the only frame in spins.pov and spins.ini
+         const unsigned int file_id = static_cast<unsigned int>(std::stoul(id_str));
+         vdc::vdc_start_file_id = file_id;
+         vdc::vdc_final_file_id = file_id + 1;
+         vdc::start_file_id = file_id;
+         vdc::final_file_id = file_id;
+      }
       else if (sw == "--povray-sticks"){ vdc::povsticks = true; } // pov sticks file output
       else if (sw == "--vtk"          ){ vdc::vtk    = true;    } // vtk coordinate file output
       else if (sw == "--text"         ){ vdc::txt    = true;    } // plain text file output
@@ -215,6 +238,7 @@ void command( int argc, char* argv[] ){
       std::cerr << "Error! No output data formats requested. Available options are: " << std::endl;
       std::cerr << "\t\t --xyz    Data output in .xyz format for viewing in rasmol/jmol" << std::endl;
       std::cerr << "\t\t --povray Data output in PoVRAY format for rendering" << std::endl;
+      std::cerr << "\t\t --povray-single-N Data output in PoVRAY format for the single snapshot N" << std::endl;
       std::cerr << "\t\t --povray-cells Data output in PoVRAY format for rendering" << std::endl;
       std::cerr << "\t\t --povray-grains Data output in PoVRAY format for rendering" << std::endl;
       std::cerr << "\t\t --vtk    Data output in VTK format for viewing in Paraview" << std::endl;

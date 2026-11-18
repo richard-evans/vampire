@@ -85,6 +85,7 @@ namespace program{
       // Effective damping program
       //------------------------------------------------------------------------
       extern double effective_damping_rotation_angle; // initial rotation of magnetisation from z-axis (degrees)
+      extern std::vector<double> effective_damping_rotation_axis; // axis to rotate spins around (unit vector)
 
       //------------------------------------------------------------------------
       // Material level parameters

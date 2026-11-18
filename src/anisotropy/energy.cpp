@@ -71,6 +71,7 @@ namespace anisotropy{
       if(internal::enable_cubic_sixth_order)             energy += internal::cubic_sixth_order_energy (atom, mat, sx, sy, sz);
 
       if(internal::enable_neel_anisotropy)               energy += internal::neel_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_neel_fourth_order_anisotropy)  energy += internal::neel_fourth_order_energy(atom, mat, sx, sy, sz);
       if(internal::enable_lattice_anisotropy)            energy += internal::lattice_energy(atom, mat, sx, sy, sz, temperature);
 
       if(internal::enable_triaxial_anisotropy)           energy += internal::triaxial_second_order_energy_fixed_basis(atom, mat, sx, sy, sz);

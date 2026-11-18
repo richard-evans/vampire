@@ -277,6 +277,14 @@ namespace program{
          program::internal::effective_damping_rotation_angle = ra;
          return true;
       }
+      //--------------------------------------------------------------------
+      test="effective-damping-rotation-axis"; // axis to rotate spins around
+      if(word==test){
+         std::vector<double> u = vin::doubles_from_string(value);
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input"); // also normalises u
+         program::internal::effective_damping_rotation_axis = u;
+         return true;
+      }
       //-------------------------------------------------------------------
       test = "field-pulse-time";
       if(word == test){

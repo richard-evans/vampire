@@ -1,0 +1,13 @@
+#===================================================
+# Material file for the neel-fourth-order-z anisotropy energy test
+#===================================================
+
+material:num-materials=1
+
+material[1]:material-name=Fe
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=1.0e-21
+material[1]:atomic-spin-moment=2.2 !muB
+material[1]:neel-anisotropy-constant[1]=1.0e-21
+material[1]:neel-fourth-order-anisotropy-constant[1]=5.0e-22
+material[1]:initial-spin-direction=0,0,1

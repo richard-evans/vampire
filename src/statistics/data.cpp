@@ -12,6 +12,9 @@
 // Vampire headers
 #include "stats.hpp"
 
+// statistics module headers
+#include "internal.hpp"
+
 namespace stats{
 
    int num_atoms; // Number of atoms for statistic purposes
@@ -62,6 +65,12 @@ namespace stats{
    bool calculate_system_binder_cumulant        = false;
    bool calculate_material_binder_cumulant      = false;
 
+   bool calculate_cubic_per_spin_geofencing     = false;
+   bool calculate_uniaxial_per_spin_geofencing  = false;
+
+   bool output_cubic_geofencing_product         = true;
+   bool output_uniaxial_geofencing_product      = true;
+
    energy_statistic_t system_energy("s");
    energy_statistic_t grain_energy("g");
    energy_statistic_t material_energy("m");
@@ -111,6 +120,14 @@ namespace stats{
    // Shared variables used for statistics calculation
    //-----------------------------------------------------------------------------
    namespace internal{
+
+      geofencing_data_t geofencing[2]; // cubic and uniaxial geofencing data
+
+      bool cubic_geofencing_111_hard = false;
+      std::vector<double> uniaxial_geofencing_axis = {0.0, 0.0, 1.0};
+      std::vector<double> per_spin_geofencing_thresholds = {0.95};
+      std::vector<bool> per_spin_geofencing_mask(0);
+      uint64_t num_per_spin_geofencing_atoms = 0;
 
    } // end of internal namespace
 } // end of stats namespace

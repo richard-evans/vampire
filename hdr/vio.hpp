@@ -206,6 +206,12 @@ namespace vout{
       track_pos_x,
       track_pos_z,
 
+      // magnetic state geofencing
+      cubic_geofencing,
+      uniaxial_geofencing,
+      cubic_per_spin_geofencing,
+      uniaxial_per_spin_geofencing,
+
       // diagnostics
       mpi_timings
    };

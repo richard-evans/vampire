@@ -15,6 +15,7 @@
 #include <vector>
 
 // vampire headers
+#include "errors.hpp"
 #include "micromagnetic.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
@@ -633,6 +634,38 @@ namespace vout{
             int r=atoi(value.c_str());
             vin::check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
             vout::output_rate=r;
+            return true;
+        }
+        //--------------------------------------------------------------------
+        test="geofencing-cubic"; // cubic state of the magnetisation, optionally without m . e_a column
+        if(word==test){
+            if(value == "no-product") stats::output_cubic_geofencing_product = false;
+            else if(value != "" && value != "product") err::fatal("Error - value for \'" + prefix + word + "\' must be \"no-product\" (or omitted) on line " + std::to_string(line) + " of input file");
+            stats::calculate_system_magnetization=true;
+            output_list.push_back(output_t::cubic_geofencing);
+            return true;
+        }
+        //--------------------------------------------------------------------
+        test="geofencing-uniaxial"; // uniaxial state of the magnetisation, optionally without m . e_a column
+        if(word==test){
+            if(value == "no-product") stats::output_uniaxial_geofencing_product = false;
+            else if(value != "" && value != "product") err::fatal("Error - value for \'" + prefix + word + "\' must be \"no-product\" (or omitted) on line " + std::to_string(line) + " of input file");
+            stats::calculate_system_magnetization=true;
+            output_list.push_back(output_t::uniaxial_geofencing);
+            return true;
+        }
+        //--------------------------------------------------------------------
+        test="geofencing-cubic-per-spin";
+        if(word==test){
+            stats::calculate_cubic_per_spin_geofencing=true;
+            output_list.push_back(output_t::cubic_per_spin_geofencing);
+            return true;
+        }
+        //--------------------------------------------------------------------
+        test="geofencing-uniaxial-per-spin";
+        if(word==test){
+            stats::calculate_uniaxial_per_spin_geofencing=true;
+            output_list.push_back(output_t::uniaxial_per_spin_geofencing);
             return true;
         }
 

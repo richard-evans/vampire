@@ -108,6 +108,20 @@ For example, to render frame 9 only, you could use:
 \noindent where the "-W" and "-H" flags define the width and heigh of the image
 (the resolution), and "+A" is used for antialiasing.
 
+For large systems converting every snapshot can be slow. A single snapshot can
+be converted instead with \textit{-{}-povray-single-N}, where N is the snapshot
+number (up to 8 digits, so that 25 selects \textit{spins-00000025.data}). For
+example
+
+\noindent
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{vdc -{}-povray-single-25}
+\end{minipage}
+
+\noindent converts snapshot 25 only and sets it as the only frame in
+\textit{spins.ini}, so that \textit{povray spins.ini} renders it.
+
 Output from \vdc can be customised in several ways, either by passing parameters
 to the command line (using the '\textit{--}' notation), or by using a separate
 \vdc input file. The \vdc input file is a plain text file containing parameters

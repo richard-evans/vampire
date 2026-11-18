@@ -10,10 +10,14 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "atoms.hpp"
 #include "program.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+
+// statistics module headers
+#include "internal.hpp"
 
 namespace stats{
 
@@ -465,6 +469,11 @@ namespace stats{
       //------------------------------------------------------------------------
       if(stats::calculate_system_binder_cumulant) stats::system_binder_cumulant.initialize(stats::system_magnetization);
       if(stats::calculate_material_binder_cumulant) stats::material_binder_cumulant.initialize(stats::material_magnetization);
+
+      //------------------------------------------------------------------------
+      // geofencing (per-spin geofencing of magnetic atoms only)
+      //------------------------------------------------------------------------
+      stats::internal::initialize_geofencing(stats::num_atoms, num_materials, atoms::magnetic);
 
       return;
 
