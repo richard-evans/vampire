@@ -93,7 +93,7 @@ double temperature_pulse_function(double function_time){
 ///
 ///   I(t) = 2/(tp delta sqrt(pi/ln 2)) exp[-(4 ln 2)(t/tp)**2] W/m^3
 ///
-///   Assuming a nominal penetration depth of 10 nm and conversion from J/m^2 -> mJ/cm^2,
+///   Assuming a nominal penetration depth of 10 nm and conversion from mJ/cm^2 -> J/m^2,
 ///   I(t) is now in units of s^1 m^-1 and laser power P is in units of mJ/cm^2
 ///
 ///-----------------------------------------------------------------------------------------
@@ -102,8 +102,8 @@ double two_temperature_function(double ftime){
    const double i_pump_time = 1.0/program::pump_time;
    const double reduced_time = (ftime-3.*program::pump_time)*i_pump_time;
    const double four_ln_2 = 2.77258872224; // 4 ln 2
-   // 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
-   const double two_delta_sqrt_pi_ln_2 = 9394372.787;
+   // 2/(delta sqrt(pi/ln 2))*10, delta = 10 nm, mJ/cm^2 -> J/m^2 (factor 10)
+   const double two_delta_sqrt_pi_ln_2 = 939437278.7;
    const double pump=program::pump_power*two_delta_sqrt_pi_ln_2*
                      exp(-four_ln_2*reduced_time*reduced_time)*i_pump_time;
 
@@ -135,8 +135,8 @@ double two_temperature_function(double ftime){
 double double_pump_two_temperature_function(double ftime){
 
    const double four_ln_2 = 2.77258872224; // 4 ln 2
-   // 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
-   const double two_delta_sqrt_pi_ln_2 = 9394372.787;
+   // 2/(delta sqrt(pi/ln 2))*10, delta = 10 nm, mJ/cm^2 -> J/m^2 (factor 10)
+   const double two_delta_sqrt_pi_ln_2 = 939437278.7;
 
    const double i_pump_time1 = 1.0/program::pump_time;
    const double reduced_time1 = (ftime-3.*program::pump_time)*i_pump_time1;

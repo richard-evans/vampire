@@ -41,7 +41,7 @@ sim:total-time-steps          = 20000
 #----------------------------------------------------------
 sim:laser-pulse-temporal-profile          = two-temperature
 sim:laser-pulse-time                      = 100 !fs
-sim:laser-pulse-power                     = 20.0
+sim:laser-pulse-power                     = 0.2
 sim:two-temperature-electron-heat-capacity = 222.0
 sim:two-temperature-phonon-heat-capacity   = 2.3e6
 sim:two-temperature-electron-phonon-coupling = 6.6e17

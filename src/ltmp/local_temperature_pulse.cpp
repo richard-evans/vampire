@@ -31,8 +31,8 @@ namespace ltmp{
          const double i_pump_time = 1.0/ltmp::internal::pump_time;
          const double reduced_time = (time_from_start - 2.0*ltmp::internal::pump_time)*i_pump_time;
          const double four_ln_2 = 2.77258872224; // 4 ln 2
-         // 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
-         const double two_delta_sqrt_pi_ln_2 = 9394372.787;
+         // 2/(delta sqrt(pi/ln 2))*10, delta = 10 nm, mJ/cm^2 -> J/m^2 (factor 10)
+         const double two_delta_sqrt_pi_ln_2 = 939437278.7;
          const double pump=ltmp::internal::pump_power*two_delta_sqrt_pi_ln_2*
                            exp(-four_ln_2*reduced_time*reduced_time)*i_pump_time;
 
