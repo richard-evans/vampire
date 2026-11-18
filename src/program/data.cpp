@@ -66,6 +66,11 @@ namespace program{
    double TTG = 6.6E17 ;///electron coupling constant
    double TTTe = 0.0; /// electron temperature
    double TTTp = 0.0; /// phonon temperature
+   double TTcutofftime = 500.0e-15; /// time after which the multilayer two-temperature model switches to the substrate parameters (s)
+   double TTdamp = -1.0;            /// Gilbert damping of all materials after the cutoff time (negative = unchanged)
+   double TTCe_sub = 222.0;         /// substrate electron specific heat (gamma)
+   double TTCl_sub = 2.3E06;        /// substrate phonon specific heat
+   double TTG_sub = 6.6E17;         /// substrate electron-phonon coupling constant
 
    double track_Ms = 0.1;
    double track_bit_width = 800;

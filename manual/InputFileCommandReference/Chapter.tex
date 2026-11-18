@@ -701,7 +701,17 @@ set the shift between the centre of application of the external field and temper
    \item[] two-temperature
    \item[] double-pulse-two-temperature
    \item[] double-pulse-square
+   \item[] multilayer-two-temperature
 \end{itemize}
+
+The multilayer-two-temperature profile is the two-temperature model with a change of parameters at
+\textit{sim:two-temperature-cutoff-time}. Before the cutoff the film parameters
+(\textit{sim:two-temperature-electron-heat-capacity}, \textit{sim:two-temperature-phonon-heat-capacity},
+\textit{sim:two-temperature-electron-phonon-coupling}) are used without heat-sink coupling, and the spins
+follow the electron temperature. From the cutoff the substrate parameters
+(\textit{sim:two-temperature-substrate-*}) are used with \textit{sim:two-temperature-heat-sink-coupling},
+the spins follow the phonon temperature, and if \textit{sim:two-temperature-damping} is set the Gilbert
+damping of every material changes to it.
 
 {\zicf sim:laser-pulse-time}\phantomsection\addcontentsline{toc}{subsection}{sim:laser-pulse-time} The length of the laser temperature pulse in time, used in \textit{sim:program = temperature-pulse}.
 
@@ -723,6 +733,22 @@ set the shift between the centre of application of the external field and temper
 
 {\zicf sim:two-temperature-electron-phonon-coupling}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-electron-phonon-coupling}
 Dictates the heat exchange coupling between the electrons and the phonons in the system, used in \newline\textit{sim:program = temperature-pulse}.
+
+{\zicf sim:two-temperature-cutoff-time = float [default $500$ fs]}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-cutoff-time}
+Time from the start of the pulse at which \textit{sim:laser-pulse-temporal-profile = multilayer-two-temperature}
+switches to the substrate parameters, with default units of seconds.
+
+{\zicf sim:two-temperature-damping = float [default unchanged]}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-damping}
+Gilbert damping given to every material at \textit{sim:two-temperature-cutoff-time} with the
+multilayer-two-temperature profile. If not set, the damping of each material is unchanged. Not available
+with GPU acceleration.
+
+{\zicf sim:two-temperature-substrate-electron-heat-capacity = float [default $222$]}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-substrate-electron-heat-capacity}
+{\zicf sim:two-temperature-substrate-phonon-heat-capacity = float [default $2.3\times10^{6}$]}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-substrate-phonon-heat-capacity}
+{\zicf sim:two-temperature-substrate-electron-phonon-coupling = float [default $6.6\times10^{17}$]}\phantomsection\addcontentsline{toc}{subsection}{sim:two-temperature-substrate-electron-phonon-coupling}
+Electron heat capacity, phonon heat capacity and electron-phonon coupling used after
+\textit{sim:two-temperature-cutoff-time} with the multilayer-two-temperature profile, in the same units as
+the film parameters.
 
 {\zicf sim:cooling-function}\phantomsection\addcontentsline{toc}{subsection}{sim:cooling-function} Dictates the shape of the cooling curve in \textit{sim:program = field-cool} simulations. Choose from:
 

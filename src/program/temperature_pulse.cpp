@@ -22,11 +22,14 @@
 ///
 
 // Standard Libraries
+#include <cmath>
 #include <iostream>
 
 // Vampire Header files
 #include "atoms.hpp"
+#include "constants.hpp"
 #include "errors.hpp"
+#include "gpu.hpp"
 #include "material.hpp"
 #include "program.hpp"
 #include "random.hpp"
@@ -41,6 +44,7 @@ double two_temperature_function(double ftime);
 double double_pump_two_temperature_function(double ftime);
 double square_temperature_function(double ftime);
 double double_pump_square_temperature_function(double ftime);
+double multilayer_two_temperature_function(double ftime);
 
 /// Selects appropriate temperature pulse function according to user input
 double temperature_pulse_function(double function_time){
@@ -61,6 +65,10 @@ double temperature_pulse_function(double function_time){
 
       case(program::double_pump_square):
          return double_pump_square_temperature_function(function_time);
+         break;
+
+      case(program::multilayer_two_temperature):
+         return multilayer_two_temperature_function(function_time);
          break;
 
       default:
@@ -128,6 +136,88 @@ double two_temperature_function(double ftime){
    }
 
    return program::TTTe;
+
+}
+
+///-----------------------------------------------------------------------------------------
+/// Multilayer two-temperature model (M Strungaru)
+///
+///   Until sim:two-temperature-cutoff-time the film is heated by the same Gaussian pulse as
+///   two_temperature_function, with the film Ce, Cl and G and no heat-sink coupling, and the
+///   electron temperature is returned. From the cutoff time the two-temperature model uses
+///   the substrate parameters (two-temperature-substrate-*) with heat-sink coupling and the
+///   phonon temperature is returned. If sim:two-temperature-damping is set, the Gilbert
+///   damping of every material is changed to it at the cutoff time.
+///
+///-----------------------------------------------------------------------------------------
+static bool multilayer_damping_switched = false;
+
+static void set_damping_of_all_materials(const double alpha){
+   for(unsigned int mat=0;mat<mp::material.size();mat++){
+      mp::material[mat].alpha = alpha;
+      mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+alpha*alpha);
+      mp::material[mat].alpha_oneplusalpha_sq =  alpha*mp::material[mat].one_oneplusalpha_sq;
+      mp::material[mat].H_th_sigma            = sqrt(2.0*alpha*constants::kB / (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*mp::dt));
+   }
+}
+
+double multilayer_two_temperature_function(double ftime){
+
+   // material parameters are copied to the GPU at initialisation, so the damping switch would be lost
+   if(gpu::acceleration && program::TTdamp >= 0.0){
+      err::fatal("Error: sim:two-temperature-damping with sim:laser-pulse-temporal-profile = multilayer-two-temperature is not implemented on the GPU.");
+   }
+
+   const double i_pump_time = 1.0/program::pump_time;
+   const double reduced_time = (ftime-3.*program::pump_time)*i_pump_time;
+   const double four_ln_2 = 2.77258872224; // 4 ln 2
+   // 2/(delta sqrt(pi/ln 2))*10, delta = 10 nm, mJ/cm^2 -> J/m^2 (factor 10)
+   const double two_delta_sqrt_pi_ln_2 = 939437278.7;
+   const double pump=program::pump_power*two_delta_sqrt_pi_ln_2*
+                     exp(-four_ln_2*reduced_time*reduced_time)*i_pump_time;
+
+   const double Te = program::TTTe;
+   const double Tp = program::TTTp;
+   const double dt = mp::dt_SI;
+
+   const bool after_cutoff = ftime >= program::TTcutofftime;
+
+   if(after_cutoff){
+
+      // change the damping once at the cutoff time
+      if(!multilayer_damping_switched && program::TTdamp >= 0.0) set_damping_of_all_materials(program::TTdamp);
+      multilayer_damping_switched = true;
+
+      // substrate parameters with heat-sink coupling
+      const double G  = program::TTG_sub;
+      const double Ce = program::TTCe_sub;
+      const double Cl = program::TTCl_sub;
+      if(Te>1.0) program::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
+      else program::TTTe =       (-G*(Te-Tp)+pump)*dt/Ce + Te;
+      program::TTTp =            ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*program::HeatSinkCouplingConstant*dt;
+
+   }
+   else{
+
+      // film parameters without heat-sink coupling
+      const double G  = program::TTG;
+      const double Ce = program::TTCe;
+      const double Cl = program::TTCl;
+      if(Te>1.0) program::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
+      else program::TTTe =       (-G*(Te-Tp)+pump)*dt/Ce + Te;
+      program::TTTp =            ( G*(Te-Tp)     )*dt/Cl + Tp;
+
+   }
+
+   // Optionally set material specific temperatures
+   if(sim::local_temperature==true){
+      for(unsigned int mat=0;mat<mp::material.size();mat++){
+         if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=program::TTTp;
+         else mp::material[mat].temperature=program::TTTe;
+      }
+   }
+
+   return after_cutoff ? program::TTTp : program::TTTe;
 
 }
 

@@ -126,7 +126,7 @@ namespace program
    extern std::vector < double > track_field_z;
 
    // laser pulse programs (pump and two-temperature model parameters)
-   enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
+   enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square, multilayer_two_temperature};
    extern double cooling_time;
    extern int cooling_function_flag;
    extern pump_functions_t pump_function;
@@ -142,6 +142,11 @@ namespace program
    extern double TTG;  ///electron coupling constant
    extern double TTTe; /// electron temperature
    extern double TTTp; /// phonon temperature
+   extern double TTcutofftime; /// time after which the multilayer two-temperature model switches to the substrate parameters (s)
+   extern double TTdamp;       /// Gilbert damping of all materials after the cutoff time (negative = unchanged)
+   extern double TTCe_sub;     /// substrate electron specific heat (gamma)
+   extern double TTCl_sub;     /// substrate phonon specific heat
+   extern double TTG_sub;      /// substrate electron-phonon coupling constant
 
    //---------------------------------------------------------------------------
    // Function to run the program selected with the sim:program keyword

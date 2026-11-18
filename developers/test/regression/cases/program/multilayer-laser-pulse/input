@@ -1,0 +1,36 @@
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+sim:time-step=1.0E-16
+sim:integrator-random-seed=12345
+output:precision=16
+sim:program=laser-pulse
+sim:integrator=llg-heun
+sim:temperature=0.0
+sim:equilibration-temperature=0.0
+sim:laser-pulse-temporal-profile=multilayer-two-temperature
+sim:laser-pulse-time=10 !fs
+sim:laser-pulse-power=0.2
+sim:two-temperature-cutoff-time=30 !fs
+sim:two-temperature-damping=0.5
+sim:two-temperature-substrate-electron-heat-capacity=500.0
+sim:two-temperature-substrate-phonon-heat-capacity=3.0e6
+sim:two-temperature-substrate-electron-phonon-coupling=2.0e18
+sim:two-temperature-heat-sink-coupling=1.0e13
+sim:equilibration-time-steps=100
+sim:total-time-steps=500
+sim:time-steps-increment=50
+output:electron-temperature
+output:phonon-temperature
+output:time-steps
+output:temperature
+output:applied-field-strength
+output:magnetisation
+output:mean-magnetisation-length
+output:total-energy

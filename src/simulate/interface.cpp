@@ -304,12 +304,18 @@ namespace sim{
             program::pump_function=program::double_pump_square;
             return true;
          }
+         test="multilayer-two-temperature";
+         if(value==test){
+            program::pump_function=program::multilayer_two_temperature;
+            return true;
+         }
          else{
             terminaltextcolor(RED);
             std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
             std::cerr << "\t\"square\"" << std::endl;
             std::cerr << "\t\"double-pulse-square\"" << std::endl;
             std::cerr << "\t\"two-temperature\"" << std::endl;
+            std::cerr << "\t\"multilayer-two-temperature\"" << std::endl;
             std::cerr << "\t\"double-pulse-two-temperature\"" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
@@ -393,6 +399,46 @@ namespace sim{
          double hscc=atof(value.c_str());
          vin::check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
          program::TTG=hscc;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-cutoff-time";
+      if(word==test){
+         double ct=atof(value.c_str());
+         vin::check_for_valid_value(ct, word, line, prefix, unit, "time", 0.0, 1.0,"input","0 - 1 s");
+         program::TTcutofftime=ct;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-damping";
+      if(word==test){
+         double a=atof(value.c_str());
+         vin::check_for_valid_value(a, word, line, prefix, unit, "none", 0.0, 10.0,"input","0.0 - 10.0");
+         program::TTdamp=a;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-substrate-electron-heat-capacity";
+      if(word==test){
+         double c=atof(value.c_str());
+         vin::check_for_valid_value(c, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         program::TTCe_sub=c;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-substrate-phonon-heat-capacity";
+      if(word==test){
+         double c=atof(value.c_str());
+         vin::check_for_valid_value(c, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         program::TTCl_sub=c;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="two-temperature-substrate-electron-phonon-coupling";
+      if(word==test){
+         double g=atof(value.c_str());
+         vin::check_for_valid_value(g, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+         program::TTG_sub=g;
          return true;
       }
       //--------------------------------------------------------------------
