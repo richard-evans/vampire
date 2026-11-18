@@ -110,6 +110,9 @@ namespace program{
       double electrical_pulse_fall_time = 0.0;    // linear fall time for electrical pulse (0.0 default)
       int num_electrical_pulses         = 1;
       double electrical_pulse_delay     = 0.0;    // delay from laser pulse centre to electrical pulse centre (0.0 default)
+      double electrical_pulse_strength  = 1.0;    // peak fractional electric field strength (1.0 default)
+      double electrical_pulse_period    = 0.0;    // repeat period of the electrical pulse (0.0 = single pulse)
+      electrical_pulse_shape_t electrical_pulse_shape = electrical_pulse_shape_t::square; // shape of the electrical pulse
 
       //------------------------------------------------------------------------
       // Field pulse program

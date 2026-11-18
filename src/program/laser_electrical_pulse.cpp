@@ -38,23 +38,6 @@ namespace pgi = program::internal;
 // to the appropriate TTM or square profile selected by sim:laser-pulse-temporal-profile
 extern double temperature_pulse_function(double function_time);
 
-//------------------------------------------------------------------------------
-// Gaussian envelope for the electrical pulse.
-//
-// The pulse is centred at (delay + 3*tau) from simulation start, matching the
-// convention used by the laser Gaussian in two_temperature_function where the
-// peak sits at t = 3*pump_time.  This means setting delay = 0 and
-// electrical-pulse-time = laser-pulse-time produces perfectly overlapping pulses.
-//------------------------------------------------------------------------------
-static void update_laser_electrical_gaussian(const double t_elec){
-
-   const double tau      = pgi::electrical_pulse_time;
-   const double four_ln2 = 2.77258872224; // 4 ln 2
-   const double reduced  = (t_elec - 3.0 * tau) / tau;
-   pg::fractional_electric_field_strength = std::exp(-four_ln2 * reduced * reduced);
-
-}
-
 namespace program{
 
 void laser_electrical_pulse(){
@@ -95,7 +78,8 @@ void laser_electrical_pulse(){
          sim::temperature = temperature_pulse_function(t);
 
          // Update Gaussian electrical pulse, offset by the user-specified delay
-         update_laser_electrical_gaussian(t - pgi::electrical_pulse_delay);
+         // (peaks at delay + 3 x electrical-pulse-time, see electrical_pulse_gaussian)
+         pg::fractional_electric_field_strength = pgi::electrical_pulse_gaussian(t - pgi::electrical_pulse_delay);
 
          sim::integrate(1);
       }

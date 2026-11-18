@@ -596,7 +596,10 @@ controlled by the parameter \textit{sim:electrical-pulse-time}
 with a rise time of \textit{sim:electrical-pulse-rise-time} and fall time of
 \textit{sim:electrical-pulse-fall-time}. The default pulse time is 1 ns, and
 default fall and rise times are 0, reproducing a square pulse. An optional delay
-before the pulse begins can be set with \textit{sim:electrical-pulse-delay}. The time
+before the pulse begins can be set with \textit{sim:electrical-pulse-delay}. A Gaussian
+pulse can be chosen instead with \textit{sim:electrical-pulse-shape}, the peak fractional
+voltage scaled with \textit{sim:electrical-pulse-strength}, and the pulse repeated with
+\textit{sim:electrical-pulse-period}. The time
 dependence of the fractional voltage can be printed in the output file with the
 parameter \textit{output:fractional-electric-field-strength}.
 
@@ -607,7 +610,8 @@ driven by the same parameters as \textit{sim:program = temperature-pulse}
 (\textit{sim:laser-pulse-temporal-profile}, \textit{sim:laser-pulse-time}, \textit{sim:laser-pulse-power},
 \textit{sim:two-temperature-electron-heat-capacity}, \textit{sim:two-temperature-phonon-heat-capacity},
 \textit{sim:two-temperature-electron-phonon-coupling}, \textit{sim:equilibration-temperature}).
-The electrical pulse modulates the spin-transfer or spin-orbit torque strength via a Gaussian envelope,
+The electrical pulse modulates the spin-transfer or spin-orbit torque strength via a Gaussian envelope
+with peak \textit{sim:electrical-pulse-strength},
 scaled by the STT/SOT field strengths set in the material file.
 The electrical Gaussian is centred at $t_\mathrm{delay} + 3\tau_\mathrm{elec}$ from the start of the simulation,
 where $t_\mathrm{delay}$ is set by \textit{sim:electrical-pulse-delay} and $\tau_\mathrm{elec}$ by
@@ -852,6 +856,25 @@ so the rise phase does not begin until $t = t_\mathrm{delay}$.
 In \textit{sim:program = laser-electrical-pulse} it sets the offset from the laser pulse centre to the
 electrical pulse centre; note that in this program \textit{sim:electrical-pulse-time} specifies the
 Gaussian width $\tau_\mathrm{elec}$ rather than a trapezoidal constant-phase duration.
+
+{\zicf sim:electrical-pulse-shape = square, gaussian [default square]}\phantomsection\addcontentsline{toc}{subsection}{sim:electrical-pulse-shape}
+Defines the shape of the electrical pulse in \textit{sim:program = electrical-pulse}. The square pulse is the
+trapezium described by \textit{sim:electrical-pulse-time}, \textit{sim:electrical-pulse-rise-time} and
+\textit{sim:electrical-pulse-fall-time}. The Gaussian pulse is the same as in
+\textit{sim:program = laser-electrical-pulse}: $\exp[-4\ln 2\,(t - t_\mathrm{delay} - 3\tau_\mathrm{elec})^2/\tau_\mathrm{elec}^2]$,
+with full width at half maximum $\tau_\mathrm{elec}$ given by \textit{sim:electrical-pulse-time}; the rise and
+fall times are not used.
+
+{\zicf sim:electrical-pulse-strength = float [default $1.0$]}\phantomsection\addcontentsline{toc}{subsection}{sim:electrical-pulse-strength}
+Defines the peak fractional electric field strength (dimensionless) of the electrical pulse, in
+\textit{sim:program = electrical-pulse} and \textit{sim:program = laser-electrical-pulse}. It scales the
+STT/SOT fields and the spin-transport voltage. Negative values reverse the current. Range $-100$ to $100$.
+
+{\zicf sim:electrical-pulse-period = float [default $0.0$ s]}\phantomsection\addcontentsline{toc}{subsection}{sim:electrical-pulse-period}
+Repeats the electrical pulse in \textit{sim:program = electrical-pulse} with this period, starting after
+\textit{sim:electrical-pulse-delay}, with default units of seconds. The default of 0 gives a single pulse.
+The period should be longer than the pulse (rise + pulse + fall times for a square pulse,
+about $6\tau_\mathrm{elec}$ for a Gaussian), otherwise each pulse is cut short.
 
  {\zicf sim:field-pulse-time = float [default $1.0$ ns]}\phantomsection\addcontentsline{toc}{subsection}{sim:field-pulse-time}
  Defines the pulse time in the program \textit{field-pulse} with default

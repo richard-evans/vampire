@@ -1,0 +1,30 @@
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.0 !nm
+dimensions:system-size-y = 2.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=Fe.mat
+sim:time-step=1.0E-16
+sim:integrator-random-seed=12345
+output:precision=16
+sim:program=electrical-pulse
+sim:integrator=llg-heun
+sim:temperature=300.0
+sim:electrical-pulse-shape=square
+sim:electrical-pulse-strength=0.5
+sim:electrical-pulse-time=8 !fs
+sim:electrical-pulse-rise-time=2 !fs
+sim:electrical-pulse-fall-time=4 !fs
+sim:electrical-pulse-delay=5 !fs
+sim:electrical-pulse-period=20 !fs
+sim:equilibration-time-steps=100
+sim:total-time-steps=600
+sim:time-steps-increment=10
+output:time-steps
+output:temperature
+output:fractional-electric-field-strength
+output:magnetisation
+output:mean-magnetisation-length

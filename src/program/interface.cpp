@@ -254,6 +254,35 @@ namespace program{
          return true;
       }
       //--------------------------------------------------------------------
+      test = "electrical-pulse-shape";
+      if(word == test){
+         if(value == "square"){
+            program::internal::electrical_pulse_shape = program::internal::electrical_pulse_shape_t::square;
+            return true;
+         }
+         if(value == "gaussian"){
+            program::internal::electrical_pulse_shape = program::internal::electrical_pulse_shape_t::gaussian;
+            return true;
+         }
+         err::fatal("Error - value for 'sim:" + word + "' on line " + std::to_string(line) + " of input file must be one of:\n\t\"square\"\n\t\"gaussian\"");
+      }
+      //--------------------------------------------------------------------
+      test = "electrical-pulse-strength";
+      if(word == test){
+         double ps = atof(value.c_str());
+         vin::check_for_valid_value(ps, word, line, prefix, unit, "none", -100.0, 100.0,"input","-100 - 100");
+         program::internal::electrical_pulse_strength = ps;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test = "electrical-pulse-period";
+      if(word == test){
+         double pp = atof(value.c_str());
+         vin::check_for_valid_positive_value(pp, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
+         program::internal::electrical_pulse_period = pp;
+         return true;
+      }
+      //--------------------------------------------------------------------
       test="exchange-stiffness-maximum-angle";
       if(word==test){
          double ma = atof(value.c_str()); // convert string to uint64_t

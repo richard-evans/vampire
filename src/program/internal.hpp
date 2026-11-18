@@ -69,6 +69,15 @@ namespace program{
       extern double electrical_pulse_fall_time; // linear fall time for electrical pulse (0.0 default)
       extern int num_electrical_pulses;
       extern double electrical_pulse_delay;     // delay from laser pulse centre to electrical pulse centre (laser-electrical-pulse program)
+      extern double electrical_pulse_strength;  // peak fractional electric field strength (1.0 default)
+      extern double electrical_pulse_period;    // repeat period of the electrical pulse (0.0 = single pulse)
+
+      enum class electrical_pulse_shape_t { square, gaussian };
+      extern electrical_pulse_shape_t electrical_pulse_shape; // shape of the electrical pulse (square default)
+
+      // Fractional electric field strength of the electrical pulse
+      double electrical_pulse_gaussian(const double t);           // Gaussian pulse, t measured from the delay
+      double electrical_pulse_fraction(const double time_from_start); // shaped (and repeated) pulse
 
       //------------------------------------------------------------------------
       // Field pulse program
