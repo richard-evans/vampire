@@ -9,26 +9,19 @@
 //
 
 // C++ standard library headers
-#include "constants.hpp"
 #include <cmath>
-#include <cstdlib>
-#include <iostream>
 #include <sstream>
-
-// C library headers
-#include <fenv.h>
-#include <signal.h>
+#include <string>
 
 // Vampire headers
-#include "cells.hpp" // needed for cells::cell_id_array but to be removed
+#include "cells.hpp"
+#include "constants.hpp"
 #include "dipole.hpp"
 #include "micromagnetic.hpp"
-#include "vio.hpp"
 #include "vmpi.hpp"
 #include "vutil.hpp"
-#include "sim.hpp"
-#include "vutil.hpp"
-// dipole module headers
+
+// hierarchical module headers
 #include "internal.hpp"
 
 // alias internal hierarchical namespace for brevity

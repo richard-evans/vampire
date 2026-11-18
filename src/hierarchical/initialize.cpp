@@ -364,7 +364,9 @@ void initialize(const double system_dimensions_x,
    ha::mag_array_z.allocate(ha::total_num_cells);
 
    // check that the number of zero levels cells is correct (must be the same for hierachical and cells structures)
-   if (ha::num_zero_level_cells != cells_num_cells) std::cout << "ERROR ZERO CELLS != NUM CELLS" << std::endl;
+   if (ha::num_zero_level_cells != cells_num_cells){
+      err::fatal("Programmer error: " + std::to_string(ha::num_zero_level_cells) + " level 0 hierarchical cells but " + std::to_string(cells_num_cells) + " cells");
+   }
    //    std::cout << ha::num_zero_level_cells << '\t' << cells_num_cells << '\t' << ha::cell_positions_mom.size()/4. << '\t' << cells_pos_and_mom_array.size()/4. <<"\t" <<  ha::num_atoms_in_cell.size() << '\t' << cells_num_atoms_in_cell.size() <<std::endl;
 
    // cell positions and moments are the same on all processes (reduced in the cells module)
@@ -816,8 +818,8 @@ void initialize(const double system_dimensions_x,
                //    ha::calc_intra(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
                // }
 
-               // No threshold on small tensor components: an absolute threshold (T^2 < 1e-15 A^-6, removed
-               // 2026-11-11) zeroed every interaction beyond ~32 nm, including almost all coarse cells.
+               // No threshold on small tensor components: an absolute threshold (T^2 < 1e-15 A^-6) would zero
+               // every interaction beyond ~32 nm, including almost all coarse cells.
                //            std::cout  << cell_i << '\t' << cell_j << "\t" << ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
                //             //std::cout << cells_num_atoms_in_cell[cell_i] << '\t' << cells_num_atoms_in_cell[cell_j] << '\t' <<  cell_i << '\t' << cell_j << "\t" <<  ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
             }

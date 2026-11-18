@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <vector>
 #include <string>
 
@@ -77,11 +78,9 @@ namespace dipole{
             // // for gpu acceleration, transfer spin positions now (does nothing for serial)
             // gpu::transfer_spin_positions_from_gpu_to_cpu();
 
-            // Time each individual dipole field recalculation, for the
-            // ARCHER2 weak/strong scaling study (papers/dipole). Barrier
-            // first so slow ranks don't make fast ranks look slow, then
-            // report the slowest rank's time (the one that sets wall clock).
-            vmpi::barrier();
+            // Time each recalculation if requested (dipole:output-timings): barrier first so that slow
+            // processes do not make fast ones look slow, then report the slowest process's time
+            if(dipole::internal::output_timings) vmpi::barrier();
             vutil::vtimer_t dipole_scaling_timer;
             dipole_scaling_timer.start();
 
@@ -124,19 +123,19 @@ namespace dipole{
             // gpu::transfer_dipole_cells_fields_from_gpu_to_cpu();
 
             dipole_scaling_timer.stop();
-            const double dipole_scaling_local_time = dipole_scaling_timer.elapsed_time();
-            const double dipole_scaling_max_time = vmpi::reduce_max(dipole_scaling_local_time);
-            // time of each phase of the update (hierarchical solver only, collective)
-            const std::string dipole_scaling_phases = dipole::internal::solver == dipole::internal::hierarchical ? hierarchical::update_phase_times() : "";
-            if(vmpi::master){
-               std::cout << "DIPOLE_SCALING UPDATE solver=" << dipole::internal::dipole_solver_name()
-                          << " nprocs=" << vmpi::num_processors
-                          << " sim_time=" << sim_time
-                          << " update_time_s=" << dipole_scaling_max_time << dipole_scaling_phases << std::endl;
-               zlog << zTs() << "DIPOLE_SCALING UPDATE solver=" << dipole::internal::dipole_solver_name()
-                    << " nprocs=" << vmpi::num_processors
-                    << " sim_time=" << sim_time
-                    << " update_time_s=" << dipole_scaling_max_time << dipole_scaling_phases << std::endl;
+            if(dipole::internal::output_timings){
+               const double max_time = vmpi::reduce_max(dipole_scaling_timer.elapsed_time());
+               // time of each phase of the update (hierarchical solver only, collective)
+               const std::string phases = dipole::internal::solver == dipole::internal::hierarchical ? hierarchical::update_phase_times() : "";
+               if(vmpi::master){
+                  std::ostringstream line;
+                  line << "DIPOLE_SCALING UPDATE solver=" << dipole::internal::dipole_solver_name()
+                       << " nprocs=" << vmpi::num_processors
+                       << " sim_time=" << sim_time
+                       << " update_time_s=" << max_time << phases;
+                  std::cout << line.str() << std::endl;
+                  zlog << zTs() << line.str() << std::endl;
+               }
             }
 
             // If enabled, output atomistic dipole fields (the atomistic fft solver has its own output)

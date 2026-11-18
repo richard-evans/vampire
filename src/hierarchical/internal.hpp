@@ -21,13 +21,11 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
 
 // Vampire headers
 #include "hierarchical.hpp"
 #include "vmpi.hpp"
-
-// hierarchical module headers
-#include "vector"
 
 namespace hierarchical{
 
@@ -98,7 +96,7 @@ namespace hierarchical{
       extern moment_exchange_t moment_exchange;
       extern int moment_exchange_level; // highest level exchanged point to point (hierarchical:moment-exchange-level)
 
-      // phases of the field update, timed separately for the scaling study (papers/dipole)
+      // phases of the field update, timed separately and reported with dipole:output-timings
       enum phase_t { upward_pass = 0, moment_reduction = 1, field_loop = 2, field_distribution = 3, num_phases = 4 };
       extern std::vector<double> phase_time; // time (s) of each phase of the last update on this process
 

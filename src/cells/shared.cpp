@@ -12,7 +12,7 @@
 //   Cell arrays held once per shared memory region (cells::shared_*).
 //
 //   With cells::full_cell_arrays the cells module builds its full size arrays
-//   on every process as before (an MPI_Allreduce over every cell) and copies
+//   on every process (an MPI_Allreduce over every cell) and copies
 //   them into the shared arrays. Otherwise (hierarchical dipole solver with no
 //   other module reading the cell arrays) each process sums only its own
 //   cells, and the sums are reduced into the shared arrays by

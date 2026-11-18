@@ -13,10 +13,6 @@
 #include <cstdlib>
 #include <iostream>
 
-// C library headers
-#include <fenv.h>
-#include <signal.h>
-
 // Vampire headers
 #include "cells.hpp" // needed for cells::cell_id_array but to be removed
 #include "dipole.hpp"

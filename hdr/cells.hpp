@@ -20,8 +20,6 @@
 // Vampire headers
 #include "vmpi.hpp"
 
-// Vampire headers
-
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for cells module
 //--------------------------------------------------------------------------------

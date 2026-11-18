@@ -36,13 +36,11 @@
 #include <algorithm>
 #include <limits>
 #include <numeric>
-#include <string>
 #include <vector>
 
 // Vampire headers
 #include "atoms.hpp"
 #include "cells.hpp"
-#include "errors.hpp"
 #include "material.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"

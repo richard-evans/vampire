@@ -45,6 +45,7 @@ namespace vmpi{
    double MaximumComputeTime;
    double MaximumWaitTime;
    bool DetailedMPITiming=false;
+   bool output_memory_checkpoints = false; // write MEMORY_CHECKPOINT lines to the log (dipole:output-timings)
    std::vector<double> ComputeTimeArray(0);
    std::vector<double> WaitTimeArray(0);
 

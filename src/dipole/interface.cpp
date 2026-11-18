@@ -15,6 +15,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -117,6 +118,14 @@ namespace dipole{
       if(word==test){
          // set flag to output atomistic dipole field
          dipole::internal::output_dipole_field = true;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="output-timings";
+      if(word==test){
+         // set flags to output build and update times and memory use checkpoints
+         dipole::internal::output_timings = true;
+         vmpi::output_memory_checkpoints = true;
          return true;
       }
       //--------------------------------------------------------------------

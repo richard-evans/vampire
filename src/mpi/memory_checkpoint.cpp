@@ -3,7 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) R F L Evans 2026. All rights reserved.
+//   (c) Richard F L Evans 2026. All rights reserved.
+//
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 
@@ -61,8 +63,11 @@ double current_memory_usage_kb(){
 // proportional set size on Linux, which counts MPI shared memory once per region) of the worst rank and the mean
 // over ranks, in MB. Peak RSS only ever rises, so the checkpoint at which the worst-rank peak jumps locates the
 // set-up phase responsible, and a rise in peak without a matching rise in current RSS shows a transient.
+// Does nothing unless output_memory_checkpoints is set (the same on every process).
 //------------------------------------------------------------------------------
 void memory_checkpoint(const std::string& label){
+
+   if(!vmpi::output_memory_checkpoints) return;
 
    vmpi::barrier();
 

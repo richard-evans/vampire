@@ -155,8 +155,8 @@ namespace dipole{
                      }
                      // End of Intra part
 
-                     // No threshold on small tensor components: an absolute threshold (T^2 < 1e-15 A^-6, removed
-                     // 2026-11-11) zeroed every interaction beyond ~32 nm, dropping the far field of large systems.
+                     // No threshold on small tensor components: an absolute threshold (T^2 < 1e-15 A^-6) would zero
+                     // every interaction beyond ~32 nm, dropping the far field of large systems.
                //   std::cout << i<< '\t' <<j << '\t' <<   dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_yz[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
                }
                }

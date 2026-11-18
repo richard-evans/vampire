@@ -11,25 +11,12 @@
 //
 
 // C++ standard library headers
-// C++ standard library headers
-#include <string>
 #include <cmath>
-#include <cstdlib>
-#include <iostream>
-// C library headers
-#include <fenv.h>
-#include <signal.h>
-#include <math.h>
-// Vampire headers
-#include "cells.hpp" // needed for cells::cell_id_array but to be removed
-#include "dipole.hpp"
-#include "errors.hpp"
-#include "vio.hpp"
-#include "vutil.hpp"
-#include "atoms.hpp"
-// Vampire headers
-#include "hierarchical.hpp"
+#include <string>
 
+// Vampire headers
+#include "errors.hpp"
+#include "hierarchical.hpp"
 
 // hierarchical module headers
 #include "internal.hpp"

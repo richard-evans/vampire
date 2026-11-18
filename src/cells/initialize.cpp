@@ -98,8 +98,7 @@ namespace cells{
       int ncy = dy;
       int ncz = dz;
 
-      // Cells are numbered (i * ncy + j) * ncz + k for cell coordinates i, j, k (formerly a 3D array of the ids,
-      // which held an inner vector for every column of cells on every process)
+      // Cells are numbered (i * ncy + j) * ncz + k for cell coordinates i, j, k
 
       // Determine number of cells in x,y,z
       const int d[3]={ncx,ncy,ncz};
@@ -306,13 +305,15 @@ namespace cells{
 
          // Reorganise array that associate cell with atoms in 1D structure
          // so to pass it easy in parallel
-         int counter_id_at=0;
-         for(unsigned int lc=0; lc<cells::cell_id_array.size() && cells::build_atom_lists; lc++){
-            for(int i=0; i<cells::num_atoms_in_cell[cells::cell_id_array[lc]]; i++){
-               int atom=cells::index_atoms_array[cells::cell_id_array[lc]][i];
-               //cells::index_atoms_array1D.push_back(atom);
-               cells::index_atoms_array1D[counter_id_at]=atom;
-               counter_id_at++;
+         if(cells::build_atom_lists){
+            int counter_id_at=0;
+            for(unsigned int lc=0; lc<cells::cell_id_array.size(); lc++){
+               for(int i=0; i<cells::num_atoms_in_cell[cells::cell_id_array[lc]]; i++){
+                  int atom=cells::index_atoms_array[cells::cell_id_array[lc]][i];
+                  //cells::index_atoms_array1D.push_back(atom);
+                  cells::index_atoms_array1D[counter_id_at]=atom;
+                  counter_id_at++;
+               }
             }
          }
 

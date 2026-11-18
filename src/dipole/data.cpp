@@ -73,6 +73,7 @@ namespace dipole{
       bool initialised=false;
       bool output_atomistic_dipole_field = false; // flag to toggle output of atomic resolution dipole field
       bool output_dipole_field = false; // flag to toggle output of dipole field
+      bool output_timings = false; // log the build and update times and memory use (DIPOLE_SCALING, MEMORY_CHECKPOINT)
 
       int update_time=-1; /// last update time
 
