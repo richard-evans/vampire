@@ -1,0 +1,37 @@
+#------------------------------------------
+# Integration test: second order Neel pair anisotropy energy
+#
+# One layer of 10 x 10 sc atoms, periodic in x and y only, so every atom is
+# a surface atom with nearest neighbours at +-x and +-y and none along z.
+# Spins along [1,0,0].
+#
+# E_i = -1/2 sum_j { l [ (s.e)^2 - 1/3 ] + q [ (s.e)^4 - 6/7 (s.e)^2 + 3/35 ] }
+#       (fourth order), or E_i = -1/2 sum_j l (s.e)^2 (second order only),
+# with l = 1e-21 J and q = 5e-22 J. Per atom:
+#   second order, s along x:   -l             (s.e = +-1, +-1, 0, 0)
+#   fourth order, s along z:    2l/3 - 6q/35  (s.e = 0 for all four neighbours)
+#   fourth order, s along x:   -l/3 - 11q/35  (s.e = +-1, +-1, 0, 0)
+# This case: -l per atom; analytic result for 100 atoms: E = -1.0e-19 J
+#------------------------------------------
+
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 2.87 !nm
+dimensions:system-size-y = 2.87 !nm
+dimensions:system-size-z = 0.2 !nm
+
+material:file=Fe.mat
+
+sim:temperature=0.0
+sim:time-steps-increment = 1
+sim:total-time-steps = 1
+sim:time-step=1.0E-15
+
+sim:program=benchmark
+sim:integrator=llg-heun
+
+output:anisotropy-energy
+output:precision = 12

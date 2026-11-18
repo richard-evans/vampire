@@ -52,7 +52,10 @@ namespace anisotropy{
       //                                              [  0   1   0  ]
       //                                              [  0   0   0  ]
       //
-      //       Energy (tensor) = S . T . S
+      //       Energy (tensor) = -ks/2 S . T . S
+      //
+      //       The stored tensor neel_tensor includes the factor ks/2 (initialize_neel.cpp),
+      //       so that E = -S . neel_tensor . S and H = -dE/dS = 2 neel_tensor . S
       //
       //                       = [ Sx Sy Sz ] [  2   0   0  ] [ Sx ]
       //                                      [  0   1   0  ] [ Sy ]

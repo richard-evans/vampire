@@ -1,0 +1,47 @@
+#------------------------------------------------------------------------------
+# Surface flags in a unit cell file
+#
+# island.ucf holds a complete 6 x 6 x 3 sc island (108 atoms) as one unit cell,
+# with the optional surface flag column marking the top and side faces as
+# surface atoms. The bottom face rests on a substrate, so it is not a surface
+# even though its atoms are missing a neighbour. Neel pair anisotropy then
+# acts on the 76 flagged atoms only (the log reports the number). Without the
+# flags, anisotropy:surface-anisotropy-threshold = 6 would make all 92 atoms
+# with fewer than six neighbours surface atoms, including the bottom face.
+#------------------------------------------------------------------------------
+
+#------------------------------------------
+# Creation attributes: one unit cell
+#------------------------------------------
+material:unit-cell-file = island.ucf
+dimensions:system-size-x = 1.7 !nm
+dimensions:system-size-y = 1.7 !nm
+dimensions:system-size-z = 0.85 !nm
+
+#------------------------------------------
+# Material files
+#------------------------------------------
+material:file = Fe.mat
+
+#------------------------------------------
+# Simulation attributes
+#------------------------------------------
+sim:temperature = 10.0
+sim:time-step = 1 !fs
+sim:total-time-steps = 20000
+sim:time-steps-increment = 1000
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program = time-series
+sim:integrator = llg-heun
+
+#------------------------------------------
+# Data output
+#------------------------------------------
+output:real-time
+output:magnetisation
+output:anisotropy-energy
+screen:time-steps
+screen:magnetisation

@@ -29,8 +29,10 @@
 //
 //    E_i = - sum_j (l - 6/7 q)/2 (s.e)^2  -  sum_j q/2 (s.e)^4  +  sum_j ( l/6 - 3q/70 )
 //
-// The quadratic term is the standard Neel tensor with pair constant (l - 6/7 q)/2,
-// calculated in initialize_neel.cpp and applied by neel_fields and neel_energy.
+// The quadratic term is the standard Neel term -1/2 sum_j k (s.e)^2 with pair
+// constant k = l - 6/7 q, calculated in initialize_neel.cpp and applied by
+// neel_fields and neel_energy, so that for q = 0 the model differs from the
+// standard Neel model only by the constant sum_j l/6.
 // This file adds the quartic and constant terms. The quartic term is a fully
 // symmetric rank 4 tensor with 15 independent components, stored as the
 // coefficients C_k of the monomials sx^a sy^b sz^c (a + b + c = 4):

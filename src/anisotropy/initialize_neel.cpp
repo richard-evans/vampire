@@ -107,17 +107,17 @@ namespace internal{
                   };
 
                   // For the fourth order model add the quartic and constant terms, and use the
-                  // quadratic pair constant (l - 6/7 q)/2 with l = kij (see neel_fourth_order.cpp)
+                  // quadratic pair constant l - 6/7 q with l = kij (see neel_fourth_order.cpp)
                   if(internal::enable_neel_fourth_order_anisotropy){
                      internal::add_neel_fourth_order_pair(atom, kij, qij, eij);
-                     kij = 0.5*(kij - (6.0/7.0)*qij);
+                     kij = kij - (6.0/7.0)*qij;
                   }
 
-                  // loop over tensor components and sum total including local anisotropy constant
-                  // note inclusion of factor - 2 . 1/2 = -1 in tensor field compared to energy due to derivative
+                  // loop over tensor components and sum T = 1/2 sum_j kij e_ij e_ij, so that the energy
+                  // E = -S.T.S = -kij/2 sum_j (S.e_ij)^2 and the field H = -dE/dS = 2 T.S (neel.cpp)
                   for(int i = 0; i < 3; ++i){
                      for(int j = 0; j < 3; ++j){
-                        tmp_tensor[ 3*i + j ] += kij * eij[i] * eij[j];
+                        tmp_tensor[ 3*i + j ] += 0.5 * kij * eij[i] * eij[j];
                      }
                   }
 

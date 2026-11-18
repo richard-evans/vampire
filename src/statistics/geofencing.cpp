@@ -203,7 +203,7 @@ namespace stats{
    //---------------------------------------------------------------------------
    // Function to output the geofencing state of the system or material
    // magnetisation, and optionally m . e_a for the closest axis. A lost state
-   // is output as 0X, where X is the closest state.
+   // is output as -1.
    //---------------------------------------------------------------------------
    std::string output_geofencing_state(const geofencing_t type, const bool header){
 
@@ -238,7 +238,7 @@ namespace stats{
       internal::closest_axis(g.axes, m[index], m[index+1], m[index+2], axis, dot);
 
       if(dot >= g.threshold) state_column << axis + 1;
-      else state_column << "0" + std::to_string(axis + 1);
+      else state_column << -1;
       if(output_product) product_column << dot;
 
       return res.str();

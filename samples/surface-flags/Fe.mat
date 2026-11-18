@@ -1,0 +1,16 @@
+#===================================================
+# Material file for the surface flags sample
+#
+# The exchange constant scales the normalised unit
+# cell file interactions. The Neel pair anisotropy
+# acts only on the surface atoms, which are set by
+# the surface flags in island.ucf.
+#===================================================
+material:num-materials = 1
+
+material[1]:material-name = Fe
+material[1]:damping-constant = 0.1
+material[1]:exchange-matrix[1] = 3.0e-21
+material[1]:atomic-spin-moment = 2.2 !muB
+material[1]:neel-anisotropy-constant[1] = 1.0e-22
+material[1]:initial-spin-direction = 0,0,1

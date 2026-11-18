@@ -24,5 +24,6 @@ top-level folder first (a short benchmark, a few seconds).
 | [geometry](geometry) | cutting materials to 2D shapes with geometry files | < 1 s |
 | [grain-alternating-magnetisation](grain-alternating-magnetisation) | Voronoi granular film with alternating grain magnetisation | ~1 s |
 | [unitcells](unitcells) | creating a custom unit cell file (Python or C++) for a ferrimagnet | ~6 s |
+| [surface-flags](surface-flags) | surface atoms set by flags in a unit cell file, for Néel surface anisotropy | < 1 s |
 | [laser-electrical-pulse](laser-electrical-pulse) | laser pulse (two-temperature model) followed by a spin-transfer torque pulse | < 1 s |
 | [sld](sld) | spin-lattice dynamics in bcc Fe | ~40 s |

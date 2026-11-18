@@ -95,6 +95,12 @@ int main(int argc, char* argv[]){
       // Anisotropy energy tests
       if( !energy_test("anisotropy/uniaxial", -1.0e-20, exe, "anisotropy" ) ) fail += 1;
 
+      // Neel pair anisotropy energy for a single periodic layer (every atom a surface atom with
+      // neighbours at +-x and +-y): second order, and fourth order with spins along z and x
+      if( !energy_test("anisotropy/neel-second-order",   -1.0e-19,           exe, "Neel" ) ) fail += 1;
+      if( !energy_test("anisotropy/neel-fourth-order-z",  5.80952380952e-20, exe, "Neel" ) ) fail += 1;
+      if( !energy_test("anisotropy/neel-fourth-order-x", -4.90476190476e-20, exe, "Neel" ) ) fail += 1;
+
       // Anisotropy energy tests for each anisotropy term: five non-interacting layers of
       // 100 atoms with spins along [001], [100], [111], d4 = (0.3,-0.5,0.8) and d5 = (-0.6,0.2,0.4)
       // (normalised); output:material-total-energy gives the energy of each layer
