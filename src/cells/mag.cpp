@@ -35,6 +35,11 @@ namespace cells{
    //int mag(const double time_from_start){
    int mag(){
 
+      // the cell magnetisations need the full size cell arrays (see dipole::needs_full_cell_arrays)
+      if(!cells::full_cell_arrays){
+         err::fatal("Programmer error: cells::mag called without the full size cell arrays; the calling module must be added to dipole::full_cell_fields in initialize_modules");
+      }
+
       if(micromagnetic::discretisation_type != 1){
      // check calling of routine if error checking is activated
       if(err::check==true) std::cout << "cells::mag has been called" << std::endl;

@@ -12,9 +12,11 @@
 #include <string>
 
 // Vampire headers
+#include "cells.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -126,6 +128,14 @@ namespace dipole{
          dipole::internal::output_dipole_field = true;
          return true;
       }
+      //-------------------------------------------------------------------
+      test="output-timings";
+      if(word==test){
+         // set flags to output build and update times and memory use checkpoints
+         dipole::internal::output_timings = true;
+         vmpi::output_memory_checkpoints = true;
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -146,6 +156,26 @@ namespace dipole{
       //--------------------------------------------------------------------
       return false;
 
+   }
+
+   //---------------------------------------------------------------------------
+   // Whether the dipole solver reads the per-cell atom lists of the cells module (cells::index_atoms_array and
+   // cells::atom_in_cell_coords_array_*). The hierarchical solver builds its own table of atoms per shared memory
+   // region instead (hierarchical/region_atoms.cpp).
+   //---------------------------------------------------------------------------
+   bool uses_cell_atom_lists(){
+      return dipole::internal::solver != dipole::internal::hierarchical;
+   }
+
+   //---------------------------------------------------------------------------
+   // Whether the full size cell arrays of the cells module (an array over every cell on every process) are needed.
+   // The hierarchical solver reads only the shared cell arrays, so they are needed with it only if another module
+   // reads every cell (dipole::full_cell_fields), the cell dipole fields are written, or cells without magnetic atoms are
+   // probed (cells:probe-non-magnetic-cells sets the probe cells up in the full size arrays).
+   //---------------------------------------------------------------------------
+   bool needs_full_cell_arrays(){
+      return !dipole::activated || dipole::internal::solver != dipole::internal::hierarchical ||
+             dipole::full_cell_fields || dipole::internal::output_dipole_field || cells::probe_non_magnetic_cells;
    }
 
 } // end of dipole namespace

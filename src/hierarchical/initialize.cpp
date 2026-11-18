@@ -139,17 +139,16 @@ void initialize(const double system_dimensions_x,
    ha::interaction_range.resize(ha::num_levels,0.0);
 
    // cell data from the cells module, read only (initialise_atomistic_cell_data takes const references)
-   const std::vector < std::vector < int > >& cells_index_atoms_array = cells::index_atoms_array;
    const std::vector < int >& cells_num_atoms_in_cell        = cells::num_atoms_in_cell;        // this process's atoms only
-   const std::vector < int >& cells_num_atoms_in_cell_global = cells::num_atoms_in_cell_global;
-   const std::vector < int >& cells_local_cell_array         = cells::local_cell_array;
-   const std::vector < double >& cells_pos_and_mom_array     = cells::pos_and_mom_array;
+   const vmpi::shared_array_t < int >& cells_num_atoms_in_cell_global = cells::shared_num_atoms_global; // one copy per region
+   const vmpi::shared_array_t < double >& cells_pos_and_mom_array     = cells::shared_pos_and_mom;
    int cells_num_cells = cells::num_cells;
    int cells_num_local_cells = cells::num_local_cells;
 
    // stop the timer for segment 1 and save it
    timer.stop();
    segment_time[0] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_1");
 
    //------------------------------------------------
    // end of data copying
@@ -173,36 +172,15 @@ void initialize(const double system_dimensions_x,
       // relative tolerance of 1e-6 treats them all atomistically
       const double real_cutoff = dipole::cutoff * cells::macro_cell_size * (1.0 + 1.0e-6);
 
-      std::vector< std::vector<double> > atoms_in_cells_array; // 2D list of [cell][atom] for local cells needed for computing dipole tensor
-      std::vector<int> list_of_atoms_with_cells; // list of cell IDs to enable parsing of atomistic data
+      // table of the atoms of the cells within the atomistic cutoff of the region's cells, held once per shared
+      // memory region (region_atoms.cpp), for the near field tensors of Segment 9
+      ha::region_atoms.build(real_cutoff, atom_coords_x, atom_coords_y, atom_coords_z);
 
-      // distribute atomistic data to enable hierarchical dipole calculation
-      dipole::internal::initialise_atomistic_cell_data(cells_num_cells,
-                                                       cells_num_local_cells,
-                                                       real_cutoff,                     // cutoff range for dipole tensor construction (Angstroms)
-                                                       cells_num_atoms_in_cell,         // number of atoms in each cell (local CPU)
-                                                       cells_local_cell_array,          // numerical list of cells containing atoms on local processor
-                                                       cells_num_atoms_in_cell_global,  // number of atoms in each cell
-                                                       cells_pos_and_mom_array,         // array of positions and cell moments
-                                                       cells_index_atoms_array,         // 2D array of [cells][atomID]
-                                                       atom_coords_x,                   // input arrays of atom coordinates
-                                                       atom_coords_y,                   //
-                                                       atom_coords_z,                   //
-                                                       atoms::m_spin_array,             // input array of atom moments (Bohr magnetons)
-                                                       list_of_atoms_with_cells,        // 2D list of [cell][atom] for local cells needed for computing dipole tensor (output)
-                                                       atoms_in_cells_array             // list of cell IDs to enable parsing of atomistic data (output)
-                                                      );
-
-   // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
-   for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
-      //if(cells_num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
-         dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
-      //}
-   }
 
    // stop the timer for segment 2 and save it
    timer.stop();
    segment_time[1] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_2");
 
    //------------------------------------------------
    // end of parallel data rationalisation
@@ -340,6 +318,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 3 and save it
    timer.stop();
    segment_time[2] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_3");
 
    //------------------------------------------------
    // end of hierarchical cell position calculation
@@ -360,6 +339,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 4 and save it
    timer.stop();
    segment_time[3] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_4");
 
    //------------------------------------------------
    // end of determination of cells in cells
@@ -378,19 +358,18 @@ void initialize(const double system_dimensions_x,
    ha::num_zero_level_cells = ha::cells_level_end_index[0];
    //std::cout << ha::num_zero_level_cells << std::endl;
 
-   // resize data structure to store
-   ha::interaction_list_start_index.resize(ha::num_zero_level_cells,false);
-   ha::interaction_list_end_index.resize(ha::num_zero_level_cells,false);
+   // first and last interaction of each local cell (indexed by local cell, lc), filled in Segment 7
+   ha::interaction_list_start_index.assign(cells_num_local_cells, 0);
+   ha::interaction_list_end_index.assign(cells_num_local_cells, 0);
    // cell magnetisations, shared by the processes of a region (collective), and this process's contributions
    ha::mag_array_x.allocate(ha::total_num_cells);
    ha::mag_array_y.allocate(ha::total_num_cells);
    ha::mag_array_z.allocate(ha::total_num_cells);
-   ha::partial_mag_array_x.assign(ha::total_num_cells,0.0);
-   ha::partial_mag_array_y.assign(ha::total_num_cells,0.0);
-   ha::partial_mag_array_z.assign(ha::total_num_cells,0.0);
 
    // check that the number of zero levels cells is correct (must be the same for hierachical and cells structures)
-   if (ha::num_zero_level_cells != cells_num_cells) std::cout << "ERROR ZERO CELLS != NUM CELLS" << std::endl;
+   if (ha::num_zero_level_cells != cells_num_cells){
+      err::fatal("Programmer error: " + std::to_string(ha::num_zero_level_cells) + " level 0 hierarchical cells but " + std::to_string(cells_num_cells) + " cells");
+   }
    //    std::cout << ha::num_zero_level_cells << '\t' << cells_num_cells << '\t' << ha::cell_positions_mom.size()/4. << '\t' << cells_pos_and_mom_array.size()/4. <<"\t" <<  ha::num_atoms_in_cell.size() << '\t' << cells_num_atoms_in_cell.size() <<std::endl;
 
    // cell positions and moments are the same on all processes (reduced in the cells module)
@@ -408,6 +387,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 5 and save it
    timer.stop();
    segment_time[4] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_5");
 
    //------------------------------------------------------
    // end of zero level cell data population
@@ -475,12 +455,46 @@ void initialize(const double system_dimensions_x,
    // of the contributions over processes. Every magnetic atom of this process must be in one of these cells.
    ha::contributing_cells.clear();
    for (int cell = 0; cell < ha::total_num_cells; cell++) if (has_local_cells[cell]) ha::contributing_cells.push_back(cell);
+
+   // The partial moments are stored only for the contributing cells, in the order of contributing_cells (the
+   // order in which they are reduced), so that they cost O(contributing cells) and not O(all cells) per process.
+   // Map each atom, micromagnetic cell and upward pass cell to its compact index once here. contributing_cells
+   // is sorted, so the compact index of a cell is found by binary search.
+   auto compact_index = [](const int cell){
+      return int(std::lower_bound(ha::contributing_cells.begin(), ha::contributing_cells.end(), cell) - ha::contributing_cells.begin());
+   };
+   const size_t num_contributing_cells = ha::contributing_cells.size();
+   ha::partial_mag_array_x.assign(num_contributing_cells, 0.0);
+   ha::partial_mag_array_y.assign(num_contributing_cells, 0.0);
+   ha::partial_mag_array_z.assign(num_contributing_cells, 0.0);
+
+   ha::atom_contributing_index.assign(vmpi::num_local_atoms, -1);
    if( micromagnetic::discretisation_type != 1 ){
       for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
-         if( atoms::magnetic[atom] && !has_local_cells[cells::atom_cell_id_array[atom]] ){
-            err::fatal("Programmer error: magnetic atom " + std::to_string(atom) + " is in cell " + std::to_string(cells::atom_cell_id_array[atom]) + ", which is not a local cell of the hierarchical dipole solver");
+         if( !atoms::magnetic[atom] ) continue;
+         if( !has_local_cells[cells::atom_cell_id_array[atom]] ){
+            err::fatal("Programmer error: atom " + std::to_string(atom) + " is in cell " + std::to_string(cells::atom_cell_id_array[atom]) + ", which is not a local cell of the hierarchical dipole solver");
          }
+         ha::atom_contributing_index[atom] = compact_index(cells::atom_cell_id_array[atom]);
       }
+   }
+   ha::micromagnetic_contributing_index.resize(micromagnetic::number_of_micromagnetic_cells);
+   for (int lc = 0; lc < micromagnetic::number_of_micromagnetic_cells; lc++){
+      ha::micromagnetic_contributing_index[lc] = compact_index(micromagnetic::list_of_micromagnetic_cells[lc]);
+   }
+
+   // children of each upward pass cell that are contributing cells. The others hold no contribution from this
+   // process (zero), so leaving them out of the sum changes no result, and the order of the rest is kept.
+   ha::upward_pass_index.clear();
+   ha::upward_children_start.assign(1, 0);
+   ha::upward_children.clear();
+   for (const int cell : ha::upward_pass_cells){
+      ha::upward_pass_index.push_back(compact_index(cell));
+      for (int interaction = ha::cells_in_cells_start_index[cell]; interaction < ha::cells_in_cells_end_index[cell]; interaction ++ ){
+         const int subcell = ha::cells_in_cells[interaction];
+         if (has_local_cells[subcell]) ha::upward_children.push_back(compact_index(subcell));
+      }
+      ha::upward_children_start.push_back(ha::upward_children.size());
    }
    ha::mag_reduction_values.assign(3 * ha::contributing_cells.size(), 0.0);
    ha::mag_reduction.initialise(ha::contributing_cells, 3);
@@ -488,6 +502,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 6 and save it
    timer.stop();
    segment_time[5] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_6");
 
    //------------------------------------------------------
    // end of other level cell data population
@@ -503,21 +518,27 @@ void initialize(const double system_dimensions_x,
    // restart the timer
    timer.start();
 
-   // level of each cell, and the roots of the hierarchy (cells that are not a subcell of another cell)
-   std::vector<int> cell_level(ha::total_num_cells, 0);
-   std::vector<bool> is_root(ha::total_num_cells, true);
-   for (int level = 0; level < ha::num_levels; level ++ ){
-      for (int cell = ha::cells_level_start_index[level]; cell < ha::cells_level_end_index[level]; cell++){
-         cell_level[cell] = level;
-         if (level > 0){
+   // level of a cell, from the level index ranges (cells are numbered level by level), so that no array over
+   // every cell is kept on each process
+   auto cell_level = [](const int cell){
+      int level = 0;
+      while (cell >= ha::cells_level_end_index[level]) level++;
+      return level;
+   };
+
+   // the roots of the hierarchy (cells that are not a subcell of another cell), with a temporary bit per cell
+   std::vector<int> roots;
+   {
+      std::vector<bool> is_root(ha::total_num_cells, true);
+      for (int level = 1; level < ha::num_levels; level ++ ){
+         for (int cell = ha::cells_level_start_index[level]; cell < ha::cells_level_end_index[level]; cell++){
             for (int interaction = ha::cells_in_cells_start_index[cell]; interaction < ha::cells_in_cells_end_index[cell]; interaction ++ ){
                is_root[ha::cells_in_cells[interaction]] = false;
             }
          }
       }
+      for (int cell = 0; cell < ha::total_num_cells; cell++) if (is_root[cell]) roots.push_back(cell);
    }
-   std::vector<int> roots;
-   for (int cell = 0; cell < ha::total_num_cells; cell++) if (is_root[cell]) roots.push_back(cell);
 
    // determine the interaction list for local cells by descending the hierarchy from the roots: a cell at level
    // L > 0 interacts as a whole if all its corners are beyond the level L interaction range, otherwise its subcells
@@ -540,7 +561,7 @@ void initialize(const double system_dimensions_x,
 
          const int cell_j = stack.back();
          stack.pop_back();
-         const int level = cell_level[cell_j];
+         const int level = cell_level(cell_j);
 
          if (level == 0){
             level_interactions_lc[0].push_back(cell_j);
@@ -617,6 +638,7 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 7 and save it
    timer.stop();
    segment_time[6] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_7");
 
    // optionally log what a point-to-point exchange of cell moments would cost
    if(ha::output_p2p_diagnostic) ha::write_p2p_diagnostic();
@@ -648,7 +670,9 @@ void initialize(const double system_dimensions_x,
    const double topology_mb = (mb(ha::cells_in_cells) + mb(ha::cells_in_cells_start_index) + mb(ha::cells_in_cells_end_index)) / shared_ranks;
    const double moment_mb   = (mb(ha::mag_array_x) + mb(ha::mag_array_y) + mb(ha::mag_array_z)) / shared_ranks
                             + mb(ha::partial_mag_array_x) + mb(ha::partial_mag_array_y) + mb(ha::partial_mag_array_z);
-   const double cells_mb    = mb(cells::pos_and_mom_array) + mb(cells::pos_array) + mb(cells::num_atoms_in_cell) + mb(cells::num_atoms_in_cell_global)
+   const double cells_mb    = (double(cells::shared_pos_and_mom.size() + cells::shared_volume.size()) * sizeof(double)
+                               + double(cells::shared_num_atoms_global.size()) * sizeof(int)) / 1.0e6 / shared_ranks
+                            + mb(cells::pos_and_mom_array) + mb(cells::pos_array) + mb(cells::num_atoms_in_cell) + mb(cells::num_atoms_in_cell_global)
                             + mb(cells::mag_array_x) + mb(cells::mag_array_y) + mb(cells::mag_array_z) + mb(cells::volume_array)
                             + 4.0 * double(cells::index_atoms_array.size() * sizeof(std::vector<int>)) / 1.0e6; // empty inner vectors of index_atoms_array and atom_in_cell_coords_array_*
    const double dipole_mb   = mb(dipole::cells_field_array_x) + mb(dipole::cells_field_array_y) + mb(dipole::cells_field_array_z)
@@ -677,14 +701,41 @@ void initialize(const double system_dimensions_x,
    ha::rij_tensor_yz.resize(interaction_num,0.0);
    ha::rij_tensor_zz.resize(interaction_num,0.0);
 
-   // resize B-field cells array
-   dipole::cells_field_array_x.resize(cells_num_cells,0.0);
-   dipole::cells_field_array_y.resize(cells_num_cells,0.0);
-   dipole::cells_field_array_z.resize(cells_num_cells,0.0);
+   // full size B-field cells arrays, only for the modules that read every cell (dipole::full_cell_fields) and the
+   // dipole field output; the field calculation and distribution use the local cell arrays above
+   ha::full_cell_fields = dipole::full_cell_fields || dipole::internal::output_dipole_field;
+   // B-field of the local cells, and the local cell of each local magnetic atom, and of every atom with
+   // cells:probe-non-magnetic-cells (for the field distribution)
+   ha::cell_field_x.assign(cells_num_local_cells, 0.0);
+   ha::cell_field_y.assign(cells_num_local_cells, 0.0);
+   ha::cell_field_z.assign(cells_num_local_cells, 0.0);
+   {
+      std::vector< std::pair<int,int> > local_cell_of(cells_num_local_cells); // (cell id, local cell index), sorted
+      for(int lc = 0; lc < cells_num_local_cells; lc++) local_cell_of[lc] = {cells::cell_id_array[lc], lc};
+      std::sort(local_cell_of.begin(), local_cell_of.end());
+      ha::atom_local_cell.assign(vmpi::num_local_atoms, -1);
+      for(int atom = 0; atom < vmpi::num_local_atoms; atom++){
+         if(!atoms::magnetic[atom] && !cells::probe_non_magnetic_cells) continue;
+         const int cell = cells::atom_cell_id_array[atom];
+         auto it = std::lower_bound(local_cell_of.begin(), local_cell_of.end(), std::make_pair(cell, -1));
+         if(it == local_cell_of.end() || it->first != cell){
+            if(ha::full_cell_fields) continue; // micromagnetic cells: the field is read from the gathered full arrays
+            err::fatal("Programmer error: atom " + std::to_string(atom) + " is in cell " + std::to_string(cell) + ", which is not a local cell of the hierarchical dipole solver");
+         }
+         ha::atom_local_cell[atom] = it->second;
+      }
+   }
+
+   if(ha::full_cell_fields){
+      dipole::cells_field_array_x.resize(cells_num_cells,0.0);
+      dipole::cells_field_array_y.resize(cells_num_cells,0.0);
+      dipole::cells_field_array_z.resize(cells_num_cells,0.0);
+   }
 
    // stop the timer for segment 8 and save it
    timer.stop();
    segment_time[7] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_8");
 
 
    //---------------------------------------------------------------------------
@@ -741,9 +792,7 @@ void initialize(const double system_dimensions_x,
                                           j,
                                           real_cutoff,
                                           cells_num_atoms_in_cell_global,
-                                          cells_pos_and_mom_array,
-                                          list_of_atoms_with_cells,
-                                          atoms_in_cells_array);
+                                          ha::region_atoms);
 
                   } // End of Inter part
 
@@ -757,8 +806,7 @@ void initialize(const double system_dimensions_x,
                                           cell_j,
                                           j,
                                           cells_num_atoms_in_cell_global,
-                                          list_of_atoms_with_cells,
-                                          atoms_in_cells_array);
+                                          ha::region_atoms);
 
                   }
                   // End of Intra part
@@ -774,6 +822,8 @@ void initialize(const double system_dimensions_x,
                //    ha::calc_intra(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
                // }
 
+               // No threshold on small tensor components: an absolute threshold (T^2 < 1e-15 A^-6) would zero
+               // every interaction beyond ~32 nm, including almost all coarse cells.
                //            std::cout  << cell_i << '\t' << cell_j << "\t" << ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
                //             //std::cout << cells_num_atoms_in_cell[cell_i] << '\t' << cells_num_atoms_in_cell[cell_j] << '\t' <<  cell_i << '\t' << cell_j << "\t" <<  ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
             }
@@ -784,15 +834,18 @@ void initialize(const double system_dimensions_x,
    // stop the timer for segment 9 and save it
    timer.stop();
    segment_time[8] = timer.elapsed_time();
+   vmpi::memory_checkpoint("hierarchical_segment_9");
 
    //---------------------------------------------------------------------------
    // Output detailed timings for the hierarchical initialisation
    //---------------------------------------------------------------------------
 
-   // cell geometry is needed only to build the interactions
+   // cell geometry and the atom table are needed only to build the interactions
+   ha::region_atoms.free();
    ha::cell_positions.free();
    ha::cell_dimensions.free();
    ha::cell_positions_mom.free();
+   vmpi::memory_checkpoint("hierarchical_geometry_freed");
 
    // print out detailed hierarchical timings
    zlog << zTs() << "\tSegment times for hierarchical initialisation:" << std::endl;

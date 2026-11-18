@@ -39,6 +39,7 @@ namespace dipole{
       extern bool initialised;
       extern bool output_atomistic_dipole_field; // flag to toggle output of atomic resolution dipole field
       extern bool output_dipole_field; // flag to toggle output of dipole field
+      extern bool output_timings; // log the build and update times and memory use (DIPOLE_SCALING, MEMORY_CHECKPOINT)
 
       // parameters for atomistic calculation
       extern double atomistic_atomic_volume; // volume of each magnetic moment for atomistic self term

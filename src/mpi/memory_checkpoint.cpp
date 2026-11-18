@@ -1,0 +1,96 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Richard F L Evans 2026. All rights reserved.
+//
+//   Email: richard.evans@york.ac.uk
+//
+//------------------------------------------------------------------------------
+
+// C++ standard library headers
+#include <fstream>
+#include <string>
+
+// System headers for the current resident set size
+#if defined(__APPLE__)
+   // proc_pid_rusage is declared in libproc.h, but that header pulls in mach headers which GCC cannot parse with
+   // recent macOS SDKs, so declare it here; rusage_info_v0 and RUSAGE_INFO_V0 come from sys/resource.h
+   #include <sys/resource.h>
+   #include <unistd.h>
+   extern "C" int proc_pid_rusage(int pid, int flavor, rusage_info_t* buffer);
+#elif defined(__linux__)
+   #include <unistd.h>
+#endif
+
+// Vampire headers
+#include "vio.hpp"
+#include "vmpi.hpp"
+#include "vutil.hpp"
+
+namespace vmpi{
+
+namespace{
+
+//------------------------------------------------------------------------------
+// Current (not peak) resident set size of this process in kB: /proc/self/statm on Linux, proc_pid_rusage on
+// macOS, -1 elsewhere
+//------------------------------------------------------------------------------
+double current_memory_usage_kb(){
+
+   #if defined(__APPLE__)
+      rusage_info_v0 info;
+      if(proc_pid_rusage(getpid(), RUSAGE_INFO_V0, reinterpret_cast<rusage_info_t*>(&info)) == 0){
+         return double(info.ri_resident_size) / 1024.0;
+      }
+      return -1.0;
+   #elif defined(__linux__)
+      std::ifstream statm("/proc/self/statm");
+      long pages_total = 0, pages_resident = 0;
+      if(statm >> pages_total >> pages_resident) return double(pages_resident) * double(sysconf(_SC_PAGESIZE)) / 1024.0;
+      return -1.0;
+   #else
+      return -1.0;
+   #endif
+
+}
+
+}
+
+//------------------------------------------------------------------------------
+// Collective: writes one MEMORY_CHECKPOINT line to the log with the peak and current resident set size (and the
+// proportional set size on Linux, which counts MPI shared memory once per region) of the worst rank and the mean
+// over ranks, in MB. Peak RSS only ever rises, so the checkpoint at which the worst-rank peak jumps locates the
+// set-up phase responsible, and a rise in peak without a matching rise in current RSS shows a transient.
+// Does nothing unless output_memory_checkpoints is set (the same on every process).
+//------------------------------------------------------------------------------
+void memory_checkpoint(const std::string& label){
+
+   if(!vmpi::output_memory_checkpoints) return;
+
+   vmpi::barrier();
+
+   const double peak_mb    = vutil::peak_memory_usage_kb() / 1024.0;
+   const double current_mb = current_memory_usage_kb() / 1024.0;
+   const double pss_kb     = vutil::proportional_memory_usage_kb();
+   const double pss_mb     = pss_kb < 0.0 ? -1.0 : pss_kb / 1024.0; // -1 where unavailable (not Linux)
+
+   const double peak_max    = vmpi::reduce_max(peak_mb);
+   const double current_max = vmpi::reduce_max(current_mb);
+   const double pss_max     = vmpi::reduce_max(pss_mb);
+   const double nprocs      = double(vmpi::num_processors > 0 ? vmpi::num_processors : 1);
+   const double peak_mean    = vmpi::reduce_sum(peak_mb) / nprocs;
+   const double current_mean = vmpi::reduce_sum(current_mb) / nprocs;
+   const double pss_mean     = vmpi::reduce_sum(pss_mb) / nprocs;
+
+   if(vmpi::master){
+      zlog << zTs() << "MEMORY_CHECKPOINT label=" << label
+           << " peak_max_mb=" << peak_max << " peak_mean_mb=" << peak_mean
+           << " current_max_mb=" << current_max << " current_mean_mb=" << current_mean
+           << " pss_max_mb=" << pss_max << " pss_mean_mb=" << pss_mean << std::endl;
+   }
+
+}
+
+}

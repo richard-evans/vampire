@@ -179,30 +179,63 @@ void initialise_moment_exchange(){
          return;
       }
 
-      // magnetic atoms of this process in the near cells, at all levels up the tree
-      std::vector<int> atoms_in_cell(ha::total_num_cells, 0);
+      // magnetic atoms of this process in its contributing cells (its level 0 cells and their coarse cells, the
+      // only cells where it has atoms), indexed like ha::contributing_cells, summed up the tree
+      std::vector<int> atoms_in_cell(ha::contributing_cells.size(), 0);
       for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
-         if(atoms::magnetic[atom]) atoms_in_cell[cells::atom_cell_id_array[atom]]++;
+         if(atoms::magnetic[atom]) atoms_in_cell[ha::atom_contributing_index[atom]]++;
       }
-      for(const int cell : ha::upward_pass_cells){
-         for(int i = ha::cells_in_cells_start_index[cell]; i < ha::cells_in_cells_end_index[cell]; i++){
-            atoms_in_cell[cell] += atoms_in_cell[ha::cells_in_cells[i]];
+      for(size_t i = 0; i < ha::upward_pass_index.size(); i++){
+         for(int c = ha::upward_children_start[i]; c < ha::upward_children_start[i+1]; c++){
+            atoms_in_cell[ha::upward_pass_index[i]] += atoms_in_cell[ha::upward_children[c]];
          }
       }
 
-      // cells read by this process: its interaction lists and its own level 0 cells
-      std::vector<int> reads(ha::total_num_cells, 0);
-      for(const int cell : ha::interaction_list) reads[cell] = 1;
-      for(int lc = 0; lc < dipole::cells_num_local_cells; lc++) reads[cells::cell_id_array[lc]] = 1;
+      // the near cells among them, as (cell, atoms) pairs
+      std::vector<int> atom_pairs;
+      for(size_t i = 0; i < ha::contributing_cells.size(); i++){
+         if(ha::contributing_cells[i] < near_cells_end && atoms_in_cell[i] > 0){
+            atom_pairs.push_back(ha::contributing_cells[i]);
+            atom_pairs.push_back(atoms_in_cell[i]);
+         }
+      }
+      atoms_in_cell.clear();
+      atoms_in_cell.shrink_to_fit();
+
+      // cells read by this process: its interaction lists and its own level 0 cells, one bit per cell
+      const int num_read_bytes = (ha::total_num_cells + 7) / 8;
+      std::vector<unsigned char> reads(num_read_bytes, 0);
+      auto mark_read = [&reads](const int cell){ reads[cell >> 3] |= static_cast<unsigned char>(1u << (cell & 7)); };
+      for(const int cell : ha::interaction_list) mark_read(cell);
+      for(int lc = 0; lc < dipole::cells_num_local_cells; lc++) mark_read(cells::cell_id_array[lc]);
 
       // the same for the region, on its leader (atoms in the near cells, reads in all cells)
       const bool leader = (vmpi::my_shared_rank == 0);
       std::vector<int> region_atoms(leader ? near_cells_end : 0, 0);
       std::vector<int> region_reads(leader ? ha::total_num_cells : 0, 0);
-      MPI_Reduce(atoms_in_cell.data(), region_atoms.data(), near_cells_end, MPI_INT, MPI_SUM, 0, vmpi::shared_comm);
-      MPI_Reduce(reads.data(), region_reads.data(), ha::total_num_cells, MPI_INT, MPI_MAX, 0, vmpi::shared_comm);
-      atoms_in_cell.clear();
-      atoms_in_cell.shrink_to_fit();
+      {
+         // atoms: gather the pairs of every process of the region and add them (integers, so in any order)
+         const int num_pair_values = atom_pairs.size();
+         std::vector<int> pair_counts(leader ? vmpi::num_shared_ranks : 0, 0);
+         std::vector<int> pair_displacements(leader ? vmpi::num_shared_ranks : 0, 0);
+         MPI_Gather(&num_pair_values, 1, MPI_INT, pair_counts.data(), 1, MPI_INT, 0, vmpi::shared_comm);
+         int total_pair_values = 0;
+         for(int r = 0; r < int(pair_counts.size()); r++){
+            pair_displacements[r] = total_pair_values;
+            total_pair_values += pair_counts[r];
+         }
+         std::vector<int> region_pairs(total_pair_values, 0);
+         MPI_Gatherv(atom_pairs.data(), num_pair_values, MPI_INT, region_pairs.data(), pair_counts.data(),
+                     pair_displacements.data(), MPI_INT, 0, vmpi::shared_comm);
+         for(int i = 0; i < total_pair_values; i += 2) region_atoms[region_pairs[i]] += region_pairs[i+1];
+
+         // reads: bitwise or of the bits of every process of the region
+         std::vector<unsigned char> region_read_bits(leader ? num_read_bytes : 0, 0);
+         MPI_Reduce(reads.data(), region_read_bits.data(), num_read_bytes, MPI_UNSIGNED_CHAR, MPI_BOR, 0, vmpi::shared_comm);
+         for(int cell = 0; cell < int(region_reads.size()); cell++) region_reads[cell] = (region_read_bits[cell >> 3] >> (cell & 7)) & 1;
+      }
+      atom_pairs.clear();
+      atom_pairs.shrink_to_fit();
       reads.clear();
       reads.shrink_to_fit();
       region_read_cells.clear();

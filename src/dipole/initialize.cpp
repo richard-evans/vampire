@@ -11,8 +11,10 @@
 // C standard library headers
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 
 // Vampire headers
 #include "cells.hpp"
@@ -81,8 +83,11 @@ namespace dipole{
       dipole::internal::cells_num_cells            = cells_num_cells;
       dipole::internal::cells_num_local_cells      = cells_num_local_cells;
       dipole::internal::cells_local_cell_array     = cells_local_cell_array;
-      dipole::internal::cells_num_atoms_in_cell    = cells_num_atoms_in_cell;
-      dipole::internal::cells_volume_array         = cells_volume_array;
+      // copies of the cell counts and volumes over every cell; the hierarchical solver reads the shared cell arrays
+      if(dipole::internal::solver != dipole::internal::hierarchical){
+         dipole::internal::cells_num_atoms_in_cell    = cells_num_atoms_in_cell;
+         dipole::internal::cells_volume_array         = cells_volume_array;
+      }
 
       // the macrocell solver reorders the cell positions and moments in parallel, so it needs its own copy;
       // the other solvers read the caller's array
@@ -92,12 +97,10 @@ namespace dipole{
       // initialise dipole solver
       //----------------------------------------------------------
 
-      // Time the build phase (tensor construction / hierarchical tree
-      // build) and its memory footprint, separately from the first field
-      // evaluation timed below, for the ARCHER2 weak/strong scaling study
-      // (papers/dipole). Barrier before sampling so all ranks start the
-      // clock together and slow ranks aren't hidden by fast ones.
-      vmpi::barrier();
+      // Time the build phase (tensor construction / hierarchical tree build) and its memory footprint, if
+      // requested (dipole:output-timings). The barrier makes all processes start the clock together.
+      vmpi::memory_checkpoint("dipole_build_start");
+      if(dipole::internal::output_timings) vmpi::barrier();
       const double dipole_scaling_mem_before_kb = vutil::peak_memory_usage_kb();
       vutil::vtimer_t dipole_scaling_build_timer;
       dipole_scaling_build_timer.start();
@@ -165,44 +168,34 @@ namespace dipole{
 
       }
 
-      // Report build time and memory footprint of the solver just
-      // initialised (papers/dipole ARCHER2 scaling study).
-      vmpi::barrier();
-      dipole_scaling_build_timer.stop();
-      const double dipole_scaling_build_time = dipole_scaling_build_timer.elapsed_time();
-      const double dipole_scaling_mem_local_kb = vutil::peak_memory_usage_kb() - dipole_scaling_mem_before_kb;
-      const double dipole_scaling_mem_total_kb = vmpi::reduce_sum(dipole_scaling_mem_local_kb);
-      const double dipole_scaling_mem_max_kb = vmpi::reduce_max(dipole_scaling_mem_local_kb);
-      // memory held after initialisation counting shared memory once per region (Linux only, -1 elsewhere)
-      const double dipole_scaling_pss_local_kb = vutil::proportional_memory_usage_kb();
-      const double dipole_scaling_pss_total_kb = vmpi::reduce_sum(dipole_scaling_pss_local_kb);
-      const double dipole_scaling_pss_max_kb = vmpi::reduce_max(dipole_scaling_pss_local_kb);
-      // dipole::internal::num_atoms is this rank's local (core + boundary
-      // halo) atom count under MPI domain decomposition, so summing it
-      // slightly over-counts shared boundary atoms rather than giving the
-      // exact system total -- good enough as a cross-check, but the
-      // scaling analysis script uses the known system size for each run
-      // directory as the authoritative atom count, not this field.
-      const uint64_t dipole_scaling_total_atoms = vmpi::reduce_sum(static_cast<uint64_t>(dipole::internal::num_atoms));
-      if(vmpi::master){
-         std::cout << "DIPOLE_SCALING BUILD solver=" << dipole::internal::dipole_solver_name()
-                    << " nprocs=" << vmpi::num_processors
-                    << " cells=" << dipole::internal::cells_num_cells
-                    << " atoms=" << dipole_scaling_total_atoms
-                    << " build_time_s=" << dipole_scaling_build_time
-                    << " mem_total_kb=" << dipole_scaling_mem_total_kb
-                    << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb
-                    << " pss_total_kb=" << dipole_scaling_pss_total_kb
-                    << " pss_max_rank_kb=" << dipole_scaling_pss_max_kb << std::endl;
-         zlog << zTs() << "DIPOLE_SCALING BUILD solver=" << dipole::internal::dipole_solver_name()
-              << " nprocs=" << vmpi::num_processors
-              << " cells=" << dipole::internal::cells_num_cells
-              << " atoms=" << dipole::internal::num_atoms
-              << " build_time_s=" << dipole_scaling_build_time
-              << " mem_total_kb=" << dipole_scaling_mem_total_kb
-              << " mem_max_rank_kb=" << dipole_scaling_mem_max_kb
-              << " pss_total_kb=" << dipole_scaling_pss_total_kb
-              << " pss_max_rank_kb=" << dipole_scaling_pss_max_kb << std::endl;
+      // Report the build time and memory footprint of the solver (collective), if requested
+      if(dipole::internal::output_timings){
+         vmpi::barrier();
+         dipole_scaling_build_timer.stop();
+         const double build_time = dipole_scaling_build_timer.elapsed_time();
+         const double mem_local_kb = vutil::peak_memory_usage_kb() - dipole_scaling_mem_before_kb;
+         const double mem_total_kb = vmpi::reduce_sum(mem_local_kb);
+         const double mem_max_kb = vmpi::reduce_max(mem_local_kb);
+         // memory held after initialisation counting shared memory once per region (Linux only, -1 elsewhere)
+         const double pss_local_kb = vutil::proportional_memory_usage_kb();
+         const double pss_total_kb = vmpi::reduce_sum(pss_local_kb);
+         const double pss_max_kb = vmpi::reduce_max(pss_local_kb);
+         // sum of the local (core and halo) atoms of each process, so slightly more than the number of atoms
+         const uint64_t total_atoms = vmpi::reduce_sum(static_cast<uint64_t>(dipole::internal::num_atoms));
+         if(vmpi::master){
+            std::ostringstream line;
+            line << "DIPOLE_SCALING BUILD solver=" << dipole::internal::dipole_solver_name()
+                 << " nprocs=" << vmpi::num_processors
+                 << " cells=" << dipole::internal::cells_num_cells
+                 << " atoms=" << total_atoms
+                 << " build_time_s=" << build_time
+                 << " mem_total_kb=" << mem_total_kb
+                 << " mem_max_rank_kb=" << mem_max_kb
+                 << " pss_total_kb=" << pss_total_kb
+                 << " pss_max_rank_kb=" << pss_max_kb;
+            std::cout << line.str() << std::endl;
+            zlog << zTs() << line.str() << std::endl;
+         }
       }
 
       // If enabled, output atomic coordinates and moments for the atomistic dipole field output (any solver
@@ -258,13 +251,15 @@ namespace dipole{
       //
       //--------------------------------------------------------------------------------------------------
 
-      // Output informative message to log file
-      zlog << zTs() << "Outputting dipole matrix " << std::endl;
-
-      // Output Demag tensor only if first step of simulation since depending only on shape
-      std::vector<double> N_tensor_array(6*dipole::internal::cells_num_cells,0.0);
-
+      // The demagnetisation tensor is calculated (and logged) for the macrocell solver only: for the other
+      // solvers it would need an array over every cell on every process.
       if (dipole::internal::solver == dipole::internal::macrocell){
+
+         // Output informative message to log file
+         zlog << zTs() << "Outputting dipole matrix " << std::endl;
+
+         // Output Demag tensor only if first step of simulation since depending only on shape
+         std::vector<double> N_tensor_array(6*dipole::internal::cells_num_cells,0.0);
 
 
       //if (dipole::internal::solver == dipole::internal::hierarchical){

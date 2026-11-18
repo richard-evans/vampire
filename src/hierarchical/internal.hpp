@@ -21,13 +21,11 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
 
 // Vampire headers
 #include "hierarchical.hpp"
 #include "vmpi.hpp"
-
-// hierarchical module headers
-#include "vector"
 
 namespace hierarchical{
 
@@ -63,10 +61,20 @@ namespace hierarchical{
       extern vmpi::shared_array_t<double> mag_array_x; /// cell magnetisations (all processes), one copy per region
       extern vmpi::shared_array_t<double> mag_array_y;
       extern vmpi::shared_array_t<double> mag_array_z;
-      extern std::vector<double> partial_mag_array_x;  /// this process's contribution to the cell magnetisations
-      extern std::vector<double> partial_mag_array_y;
-      extern std::vector<double> partial_mag_array_z;
       extern std::vector<int> contributing_cells;      // cells (all levels, in order) with a contribution from this process
+      extern std::vector<double> partial_mag_array_x;  /// this process's contribution to the moment of each of contributing_cells
+      extern std::vector<double> partial_mag_array_y;  /// (compact: indexed like contributing_cells, not by cell id)
+      extern std::vector<double> partial_mag_array_z;
+      extern std::vector<int> atom_contributing_index;          // index in contributing_cells of each local atom's cell (-1 if not magnetic)
+      extern std::vector<int> micromagnetic_contributing_index; // index in contributing_cells of each micromagnetic cell of this process
+      extern std::vector<int> upward_pass_index;       // index in contributing_cells of each of upward_pass_cells
+      extern std::vector<int> upward_children_start;   // children of upward_pass_cells[i] in contributing_cells:
+      extern std::vector<int> upward_children;         //    upward_children[upward_children_start[i] .. upward_children_start[i+1])
+      extern std::vector<double> cell_field_x;   // field of each local cell (indexed like cells::cell_id_array)
+      extern std::vector<double> cell_field_y;
+      extern std::vector<double> cell_field_z;
+      extern std::vector<int> atom_local_cell;   // local cell index of each local magnetic atom's cell (-1 otherwise)
+      extern bool full_cell_fields; // also fill dipole::cells_field_array_* (sized for all cells)
       extern std::vector<double> mag_reduction_values; // contributions of this process, x then y then z
       extern vmpi::shared_sum_t mag_reduction;         // sum of the contributions over processes
 
@@ -88,7 +96,7 @@ namespace hierarchical{
       extern moment_exchange_t moment_exchange;
       extern int moment_exchange_level; // highest level exchanged point to point (hierarchical:moment-exchange-level)
 
-      // phases of the field update, timed separately for the scaling study (papers/dipole)
+      // phases of the field update, timed separately and reported with dipole:output-timings
       enum phase_t { upward_pass = 0, moment_reduction = 1, field_loop = 2, field_distribution = 3, num_phases = 4 };
       extern std::vector<double> phase_time; // time (s) of each phase of the last update on this process
 
@@ -113,23 +121,35 @@ namespace hierarchical{
                                                 std::vector <double>& m_spin_array, // atomic spin moment
                                                 std::vector < bool >& magnetic);    // is magnetic);
 
+      // Table of the atoms of each level 0 cell, one per shared memory region (region_atoms.cpp): the magnetic
+      // atoms of the region's processes and of other regions' cells within the atomistic cutoff, sorted by cell,
+      // source process and index. The atoms of the k-th cell held, cell_ids[k], are a = cell_starts[k] ..
+      // cell_starts[k+1]-1, with coordinates coords[3a+0..2].
+      struct region_atoms_t{
+         vmpi::shared_array_t<double> coords;
+         vmpi::shared_array_t<int> cell_ids;    // ascending
+         vmpi::shared_array_t<int> cell_starts; // one more than cell_ids
+         void build(const double cutoff, const std::vector<double>& atom_coords_x, const std::vector<double>& atom_coords_y,
+                    const std::vector<double>& atom_coords_z); // collective
+         int find(const int cell) const;        // index k of cell, or -1
+         void free();                           // collective
+      };
+      extern region_atoms_t region_atoms;
+
       // new version of inter tensor method
       void calc_inter(const int celli,                                                // global ID of cell i
                       const int cellj,                                                // global ID of cell i
                       const int interaction_no,                                       // interaction number
                       const double cutoff,                                            // cutoff range for dipole tensor construction (Angstroms)
-                      const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
-                      const std::vector<double>& cells_pos_and_mom_array,             // array of positions and cell moments
-                      const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
-                      const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                      const vmpi::shared_array_t<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                      const region_atoms_t& atoms_table                               // atoms of the cells near this process's cells
                      );
 
       void calc_intra(const int celli,                                                // global ID of cell i
                       const int cellj,                                                // global ID of cell i
                       const int interaction_no,                                       // interaction number
-                      const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
-                      const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
-                      const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                      const vmpi::shared_array_t<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                      const region_atoms_t& atoms_table                               // atoms of the cells near this process's cells
                      );
 
       void calc_tensor(int cells_num_local_cells,
