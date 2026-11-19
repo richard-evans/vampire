@@ -19,10 +19,13 @@ namespace create{
 
    namespace internal{
 
-      // comparison function for reverse order sorting
+      // comparison function for reverse order sorting: decreasing radius, and materials with equal radii (the default
+      // core-shell-size of 1 for all materials) in decreasing material index. This must be a strict weak ordering for
+      // std::list::sort (false for equal elements); the index tie-break keeps the order the earlier non-strict
+      // comparison gave with both libstdc++ and libc++, so material assignment is unchanged.
       bool compare_radius(core_radius_t first,core_radius_t second){
-         if(first.radius<second.radius) return false;
-         else return true;
+         if(first.radius != second.radius) return first.radius > second.radius;
+         return first.mat > second.mat;
       }
 
    } // end of internal namespace
@@ -33,8 +36,8 @@ namespace create{
    // must not reach into create::internal directly.
    //--------------------------------------------------------------------
    bool compare_radius(core_radius_t first, core_radius_t second){
-      if(first.radius<second.radius) return false;
-      else return true;
+      if(first.radius != second.radius) return first.radius > second.radius;
+      return first.mat > second.mat;
    }
 
    std::list<core_radius_t> sorted_core_shell_materials(){

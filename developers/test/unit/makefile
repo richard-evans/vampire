@@ -56,7 +56,8 @@ VAMPIRE_OBJECTS= \
 ../../../obj/grains/grain_shape.o\
 ../../../obj/grains/grain_tessellation.o\
 ../../../obj/mpi/shmem.o\
-../../../obj/spininitialize/domain_wall.o
+../../../obj/spininitialize/domain_wall.o\
+../../../obj/create/compare_radius.o
 
 
 EXECUTABLE=unit_tests
