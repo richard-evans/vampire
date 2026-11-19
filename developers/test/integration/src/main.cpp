@@ -175,6 +175,9 @@ int main(int argc, char* argv[]){
       // kitaev exchange: E = -N J (S_A.S_B) + N K S_A,x S_B,x for bonds along x, J = 1e-21 J, K = 0.5e-21 J,
       // for N = 2000 spins (nearest neighbour bonds only, all within the Kitaev cutoff)
       if( !final_values_test("exchange/kitaev", { {"exchange energy", 0, -9.263710192499127e-19, 1.0e-10} }, exe ) ) fail += 1;
+      // the same chain with extra A-A and B-B bonds at 6 A (J = 0) beyond the 3.5 A Kitaev cutoff: they must add no Kitaev
+      // term, so the energy is unchanged (these bonds used to get the previous neighbour's Kitaev tensor, -7.4156e-19 J)
+      if( !final_values_test("exchange/kitaev-cutoff", { {"exchange energy", 0, -9.263710192499127e-19, 1.0e-10} }, exe ) ) fail += 1;
 
       // Integrator tests
       if( serial_only("dynamics/heun") && !integrator_test("dynamics/heun",    9.74e-11, -0.103927, -0.338608, 0.935171, exe ) ) fail += 1;

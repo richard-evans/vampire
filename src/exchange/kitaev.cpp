@@ -76,6 +76,10 @@ namespace internal{
             // get material id for j atom
             const unsigned int jmat = atoms::type_array[nj];
 
+            // reinitialise Kitaev tensor for each i-j interaction, so that neighbours beyond the
+            // Kitaev cutoff (and self interactions) add nothing
+            for(int idx = 0; idx < 9; idx++) tmp_tensor[idx] = 0.0;
+
             // ignore self interaction
             if(i != nj){
 
@@ -93,9 +97,6 @@ namespace internal{
 
                   // normalise to unit vector
                   const double inv_rij=1.0/sqrt(mod_eij_sq);
-
-                  // reinitialise exchange tensor for each i-j interaction
-                  for(int idx = 0; idx < 9; idx++) tmp_tensor[idx] = 0.0;
 
                   // normalise components to unit vector
                   for(int idx = 0; idx < 3; idx++){
