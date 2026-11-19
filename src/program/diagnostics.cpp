@@ -29,7 +29,9 @@
 // Standard Libraries
 #include "constants.hpp"
 #include <cmath>
+#include <algorithm>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 
 // Vampire Header files
@@ -42,9 +44,85 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
+#include "vmpi.hpp"
 
 
 namespace program{
+
+   namespace{
+
+      //------------------------------------------------------------------------
+      // Add the polar angle of each spin owned by this process (core and
+      // boundary atoms, not halo copies) to a histogram of 1 degree bins
+      // centred on 0, 1, ..., 180 degrees
+      //------------------------------------------------------------------------
+      void bin_spin_angles(std::vector<double>& bin){
+
+         #ifdef MPICF
+            const int num_owned_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
+         #else
+            const int num_owned_atoms = atoms::num_atoms;
+         #endif
+
+         for(int atom=0; atom<num_owned_atoms; atom++){
+            const double mx = atoms::x_spin_array[atom];
+            const double my = atoms::y_spin_array[atom];
+            const double mz = atoms::z_spin_array[atom];
+            const double mm = sqrt(mx*mx + my*my + mz*mz);
+            // clamp so that round-off in |m| cannot give acos of more than 1 (nan)
+            const double cos_theta = std::max(-1.0, std::min(1.0, mz/mm));
+            const double angle = acos(cos_theta)*180.0/M_PI;
+            bin[vmath::iround(angle)] += 1.0;
+         }
+
+      }
+
+      //------------------------------------------------------------------------
+      // Sum the histograms of all processes and write boltzmann-distribution.txt
+      // (root process only), with the analytic anisotropy and field distributions
+      //------------------------------------------------------------------------
+      void write_boltzmann_distribution(std::vector<double>& bin){
+
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &bin[0], bin.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif
+
+         if(vmpi::my_rank != 0) return;
+
+         const double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
+         const double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // Zeeman energy for material 0
+
+         // Find max probability and max P
+         std::vector<double> PK(181,0.0);
+         std::vector<double> PH(181,0.0);
+         double maxPK = 0.0;
+         double maxPH = 0.0;
+         double maxP  = 0.0;
+         for(int b=0;b<181;b++){
+            const double theta = double(b)*M_PI/180.0;
+            PK[b] = sin(theta)*exp(energyK*sin(theta)*sin(theta));
+            PH[b] = sin(theta)*exp(energyH*cos(theta));
+            if(bin[b]>maxP) maxP=bin[b];
+            if(PK[b]>maxPK) maxPK=PK[b];
+            if(PH[b]>maxPH) maxPH=PH[b];
+         }
+
+         std::ofstream ofile("boltzmann-distribution.txt");
+
+         // Output data
+         ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << energyK << std::endl;
+         ofile << "# Field:               " << sim::H_applied << "\t" << energyH << std::endl;
+         ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/constants::muB << "\t" << sim::temperature << std::endl;
+         for(int b=0;b<181;b++){
+            ofile << b << "\t" << bin[b]/maxP << "\t" << (bin[b]+bin[180-b])/(2.0*maxP) << "\t" << PK[b]/maxPK << "\t" << PH[b]/maxPH << std::endl;
+         }
+
+         // close Boltzmann file
+         ofile.close();
+
+      }
+
+   } // end of anonymous namespace
 
    int timestep_scaling(){
 
@@ -118,44 +196,12 @@ namespace program{
          // Integrate system
          sim::integrate(sim::partial_time);
 
-         // Calculate magnetisation statistics
-         for(int atom=0; atom<atoms::num_atoms; atom++){
-            double angle = acos(atoms::z_spin_array[atom])*180.0/M_PI;
-            double id = vmath::iround(angle+0.5);
-            bin[id]+=1.0;
-         }
+         // Add spin angles to histogram
+         bin_spin_angles(bin);
       }
 
-      // Find max probability and max P
-      double maxPK = 0.0;
-      double maxPH = 0.0;
-      double maxP  = 0.0;
-      for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
-         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
-         if((bin[b])>maxP) maxP=bin[b];
-         if(PK>maxPK) maxPK=PK;
-         if(PH>maxPH) maxPH=PH;
-      }
-
-      std::ofstream ofile("boltzmann-distribution.txt");
-
-      // Output data
-      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB) << std::endl;
-      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB) << std::endl;
-      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/constants::muB << "\t" << sim::temperature << std::endl;
-      for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
-         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
-         ofile << b << "\t" << bin[b]/maxP << "\t" << (bin[b]+bin[180-b])/(2.0*maxP) << "\t" << PK/maxPK << "\t" << PH/maxPH << std::endl;
-      }
-
-      // close Boltzmann file
-      ofile.close();
+      // Sum over processes and write the distribution
+      write_boltzmann_distribution(bin);
 
    }
 
@@ -176,17 +222,8 @@ namespace program{
          // Integrate system
          sim::integrate(sim::partial_time);
 
-         // Calculate magnetisation statistics
-         for(int atom=0; atom<atoms::num_atoms; atom++){
-            const double mx = atoms::x_spin_array[atom];
-            const double my = atoms::y_spin_array[atom];
-            const double mz = atoms::z_spin_array[atom];
-            const double mm = sqrt(mx*mx + my*my + mz*mz);
-            double angle = acos(mz/mm)*180.0/M_PI;
-            double id = vmath::iround(angle+0.5);
-            //std::cout << id << "\t" << angle << "\t" << mx << "\t" << my << "\t" << mz << "\t" << mm << std::endl;
-            bin[id]+=1.0;
-         }
+         // Add spin angles to histogram
+         bin_spin_angles(bin);
 
          // Calculate magnetisation statistics
          stats::update();
@@ -196,36 +233,8 @@ namespace program{
 
       }
 
-      // Find max probability and max P
-      double maxPK = 0.0;
-      double maxPH = 0.0;
-      double maxP  = 0.0;
-      for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
-         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
-         if((bin[b])>maxP) maxP=bin[b];
-         if(PK>maxPK) maxPK=PK;
-         if(PH>maxPH) maxPH=PH;
-      }
-
-      std::ofstream ofile("boltzmann-distribution.txt");
-
-      // Output data
-      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB) << std::endl;
-      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB) << std::endl;
-      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/constants::muB << "\t" << sim::temperature << std::endl;
-      for(int b=0;b<181;b++){
-         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*constants::kB); // get anisotropy constant for material 0
-         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
-         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
-         ofile << b << "\t" << bin[b]/maxP << "\t" << (bin[b]+bin[180-b])/(2.0*maxP) << "\t" << PK/maxPK << "\t" << PH/maxPH << std::endl;
-      }
-
-      // close Boltzmann file
-      ofile.close();
+      // Sum over processes and write the distribution
+      write_boltzmann_distribution(bin);
 
    }
 
