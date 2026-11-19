@@ -58,6 +58,11 @@ Run the compiled binary with an input file in the working directory:
 
 ## Testing
 
+The regression and validation suites (`-r`, `-m`, `-v`) build and run the reproducible test executables
+(`make serial-test` / `parallel-test`: `-ffp-contract=off`, no architecture flags), so their goldens hold on both macOS
+(clang, arm64) and Linux (gcc, x86-64). Optimised builds may fail them in the last bits; make goldens and references
+only with the test builds.
+
 ```bash
 # Run standard integration and unit tests (default, fast)
 developers/tests.sh

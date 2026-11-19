@@ -79,6 +79,16 @@ PCC_LDFLAGS= -I./hdr -O2 -march=barcelona -ipa
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr
 IBM_LDFLAGS= -lstdc++ -I./hdr -O5 -qarch=450 -qtune=450
 
+# Test suite builds (make serial-test, parallel-test): portable, bit for bit reproducible results on every platform.
+# Fused multiply-add contraction (the default of clang on arm64, and of gcc whenever the target has FMA instructions)
+# rounds a*b+c once instead of twice, which changes the last bit of results and grows into different trajectories in
+# thermal and chaotic cases, so it is turned off. No architecture-specific flags, no fast-math. The regression goldens
+# and validation references are made with these builds; optimised production builds may differ from them.
+TEST_CXX=c++
+TEST=$(TEST_CXX) $(CXXSTD) -DCOMP='"C++ compiler (test build)"'
+TEST_CFLAGS= -O3 -ffp-contract=off -I./hdr $(FFTW)
+TEST_LDFLAGS= -I./hdr $(FFTW)
+
 CRAY_CFLAGS= -O3 -hfp3 -I./hdr
 CRAY_LDFLAGS= -I./hdr
 
@@ -142,10 +152,12 @@ GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
 PCCDB_OBJECTS=$(OBJECTS:.o=_pdb.o)
 IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb.o)
 LLVMDB_OBJECTS=$(OBJECTS:.o=_llvmdb.o)
+TEST_OBJECTS=$(OBJECTS:.o=_test.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_par.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_par.o)
 MPI_LLVM_OBJECTS=$(OBJECTS:.o=_llvm_par.o)
+MPI_TEST_OBJECTS=$(OBJECTS:.o=_test_par.o)
 MPI_PCC_OBJECTS=$(OBJECTS:.o=_p_par.o)
 MPI_IBM_OBJECTS=$(OBJECTS:.o=_ibm_par.o)
 MPI_CRAY_OBJECTS=$(OBJECTS:.o=_cray_par.o)
@@ -183,6 +195,13 @@ serial-intel: $(ICC_OBJECTS)
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $(OPTIONS) $<
+
+# serial - reproducible build for the test suites (developers/tests.sh)
+serial-test: $(TEST_OBJECTS)
+	$(TEST) $(TEST_LDFLAGS) $(TEST_OBJECTS) $(LIBS) -o $(EXECUTABLE)-test
+
+$(TEST_OBJECTS): obj/%_test.o: src/%.cpp
+	$(TEST) -c -o $@ $(TEST_CFLAGS) $(OPTIONS) $<
 
 # serial - use for macOS systems
 serial-llvm: $(LLVM_OBJECTS)
@@ -255,6 +274,13 @@ parallel-archer: $(MPI_ARCHER_OBJECTS)
 
 $(MPI_ARCHER_OBJECTS): obj/%_archer_par.o: src/%.cpp
 	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
+
+# parallel - reproducible build for the test suites (developers/tests.sh)
+parallel-test: $(MPI_TEST_OBJECTS)
+	$(MPICC) $(TEST_LDFLAGS) $(MPI_TEST_OBJECTS) $(LIBS) -o $(PEXECUTABLE)-test
+
+$(MPI_TEST_OBJECTS): obj/%_test_par.o: src/%.cpp
+	$(MPICC) -c -o $@ $(TEST_CFLAGS) $(OPTIONS) $<
 
 # parallel - use for macOS systems
 parallel-llvm: $(MPI_LLVM_OBJECTS)

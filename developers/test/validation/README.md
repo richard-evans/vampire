@@ -13,7 +13,9 @@ python3 developers/test/validation/vtest.py compare --test gpu-dp --ref cpu
 - `compare` exits non-zero on any failure; passing cases are summarised in one line (`--verbose` shows every quantity). Labels are looked up in `results/` first, then `reference/`.
   `--paired RTOL` instead compares every run with the same run (same seed) of the reference row by row, for result sets
   with the same dynamics whose output differs only by rounding.
-- `developers/tests.sh -v` runs `vampire-serial` and compares against `reference/cpu`.
+- `developers/tests.sh -v` builds and runs `vampire-serial-test` (`make serial-test`) and compares against `reference/cpu`.
+  The CPU references are made with this reproducible test build: it turns off fused multiply-add contraction, so it
+  gives the same bits on every platform (see `developers/test/regression/README.md`, Test builds).
 
 ## GPU validation
 
@@ -25,7 +27,7 @@ Which check to run:
 | touches the multi-GPU version (`src/mgpu`, halo, decomposition) | `mgpu_check.sh` as well |
 | changes results (new physics, different arithmetic or random numbers) | `run_gpu_suite.sh`, `mgpu_check.sh`, and `ab_compare.sh` for statistically equivalent changes |
 | anything that could change what an ordinary user of the serial or MPI version sees (input, output files, checkpoints, vdc) | `compat_check.sh` against the reference version (CPU only, no GPU needed) |
-| any change to the CPU code | upstream's regression suite, `developers/tests.sh -r` and `-m 2` (about 30 s and 50 s); built with GCC 15 the serial cases `config/binary-continuous`, `integrate/constrained-monte-carlo`, `program/hamr-cool`, `vio/all-columns`, `vio/grain-columns` and the 2-process cases `config/binary-continuous`, `config/output-mode-mpi-io`, `program/hamr-cool`, `vio/grain-columns` fail for the reference version too (low order bits of their golden files), so only other failures point to a change |
+| any change to the CPU code | the regression suite, `developers/tests.sh -r` and `-m 2` (about 30 s and 50 s), which build and run the reproducible test executables (`make serial-test`, `parallel-test`) and so give the same results on every platform |
 | the HAMR active window (`src/hamr/active_window.cpp`, window snapshots) | `hamr_window_check.sh` (below) |
 | new feature or validation case | all of the above once, before committing |
 

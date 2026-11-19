@@ -23,6 +23,9 @@ obj/main/githash_gdb_par.o : OPTIONS = -DGHASH='$(GHASH)'
 # LLVM
 obj/main/githash_llvm.o : OPTIONS = -DGHASH='$(GHASH)'
 obj/main/githash_llvm_par.o : OPTIONS = -DGHASH='$(GHASH)'
+# TEST SUITE
+obj/main/githash_test.o : OPTIONS = -DGHASH='$(GHASH)'
+obj/main/githash_test_par.o : OPTIONS = -DGHASH='$(GHASH)'
 # INTEL
 obj/main/githash_i.o : OPTIONS = -DGHASH='$(GHASH)'
 obj/main/githash_i_par.o : OPTIONS = -DGHASH='$(GHASH)'

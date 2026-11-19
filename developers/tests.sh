@@ -10,14 +10,16 @@ usage(){
    echo "   -i   run standard integration tests"
    echo "   -e   run extended (long running) integration tests"
    echo "   -u   run unit tests"
-   echo "   -r   run regression tests with vampire-serial"
-   echo "   -v   run the physics validation suite with vampire-serial against the CPU references"
-   echo "   -m   run regression tests with vampire-parallel on N processes (default 2)"
+   echo "   -r   run regression tests with vampire-serial-test (built by make serial-test)"
+   echo "   -v   run the physics validation suite with vampire-serial-test against the CPU references"
+   echo "   -m   run regression tests with vampire-parallel-test (make parallel-test) on N processes (default 2)"
    echo "   -b   build matrix: clean build of every build variant in a temporary copy"
    echo "   -c   coverage report from a debug build in a temporary copy (needs gcovr)"
    echo "   -s   check source code style (tabs, trailing whitespace, licence headers)"
    echo "   -h   show this help"
    echo "With no option, the standard integration and unit tests are run."
+   echo "The regression and validation suites (-r, -m, -v) build and use the reproducible test builds, whose results"
+   echo "are the same on every platform; optimised builds (serial, serial-llvm, ...) may fail them in the last bits."
 }
 
 integration=false
@@ -105,13 +107,25 @@ if [ "$unit" = true ]; then
    time ./unit_tests || status=1
 fi
 
+#------------------------------------------------------
+# reproducible test builds for the regression and
+# validation suites (no FMA contraction, see makefile)
+#------------------------------------------------------
+build_test(){
+   echo "Building $1 (make $2)"
+   make -C "$root" -j 8 "$2" > "$root/build-$2.log" 2>&1 || { echo "Error: make $2 failed, see $root/build-$2.log"; exit 1; }
+   rm -f "$root/build-$2.log"
+}
+if [ "$regression" = true ] || [ "$validation" = true ]; then build_test vampire-serial-test serial-test; fi
+if [ "$mpi_processes" -gt 0 ]; then build_test vampire-parallel-test parallel-test; fi
+
 if [ "$regression" = true ]; then
    time "$root/developers/test/regression/run_regression.sh" --serial || status=1
 fi
 
 if [ "$validation" = true ]; then
    cd "$root" || exit 1
-   python3 developers/test/validation/vtest.py run --exe ./vampire-serial --label serial --jobs 4 || status=1
+   python3 developers/test/validation/vtest.py run --exe ./vampire-serial-test --label serial --jobs 4 || status=1
    python3 developers/test/validation/vtest.py compare --test serial --ref cpu || status=1
 fi
 
@@ -186,7 +200,7 @@ if [ "$coverage" = true ]; then
 
    make -C "$dir/developers/test/integration" > /dev/null || exit 1
    ( cd "$dir/developers/test/integration" && ./integration_tests --all )
-   "$dir/developers/test/regression/run_regression.sh" --serial
+   "$dir/developers/test/regression/run_regression.sh" --serial --exe "$dir/vampire-serial-debug"
 
    mkdir -p "$dir/coverage"
    ( cd "$dir" && $gcovr --root . --filter src/ --exclude src/qvoronoi/ --object-directory obj \

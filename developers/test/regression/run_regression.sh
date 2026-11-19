@@ -16,7 +16,7 @@
 # A case directory contains:
 #    input, *.mat, [*.ucf, ...]   inputs, copied into a temporary directory
 #    expected-serial.dat          golden output (comment lines stripped)
-#    expected-mpi-np<N>.dat       golden output for vampire-parallel on N processes
+#    expected-mpi-np<N>.dat       golden output for vampire-parallel-test on N processes
 #    tolerance                    optional, "rel <r> abs <a>" (default rel 1e-12 abs 1e-14)
 #    files                        optional, other output files to compare, one per line (glob patterns
 #                                 allowed); their golden files are expected-serial.<file> and
@@ -25,14 +25,17 @@
 #                                 its terminal output must contain each line of this file (all modes)
 #
 # A case is only run in a mode for which it has a golden file, unless --bless is given.
+# The goldens are made with the reproducible test builds (make serial-test, parallel-test), which give the same
+# bits on every platform; optimised builds (--exe) can differ in the last bits, which grow in thermal cases.
 # Each run is stopped after TIME_LIMIT seconds (default 300), so a hang is reported as a failure.
 #
 #------------------------------------------------------------------------------
 
 usage(){
-   echo "Usage: $0 [--serial | --mpi N] [--exact] [--bless] [--case <glob>] [--keep]"
-   echo "   --serial       run vampire-serial (default)"
-   echo "   --mpi N        run vampire-parallel on N processes"
+   echo "Usage: $0 [--serial | --mpi N] [--exe <path>] [--exact] [--bless] [--case <glob>] [--keep]"
+   echo "   --serial       run vampire-serial-test (default)"
+   echo "   --mpi N        run vampire-parallel-test on N processes"
+   echo "   --exe <path>   run this executable instead (eg an optimised build, which may fail cases that grow round-off)"
    echo "   --exact        compare byte for byte instead of with a numerical tolerance"
    echo "   --bless        write the obtained output as the new golden file"
    echo "   --case <glob>  only run cases matching <module>/<case> glob, eg 'integrate/llg-*'"
@@ -45,6 +48,7 @@ exact=false
 bless=false
 pattern="*/*"
 keep=false
+exe=""
 
 while [ $# -gt 0 ]; do
    case "$1" in
@@ -53,6 +57,7 @@ while [ $# -gt 0 ]; do
       --exact)  exact=true;;
       --bless)  bless=true;;
       --case)   pattern="$2"; shift;;
+      --exe)    exe="$2"; shift;;
       --keep)   keep=true;;
       -h|--help) usage; exit 0;;
       *) usage; exit 1;;
@@ -69,18 +74,23 @@ fi
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="$(cd "$here/../../.." && pwd)"
 
+# cases run in their own temporary directories, so --exe must be an absolute path
+if [ -n "$exe" ] && [ -e "$exe" ]; then
+   exe="$(cd "$(dirname "$exe")" && pwd)/$(basename "$exe")"
+fi
+
 if [ "$mode" = serial ]; then
-   executable="$root/vampire-serial"
+   executable="${exe:-$root/vampire-serial-test}"
    golden=expected-serial.dat
    run="$executable"
 else
-   executable="$root/vampire-parallel"
+   executable="${exe:-$root/vampire-parallel-test}"
    golden=expected-mpi-np$nprocs.dat
    run="${MPIRUN:-mpirun} -np $nprocs $executable"
 fi
 
 if [ ! -x "$executable" ]; then
-   echo "Error: $executable not found - build it first"
+   echo "Error: $executable not found - build it first (make serial-test or make parallel-test)"
    exit 1
 fi
 
