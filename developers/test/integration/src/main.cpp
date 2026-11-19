@@ -166,6 +166,9 @@ int main(int argc, char* argv[]){
       // directions S_A = (0.3,-0.5,0.8) and S_B = (0.5,0.4,0.7) (normalised)
       // isotropic exchange: E = -N J (S_A.S_B), J = 1e-21 J, for N = 2000 spins
       if( !final_values_test("exchange/isotropic", { {"exchange energy", 0, -1.086090160499898e-18, 1.0e-10} }, exe ) ) fail += 1;
+      // the same with normalised exchange (UCF J = 1 times material exchange-matrix = 1e-21 J), in both spellings
+      if( !final_values_test("exchange/normalised-isotropic", { {"exchange energy", 0, -1.086090160499898e-18, 1.0e-10} }, exe ) ) fail += 1;
+      if( !final_values_test("exchange/normalized-isotropic", { {"exchange energy", 0, -1.086090160499898e-18, 1.0e-10} }, exe ) ) fail += 1;
       // vectorial exchange: E = -N sum_k J_kk S_A,k S_B,k, J = (1,2,3) x 1e-21 J, for N = 2000 spins
       if( !final_values_test("exchange/vectorial", { {"exchange energy", 0, -3.045311626499714e-18, 1.0e-10} }, exe ) ) fail += 1;
       // tensorial exchange: E = -N S_A^T J S_B for a general 3x3 J (with J^T for B->A bonds), for N = 2000 spins

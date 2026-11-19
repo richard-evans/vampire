@@ -776,7 +776,7 @@ namespace create{
          //------------------------------------------------------------------
          if( (num_points < 3) || (num_points > 1000) ){
             std::ostringstream message;
-            message << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100";
+            message << "Error in geometry input file " << value.c_str() << " - first number must be an integer in the range 3-1000";
             err::fatal(message.str());
          }
 

@@ -37,6 +37,12 @@ namespace unitcell{
    //------------------------------------------------------------------------------
    unsigned int unitcell::exchange_template_t::set_exchange_type(std::string exchange_type_string){
 
+      // accept the American spelling normalized-* as well as normalised-*
+      const std::string normalized_prefix = "normalized-";
+      if(exchange_type_string.compare(0, normalized_prefix.size(), normalized_prefix) == 0){
+         exchange_type_string = "normalised-" + exchange_type_string.substr(normalized_prefix.size());
+      }
+
       //----------------------------------------
       // check for standard isotropic exchange
       //----------------------------------------
