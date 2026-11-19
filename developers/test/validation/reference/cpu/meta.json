@@ -2,10 +2,10 @@
    "label": "cpu",
    "exe": "vampire-serial-test",
    "ranks": null,
-   "version": "vampire version 7.0.0\nGithash e30ab95b0530235178f07c9117e7df40648d564c\n\nThis is free software; see the source for licence information.",
+   "version": "vampire version 7.0.0\nGithash bca8b412625f4236ace4c1ebf4da0a3b485d7d34\n\nThis is free software; see the source for licence information.",
    "precision": "dp",
    "extra": [],
    "seed_offset": 0,
-   "date": "2026-11-19T13:02:57",
+   "date": "2026-11-19T13:54:47",
    "gpu": ""
 }
