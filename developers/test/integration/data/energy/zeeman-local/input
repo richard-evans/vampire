@@ -1,0 +1,16 @@
+create:crystal-structure=sc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+dimensions:unit-cell-size = 3.5 !A
+dimensions:system-size-x = 3.5 !nm
+dimensions:system-size-y = 3.5 !nm
+dimensions:system-size-z = 1.75 !nm
+material:file=layers.mat
+sim:temperature=0.0
+sim:time-steps-increment=1
+sim:total-time-steps=0
+sim:time-step=1.0E-16
+sim:program=benchmark
+sim:integrator=llg-heun
+output:precision=16
+output:material-total-energy

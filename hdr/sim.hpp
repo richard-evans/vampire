@@ -99,6 +99,7 @@ namespace sim{
    // Field and energy functions
    extern double calculate_spin_energy(const int atom);
    extern double spin_applied_field_energy(const double, const double, const double);
+   extern double spin_local_applied_field_energy(const int mat, const double sx, const double sy, const double sz);
    extern double spin_magnetostatic_energy(const int, const double, const double, const double);
 
    void calculate_spin_fields(const int start_index,const int end_index);

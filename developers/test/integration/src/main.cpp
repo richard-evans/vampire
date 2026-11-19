@@ -231,6 +231,13 @@ int main(int argc, char* argv[]){
                                                 {"E[111]", 2, -2.677176107586904e-21, 1.0e-10, 1.0e-30},
                                                 {"E(d4)", 3, -8.431348390917834e-22, 1.0e-10, 1.0e-30},
                                                 {"E(d5)", 4, -7.435750353104395e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
+      // the same field set per material (material[i]:applied-field-strength/-unit-vector) instead of globally:
+      // the material specific applied field energy must be included in the output energies
+      if( !final_values_test("energy/zeeman-local", { {"E[001]", 0, -1.854802015660000e-21, 1.0e-10, 1.0e-30},
+                                                      {"E[100]", 1, -9.274010078300000e-22, 1.0e-10, 1.0e-30},
+                                                      {"E[111]", 2, -2.677176107586904e-21, 1.0e-10, 1.0e-30},
+                                                      {"E(d4)", 3, -8.431348390917834e-22, 1.0e-10, 1.0e-30},
+                                                      {"E(d5)", 4, -7.435750353104395e-22, 1.0e-10, 1.0e-30} }, exe ) ) fail += 1;
       // kB: single spin MC with fixed seed; final spin direction is deterministic and depends on kB
       if( serial_only("constants/kB") && !integrator_test("constants/kB", 9.74e-11, 0.411154, -0.829297, 0.378442, exe ) ) fail += 1;
 

@@ -214,6 +214,14 @@ void energy_statistic_t::calculate(const std::vector<double>& sx,  // spin unit 
       applied_field_energy[mask_id] += sim::spin_applied_field_energy(sx[atom], sy[atom], sz[atom]) * mm[atom];
    }
 
+   // add material specific (local) applied fields
+   if(sim::local_applied_field){
+      for( int atom = 0; atom < num_atoms; ++atom ){
+         const int mask_id = mask[atom]; // get mask id
+         applied_field_energy[mask_id] += sim::spin_local_applied_field_energy(mat[atom], sx[atom], sy[atom], sz[atom]) * mm[atom];
+      }
+   }
+
    //---------------------------------------------------------------------------
    // Calculate magnetostatic field energy (in Tesla)
    //---------------------------------------------------------------------------
