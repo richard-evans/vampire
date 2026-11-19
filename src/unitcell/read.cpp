@@ -44,8 +44,6 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
    unsigned int line_counter=0;
    unsigned int line_id=0;
 
-   std::string exchange_type_string; // string defining exchange type
-
    // defaults for interaction list
    unsigned int interaction_range = 1; // assume +-1 unit cell as default
 
@@ -219,7 +217,10 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
    zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
    zlog << zTs() << "\t" << "Number of bilinear interactions read-in: " << unit_cell.bilinear.interaction.size() << std::endl;
    zlog << zTs() << "\t" << "Number of biquadratic interactions read-in: " << unit_cell.biquadratic.interaction.size() << std::endl;
-   zlog << zTs() << "\t" << "Exchange type: " << exchange_type_string << std::endl;
+   zlog << zTs() << "\t" << "Exchange type: " << unit_cell.bilinear.exchange_type_name << std::endl;
+   if(unit_cell.biquadratic.interaction.size() > 0){
+      zlog << zTs() << "\t" << "Biquadratic exchange type: " << unit_cell.biquadratic.exchange_type_name << std::endl;
+   }
    zlog << zTs() << "\t" << "Calculated interaction range: " << unit_cell.interaction_range << " Unit Cells" << std::endl;
 
    return;

@@ -34,18 +34,17 @@ namespace unitcell{
    ){
 
       int num_interactions = 0; // assume no interactions
-      std::string exchange_type_string; // string defining exchange type
 
       // get number of exchange types
-      ucf_ss >> num_interactions >> exchange_type_string;
+      ucf_ss >> num_interactions >> exchange_type_name;
 
       // process exchange string to set exchange type and normalisation
-      const int num_exchange_values = unitcell::exchange_template_t::set_exchange_type(exchange_type_string);
+      const int num_exchange_values = unitcell::exchange_template_t::set_exchange_type(exchange_type_name);
 
       if(num_interactions>=0) interaction.resize(num_interactions);
       else {
          terminaltextcolor(RED);
-         std::cerr << "Error! Requested number of biquadratic exchange interactions " << num_interactions << " on line " << line_counter
+         std::cerr << "Error! Requested number of exchange interactions " << num_interactions << " on line " << line_counter
          << " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();
          terminaltextcolor(WHITE);
       }

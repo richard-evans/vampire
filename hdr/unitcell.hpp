@@ -101,6 +101,7 @@ namespace unitcell{
       exchange::exchange_t exchange_type; // exchange type to use in simulation
       bool use_material_exchange_constants; // flag to enable material exchange parameters
       int num_unit_cell_atoms; // number of atoms in unit cell
+      std::string exchange_type_name; // exchange type as given in the unit cell file (for the log)
 
       // list of interactions in each unit cell
       std::vector <unitcell::interaction_t> interaction;
