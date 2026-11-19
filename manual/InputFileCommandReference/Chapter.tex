@@ -668,7 +668,7 @@ The margin between the edge of the system and the written tracks in cross-track 
 \textit{hamr:track-padding}, while \textit{hamr:NPS}/\textit{hamr:NFT-to-pole-spacing}
 set the shift between the centre of application of the external field and temperature pulse.
 
-{\zicf sim:enable-fmr-field}\phantomsection\addcontentsline{toc}{subsection}{sim:enable-fmr-field}
+{\zicf sim:enable-fmr-field}\phantomsection\addcontentsline{toc}{subsection}{sim:enable-fmr-field} [true/false, default false] Switches on the oscillating (FMR) field $B(t) = B_{\mathrm{fmr}} \sin(2 \pi f t)$ for any program, set by \textit{sim:fmr-field-strength}, \textit{sim:fmr-field-frequency} and \textit{sim:fmr-field-unit-vector}, and the material specific \textit{material:fmr-field-strength} and \textit{material:fmr-field-frequency}. \textit{sim:program = fmr} switches the field on itself after equilibration, so the keyword is not needed there.
 
 {\zicf sim:time-step}\phantomsection\addcontentsline{toc}{subsection}{sim:time-step} The timestep for the evolution of the system, determines how long a simulation will take.
 

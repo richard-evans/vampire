@@ -189,6 +189,9 @@ namespace sim{
       //--------------------------------------------------------------------
       test="enable-fmr-field";
       if(word==test){
+         // switch on the oscillating (fmr) field, global and material specific, for any program
+         // (program:fmr switches it on itself after equilibration)
+         sim::enable_fmr = vin::check_for_valid_bool(value, word, line, prefix, "input");
          return true;
       }
       //--------------------------------------------------------------------
