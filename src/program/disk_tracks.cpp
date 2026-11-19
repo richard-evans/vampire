@@ -29,6 +29,7 @@
 #include <math.h>
 #include <fstream>
 #include <sstream>
+#include <string>
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
@@ -197,6 +198,54 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
 
 }
 
+//------------------------------------------------------------------------------
+// Function to set the track field in the local cells at a given step
+//------------------------------------------------------------------------------
+void set_local_track_field(const int step){
+   for (int lc = 0; lc < cells::num_local_cells; lc++){
+      const int cell = cells::cell_id_array[lc];
+      const double cx = cells::pos_and_mom_array[4*cell+0];
+      const double cy = cells::pos_and_mom_array[4*cell+1];
+      const double cz = cells::pos_and_mom_array[4*cell+2];
+      const std::vector<double> B = calculate_field(cx,cy,cz,step);
+      program::track_field_x[cell] = B[0];
+      program::track_field_y[cell] = B[1];
+      program::track_field_z[cell] = B[2];
+   }
+}
+
+//------------------------------------------------------------------------------
+// Function to write a line of position.txt (root process only): time, track
+// position, MR resistance, the track field averaged over all cells with
+// magnetic atoms and optionally the field in the last such cell. The cell
+// centres are held on every process, so the average does not depend on the
+// number of processes.
+//------------------------------------------------------------------------------
+void write_track_position(std::ofstream& ofile, const int step, const bool last_cell_field){
+
+   if(vmpi::my_rank != 0) return;
+
+   double avB[3] = {0.0, 0.0, 0.0};
+   std::vector<double> B(3,0.0);
+   int num_cells_with_atoms = 0;
+
+   for (int cell = 0; cell < cells::num_cells; cell++){
+      if(cells::num_atoms_in_cell_global[cell] == 0) continue;
+      const double cx = cells::pos_and_mom_array[4*cell+0];
+      const double cy = cells::pos_and_mom_array[4*cell+1];
+      const double cz = cells::pos_and_mom_array[4*cell+2];
+      B = calculate_field(cx,cy,cz,step);
+      for(int i = 0; i < 3; i++) avB[i] += B[i];
+      num_cells_with_atoms++;
+   }
+   for(int i = 0; i < 3; i++) avB[i] /= double(num_cells_with_atoms);
+
+   ofile << sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << avB[0] << '\t' << avB[1] << '\t' << avB[2];
+   if(last_cell_field) ofile << "\t" << B[0] << '\t' << B[1] << '\t' << B[2];
+   ofile << std::endl;
+
+}
+
 void tracks(){
 
 
@@ -216,11 +265,22 @@ void tracks(){
      tp::track_gap = program::track_track_gap;
      tp::bit_gap = program::track_bit_gap;
 
-     tp::total_bit_size = tp::bit_size + tp::bit_gap;
-     tp::total_bit_width = tp::bit_width + tp::track_gap;
+     // centre to centre spacing of bits: across tracks (x) the bit size plus the gap between tracks,
+     // down a track (z) the bit width plus the gap between bits
+     tp::total_bit_size = tp::bit_size + tp::track_gap;
+     tp::total_bit_width = tp::bit_width + tp::bit_gap;
      tp::total_bit_depth = tp::bit_depth;
 
-   //  std:: cout << tp::bit_size << '\t' << tp::bit_width << '\t' << std::endl;
+     // check track parameters (a zero bit size gives a singular field)
+     if(tp::num_tracks < 1 || tp::num_bits_per_track < 1){
+        err::fatal("Error: disk-tracks needs sim:num-tracks and sim:num-bits-per-track of at least 1. Exiting.");
+     }
+     if(tp::bit_size <= 0.0 || tp::bit_width <= 0.0 || tp::bit_depth <= 0.0){
+        err::fatal("Error: disk-tracks needs sim:track-bit-size-x, -y and -z greater than zero. Exiting.");
+     }
+     // note: the track field is evaluated at the cell centres in the full size cell arrays, which
+     // initialize_modules always builds for this program (dipole::full_cell_fields)
+
      program::Ms = program::track_Ms;// mu0 Ms in Tesla
 
      program::track_field_x.resize(cells::num_cells,0.0);
@@ -235,8 +295,6 @@ void tracks(){
     tp::z_track_pos.resize(tp::num_bits,0.0);
     tp::bit_magnetisation.resize(tp::num_bits,0.0);
 
-    std::vector <double > B(3,0.0);
-
     int M = 1;
 
     std::ifstream ifile;
@@ -250,7 +308,7 @@ void tracks(){
     std::vector <double > bitms(tp::num_tracks*tp::num_bits_per_track,0.0);
 
     if (program::track_ms_file == true){
-      std::cout << "Creating track from file" << std::endl;
+      zlog << zTs() << "disk-tracks: creating track from file track_ms" << std::endl;
 
      // read number of atoms in this file
      std::string line; // declare a string to hold line of text
@@ -258,77 +316,55 @@ void tracks(){
        std::stringstream line_stream(line);
        bits++;
        if (bits > tp::num_bits) {
-         std::cout << "error number of bits in file more than number of specified bits" << std::endl;
-         err::vexit();
+         err::fatal("Error: track_ms file has more lines than the number of bits (" + std::to_string(tp::num_bits) + "). Exiting.");
        }
        line_stream >> track_num >> bit_num >> M;
    //    std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
-       if (track_num-1 > tp::num_tracks || bit_num-1  > tp::num_bits_per_track){
-         std::cout << "error number of bits in file more than number of specified bits" << std::endl;
-         err::vexit();
+       // track and bit numbers in the file count from 1
+       if (track_num < 1 || track_num > tp::num_tracks || bit_num < 1 || bit_num > tp::num_bits_per_track){
+         err::fatal("Error: track " + std::to_string(track_num) + " bit " + std::to_string(bit_num) +
+                    " in track_ms file is out of range (tracks 1-" + std::to_string(tp::num_tracks) +
+                    ", bits per track 1-" + std::to_string(tp::num_bits_per_track) + "). Exiting.");
        }
        bitms[(track_num-1)*(tp::num_bits_per_track) + (bit_num-1)] = M;
    //    std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
      }
    }
    else {
-           std::cout << "Creating track using random Ms values" << std::endl;
-  //   std::cout << "ENTER2" << std::endl;
-     int M = 1;
-     for (int bit  =0; bit < tp::num_bits; bit++){
-       for (int track =0; track < tp::num_tracks; track++){
-         bitms[(track-1)*(tp::num_bits_per_track) + (bit-1)] = M;
-         M *=-1;
+     zlog << zTs() << "disk-tracks: no track file, creating track using alternating Ms values" << std::endl;
+     // bits alternate +1, -1 along each track
+     for (int track = 0; track < tp::num_tracks; track++){
+       for (int bit = 0; bit < tp::num_bits_per_track; bit++){
+         bitms[track*tp::num_bits_per_track + bit] = (bit % 2 == 0) ? 1 : -1;
        }
      }
    }
 
-   // temporary constants defining half sizes of bits
-   const double xb = tp::bit_size*0.5;
-   //const double yb = tp::bit_depth*0.5;
-   const double zb = tp::bit_width*0.5;
-
-   int bit = 0;
-
-   const int start_x = -(tp::num_tracks*xb) + xb;
-   const int end_x = (tp::num_tracks*xb) + xb;
-   const int bs = tp::total_bit_size;
-   const int bw = tp::total_bit_width;
-   const int start_z = -(tp::num_bits_per_track*zb) + zb;
-   const int end_z = (tp::num_bits_per_track*zb) + zb;
-
-    for (int x = start_x; x < end_x; x = x + bs){
-       for (double z = start_z; z < end_z; z = z + bw){
-          tp::x_track_pos[bit] = x;
-          tp::z_track_pos[bit] = z;
-          tp::bit_magnetisation[bit] = bitms[bit];
-          bit++;
-
-       }
-    }
+   // bit centres (A) on a grid centred on the origin, tracks along x and bits down each track along z,
+   // in the same track-major order as bitms
+   for (int track = 0; track < tp::num_tracks; track++){
+      for (int b = 0; b < tp::num_bits_per_track; b++){
+         const int bit = track*tp::num_bits_per_track + b;
+         tp::x_track_pos[bit] = (double(track) - 0.5*double(tp::num_tracks - 1))*tp::total_bit_size;
+         tp::z_track_pos[bit] = (double(b) - 0.5*double(tp::num_bits_per_track - 1))*tp::total_bit_width;
+         tp::bit_magnetisation[bit] = bitms[bit];
+      }
+   }
+   zlog << zTs() << "disk-tracks: " << tp::num_tracks << " tracks of " << tp::num_bits_per_track << " bits, pitch " <<
+           tp::total_bit_size << " A across tracks (x) and " << tp::total_bit_width << " A down track (z), bit centres from (" <<
+           tp::x_track_pos[0] << ", " << tp::z_track_pos[0] << ") to (" << tp::x_track_pos[tp::num_bits-1] << ", " <<
+           tp::z_track_pos[tp::num_bits-1] << ") A" << std::endl;
 
     //run a scan over bits
    if (program::LFA == false){
-     std::cout << "NO LFAAAAAA" << "\t" << cells::num_local_cells <<std::endl;
+   zlog << zTs() << "disk-tracks: moving track scan over " << cells::num_local_cells << " local cells" << std::endl;
 
-   for (int lc = 0; lc < cells::num_local_cells; lc++){
-    int cell = cells::cell_id_array[lc];
-
-    const double cx = cells::pos_and_mom_array[4*cell+0];
-    const double cy = cells::pos_and_mom_array[4*cell+1];
-    const double cz = cells::pos_and_mom_array[4*cell+2];
-    B = calculate_field(cx,cy,cz,sim::time);
-
-    program::track_field_x[cell] = B[0];
-    program::track_field_y[cell] = B[1];
-    program::track_field_z[cell] = B[2];
-
-  }
+   set_local_track_field(sim::time);
 
    sim::integrate(sim::equilibration_time);
 
    std::ofstream ofile;
-   ofile.open ("position.txt");
+   if(vmpi::my_rank == 0) ofile.open ("position.txt");
    int step = 0;
 
    while(sim::time <sim::equilibration_time+sim::total_time){
@@ -336,31 +372,8 @@ void tracks(){
      program::track_pos_x = program::initial_cross_track_position + program::cross_track_velocity*step;
      program::track_pos_z = program::initial_down_track_position + program::down_track_velocity*step;
 
-   double avBx = 0;
-   double avBy = 0;
-   double avBz = 0;
-
-   for (int lc = 0; lc < cells::num_local_cells; lc++){
-     int cell = cells::cell_id_array[lc];
-
-      const double cx = cells::pos_and_mom_array[4*cell+0];
-      const double cy = cells::pos_and_mom_array[4*cell+1];
-      const double cz = cells::pos_and_mom_array[4*cell+2];
-
-      B = calculate_field(cx,cy,cz,step);
-      program::track_field_x[cell] = B[0];
-      program::track_field_y[cell] = B[1];
-      program::track_field_z[cell] = B[2];
-      avBx = avBx + B[0];
-      avBy = avBy + B[1];
-      avBz = avBz + B[2];
-
-      //   std::cout  <<"returned B\t" << sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
-    }
-    avBx =avBx/cells::num_local_cells;
-    avBy =avBy/cells::num_local_cells;
-    avBz =avBz/cells::num_local_cells;
-    ofile << sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << avBx<< '\t' << avBy<< '\t' << avBz << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+    set_local_track_field(step);
+    write_track_position(ofile, step, true);
 
          // Integrate system
   sim::integrate(sim::partial_time);
@@ -384,8 +397,7 @@ else {
   //   std::cout << "LFAAAAAA" << std::endl;
 
    std::ofstream ofile;
-   ofile.open ("position.txt");
-   //int step = 0;
+   if(vmpi::my_rank == 0) ofile.open ("position.txt");
 
    std::ifstream ifile2;
    ifile2.open("lfa-ms");
@@ -396,7 +408,7 @@ else {
 
 
    if (ifile2.good()){
-     std::cout << "Creating lfa scan from file" << std::endl;
+     zlog << zTs() << "disk-tracks: creating lfa scan from file" << std::endl;
 
    sim::integrate(sim::equilibration_time);
     // read number of atoms in this file
@@ -415,31 +427,8 @@ else {
         while(program::Ms > end_ms){
     //  std::cout << "also here" <<std::endl;
 
-         double avBx = 0;
-         double avBy = 0;
-         double avBz = 0;
-          for (int lc = 0; lc < cells::num_local_cells; lc++){
-            int cell = cells::cell_id_array[lc];
-
-            const double cx = cells::pos_and_mom_array[4*cell+0];
-            const double cy = cells::pos_and_mom_array[4*cell+1];
-            const double cz = cells::pos_and_mom_array[4*cell+2];
-
-            std::vector < double > B2 = calculate_field(cx,cy,cz,0);
-            program::track_field_x[cell] = B2[0];
-            program::track_field_y[cell] = B2[1];
-            program::track_field_z[cell] = B2[2];
-
-            avBx = avBx + B2[0];
-            avBy = avBy + B2[1];
-            avBz = avBz + B2[2];
-
-      //   std::cout << "RETURNED B\t" <<sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << B2[0] << '\t' << B2[1] << '\t' << B2[2] <<  std::endl;
-          }
-          avBx =avBx/cells::num_local_cells;
-          avBy =avBy/cells::num_local_cells;
-          avBz =avBz/cells::num_local_cells;
-          ofile << sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << avBx<< '\t' << avBy<< '\t' << avBz <<  std::endl;
+          set_local_track_field(0);
+          write_track_position(ofile, 0, false);
 
           //      std::cout << "and here" <<std::endl;
 
@@ -462,31 +451,7 @@ else {
 
          while(program::Ms < end_ms){
 
-            double avBx = 0;
-            double avBy = 0;
-            double avBz = 0;
-
-           for (int lc = 0; lc < cells::num_local_cells; lc++){
-             int cell = cells::cell_id_array[lc];
-
-             const double cx = cells::pos_and_mom_array[4*cell+0];
-             const double cy = cells::pos_and_mom_array[4*cell+1];
-             const double cz = cells::pos_and_mom_array[4*cell+2];
-
-             B = calculate_field(cx,cy,cz,0);
-             program::track_field_x[cell] = B[0];
-             program::track_field_y[cell] = B[1];
-             program::track_field_z[cell] = B[2];
-
-             avBx = avBx + B[0];
-             avBy = avBy + B[1];
-             avBz = avBz + B[2];
-
-      //   std::cout << "RETURNED B\t" <<sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << B2[0] << '\t' << B2[1] << '\t' << B2[2] <<  std::endl;
-          }
-          avBx =avBx/cells::num_local_cells;
-          avBy =avBy/cells::num_local_cells;
-          avBz =avBz/cells::num_local_cells;
+          set_local_track_field(0);
 
           // Integrate system
           sim::integrate(sim::partial_time);
@@ -496,8 +461,8 @@ else {
 
           // Output data
           vout::data();
-                   std::cout << sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
-                   ofile << sim::time << '\t' << program::track_pos_z << "\t" << program::track_pos_x << '\t' << micromagnetic::MR_resistance << "\t" << avBx<< '\t' << avBy<< '\t' << avBz <<  std::endl;
+          // field written after the step, as before
+          write_track_position(ofile, 0, false);
 
          program::Ms = program::Ms + program::LFA_scan_field_step;
 
@@ -507,8 +472,7 @@ else {
     }
   }
   else {
-    std::cout << "lfa-ms file missing." <<std::endl;
-    err::vexit();
+    err::fatal("Error: disk-tracks with LFA needs an lfa-ms file in the run directory. Exiting.");
   }
 
   }
