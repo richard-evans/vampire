@@ -13,7 +13,11 @@
 // C++ standard library headers
 
 // Vampire headers
+#include <algorithm>
+#include <vector>
 #include "sld.hpp"
+#include "errors.hpp"
+#include "vio.hpp"
 #include "atoms.hpp"
 #include "iostream"
 #include "neighbours.hpp"
@@ -29,6 +33,24 @@ namespace sld{
    // Function to initialize sld module
    //----------------------------------------------------------------------------
    void initialize(){
+
+      // spin-lattice outputs read arrays that exist only when the sld module is enabled,
+      // so stop with a clear error rather than a segmentation fault
+      if(!sld::enabled){
+         const std::vector<vout::output_t> sld_outputs = { vout::output_t::potential_energy, vout::output_t::kinetic_energy,
+            vout::output_t::sld_exchange_energy, vout::output_t::sld_coupling_energy, vout::output_t::sld_total_energy,
+            vout::output_t::mean_coupling_field_vec, vout::output_t::lattice_temperature, vout::output_t::mean_lattice_temperature,
+            vout::output_t::material_lattice_temperature, vout::output_t::material_mean_lattice_temperature };
+         for(const std::vector<vout::output_t>* list : { &vout::file_output_list, &vout::screen_output_list }){
+            for(const vout::output_t output : *list){
+               if(std::find(sld_outputs.begin(), sld_outputs.end(), output) != sld_outputs.end()){
+                  err::fatal("Error: spin-lattice outputs (potential-energy, kinetic-energy, sld-*-energy, mean-coupling-field-vec "
+                             "and the lattice temperatures) need the spin-lattice module: set sim:integrator = spin-lattice "
+                             "and the spin-lattice: parameters. Exiting.");
+               }
+            }
+         }
+      }
 
       // check for sld module being enabled
       if(!sld::enabled) return;

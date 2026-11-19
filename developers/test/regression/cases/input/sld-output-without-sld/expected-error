@@ -1,0 +1,1 @@
+spin-lattice outputs (potential-energy, kinetic-energy, sld-*-energy, mean-coupling-field-vec and the lattice temperatures) need the spin-lattice module
