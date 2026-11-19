@@ -115,11 +115,11 @@ namespace ltmp{
                   const double Tmax);
 
    //-----------------------------------------------------------------------------
-   // Function to copy localised thermal fields to external field array
+   // Function to set the thermal field array to the localised thermal fields
    //-----------------------------------------------------------------------------
-   void get_localised_thermal_fields(std::vector<double>& x_total_external_field_array,
-                               std::vector<double>& y_total_external_field_array,
-                               std::vector<double>& z_total_external_field_array,
+   void get_localised_thermal_fields(std::vector<double>& x_thermal_field_array,
+                               std::vector<double>& y_thermal_field_array,
+                               std::vector<double>& z_thermal_field_array,
                                const int start_index,
                                const int end_index);
 

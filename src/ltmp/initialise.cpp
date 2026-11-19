@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <string>
 
 // Vampire headers
 #include "ltmp.hpp"
@@ -101,6 +102,19 @@ void initialise(const double system_dimensions_x,
       zlog << zTs() << "No discretisation (lateral/vertical) specified for local temperature calculation. Disabling local temperature calculation." << std::endl;
       ltmp::internal::enabled = false;
       return;
+   }
+
+   //-------------------------------------------------------------------------------------
+   // The explicit two temperature model update of the electron temperature is unstable
+   // at very low temperatures, where the electron heat capacity Ce*Te is tiny (Te goes
+   // negative and sqrt(Te) gives nan), so require a minimum starting temperature
+   //-------------------------------------------------------------------------------------
+   const double minimum_starting_temperature = 10.0; // K
+   if(!ltmp::internal::gradient && starting_temperature < minimum_starting_temperature){
+      err::fatal("Error: the localised temperature pulse needs a starting (equilibration) temperature of at least " +
+                 std::to_string(int(minimum_starting_temperature)) + " K, as its two temperature model is unstable for "
+                 "lower electron temperatures. Set sim:equilibration-temperature to " +
+                 std::to_string(int(minimum_starting_temperature)) + " K or above. Exiting.");
    }
 
    //-------------------------------------------------------------------------------------
