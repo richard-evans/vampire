@@ -1,0 +1,22 @@
+{
+   "description": "4500-atom periodic sc Co with tensorial exchange from a unit cell file (isotropic J plus an antisymmetric, Dzyaloshinskii-Moriya part), so that on GPUs the exchange fields come from the sparse exchange matrix; starts from a spin spiral along z, T=0, field at 45 degrees. The initial state does not depend on the MPI decomposition, so runs on any number of ranks are compared with the serial reference. The antisymmetric part makes the spiral unstable: the net magnetisation grows from round-off, so round-off differences grow by about 1e7 per 100 steps after the first 100, and only the first 5 rows (80 steps, in which the antisymmetric part already turns the magnetisation away from that of t0-spin-spiral) are compared. Single precision runs get the absolute tolerance of t0-spin-spiral",
+   "kind": "deterministic",
+   "quantities": {
+      "mx": "s0M_norm_x*s0M_norm_l",
+      "my": "s0M_norm_y*s0M_norm_l",
+      "mz": "s0M_norm_z*s0M_norm_l"
+   },
+   "tolerance": {
+      "dp": {
+         "rtol": 1e-08,
+         "atol": 1e-08,
+         "rows": 5
+      },
+      "sp": {
+         "rtol": 0.0001,
+         "atol": 0.0001,
+         "abs": 1e-06,
+         "rows": 5
+      }
+   }
+}

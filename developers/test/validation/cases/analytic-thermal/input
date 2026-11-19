@@ -1,0 +1,23 @@
+#------------------------------------------
+# Non-interacting spins with field and uniaxial
+# anisotropy along z at finite temperature:
+# <mz> compared with the Boltzmann average
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 5.31 !nm
+dimensions:system-size-y = 5.31 !nm
+dimensions:system-size-z = 5.31 !nm
+material:file=ideal.mat
+sim:temperature=5.0
+sim:time-steps-increment=100
+sim:total-time-steps=30000
+sim:time-step=1.0E-15
+sim:applied-field-strength=10.0 !T
+sim:applied-field-unit-vector=0,0,1
+sim:program=time-series
+sim:integrator=llg-heun
+output:real-time
+output:magnetisation
+output:precision=16
+output:column-headers

@@ -150,9 +150,6 @@ namespace vcuda{
          success = false;
       }
 
-
-      cu::mc::initialise();
-
       // Successful initialization
       return success;
 
@@ -593,6 +590,7 @@ namespace vcuda{
             _materials[i].temperature_rescaling_alpha = ::mp::material[i].temperature_rescaling_alpha;
             _materials[i].temperature_rescaling_Tc    = ::mp::material[i].temperature_rescaling_Tc;
             _materials[i].H_th_sigma = ::mp::material[i].H_th_sigma;
+            _materials[i].skip = gpu::skipped_material(i);
 
          }
 

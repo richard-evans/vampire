@@ -81,4 +81,12 @@ namespace sim{
       return sim::internal::stt_pj;
    }
 
+   bool spin_torque_fields_enabled(){
+      return sim::internal::enable_spin_torque_fields;
+   }
+
+   bool vcma_fields_enabled(){
+      return sim::internal::enable_vcma_fields;
+   }
+
 } // end of sim namespace

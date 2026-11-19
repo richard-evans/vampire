@@ -1,0 +1,4 @@
+{
+   "description": "~168k-atom FePt-like film, time series at a uniform 300 K (global thermal field): run on request only (--cases thermal-perf) for timing/profiling, not compared",
+   "kind": "benchmark"
+}

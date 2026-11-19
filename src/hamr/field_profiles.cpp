@@ -35,17 +35,18 @@ namespace hamr{
          const double Hmin = hamr::internal::Hmin;
          double H_inc = 0.0;
 
-         // Determine max magnitude of external field during initial ramp
-         if(current_time_step <= rise_time_step){
-            H_inc = (Hmax-Hmin) / hamr::internal::H_rise_time * mp::dt_SI;
+         // Increase field during initial ramp: exactly rise_time_step increments so that the field reaches Hmax
+         if(current_time_step < rise_time_step){
+            H_inc = (Hmax-Hmin) / double(rise_time_step);
          }
          // In the central region the max magnitude of the field is Hmax
          // else if(current_time_step > rise_time_step && current_time_step < bit_time_step-fall_time_step){
          //    H_inc = 0.0;
          // }
-         // Decrease field in the final region
-         else if(current_time_step >= bit_time_step-fall_time_step && current_time_step <= bit_time_step){
-            H_inc = -1.0*(Hmax-Hmin) / hamr::internal::H_fall_time * mp::dt_SI;
+         // Decrease field in the final region: exactly fall_time_step decrements (bit loop ends at bit_time_step-1)
+         // so that the field returns to Hmin and does not drift from bit to bit
+         else if(current_time_step >= bit_time_step-fall_time_step && current_time_step < bit_time_step){
+            H_inc = -1.0*(Hmax-Hmin) / double(fall_time_step);
          }
 
          return H_inc;

@@ -1,0 +1,8 @@
+{
+   "description": "Single spin, T=0, H=10 T along z, initially along x: damped precession vs analytic LLG solution",
+   "kind": "analytic",
+   "model": "precession",
+   "params": {"H": 10.0, "alpha": 1.0},
+   "quantities": {"mx": "s0M_norm_x*s0M_norm_l", "my": "s0M_norm_y*s0M_norm_l", "mz": "s0M_norm_z*s0M_norm_l"},
+   "tolerance": {"dp": {"atol": 1e-8}, "sp": {"atol": 1e-4}}
+}

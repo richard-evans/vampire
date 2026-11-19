@@ -9,6 +9,7 @@
 //
 
 // C standard library headers
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -18,6 +19,7 @@
 // Vampire headers
 #include "cells.hpp"
 #include "dipole.hpp"
+#include "errors.hpp"
 #include "gpu.hpp"
 #include "material.hpp"
 #include "vio.hpp"
@@ -103,6 +105,10 @@ namespace dipole{
       vutil::vtimer_t dipole_scaling_build_timer;
       dipole_scaling_build_timer.start();
 
+      if(dipole::internal::on_the_fly_tensors && dipole::internal::solver != dipole::internal::tensor){
+         err::fatal("Error - dipole:on-the-fly-tensors is only available with dipole:solver = tensor.");
+      }
+
       switch (dipole::internal::solver){
 
          case dipole::internal::macrocell:
@@ -119,8 +125,16 @@ namespace dipole{
          case dipole::internal::tensor:
             std::cout     << "Initialising dipole field calculation using tensor solver" << std::endl;
             zlog << zTs() << "Initialising dipole field calculation using tensor solver" << std::endl;
-            internal::output_dipole_solver_mem_info(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
-            dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
+            if(dipole::internal::on_the_fly_tensors){
+               // one tensor row, recomputed for each local cell at every field update
+               zlog << zTs() << "Computing dipole tensors at every field update (dipole:on-the-fly-tensors): memory for one row of " << dipole::internal::cells_num_cells << " cells" << std::endl;
+               dipole::internal::allocate_memory(std::min(cells_num_local_cells, 1), cells_num_cells);
+            }
+            else{
+               internal::output_dipole_solver_mem_info(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
+               internal::check_tensor_solver_memory(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
+               dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
+            }
             dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
                                                        dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, cells_pos_and_mom_array,
                                                        cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,

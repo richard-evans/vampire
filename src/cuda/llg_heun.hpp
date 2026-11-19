@@ -34,6 +34,10 @@ namespace vcuda
           * @var lambda * prefactor
           */
          cu_real_t lambda_times_prefactor;
+         /**
+          * @var atoms of this material are not integrated (gpu:skip-non-magnetic-atoms)
+          */
+         int skip;
       };
 
       namespace llg
@@ -42,12 +46,20 @@ namespace vcuda
           * Private data
           */
          extern bool initialized;
+         extern heun_parameters_t * d_heun_params;
+         extern cu_real_t * d_x_spin_buffer;
+         extern cu_real_t * d_y_spin_buffer;
+         extern cu_real_t * d_z_spin_buffer;
+         extern cu_real_t * d_ds_x;
+         extern cu_real_t * d_ds_y;
+         extern cu_real_t * d_ds_z;
 
          /*
           * Internal functions
           */
          void __llg_init ();
          void __llg_step ();
+         void __llg_finalise ();
 
          /*
           * Internal kernels
@@ -59,7 +71,7 @@ namespace vcuda
                cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
                cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
                cu_real_t * dS_x, cu_real_t * dS_y, cu_real_t * dS_z,
-               cu_real_t dt, size_t num_atoms
+               cu_real_t dt, size_t num_atoms, const int * active
                );
 
          __global__ void llg_heun_corrector_step (
@@ -70,7 +82,7 @@ namespace vcuda
                cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
                cu_real_t * x_spin_buffer, cu_real_t * y_spin_buffer, cu_real_t * z_spin_buffer,
                cu_real_t * dS_x, cu_real_t * dS_y, cu_real_t * dS_z,
-               cu_real_t dt, size_t num_atoms
+               cu_real_t dt, size_t num_atoms, const int * active
                );
       } /* llg */
 

@@ -1,0 +1,15 @@
+#------------------------------------------------------------------------------
+# Non-interacting spins with second, fourth and sixth order uniaxial anisotropy
+# and temperature rescaling (Tc = 1000 K, exponent 2: 500 K is rescaled to 250 K)
+#------------------------------------------------------------------------------
+material:num-materials=1
+material[1]:material-name=Ideal
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=0.0
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:second-order-uniaxial-anisotropy-constant=5.0e-21
+material[1]:fourth-order-uniaxial-anisotropy-constant=2.0e-20
+material[1]:sixth-order-uniaxial-anisotropy-constant=2.0e-20
+material[1]:temperature-rescaling-exponent=2.0
+material[1]:temperature-rescaling-curie-temperature=1000.0
+material[1]:initial-spin-direction=0,0,1

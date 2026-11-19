@@ -11,6 +11,7 @@
 #include <iomanip>
 
 // Vampire headers
+#include "hamr.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
 
@@ -252,6 +253,14 @@ namespace vmpi{
                }
             }
          }
+      }
+
+      // HAMR active window: split across the track (y) only, so that every processor holds a part of the
+      // window as it moves along the track (split along x, most processors would have nothing to integrate)
+      if(hamr::active_window_requested()){
+         nx = 1;
+         ny = x;
+         nz = 1;
       }
 
       // Output informative message to screen and log file

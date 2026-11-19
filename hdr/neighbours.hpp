@@ -35,9 +35,17 @@ namespace neighbours{
       int nn; // atom id of neighbour
       int i; // interaction type of neighbour
 
-      double vx; // real coordinate vector between atoms i->j
-      double vy;
-      double vz;
+   };
+
+   //-----------------------------------------------------------------------------
+   // Real coordinate vector between atoms i->j
+   //-----------------------------------------------------------------------------
+   class vector_t {
+   public:
+
+      double x;
+      double y;
+      double z;
 
    };
 
@@ -50,11 +58,16 @@ namespace neighbours{
       // list of neighbours in terms of atom IDs
       std::vector<std::vector <neighbours::neighbour_t> > list;
 
+      // vectors i->j in the same layout as list, empty unless requested in generate
+      // (only a few interactions need them and they would triple the memory of the list)
+      std::vector<std::vector <neighbours::vector_t> > vectors;
+
       // generate neighbour list from interaction template and list of atoms
       void generate(std::vector<cs::catom_t>& atoms,
                     unitcell::exchange_template_t& exchange,
                     const unsigned int num_atoms_in_unit_cell,
-                    double ucdx, double ucdy, double ucdz);
+                    double ucdx, double ucdy, double ucdz,
+                    const bool store_vectors);
 
       // release neighbour list
       void clear();

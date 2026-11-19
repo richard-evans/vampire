@@ -290,4 +290,21 @@ namespace anisotropy{
    bool is_rotational_enabled() {
       return internal::enable_rotational_anisotropy;
    }
+   //--------------------------------------------------------------------------------
+   // Functions to determine if triaxial, lattice, rotated cubic or simple fourth
+   // order biaxial anisotropy is enabled
+   //--------------------------------------------------------------------------------
+   bool is_triaxial_enabled() {
+      return internal::enable_triaxial_anisotropy || internal::enable_triaxial_anisotropy_rotated ||
+             internal::enable_triaxial_fourth_order || internal::enable_triaxial_fourth_order_rotated;
+   }
+   bool is_lattice_enabled() {
+      return internal::enable_lattice_anisotropy;
+   }
+   bool is_cubic_rotation_enabled() {
+      return internal::enable_cubic_fourth_order_rotation;
+   }
+   bool is_biaxial_fourth_order_simple_enabled() {
+      return internal::enable_biaxial_fourth_order_simple;
+   }
 } // end of anisotropy namespace

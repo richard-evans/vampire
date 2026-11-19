@@ -118,8 +118,8 @@ namespace grains{
 
          }
 
-         // Now lets renumber the grains
-         for(unsigned int atom=0;atom< num_local_atoms;atom++){
+         // Now lets renumber the grains, of the halo atoms too (the numbers are the same on every processor)
+         for(int atom=0;atom< atoms::num_atoms;atom++){
             const int old_grain_number = atoms::grain_array[atom];
             const int new_grain_number = new_grain_numbers[old_grain_number];
 

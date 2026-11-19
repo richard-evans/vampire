@@ -16,10 +16,12 @@
 
 // Vampire headers
 #include "errors.hpp"
+#include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
 #include "dipole.hpp"
+#include "exchange.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
@@ -150,11 +152,12 @@ int create(){
    neighbours::list_t biquadratic; // biquadratic exchange list
 
    // generate bilinear exchange list
-   bilinear.generate(catom_array, cs::unit_cell.bilinear, na, ucx, ucy, ucz);
+   bilinear.generate(catom_array, cs::unit_cell.bilinear, na, ucx, ucy, ucz,
+                     exchange::neighbour_vectors_needed() || anisotropy::is_neel_enabled());
 
    // optionally create a biquadratic neighbour list
    if(exchange::biquadratic){
-      biquadratic.generate(catom_array, cs::unit_cell.biquadratic, na, ucx, ucy, ucz);
+      biquadratic.generate(catom_array, cs::unit_cell.biquadratic, na, ucx, ucy, ucz, false);
    }
 
    #ifdef MPICF

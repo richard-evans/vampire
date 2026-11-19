@@ -10,6 +10,9 @@
 // C++ standard library headers
 
 // Vampire headers
+#include <algorithm>
+#include <limits>
+
 #include "cuda.hpp"
 
 
@@ -42,11 +45,34 @@ void transfer_spin_positions_from_gpu_to_cpu(){
    std::copy(internal::h_y_spin_transfer_buffer, internal::h_y_spin_transfer_buffer + ::atoms::num_atoms, ::atoms::y_spin_array.begin());
    std::copy(internal::h_z_spin_transfer_buffer, internal::h_z_spin_transfer_buffer + ::atoms::num_atoms, ::atoms::z_spin_array.begin());
 
+   internal::stats::host_spins_current = true;
+
    /*
    thrust::copy(internal::atoms::x_spin_array.begin(),internal::atoms::x_spin_array.end(),::atoms::x_spin_array.begin());
    thrust::copy(internal::atoms::y_spin_array.begin(),internal::atoms::y_spin_array.end(),::atoms::y_spin_array.begin());
    thrust::copy(internal::atoms::z_spin_array.begin(),internal::atoms::z_spin_array.end(),::atoms::z_spin_array.begin());
    */
+   return;
+
+}
+
+//------------------------------------------------------------------------------
+// Function to overwrite the spins on the host with NaN when statistics are
+// calculated on the device. The host spins are then only valid directly after
+// an explicit transfer, so that any code reading them at other times produces
+// NaN in its output instead of silently using out of date spins.
+//------------------------------------------------------------------------------
+void invalidate_host_spins(){
+
+   if(!internal::stats::device_owns_spins || !internal::stats::host_spins_current) return;
+
+   const double nan = std::numeric_limits<double>::quiet_NaN();
+   std::fill(::atoms::x_spin_array.begin(), ::atoms::x_spin_array.end(), nan);
+   std::fill(::atoms::y_spin_array.begin(), ::atoms::y_spin_array.end(), nan);
+   std::fill(::atoms::z_spin_array.begin(), ::atoms::z_spin_array.end(), nan);
+
+   internal::stats::host_spins_current = false;
+
    return;
 
 }

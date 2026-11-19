@@ -99,4 +99,6 @@ namespace spin_transport{
 
    } // end of internal namespace
 
+   bool is_enabled(){ return internal::enabled; }
+
 } // end of spin_transport namespace

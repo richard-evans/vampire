@@ -1008,7 +1008,8 @@ namespace anisotropy{
       double lattice_energy(const int atom, const int mat, const double sx, const double sy, const double sz, const double temperature);
 
       void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
-                                             std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
+                                             std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                                             std::vector<std::vector <neighbours::vector_t> >& cvectors);
 
       void add_neel_fourth_order_pair(const int atom, const double l, const double q, const double eij[3]);
 

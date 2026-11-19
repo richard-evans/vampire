@@ -18,6 +18,17 @@ make vdc             # vdc, the vampire data converter for visualisation
 ```
 `make` on its own builds all of serial, parallel and vdc. Add `-j 8` to compile in parallel.
 
+**GPU versions** (need the CUDA toolkit, `nvcc`):
+```bash
+make cuda            # vampire-cuda, one GPU, double precision
+make cuda CUDA_PR=-DCUDA_SP           # single precision (much faster on consumer GPUs)
+make cuda-multigpu   # vampire-cuda-multigpu, MPI with one GPU per process (needs MPI)
+```
+`CUDA_ARCH=-arch=native` compiles only for the GPU of the build machine (faster to compile).
+The serial and cuda versions share object files: run `make clean` when switching between them.
+The GPU versions run the same input files; features they do not support (e.g. dipole fields,
+integrators other than llg-heun and monte-carlo) are reported at start-up and the simulation stops. `gpu:acceleration = off` runs a GPU build on the CPU.
+
 **Check the build**
 
 The `input` and `Co.mat` files in this folder run a short benchmark (a few seconds):

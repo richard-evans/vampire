@@ -222,7 +222,8 @@ namespace dipole{
 
             int type = dipole::internal::atom_type_array[atom];
 
-            if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==false){
+            // with cells:probe-non-magnetic-cells non-magnetic atoms sample the field of their cell too
+            if(cells::probe_non_magnetic_cells || (dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==false)){
 
                // Copy B-field from macrocell to atomistic spin
                // Copy B-field from macrocell to atomistic spin

@@ -53,6 +53,9 @@ namespace dipole{
 
          const int num_atoms = global_atoms_in_cell_count[celli];
 
+         // a cell without magnetic atoms (cells:probe-non-magnetic-cells) has no self term
+         if( num_atoms == 0 ) return;
+
          // search for cells i and j in local atom-cells list
          int cell_with_atoms_index_i = -1;
          for(size_t idx = 0; idx < atoms_in_cells_array.size(); idx++){

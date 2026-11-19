@@ -1,0 +1,10 @@
+{
+   "description": "laser-pulse program (square profile), 3375-atom sc Co, 300 K with a 3 ps pulse to 1000 K in 0.5 T: per-row magnetisation length",
+   "kind": "statistical",
+   "per_row": true,
+   "quantities": {
+      "m": "s0M_norm_l"
+   },
+   "seeds": 8,
+   "k": 4
+}

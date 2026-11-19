@@ -21,6 +21,8 @@ namespace create{
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
    int num_total_atoms_non_filler = 0;
+   std::vector<uint64_t> atom_keys; // key of each atom, independent of the decomposition
+   bool atom_keys_valid = false; // atom_keys set and distinct for the local atoms
 
       namespace internal{
 
@@ -35,6 +37,7 @@ namespace create{
          int dilute_seed = 465865253;  // random seed to control dilution of atoms
          int mixing_seed = 100181363;  // random seed to control intermixing of atoms
          int spin_init_seed = 123456;  // random seed to control ranomised spin directions
+         bool decomposition_independent_random = false; // random choices of creation drawn per atom key
 
          double faceted_particle_100_radius = 1.0; // 100 facet particle radius
          double faceted_particle_110_radius = 1.0; // 110 facet particle radius

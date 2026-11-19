@@ -1,0 +1,39 @@
+#------------------------------------------
+# HAMR at T=0 (Tmin=Tmax=Teq=0, tilted spins):
+# deterministic test of head motion, field box and ramp
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 20.0 !nm
+dimensions:system-size-y = 10.0 !nm
+dimensions:system-size-z = 2.0 !nm
+material:file=hamr.mat
+sim:time-step=1.0E-15
+sim:equilibration-time-steps=2000
+sim:equilibration-temperature=0.0
+sim:minimum-temperature=0.0
+sim:maximum-temperature=0.0
+sim:minimum-applied-field-strength=0.0 !T
+sim:maximum-applied-field-strength=1.0 !T
+sim:applied-field-unit-vector=0,0,1
+hamr:laser-FWHM-x=5.0 !nm
+hamr:laser-FWHM-y=5.0 !nm
+hamr:head-field-x=5.0 !nm
+hamr:head-field-y=8.0 !nm
+hamr:head-speed=1000.0 !m/s
+hamr:field-rise-time=0.5E-12 !s
+hamr:field-fall-time=0.5E-12 !s
+hamr:bit-size=5.0 !nm
+hamr:track-size=8.0 !nm
+hamr:track-padding=0.5 !nm
+hamr:number-of-bits=3
+hamr:bit-sequence-type=single-tone-predefined
+sim:program=hamr-simulation
+sim:integrator=llg-heun
+output:real-time
+output:temperature
+output:applied-field-strength
+output:magnetisation
+output:output-rate=250
+output:precision=16
+output:column-headers

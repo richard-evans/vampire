@@ -12,6 +12,7 @@
 #include <string>
 
 // Vampire headers
+#include "cells.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
@@ -102,6 +103,13 @@ namespace dipole{
          dipole::cutoff=dpur;
          return true;
       }
+      test="on-the-fly-tensors";
+      if(word==test){
+         // tensor solver: compute each cell's tensors when the field is updated instead of storing them all
+         dipole::internal::on_the_fly_tensors = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         return true;
+      }
+      //-------------------------------------------------------------------
       test="atomistic-tensor-enabled";
       if(word==test){
          dipole::atomsitic_tensor_enabled=true;
@@ -162,11 +170,12 @@ namespace dipole{
    //---------------------------------------------------------------------------
    // Whether the full size cell arrays of the cells module (an array over every cell on every process) are needed.
    // The hierarchical solver reads only the shared cell arrays, so they are needed with it only if another module
-   // reads every cell (dipole::full_cell_fields) or the cell dipole fields are written.
+   // reads every cell (dipole::full_cell_fields), the cell dipole fields are written, or cells without magnetic atoms are
+   // probed (cells:probe-non-magnetic-cells sets the probe cells up in the full size arrays).
    //---------------------------------------------------------------------------
    bool needs_full_cell_arrays(){
       return !dipole::activated || dipole::internal::solver != dipole::internal::hierarchical ||
-             dipole::full_cell_fields || dipole::internal::output_dipole_field;
+             dipole::full_cell_fields || dipole::internal::output_dipole_field || cells::probe_non_magnetic_cells;
    }
 
 } // end of dipole namespace

@@ -24,6 +24,7 @@
 #include "environment.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
+#include "mgpu.hpp"
 #include "material.hpp"
 #include "micromagnetic.hpp"
 #include "montecarlo.hpp"
@@ -54,6 +55,10 @@ int integrate(uint64_t n_steps){
    #else
       internal::integrate_serial(n_steps);
    #endif
+
+   // With GPU acceleration, programs that read the spins on the host directly need
+   // them copied from the device after integration
+   if(gpu::acceleration) gpu::update_host_spins();
 
    // return
    return EXIT_SUCCESS;
@@ -256,10 +261,15 @@ int integrate_mpi(uint64_t n_steps){
          for(uint64_t ti=0;ti<n_steps;ti++){
          #ifdef MPICF
             // Select CUDA version if supported
-            #ifdef CUDA
+            #if defined(CUDA) && !defined(CUDA_MULTIGPU)
                //sim::LLG_Heun_cuda_mpi();
             #else
-               internal::LLG_Heun_mpi();
+               #ifdef CUDA_MULTIGPU
+                  if(gpu::acceleration) mgpu::llg_heun();
+                  else internal::LLG_Heun_mpi();
+               #else
+                  internal::LLG_Heun_mpi();
+               #endif
                //calcualte the field from the environment
                if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
                   environment::LLB(sim::temperature,

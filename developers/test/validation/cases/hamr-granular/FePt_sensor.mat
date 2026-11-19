@@ -1,0 +1,86 @@
+#===================================================
+# Granular FePt recording medium (three sublattices) with a non-magnetic
+# fill between the grains and a dense non-magnetic sensor layer above them.
+# Initial spins tilted from z so the initial state does not depend on the
+# decomposition; fill at full density so its atoms do not depend on it either.
+#===================================================
+# Anisotropy constant: (4.4**3)*1e-30*6.2e6/8
+# mu_s: (5**3)*1e-30*1200000/8/9.274e-24
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=5
+#---------------------------------------------------
+# Material 1 Fe Sublattice 1
+#---------------------------------------------------
+material[1]:material-name=FePt1
+material[1]:damping-constant=0.1
+material[1]:exchange-matrix-1st-nn[3] = 5.6e-21 # FePt-FePt bond
+material[1]:atomic-spin-moment=2.02178132413 !muB
+material[1]:uniaxial-anisotropy-constant=15.0e-23
+material[1]:material-element=Ag
+material[1]:minimum-height=0.0
+material[1]:maximum-height=0.5
+material[1]:unit-cell-category = 1
+material[1]:initial-spin-direction = 0.3,0,1
+material[1]:core-shell-size = 1.0
+#---------------------------------------------------
+# Material 2 Fe Sublattice 2
+#---------------------------------------------------
+material[2]:material-name=FePt2
+material[2]:damping-constant=0.1
+material[2]:exchange-matrix-1st-nn[3] = 5.6e-21 # FePt-FePt bond
+material[2]:atomic-spin-moment=2.02178132413 !muB
+material[2]:uniaxial-anisotropy-constant=15.0e-23
+material[2]:material-element=Ag
+material[2]:minimum-height=0.0
+material[2]:maximum-height=0.5
+material[2]:unit-cell-category = 2
+material[2]:initial-spin-direction = 0.3,0,1
+material[2]:core-shell-size = 1.0
+#---------------------------------------------------
+# Material 3 Fe Sublattice 3
+#---------------------------------------------------
+material[3]:material-name=FePt3
+material[3]:damping-constant=0.1
+material[3]:exchange-matrix-1st-nn[1] = 5.6e-21 # FePt-FePt bond
+material[3]:exchange-matrix-1st-nn[2] = 5.6e-21 # FePt-FePt bond
+material[3]:atomic-spin-moment=2.02178132413 !muB
+material[3]:uniaxial-anisotropy-constant=15.0e-23
+material[3]:material-element=Ag
+material[3]:minimum-height=0.0
+material[3]:maximum-height=0.5
+material[3]:unit-cell-category = 3
+material[3]:initial-spin-direction = 0.3,0,1
+material[3]:core-shell-size = 1.0
+#---------------------------------------------------
+# Material 4 intergranular fill (magnetic layer only, height 0-0.5)
+#---------------------------------------------------
+material[4]:material-name="fill"
+material[4]:non-magnetic=keep
+material[4]:fill-space
+material[4]:density = 1.0
+material[4]:minimum-height=0.0
+material[4]:maximum-height=0.5
+material[4]:material-element="H"
+material[4]:initial-spin-direction = 0.3,0,1
+material[4]:unit-cell-category = 1
+#---------------------------------------------------
+# Material 5 dense non-magnetic sensor/read-back layer (height 0.5-1.0)
+# Full lattice density (no fill-space low-density trick): a solid probe
+# lattice for dipole:output-atomistic-dipole-field, read out via the
+# hierarchical solver's per-atom field broadcast (src/dipole/field.cpp,
+# broadcast_cell_field_to_atoms()). continuous=true gives full x-y coverage
+# above intergranular gaps too, matching the old "dipole" material's role.
+#---------------------------------------------------
+material[5]:material-name="sensor"
+material[5]:non-magnetic=keep
+material[5]:damping-constant=1.0
+material[5]:atomic-spin-moment=2.02178132413 !muB
+material[5]:uniaxial-anisotropy-constant=0.0
+material[5]:material-element=Ag
+material[5]:minimum-height=0.5
+material[5]:maximum-height=1.0
+material[5]:unit-cell-category = 3
+material[5]:initial-spin-direction = 0.3,0,1
+material[5]:continuous = true

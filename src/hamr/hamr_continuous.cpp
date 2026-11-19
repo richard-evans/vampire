@@ -84,11 +84,20 @@ namespace hamr{
       std::cout << " Time per track: " << total_track_time*mp::dt_SI << " s" << std::endl;
       std::cout << " New total simulation time: " << (total_time + final_time)*mp::dt_SI << " s" << std::endl;
 
+      if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::time > sim::equilibration_time){
+         if(!hamr::internal::resume_state_loaded){
+            err::fatal("Error - the checkpoint file contains no HAMR head state (written by an older version), so the HAMR simulation cannot be continued.");
+         }
+         // Skips every step that was already simulated prior to the checkpoint, continuing simulation from that point onwards
+         hamr::internal::resume_steps = sim::time - sim::equilibration_time;
+      }
+
+      if(hamr::active_window_requested()) hamr::internal::initialize_active_window();
+
       //--------------------------------------------//
       // Start hamr simulation
       //--------------------------------------------//
       int bit_tot = 0;
-      int bit = 0;
       int track = 0;
       const uint64_t total_sim_time = total_time + sim::equilibration_time;
       const uint64_t total_final_time = final_time + total_sim_time;
@@ -96,7 +105,6 @@ namespace hamr{
       while(sim::time < total_sim_time){ // loop over whole time
 
          track = int(round(bit_tot/n_bits_per_track));
-         bit = bit_tot - track*n_bits_per_track;
          // Set head position at beginning of track
          hamr::internal::head_position_x +=Deltax; //= head_position_initial + BL*bit;
          hamr::internal::head_position_y = TW*(0.5 + track) + padding;
@@ -110,18 +118,23 @@ namespace hamr{
          uint64_t tmp_track_time = 0;
          while(tmp_track_time < extra_time){
 
-            // Switch off external field
-            sim::H_applied = 0.0;
+            // step already simulated before the checkpoint this simulation continues from
+            if(hamr::internal::resume_steps > 0) hamr::internal::skip_simulated_step();
+            else{
 
-            // Update head position in downtrack
-            hamr::internal::head_position_x += Deltax;
+               // Switch off external field
+               sim::H_applied = 0.0;
 
-            // Integrate system
-            sim::integrate(sim::partial_time);
-            // Calculate magnetisation statistics
-            stats::update();
-            // Output data
-            vout::data();
+               // Update head position in downtrack
+               hamr::internal::head_position_x += Deltax;
+
+               // Integrate system
+               sim::integrate(sim::partial_time);
+               // Calculate magnetisation statistics
+               stats::update();
+               // Output data
+               vout::data();
+            }
 
             tmp_track_time++;
          } // end of loop over head outside track region
@@ -130,36 +143,42 @@ namespace hamr{
          //-----------------------------------------//
          // Enter in track => within bits
          //-----------------------------------------//
-         while(tmp_track_time < track_time){
+         // tmp_track_time already includes the lead-in, so every bit of the track is written
+         while(tmp_track_time < extra_time + track_time){
 
             // Decleare integer time step within bit
             uint64_t tmp_bit_time = 0;
             while(tmp_bit_time < bit_time){
 
-               // Move head along downtrack
-               hamr::internal::head_position_x += Deltax;
+               // step already simulated before the checkpoint this simulation continues from
+               if(hamr::internal::resume_steps > 0) hamr::internal::skip_simulated_step();
+               else{
 
-               // Determine field polarisation within bit
-               const double H_app_dir = static_cast<double>(hamr::internal::bit_sequence[bit_tot]);
-               // Update applied field value depending on trapezoidal time profile
-               const double H_app_abs = fabs(sim::H_applied) + hamr::internal::update_field_time_trapz_profile(tmp_bit_time, rise_time, fall_time, bit_time);
-               // Determine sign of applied field
-               sim::H_applied = H_app_abs * H_app_dir;
+                  // Move head along downtrack
+                  hamr::internal::head_position_x += Deltax;
 
-               // Integrate system
-               sim::integrate(sim::partial_time);
+                  // Determine field polarisation within bit
+                  const double H_app_dir = static_cast<double>(hamr::internal::bit_sequence[bit_tot]);
+                  // Update applied field value depending on trapezoidal time profile
+                  const double H_app_abs = fabs(sim::H_applied) + hamr::internal::update_field_time_trapz_profile(tmp_bit_time, rise_time, fall_time, bit_time);
+                  // Determine sign of applied field
+                  sim::H_applied = H_app_abs * H_app_dir;
 
-               // Calculate magnetisation statistics
-               stats::update();
-               // Output data
-               vout::data();
+                  // Integrate system
+                  sim::integrate(sim::partial_time);
+
+                  // Calculate magnetisation statistics
+                  stats::update();
+                  // Output data
+                  vout::data();
+               }
 
                tmp_bit_time++;
                tmp_track_time++;
             } // end of loop over single bit region
 
             // Print update on screen and log file
-            zlog << zTs() << "Written bit " << bit_tot+1 << " : bit " << bit+1 << " on track " << track+1 <<  std::endl;
+            zlog << zTs() << "Written bit " << bit_tot+1 << " : bit " << bit_tot - track*n_bits_per_track + 1 << " on track " << track+1 <<  std::endl;
             zlog << zTs() << "Head moving to position: " << (hamr::internal::head_position_x+Deltax)*0.1 << " nm, " << hamr::internal::head_position_y*0.1 << " nm" << std::endl;
 
             bit_tot++;
@@ -172,18 +191,23 @@ namespace hamr{
          //--------------------------------------------------//
          while(tmp_track_time < total_track_time){
 
-            // Switch off external field
-            sim::H_applied = 0.0;
+            // step already simulated before the checkpoint this simulation continues from
+            if(hamr::internal::resume_steps > 0) hamr::internal::skip_simulated_step();
+            else{
 
-            // Update head position in downtrack
-            hamr::internal::head_position_x += Deltax;
+               // Switch off external field
+               sim::H_applied = 0.0;
 
-            // Integrate system
-            sim::integrate(sim::partial_time);
-            // Calculate magnetisation statistics
-            stats::update();
-            // Output data
-            vout::data();
+               // Update head position in downtrack
+               hamr::internal::head_position_x += Deltax;
+
+               // Integrate system
+               sim::integrate(sim::partial_time);
+               // Calculate magnetisation statistics
+               stats::update();
+               // Output data
+               vout::data();
+            }
 
             tmp_track_time++;
          } // end of loop over head outside track region

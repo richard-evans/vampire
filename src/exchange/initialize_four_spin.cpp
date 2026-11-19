@@ -31,7 +31,8 @@ namespace exchange{
 
 namespace internal{
 
-   void initialize_four_spin_exchange(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
+   void initialize_four_spin_exchange(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                                      std::vector<std::vector <neighbours::vector_t> >& cvectors){
 
       // if four spin exchange is not needed then do nothing
       if(!internal::enable_fourspin) return;
@@ -83,7 +84,7 @@ namespace internal{
 
          for(int a=start;a<end;a++){
 
-            dist = std::sqrt(std::pow(((cneighbourlist[i][am].vx)/ucx),2)+std::pow(((cneighbourlist[i][am].vy)/ucy),2)+std::pow(((cneighbourlist[i][am].vz)/ucz),2));
+            dist = std::sqrt(std::pow(((cvectors[i][am].x)/ucx),2)+std::pow(((cvectors[i][am].y)/ucy),2)+std::pow(((cvectors[i][am].z)/ucz),2));
 
             if ((dist <= nn_distance+0.01) && (dist >= nn_distance-0.01)){
                first_neigh[counter1]=cneighbourlist[i][am].nn;

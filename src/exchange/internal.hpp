@@ -255,8 +255,10 @@ namespace exchange{
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
-      void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
-      void calculate_kitaev(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
+      void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                         std::vector<std::vector <neighbours::vector_t> >& cvectors);
+      void calculate_kitaev(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                            std::vector<std::vector <neighbours::vector_t> >& cvectors);
       void unroll_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
       void unroll_normalised_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
       void unroll_normalised_biquadratic_exchange_interactions();
@@ -301,7 +303,8 @@ namespace exchange{
                                      std::vector<double>& field_array_z);
 
       void initialize_biquadratic_exchange();
-      void initialize_four_spin_exchange(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
+      void initialize_four_spin_exchange(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                                         std::vector<std::vector <neighbours::vector_t> >& cvectors);
 
    } // end of internal namespace
 

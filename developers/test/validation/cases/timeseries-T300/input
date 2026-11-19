@@ -1,0 +1,23 @@
+#------------------------------------------
+# Co benchmark system (reduced) at 300 K:
+# equilibrium magnetisation and energies
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 5.31 !nm
+dimensions:system-size-y = 5.31 !nm
+dimensions:system-size-z = 5.31 !nm
+material:file=Co.mat
+sim:temperature=300.0
+sim:equilibration-time-steps=5000
+sim:time-steps-increment=100
+sim:total-time-steps=20000
+sim:time-step=1.0E-15
+sim:program=time-series
+sim:integrator=llg-heun
+output:real-time
+output:magnetisation
+output:exchange-energy
+output:anisotropy-energy
+output:precision=16
+output:column-headers

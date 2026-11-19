@@ -30,6 +30,7 @@ void list_t::clear(){
 
    // swap the pointers
    tmp.swap(list);
+   std::vector< std::vector <neighbours::vector_t> >().swap(vectors);
 
    // leaving unloved memory behind
    return;

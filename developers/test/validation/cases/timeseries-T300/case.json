@@ -1,0 +1,8 @@
+{
+   "description": "3375-atom sc Co (benchmark material) at 300 K: time/seed averaged |m| and energies",
+   "kind": "statistical",
+   "quantities": {"m": "s0M_norm_l", "E_exchange": "s0_E1_Energy", "E_anisotropy": "s0_E2_Energy"},
+   "seeds": 8,
+   "skip_rows": 80,
+   "k": 4
+}

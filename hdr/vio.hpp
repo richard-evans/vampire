@@ -238,6 +238,7 @@ namespace vout{
     extern void write_out(std::ostream&,std::vector<output_t>&);
    //extern int pov_file();
 
+   void log_memory_usage(const std::string& phase); // host memory of all ranks to the log
    void redirect(std::ostream& strm, std::string filename);
    void nullify(std::ostream& strm);
 

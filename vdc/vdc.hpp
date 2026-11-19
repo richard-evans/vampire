@@ -165,6 +165,7 @@ namespace vdc{
    // array to store subsidiary data file names
    extern std::vector <std::string> coord_filenames;
    extern std::vector <std::string> spin_filenames;
+   extern bool spin_window_data; // spin files hold a window snapshot (only the atoms that changed)
    extern std::vector <std::string> nm_filenames;
 
    // arrays for storing time-averaged spin-spin correlations

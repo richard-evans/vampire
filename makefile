@@ -132,6 +132,7 @@ include src/vio/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
+include src/mgpu/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)

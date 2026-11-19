@@ -71,59 +71,57 @@ namespace vcuda{
             curandState * rand_states,
             cu::material_parameters_t * material_params,
             int * material,
-            int n_atoms
+            int n_atoms,
+            const int * active
             )
       {
          int tid = blockIdx.x * blockDim.x + threadIdx.x;
-         for (int i = tid;
-            i < n_atoms;
-            i += blockDim.x * gridDim.x){
+
+         // Load the curand state into local memory once for all atoms of this thread
+         curandState local_state = rand_states[tid];
+
+         for (int k = tid;
+            k < n_atoms;
+            k += blockDim.x * gridDim.x){
+
+            const int i = active ? active[k] : k;
 
             // Get material of atom i
             int mid = material[i];
             // Load parameters from memory
             cu::material_parameters_t mat = material_params[mid];
-
-            // Load the curand state into local memory
-            curandState local_state = rand_states[tid];
+            // atoms that are not integrated need no field, but draw their random numbers
+            // so that the other atoms of this thread get the same ones as without skipping
+            if(mat.skip){
+               curand_normal(&local_state);
+               curand_normal(&local_state);
+               curand_normal(&local_state);
+               continue;
+            }
 
             cu_real_t field_x = 0.0;
             cu_real_t field_y = 0.0;
             cu_real_t field_z = 0.0;
 
             // thermal field calculation
-            cu_real_t temp = temperature;
-            cu_real_t alpha = mat.temperature_rescaling_alpha;
-            cu_real_t sigma = mat.H_th_sigma;
-            cu_real_t tc = mat.temperature_rescaling_Tc;
+            const cu_real_t rsigma = cu::thermal_field_sigma(mat, temperature);
 
-            #ifdef CUDA_DP
-               double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
-               double rsigma = sigma*sqrt(resc_temp);
-            #else
-               float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
-               float rsigma = sigma*sqrtf(resc_temp);
-            #endif
-
-            #ifdef CUDA_DP
-               field_x = rsigma * curand_normal_double (&local_state);
-               field_y = rsigma * curand_normal_double (&local_state);
-               field_z = rsigma * curand_normal_double (&local_state);
-            #else
-               field_x = rsigma * curand_normal(&local_state);
-               field_y = rsigma * curand_normal(&local_state);
-               field_z = rsigma * curand_normal(&local_state);
-            #endif
+            // Gaussian random numbers are generated in single precision in both builds, since double
+            // precision generation is slow on GPUs with reduced double precision throughput
+            field_x = rsigma * curand_normal(&local_state);
+            field_y = rsigma * curand_normal(&local_state);
+            field_z = rsigma * curand_normal(&local_state);
             // if(i<10){printf("         %d  %lf  %lf  %lf\n",i,field_x,field_y,field_z);}
 
             x_field_array[i] = field_x;
             y_field_array[i] = field_y;
             z_field_array[i] = field_z;
 
-            // Write local curand state back to global memory
-            rand_states[tid] = local_state;
-
          }
+
+         // Write local curand state back to global memory
+         rand_states[tid] = local_state;
+
          return;
       } // end apply_global_temperature_kernel
 
@@ -144,7 +142,7 @@ namespace vcuda{
             cu::d_rand_state,
             cu::mp::d_material_params,
             cu::atoms::d_materials,
-            num_atoms);
+            num_atoms, nullptr);
 
          check_cuda_errors (__FILE__, __LINE__);
 

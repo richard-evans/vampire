@@ -2,7 +2,7 @@
 #                 Makefile for cuda module
 #--------------------------------------------------------------
 
-NVCC_VERSION=$(shell nvcc --version | tail -n 1 | cut -b 38-)
+NVCC_VERSION=$(shell nvcc --version | sed -n 's/.*release \([0-9.]*\).*/\1/p')
 NVCC=nvcc -DCOMP='"NVCC $(NVCC_VERSION)"'
 
 # Correct incompatibility with -Wsign-compare flag and nvcc
@@ -30,13 +30,10 @@ CUDA_OBJECTS= \
 	obj/cuda/thermal_fields.o \
 	obj/cuda/transfer.o
 
-CUDA_ARCH=\
--gencode arch=compute_50,code=sm_50 \
--gencode arch=compute_50,code=compute_50 \
--gencode arch=compute_61,code=sm_61 \
--gencode arch=compute_61,code=compute_61 \
--gencode arch=compute_70,code=compute_70 \
--gencode arch=compute_75,code=compute_75
+# GPU architectures: machine code for every major architecture supported by this nvcc
+# (devices of the same major version, e.g. sm_86, run the sm_80 code) plus PTX for newer
+# devices. Override on the command line, e.g. make cuda CUDA_ARCH=-arch=native
+CUDA_ARCH=-arch=all-major
 
 # The device linked object for CUDA
 CUDA_DLINK= obj/cuda/vampire_cuda.o

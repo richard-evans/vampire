@@ -75,6 +75,13 @@ namespace dipole{
       extern std::vector <std::vector < double > > rij_tensor_yz;
       extern std::vector <std::vector < double > > rij_tensor_zz;
 
+      extern bool on_the_fly_tensors;
+      extern double otf_cutoff;
+      extern std::vector<int> otf_global_atoms_in_cell_count;
+      extern std::vector<double> otf_cells_pos_and_mom_array;
+      extern std::vector<int> otf_list_of_cells_with_atoms;
+      extern std::vector< std::vector<double> > otf_atoms_in_cells_array;
+
       extern int num_atoms;
       extern std::vector < int > atom_type_array;
       extern std::vector < int > atom_cell_id_array;
@@ -205,6 +212,15 @@ namespace dipole{
                                     std::vector<double>& atom_coords_y,
                                     std::vector<double>& atom_coords_z,
                                     int num_atoms);
+
+      // tensor row of cell celli (interactions with every cell) stored in rij_tensor_*[row]
+      void compute_tensor_row(const int celli,
+                              const int row,
+                              const double cutoff,
+                              const std::vector<int>& global_atoms_in_cell_count,
+                              const std::vector<double>& cells_pos_and_mom_array,
+                              const std::vector<int>& list_of_cells_with_atoms,
+                              const std::vector< std::vector<double> >& atoms_in_cells_array);
 
       // new version of inter tensor method
       void compute_inter_tensor(const int celli,                                                // global ID of cell i
@@ -346,6 +362,7 @@ namespace dipole{
        // Function to output solver memory information
        //-----------------------------------------------------------------
        void output_dipole_solver_mem_info(int num_cells, int num_local_cells);
+       void check_tensor_solver_memory(int num_cells, int num_local_cells);
 
    } // end of internal namespace
 

@@ -1,0 +1,26 @@
+#------------------------------------------
+# Two-material bilayer (different moments,
+# damping, anisotropy, exchange), random initial
+# spins, T=0: per-material and per-height
+# magnetisation statistics, no energy outputs
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 5.31 !nm
+dimensions:system-size-y = 5.31 !nm
+dimensions:system-size-z = 5.31 !nm
+material:file=bilayer.mat
+sim:temperature=0.0
+sim:time-steps-increment=20
+sim:total-time-steps=2000
+sim:time-step=1.0E-15
+sim:applied-field-strength=0.5 !T
+sim:applied-field-unit-vector=1,0,1
+sim:program=time-series
+sim:integrator=llg-heun
+output:real-time
+output:magnetisation
+output:material-magnetisation
+output:height-magnetisation
+output:precision=16
+output:column-headers

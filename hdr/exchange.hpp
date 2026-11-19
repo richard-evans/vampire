@@ -77,7 +77,8 @@ namespace exchange{
    // Function to initialise exchange module
    //-----------------------------------------------------------------------------
    void initialize(std::vector<std::vector <neighbours::neighbour_t> >& bilinear,
-                   std::vector<std::vector <neighbours::neighbour_t> >& biquadratic);
+                   std::vector<std::vector <neighbours::neighbour_t> >& biquadratic,
+                   std::vector<std::vector <neighbours::vector_t> >& bilinear_vectors);
 
    //-----------------------------------------------------------------------------
    // Functions to set exchange type isotropic, vectorial or tensorial
@@ -89,6 +90,11 @@ namespace exchange{
    // Function to get exchange type isotropic (0), vectorial(1) or tensorial(2)
    //-----------------------------------------------------------------------------
    unsigned int get_exchange_type();
+
+   //-----------------------------------------------------------------------------
+   // Function to determine whether the vectors i->j of the bilinear neighbour list are needed
+   //-----------------------------------------------------------------------------
+   bool neighbour_vectors_needed();
 
    //---------------------------------------------------------------------------
    // Calculate  exchange energy for single spin selecting the correct type

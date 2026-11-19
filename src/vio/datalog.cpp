@@ -24,6 +24,7 @@
 #include "sim.hpp"
 #include "sld.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 #include "vutil.hpp"
 #include "micromagnetic.hpp"
 
@@ -362,9 +363,6 @@ namespace vout{
       // Output data to output
       if(vmpi::my_rank==0){
 
-         // For gpu acceleration get statistics from device
-         if(gpu::acceleration) gpu::stats::get();
-
          for(unsigned int item=0;item<list.size();item++){
             output_switch(stream,list[item],header);
          }
@@ -409,11 +407,20 @@ namespace vout{
       }
       #endif
 
+      // For gpu acceleration get statistics from device when output is due. Called on all
+      // processes, since it may reduce statistics over processes (write_out also writes the
+      // column headers on the root process only, which need no statistics)
+      if(gpu::acceleration && sim::time%vout::output_rate==0) gpu::stats::get();
+
       // check for open ofstream on root process only
       if(vmpi::my_rank == 0){
          if(!zmag.is_open()){
-            // check for checkpoint continue and append data
-            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open(vout::output_file_name,std::ofstream::app);
+            // check for checkpoint continue and append data, after a line of column headers
+            // (write_out writes them at its first call, which would otherwise replace the first data row)
+            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
+               zmag.open(vout::output_file_name,std::ofstream::app);
+               if(vout::header_option) write_out(zmag, file_output_list);
+            }
             // otherwise overwrite file
             else{
                zmag.open(vout::output_file_name,std::ofstream::trunc);
@@ -438,7 +445,15 @@ namespace vout{
       config::output();
 
       // optionally save checkpoint file
-      if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();
+      if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0){
+         // spins on the host are not kept up to date when statistics are calculated on the GPU
+         if(gpu::acceleration) gpu::transfer_spin_positions_from_gpu_to_cpu();
+         save_checkpoint();
+      }
+
+      // spins on the host are only valid during configuration and checkpoint output when
+      // statistics are calculated on the GPU
+      if(gpu::acceleration) gpu::invalidate_host_spins();
      // }
       if (micromagnetic::discretisation_type ==1){
          micromagnetic::outputs();
@@ -446,5 +461,29 @@ namespace vout{
       return;
 
    } // end of data()
+
+   //------------------------------------------------------------------------------
+   // Writes the host memory of all ranks to the log after a phase of the code:
+   // current and peak resident memory of the largest rank and summed over ranks
+   //------------------------------------------------------------------------------
+   void log_memory_usage(const std::string& phase){
+
+      // current and peak from the same source, so that they are comparable
+      const double current = vutil::proc_status_kb("VmRSS:");
+      const double hwm     = vutil::proc_status_kb("VmHWM:");
+      const double peak    = (current >= 0.0 && hwm >= 0.0) ? hwm : vutil::peak_memory_usage_kb();
+
+      // reductions to the root process: every rank must take part
+      const double current_max = vmpi::reduce_max(current);
+      const double current_sum = vmpi::reduce_sum(current);
+      const double peak_max    = vmpi::reduce_max(peak);
+      const double peak_sum    = vmpi::reduce_sum(peak);
+
+      if(vmpi::my_rank != 0) return;
+      const double mb = 1.0 / 1024.0;
+      if(current < 0.0) zlog << zTs() << "Host memory after " << phase << ": peak " << peak_max * mb << " MB (largest rank), " << peak_sum * mb << " MB (all ranks)" << std::endl;
+      else zlog << zTs() << "Host memory after " << phase << ": current " << current_max * mb << " MB (largest rank), " << current_sum * mb << " MB (all ranks); peak " << peak_max * mb << " MB (largest rank), " << peak_sum * mb << " MB (all ranks)" << std::endl;
+
+   }
 
 } // end of namespace vout

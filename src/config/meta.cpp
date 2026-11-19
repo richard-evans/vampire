@@ -104,7 +104,8 @@ namespace config{
                       const double applied_field_mag,
                       const double magnetization_x, // magnetization components (normalized)
                       const double magnetization_y,
-                      const double magnetization_z){
+                      const double magnetization_z,
+                      const bool window_data){
 
          // determine file name
          std::stringstream filename;
@@ -142,6 +143,8 @@ namespace config{
             // flush data to disk
             ofile << std::flush;
          }
+         // window snapshot (after the file list, which readers find by line position)
+         if(window_data) ofile << "Spin data: window" << "\n";
 
          ofile << "#------------------------------------------------------"<< "\n";
 

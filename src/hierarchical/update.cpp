@@ -57,16 +57,22 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       const int start = ha::interaction_list_start_index[lc];
       const int end = ha::interaction_list_end_index[lc];
 
-      // Self demagnetisation factor multiplying m(i)
+      // Self demagnetisation factor multiplying m(i); a cell with no magnetic atoms (probe cell) has
+      // zero volume and magnetisation, so it has no self term but still receives the field of the others
       const double V = cells::shared_volume[cell_i];
-      const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
-      const double self_demag = eightPI_three_cell_volume;
-      //std::cout << self_demag << std::endl;
+      double self_demag = 0.0;
+      double mx_i = 0.0;
+      double my_i = 0.0;
+      double mz_i = 0.0;
+      if( V > 0.0 ){
+         const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
+         self_demag = eightPI_three_cell_volume;
 
-      // Cell magnetisation (Bohr magnetons) from level 0 of the hierarchical cells, whose ids are the cell ids
-      const double mx_i = ha::mag_array_x[cell_i];
-      const double my_i = ha::mag_array_y[cell_i];
-      const double mz_i = ha::mag_array_z[cell_i];
+         // Cell magnetisation (Bohr magnetons) from level 0 of the hierarchical cells, whose ids are the cell ids
+         mx_i = ha::mag_array_x[cell_i];
+         my_i = ha::mag_array_y[cell_i];
+         mz_i = ha::mag_array_z[cell_i];
+      }
       // std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
 
       // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
@@ -121,19 +127,26 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    if(micromagnetic::discretisation_type > 0) dipole::gather_cell_fields();
 
    // Copy B-field from macrocell to atomistic spins, and the demagnetising field
-   // mu_0 H = B - mu_0 M (self term -1/3 mu_0 M, as in the tensor solver) for the magnetostatic energy
+   // mu_0 H = B - mu_0 M (self term -1/3 mu_0 M, as in the tensor solver) for the magnetostatic energy.
+   // With cells:probe-non-magnetic-cells non-magnetic atoms get the field of their cell too (mu_0 H = B)
    for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
-      if( magnetic[atom] ){
-         const int cell = cells::atom_cell_id_array[atom];
-         const int lc = ha::atom_local_cell[atom];
-         // field of the atom's cell: local cell arrays, or the gathered full arrays for a cell that is not local
-         // (micromagnetic cells only)
-         const double bx = lc >= 0 ? ha::cell_field_x[lc] : dipole::cells_field_array_x[cell];
-         const double by = lc >= 0 ? ha::cell_field_y[lc] : dipole::cells_field_array_y[cell];
-         const double bz = lc >= 0 ? ha::cell_field_z[lc] : dipole::cells_field_array_z[cell];
-         dipole::atom_dipolar_field_array_x[atom] = bx;
-         dipole::atom_dipolar_field_array_y[atom] = by;
-         dipole::atom_dipolar_field_array_z[atom] = bz;
+      const int cell = cells::atom_cell_id_array[atom];
+      const int lc = ha::atom_local_cell[atom];
+      if( !magnetic[atom] && !cells::probe_non_magnetic_cells ) continue;
+      // field of the atom's cell: local cell arrays, or the gathered full arrays for a cell that is not local
+      // (micromagnetic cells only)
+      const double bx = lc >= 0 ? ha::cell_field_x[lc] : dipole::cells_field_array_x[cell];
+      const double by = lc >= 0 ? ha::cell_field_y[lc] : dipole::cells_field_array_y[cell];
+      const double bz = lc >= 0 ? ha::cell_field_z[lc] : dipole::cells_field_array_z[cell];
+      dipole::atom_dipolar_field_array_x[atom] = bx;
+      dipole::atom_dipolar_field_array_y[atom] = by;
+      dipole::atom_dipolar_field_array_z[atom] = bz;
+      if( !magnetic[atom] ){
+         dipole::atom_mu0demag_field_array_x[atom] = bx;
+         dipole::atom_mu0demag_field_array_y[atom] = by;
+         dipole::atom_mu0demag_field_array_z[atom] = bz;
+      }
+      else{
          const double mu0_m = 4.0 * M_PI * constants::dipole_prefactor / cells::shared_volume[cell];
          dipole::atom_mu0demag_field_array_x[atom] = bx - mu0_m * ha::mag_array_x[cell];
          dipole::atom_mu0demag_field_array_y[atom] = by - mu0_m * ha::mag_array_y[cell];

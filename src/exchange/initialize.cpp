@@ -51,7 +51,8 @@ namespace exchange{
    // Function to initialize exchange module
    //----------------------------------------------------------------------------
    void initialize(std::vector<std::vector <neighbours::neighbour_t> >& bilinear,
-                   std::vector<std::vector <neighbours::neighbour_t> >& biquadratic){
+                   std::vector<std::vector <neighbours::neighbour_t> >& biquadratic,
+                   std::vector<std::vector <neighbours::vector_t> >& bilinear_vectors){
 
       zlog << zTs() << "Initialising data structures for exchange calculation." << std::endl;
 
@@ -216,6 +217,9 @@ namespace exchange{
          atoms::neighbour_list_end_index[atom]=counter-1;
       }
 
+      // free the neighbour list now unless the interactions calculated below still need it
+      if(!exchange::neighbour_vectors_needed()) std::vector<std::vector <neighbours::neighbour_t> >().swap(bilinear);
+
       //------------------------------------------------------------------------
       // Biquadratic exchange list - should probably be classified at some point
       //------------------------------------------------------------------------
@@ -277,13 +281,13 @@ namespace exchange{
       exchange::internal::initialize_biquadratic_exchange();
 
       // initialise four spin
-      exchange::internal::initialize_four_spin_exchange(bilinear);
+      exchange::internal::initialize_four_spin_exchange(bilinear, bilinear_vectors);
 
       // Calculate Dzyaloshinskii-Moriya interactions (must be done after exchange unrolling)
-      exchange::internal::calculate_dmi(bilinear);
+      exchange::internal::calculate_dmi(bilinear, bilinear_vectors);
 
       // Calculate Kitaev interactions (must be done after exchange unrolling)
-      exchange::internal::calculate_kitaev(bilinear);
+      exchange::internal::calculate_kitaev(bilinear, bilinear_vectors);
 
       return;
 

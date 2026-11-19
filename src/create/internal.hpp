@@ -127,6 +127,9 @@ namespace create{
       extern int dilute_seed; // random seed to control dilution of atoms
       extern int mixing_seed; // random seed to control intermixing of atoms
       extern int spin_init_seed; // random seed to control ranomised spin directions
+      // draw the random choices of alloying, intermixing and dilution from the key of each atom
+      // instead of a random number sequence per process (create:decomposition-independent-random)
+      extern bool decomposition_independent_random;
 
       extern double faceted_particle_100_radius; // 100 facet radius
       extern double faceted_particle_110_radius; // 110 facet radius
@@ -178,6 +181,13 @@ namespace create{
       extern void mark_non_interacting_halo(std::vector<cs::catom_t>& catom_array);
       extern void sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
       extern void init_mpi_comms(std::vector<cs::catom_t> & catom_array);
+
+      // Keys and random numbers independent of the decomposition (atom_keys.cpp)
+      uint64_t atom_key(const cs::catom_t& atom);
+      bool key_limits_ok(const std::vector<cs::catom_t>& catom_array);
+      double keyed_uniform(const uint64_t seed, const uint64_t key, const uint64_t draw);
+      void check_keyed_random(const std::vector<cs::catom_t>& catom_array);
+      double draw_uniform(const int seed, const cs::catom_t& atom, const uint64_t draw);
 
    } // end of internal namespace
 } // end of create namespace

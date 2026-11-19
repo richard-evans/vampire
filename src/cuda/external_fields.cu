@@ -16,6 +16,7 @@
 
 // Vampire headers
 #include "cuda.hpp"
+#include "dipole.hpp"
 
 // Local cuda headers
 #include "cuda_utils.hpp"
@@ -220,11 +221,13 @@ namespace internal{
    //   // update dipole field
    //    update_dipolar_fields();  //-- disabled  as causes NaN and deferred to CPU code for now
 
-      // Call kernel to calculate external fields
-      cu::update_external_fields_kernel <<< cu::grid_size, cu::block_size >>> (
-            cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
-            cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
-            num_atoms);
+      // Add the dipole field (zero unless dipole fields are enabled)
+      if(::dipole::activated){
+         cu::update_external_fields_kernel <<< cu::grid_size, cu::block_size >>> (
+               cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
+               cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+               num_atoms);
+      }
 
       // Check for errors
       check_cuda_errors (__FILE__, __LINE__);

@@ -1,0 +1,11 @@
+{
+   "label": "cpu",
+   "exe": "vampire-serial",
+   "ranks": null,
+   "version": "vampire version 7.0.0\nGithash 08ef9cb0d10d6e11e73ab2b58c3f534ba467ac2d\n\nThis is free software; see the source for licence information.",
+   "precision": "dp",
+   "extra": [],
+   "seed_offset": 0,
+   "date": "2026-10-17T04:11:13",
+   "gpu": ""
+}

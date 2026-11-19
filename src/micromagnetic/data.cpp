@@ -154,4 +154,6 @@ namespace micromagnetic{
 
    } // end of internal namespace
 
+   bool bias_magnets_enabled(){ return internal::bias_magnets; }
+
 } // end of micromagnetic namespace

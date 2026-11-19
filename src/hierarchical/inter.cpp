@@ -58,7 +58,8 @@ namespace hierarchical{
         const double r2 = rx*rx + ry*ry + rz*rz;
 
         // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
-        if( r2 > cutoff*cutoff ){
+        // a cell without magnetic atoms (cells:probe-non-magnetic-cells) has no atomistic data, so it is a point dipole at any distance
+        if( r2 > cutoff*cutoff || global_atoms_in_cell_count[celli] == 0 || global_atoms_in_cell_count[cellj] == 0 ){
 
            const double rij = 1.0/sqrt(r2); // Reciprocal of the distance
 

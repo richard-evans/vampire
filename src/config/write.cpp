@@ -178,7 +178,45 @@ double write_data_binary(std::string filename, const std::vector<double> &buffer
 
 }
 
+//----------------------------------------------------------------------------------------------------
+// Function to write a window snapshot (active HAMR window) in binary format: includes the spins of the atoms
+// that changed since the previous snapshot, as ranges of positions in the order of the coordinate file
+//
+//    uint64                      number of atoms in the coordinate file
+//    uint64                      number of ranges r
+//    r x (uint64, uint64)        first position and number of atoms of each range
+//    3 x (sum of numbers) double x, y, z of the atoms of the ranges, in order
+//
+//----------------------------------------------------------------------------------------------------
+//
+double write_window_data(std::string filename, const uint64_t num_atoms, const std::vector<uint64_t>& ranges, const std::vector<double>& buffer){
 
+   // Declare and open output file
+   std::ofstream ofile;
+   ofile.open(filename.c_str(), std::ios::binary);
+
+   // instantiate timer
+   vutil::vtimer_t timer;
+
+   // start timer
+   timer.start();
+
+   const uint64_t num_ranges = ranges.size() / 2;
+   ofile.write(reinterpret_cast<const char *>(&num_atoms), sizeof(uint64_t));
+   ofile.write(reinterpret_cast<const char *>(&num_ranges), sizeof(uint64_t));
+   ofile.write(reinterpret_cast<const char *>(ranges.data()), sizeof(uint64_t) * ranges.size());
+   ofile.write(reinterpret_cast<const char *>(buffer.data()), sizeof(double) * buffer.size());
+
+   // end timer
+   timer.stop();
+
+   // close output file
+   ofile.close();
+
+   // return bandwidth
+   return timer.elapsed_time();
+
+}
 
 } // end of namespace internal
 } // end of namespace config

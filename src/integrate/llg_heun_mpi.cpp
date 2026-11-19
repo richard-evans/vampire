@@ -13,6 +13,7 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
+#include "hamr.hpp"
 #include "sim.hpp"
 
 // integrate module headers
@@ -20,7 +21,9 @@
 #include "internal.hpp"
 #include "vmpi.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <vector>
 
 
 namespace integrate{
@@ -41,6 +44,19 @@ int LLG_Heun_mpi(){
 
    // Check for initialisation of LLG integration arrays
    if(LLG_set==false) LLGinit();
+
+   // Atoms to integrate as [first, last+1) pairs: all local atoms, or the grains near the head (hamr:active-window)
+   const std::vector<int> all_atoms = {0, vmpi::num_core_atoms + vmpi::num_bdry_atoms};
+   const std::vector<int>& ranges = hamr::active_window_enabled() ? hamr::update_active_window() : all_atoms;
+
+   // spin fields of the atoms to integrate in [first, last); the external (thermal) fields are calculated
+   // for all local atoms, so that the thermal noise of an atom does not depend on the window
+   auto spin_fields = [&ranges](const int first, const int last){
+      for(size_t r = 0; r < ranges.size(); r += 2){
+         const int a = std::max(ranges[r], first), b = std::min(ranges[r+1], last);
+         if(a < b) sim::calculate_spin_fields(a, b);
+      }
+   };
 
    //----------------------------------------
    // Local variables for system generation
@@ -64,7 +80,7 @@ int LLG_Heun_mpi(){
       // Store initial spin positions (all)
       //----------------------------------------
 
-      for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
+      for(size_t r = 0; r < ranges.size(); r += 2) for(int atom = std::max(ranges[r], pre_comm_si); atom < std::min(ranges[r+1], post_comm_ei); atom++){
          x_initial_spin_array[atom] = atoms::x_spin_array[atom];
          y_initial_spin_array[atom] = atoms::y_spin_array[atom];
          z_initial_spin_array[atom] = atoms::z_spin_array[atom];
@@ -74,14 +90,14 @@ int LLG_Heun_mpi(){
       // Calculate fields (core)
       //----------------------------------------
 
-      sim::calculate_spin_fields(pre_comm_si,pre_comm_ei);
+      spin_fields(pre_comm_si,pre_comm_ei);
       sim::calculate_external_fields(pre_comm_si,pre_comm_ei);
 
       //----------------------------------------
       // Calculate Euler Step (Core)
       //----------------------------------------
 
-      for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
+      for(size_t r = 0; r < ranges.size(); r += 2) for(int atom = std::max(ranges[r], pre_comm_si); atom < std::min(ranges[r+1], pre_comm_ei); atom++){
 
          const int imaterial=atoms::type_array[atom];
          const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
@@ -130,14 +146,14 @@ int LLG_Heun_mpi(){
       // Calculate fields (boundary)
       //----------------------------------------
 
-      sim::calculate_spin_fields(post_comm_si,post_comm_ei);
+      spin_fields(post_comm_si,post_comm_ei);
       sim::calculate_external_fields(post_comm_si,post_comm_ei);
 
       //----------------------------------------
       // Calculate Euler Step (boundary)
       //----------------------------------------
 
-      for(int atom=post_comm_si;atom<post_comm_ei;atom++){
+      for(size_t r = 0; r < ranges.size(); r += 2) for(int atom = std::max(ranges[r], post_comm_si); atom < std::min(ranges[r+1], post_comm_ei); atom++){
 
          const int imaterial=atoms::type_array[atom];
          const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
@@ -180,7 +196,7 @@ int LLG_Heun_mpi(){
       //----------------------------------------
       // Copy new spins to spin array (all)
       //----------------------------------------
-      for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
+      for(size_t r = 0; r < ranges.size(); r += 2) for(int atom = std::max(ranges[r], pre_comm_si); atom < std::min(ranges[r+1], post_comm_ei); atom++){
          atoms::x_spin_array[atom]=x_spin_storage_array[atom];
          atoms::y_spin_array[atom]=y_spin_storage_array[atom];
          atoms::z_spin_array[atom]=z_spin_storage_array[atom];
@@ -195,13 +211,13 @@ int LLG_Heun_mpi(){
       // Recalculate spin dependent fields (core)
       //------------------------------------------
 
-      sim::calculate_spin_fields(pre_comm_si,pre_comm_ei);
+      spin_fields(pre_comm_si,pre_comm_ei);
 
       //----------------------------------------
       // Calculate Heun Gradients (core)
       //----------------------------------------
 
-      for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
+      for(size_t r = 0; r < ranges.size(); r += 2) for(int atom = std::max(ranges[r], pre_comm_si); atom < std::min(ranges[r+1], pre_comm_ei); atom++){
 
          const int imaterial=atoms::type_array[atom];;
          const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
@@ -233,13 +249,13 @@ int LLG_Heun_mpi(){
       // Recalculate spin dependent fields (boundary)
       //------------------------------------------
 
-      sim::calculate_spin_fields(post_comm_si,post_comm_ei);
+      spin_fields(post_comm_si,post_comm_ei);
 
       //----------------------------------------
       // Calculate Heun Gradients (boundary)
       //----------------------------------------
 
-      for(int atom=post_comm_si;atom<post_comm_ei;atom++){
+      for(size_t r = 0; r < ranges.size(); r += 2) for(int atom = std::max(ranges[r], post_comm_si); atom < std::min(ranges[r+1], post_comm_ei); atom++){
 
          const int imaterial=atoms::type_array[atom];;
          const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
@@ -266,7 +282,7 @@ int LLG_Heun_mpi(){
       // Calculate Heun Step
       //----------------------------------------
 
-      for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
+      for(size_t r = 0; r < ranges.size(); r += 2) for(int atom = std::max(ranges[r], pre_comm_si); atom < std::min(ranges[r+1], post_comm_ei); atom++){
          S_new[0]=x_initial_spin_array[atom]+mp::half_dt*(x_euler_array[atom]+x_heun_array[atom]);
          S_new[1]=y_initial_spin_array[atom]+mp::half_dt*(y_euler_array[atom]+y_heun_array[atom]);
          S_new[2]=z_initial_spin_array[atom]+mp::half_dt*(z_euler_array[atom]+z_heun_array[atom]);

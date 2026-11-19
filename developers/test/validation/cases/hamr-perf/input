@@ -1,0 +1,39 @@
+#------------------------------------------
+# HAMR profiling case (~168k atoms): 4 bits,
+# not compared, used for timing and profiling
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 41.0 !nm
+dimensions:system-size-y = 30.0 !nm
+dimensions:system-size-z = 6.0 !nm
+material:file=hamr.mat
+sim:time-step=1.0E-15
+sim:equilibration-time-steps=2000
+sim:equilibration-temperature=300.0
+sim:minimum-temperature=300.0
+sim:maximum-temperature=900.0
+sim:minimum-applied-field-strength=0.0 !T
+sim:maximum-applied-field-strength=1.0 !T
+sim:applied-field-unit-vector=0,0,1
+hamr:laser-FWHM-x=10.0 !nm
+hamr:laser-FWHM-y=10.0 !nm
+hamr:head-field-x=10.0 !nm
+hamr:head-field-y=8.0 !nm
+hamr:head-speed=1000.0 !m/s
+hamr:field-rise-time=0.5E-12 !s
+hamr:field-fall-time=0.5E-12 !s
+hamr:bit-size=10.0 !nm
+hamr:track-size=8.0 !nm
+hamr:track-padding=0.5 !nm
+hamr:number-of-bits=4
+hamr:bit-sequence-type=single-tone-predefined
+sim:program=hamr-simulation
+sim:integrator=llg-heun
+output:real-time
+output:temperature
+output:applied-field-strength
+output:magnetisation
+output:output-rate=1000
+output:precision=16
+output:column-headers

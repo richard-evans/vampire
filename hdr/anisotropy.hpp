@@ -101,7 +101,8 @@ namespace anisotropy
    //-----------------------------------------------------------------------------
    // function to identify surface atoms
    //-----------------------------------------------------------------------------
-   void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbours::neighbour_t> > & cneighbourlist);
+   void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbours::neighbour_t> > & cneighbourlist,
+                                                                       std::vector<std::vector <neighbours::vector_t> > & cvectors);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for anisotropy module
@@ -118,6 +119,12 @@ namespace anisotropy
    bool is_neel_enabled();
 
    bool is_rotational_enabled();
+
+   // terms that only the CPU version calculates
+   bool is_triaxial_enabled();
+   bool is_lattice_enabled();
+   bool is_cubic_rotation_enabled();
+   bool is_biaxial_fourth_order_simple_enabled();
 } // end of anisotropy namespace
 
 #endif //ANISOTROPY_H_

@@ -171,6 +171,13 @@ namespace create{
    // Variable for total number of atoms that are not filler
    extern int num_total_atoms_non_filler;
 
+   // Key of each atom (core, boundary and halo): built from its unit cell (supercell
+   // coordinates, wrapped for periodic images) and its number within the unit cell, so it
+   // does not depend on how the system is decomposed. Valid only if atom_keys_valid.
+   extern std::vector<uint64_t> atom_keys;
+   extern bool atom_keys_valid;
+   void set_atom_keys(const std::vector<cs::catom_t>& catom_array);
+
 
    // Functions
    void initialize();

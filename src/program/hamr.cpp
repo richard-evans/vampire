@@ -91,8 +91,8 @@ namespace program{
          // Set system temperature as minimum temperature
          sim::temperature=sim::Tmin;
 
-         // Reset mean magnetisation counters
-         stats::reset();
+         // Reset mean magnetisation counters (unless continuing from a checkpoint saved after the reset)
+         if(!(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::time > sim::equilibration_time)) stats::reset();
 
          // Perform harm continuous simulation
          hamr::hamr_continuous();

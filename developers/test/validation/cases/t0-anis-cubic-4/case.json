@@ -1,0 +1,22 @@
+{
+   "description": "3375-atom sc Co, random initial spins, T=0: fourth order cubic anisotropy only",
+   "kind": "deterministic",
+   "quantities": {
+      "mx": "s0M_norm_x*s0M_norm_l",
+      "my": "s0M_norm_y*s0M_norm_l",
+      "mz": "s0M_norm_z*s0M_norm_l",
+      "E_exchange": "s0_E1_Energy",
+      "E_anisotropy": "s0_E2_Energy"
+   },
+   "tolerance": {
+      "dp": {
+         "rtol": 1e-08,
+         "atol": 1e-08
+      },
+      "sp": {
+         "rtol": 0.0001,
+         "atol": 0.0001,
+         "rows": 10
+      }
+   }
+}

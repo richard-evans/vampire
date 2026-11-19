@@ -43,6 +43,7 @@ namespace create{
          int material; // material id
          int cpuid; // cpu where real atom resides
          int ucid; // unit cell id of atom
+         int grain; // grain id of atom
 
       };
 
@@ -103,6 +104,7 @@ namespace create{
                temp_vp.material=catom_array[atom].material;
                temp_vp.cpuid=vmpi::my_rank;
                temp_vp.ucid=catom_array[atom].uc_id;
+               temp_vp.grain=catom_array[atom].grain;
 
                // pushback list of virtual particles
                virtual_particle_array[cpu_rank].push_back(temp_vp);
@@ -323,7 +325,9 @@ namespace create{
          std::vector<int> send_mpi_atom_num_array(num_bdry_atoms,0);
          std::vector<int> recv_mpi_atom_num_array(num_halo_atoms,0);
          std::vector<int> send_mpi_uc_id_array(num_bdry_atoms,0);
+         std::vector<int> send_grain_array(num_bdry_atoms,0);
          std::vector<int> recv_mpi_uc_id_array(num_halo_atoms,0);
+         std::vector<int> recv_grain_array(num_halo_atoms,0);
 
          // Pack up data for sending
          int counter=0; // array index
@@ -360,6 +364,7 @@ namespace create{
             send_material_array[counter]               = virtual_particle_array[cpu][vpidx].material;
             send_cpuid_array[counter]                  = virtual_particle_array[cpu][vpidx].cpuid;
             send_mpi_uc_id_array[counter]              = virtual_particle_array[cpu][vpidx].ucid;
+            send_grain_array[counter]                  = virtual_particle_array[cpu][vpidx].grain;
             counter++;
          }
       }
@@ -385,6 +390,8 @@ namespace create{
             MPI_Isend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53, MPI_COMM_WORLD, &requests.back());
             requests.push_back(req);
             MPI_Isend(&send_mpi_uc_id_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,55, MPI_COMM_WORLD, &requests.back());
+            requests.push_back(req);
+            MPI_Isend(&send_grain_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,56, MPI_COMM_WORLD, &requests.back());
             //std::cout << "Send complete on CPU " << vmpi::my_rank << " to CPU " << cpu << " at index " << send_index  << std::endl;
             send_index+=num_send_atoms[cpu];
          }
@@ -401,6 +408,8 @@ namespace create{
             MPI_Irecv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53, MPI_COMM_WORLD, &requests.back());
             requests.push_back(req);
             MPI_Irecv(&recv_mpi_uc_id_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,55, MPI_COMM_WORLD, &requests.back());
+            requests.push_back(req);
+            MPI_Irecv(&recv_grain_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,56, MPI_COMM_WORLD, &requests.back());
             //std::cout << "Receive complete on CPU " << vmpi::my_rank << " from CPU " << cpu << " at index " << recv_index << " at address " << &recv_mpi_atom_num_array[recv_index] << std::endl;
             recv_index+=num_recv_atoms[cpu];
          }
@@ -427,6 +436,7 @@ namespace create{
          catom_array[atom].mpi_type = 2; // mark as halo atom
          catom_array[atom].mpi_atom_number = recv_mpi_atom_num_array[index];
          catom_array[atom].uc_id = recv_mpi_uc_id_array[index];
+         catom_array[atom].grain = recv_grain_array[index];
       }
 
       // wait for everyone
@@ -682,6 +692,7 @@ namespace create{
          std::vector <cs::catom_t> tmp_catom_array(new_num_atoms);
          std::vector <std::vector <neighbours::neighbour_t> > tmp_bilinear(new_num_atoms);
          std::vector <std::vector <neighbours::neighbour_t> > tmp_biquadratic(new_num_atoms);
+         std::vector <std::vector <neighbours::vector_t> > tmp_bilinear_vectors(bilinear.vectors.empty() ? 0 : new_num_atoms);
 
          // Populate tmp arrays (assuming all mpi_type=3 atoms are at the end of the array?)
          for (unsigned int atom=0;atom<new_num_atoms;atom++){ // new atom number
@@ -725,13 +736,12 @@ namespace create{
                temp_nt.nn=new_nn_number;
                temp_nt.i=interaction_id;
 
-               // Actual neighbours stay the same so simply copy separation vectors
-               temp_nt.vx=bilinear.list[old_atom_num][nn].vx;
-               temp_nt.vy=bilinear.list[old_atom_num][nn].vy;
-               temp_nt.vz=bilinear.list[old_atom_num][nn].vz;
-
                // ignore all halo-x interactions but not x-halo
-               if(!(mpi_type_vec[atom].mpi_type==2)) tmp_bilinear[atom].push_back(temp_nt);
+               if(!(mpi_type_vec[atom].mpi_type==2)){
+                  tmp_bilinear[atom].push_back(temp_nt);
+                  // Actual neighbours stay the same so simply copy separation vectors
+                  if(!bilinear.vectors.empty()) tmp_bilinear_vectors[atom].push_back(bilinear.vectors[old_atom_num][nn]);
+               }
 
             }
 
@@ -751,11 +761,6 @@ namespace create{
                   temp_nt.nn = new_nn_number;
                   temp_nt.i = interaction_id;
 
-                  // Actual neighbours stay the same so simply copy separation vectors
-                  temp_nt.vx = biquadratic.list[old_atom_num][nn].vx;
-                  temp_nt.vy = biquadratic.list[old_atom_num][nn].vy;
-                  temp_nt.vz = biquadratic.list[old_atom_num][nn].vz;
-
                   // ignore all halo-x interactions but not x-halo
                   if(!(mpi_type_vec[atom].mpi_type==2)) tmp_biquadratic[atom].push_back(temp_nt);
 
@@ -771,6 +776,7 @@ namespace create{
          //----// cneighbourlist.swap(tmp_cneighbourlist); // This actually works(!) - COPIES both pointers and elements of pointers
 
          bilinear.list.swap(tmp_bilinear); // This actually works(!) - COPIES both pointers and elements of pointers
+         bilinear.vectors.swap(tmp_bilinear_vectors);
          biquadratic.list.swap(tmp_biquadratic);
 
          // Print out final neighbourlist

@@ -43,6 +43,11 @@ namespace cells{
       extern bool initialised; /// flag set if initialised
       //extern int num_cells; /// number of macro-cells
 
+      // Number of atoms of any kind (magnetic + non-magnetic) in each cell, used to keep
+      // non-magnetic-only cells when probe_non_magnetic_cells is enabled
+      extern std::vector<int> num_any_atoms_in_cell;
+
+
       extern std::vector<double> spin_array_x;
       extern std::vector<double> spin_array_y;
       extern std::vector<double> spin_array_z;

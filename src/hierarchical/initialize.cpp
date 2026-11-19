@@ -166,8 +166,11 @@ void initialize(const double system_dimensions_x,
       // all processors wait here before starting the timer
       vmpi::barrier();
 
-      // get realspace cutoff distance
-      const double real_cutoff = dipole::cutoff * cells::macro_cell_size;
+      // get realspace cutoff distance. On a regular cell grid many cell pairs lie
+      // exactly at the cutoff, and rounding of the cell centres (which depends on
+      // the number of processors) would put each on either side of it; the
+      // relative tolerance of 1e-6 treats them all atomistically
+      const double real_cutoff = dipole::cutoff * cells::macro_cell_size * (1.0 + 1.0e-6);
 
       // table of the atoms of the cells within the atomistic cutoff of the region's cells, held once per shared
       // memory region (region_atoms.cpp), for the near field tensors of Segment 9
@@ -470,7 +473,7 @@ void initialize(const double system_dimensions_x,
       for(int atom = 0; atom < vmpi::num_local_atoms; ++atom){
          if( !atoms::magnetic[atom] ) continue;
          if( !has_local_cells[cells::atom_cell_id_array[atom]] ){
-            err::fatal("Programmer error: magnetic atom " + std::to_string(atom) + " is in cell " + std::to_string(cells::atom_cell_id_array[atom]) + ", which is not a local cell of the hierarchical dipole solver");
+            err::fatal("Programmer error: atom " + std::to_string(atom) + " is in cell " + std::to_string(cells::atom_cell_id_array[atom]) + ", which is not a local cell of the hierarchical dipole solver");
          }
          ha::atom_contributing_index[atom] = compact_index(cells::atom_cell_id_array[atom]);
       }
@@ -701,7 +704,8 @@ void initialize(const double system_dimensions_x,
    // full size B-field cells arrays, only for the modules that read every cell (dipole::full_cell_fields) and the
    // dipole field output; the field calculation and distribution use the local cell arrays above
    ha::full_cell_fields = dipole::full_cell_fields || dipole::internal::output_dipole_field;
-   // B-field of the local cells, and the local cell of each local magnetic atom (for the field distribution)
+   // B-field of the local cells, and the local cell of each local magnetic atom, and of every atom with
+   // cells:probe-non-magnetic-cells (for the field distribution)
    ha::cell_field_x.assign(cells_num_local_cells, 0.0);
    ha::cell_field_y.assign(cells_num_local_cells, 0.0);
    ha::cell_field_z.assign(cells_num_local_cells, 0.0);
@@ -711,12 +715,12 @@ void initialize(const double system_dimensions_x,
       std::sort(local_cell_of.begin(), local_cell_of.end());
       ha::atom_local_cell.assign(vmpi::num_local_atoms, -1);
       for(int atom = 0; atom < vmpi::num_local_atoms; atom++){
-         if(!atoms::magnetic[atom]) continue;
+         if(!atoms::magnetic[atom] && !cells::probe_non_magnetic_cells) continue;
          const int cell = cells::atom_cell_id_array[atom];
          auto it = std::lower_bound(local_cell_of.begin(), local_cell_of.end(), std::make_pair(cell, -1));
          if(it == local_cell_of.end() || it->first != cell){
             if(ha::full_cell_fields) continue; // micromagnetic cells: the field is read from the gathered full arrays
-            err::fatal("Programmer error: magnetic atom " + std::to_string(atom) + " is in cell " + std::to_string(cell) + ", which is not a local cell of the hierarchical dipole solver");
+            err::fatal("Programmer error: atom " + std::to_string(atom) + " is in cell " + std::to_string(cell) + ", which is not a local cell of the hierarchical dipole solver");
          }
          ha::atom_local_cell[atom] = it->second;
       }
@@ -753,8 +757,8 @@ void initialize(const double system_dimensions_x,
       // get the global cell ID
       int cell_i = cells::cell_id_array[lc];
 
-      // only calculate interaction for local cells with atoms
-      if (cells_num_atoms_in_cell[cell_i] != 0){
+      // only calculate interaction for local cells with atoms (or cells without magnetic atoms, which only receive the field)
+      if (cells_num_atoms_in_cell[cell_i] != 0 || cells::probe_non_magnetic_cells){
 
          // for each cell loop over cel-cell interactions for all levels, getting frirst and last interactions
          const int start = ha::interaction_list_start_index[lc];

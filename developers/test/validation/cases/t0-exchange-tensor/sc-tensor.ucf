@@ -1,0 +1,20 @@
+# Simple cubic unit cell (3.54 A) with tensorial exchange: isotropic J = 11.2e-21 J
+# plus an antisymmetric (Dzyaloshinskii-Moriya) part D = 2.0e-21 J, D vector z x r for
+# in-plane bonds and along the bond for bonds along z (twists the spin spiral)
+# Unit cell size:
+3.54 3.54 3.54
+# Unit cell lattice vectors:
+1.0 0.0 0.0
+0.0 1.0 0.0
+0.0 0.0 1.0
+# Atoms: number of atoms; id cx cy cz material lattice-category height-category
+1
+0 0.0 0.0 0.0 0 0 0
+# Interactions: number, type; id i j dx dy dz Jxx Jxy Jxz Jyx Jyy Jyz Jzx Jzy Jzz
+6 tensorial
+0 0 0 1 0 0 1.120000e-20 -0.000000e+00 2.000000e-21 0.000000e+00 1.120000e-20 -0.000000e+00 -2.000000e-21 0.000000e+00 1.120000e-20
+1 0 0 -1 0 0 1.120000e-20 -0.000000e+00 -2.000000e-21 0.000000e+00 1.120000e-20 -0.000000e+00 2.000000e-21 0.000000e+00 1.120000e-20
+2 0 0 0 1 0 1.120000e-20 -0.000000e+00 0.000000e+00 0.000000e+00 1.120000e-20 2.000000e-21 -0.000000e+00 -2.000000e-21 1.120000e-20
+3 0 0 0 -1 0 1.120000e-20 -0.000000e+00 0.000000e+00 0.000000e+00 1.120000e-20 -2.000000e-21 -0.000000e+00 2.000000e-21 1.120000e-20
+4 0 0 0 0 1 1.120000e-20 -2.000000e-21 0.000000e+00 2.000000e-21 1.120000e-20 -0.000000e+00 -0.000000e+00 0.000000e+00 1.120000e-20
+5 0 0 0 0 -1 1.120000e-20 2.000000e-21 0.000000e+00 -2.000000e-21 1.120000e-20 -0.000000e+00 -0.000000e+00 0.000000e+00 1.120000e-20

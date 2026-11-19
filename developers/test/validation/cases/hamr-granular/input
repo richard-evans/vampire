@@ -1,0 +1,60 @@
+#------------------------------------------
+# Granular HAMR write at finite temperature (300-800 K laser): the film of
+# hamr-granular-t0; statistical test of the write
+#------------------------------------------
+create:crystal-structure = rocksalt-supercell
+create:granular-film
+create:grain-tessellation = voronoi
+create:grain-periodic-boundaries
+create:grain-size = 6.0 !nm
+create:grain-size-distribution = normal
+create:grain-spacing = 1.0 !nm
+create:grain-structure-random-seed = 243831
+create:grain-size-sd = 0.15
+create:grain-height = 10 !nm
+create:voronoi-elliptical-rounding = 0.0
+create:voronoi-elliptical-rounding-height = 0.6
+create:periodic-boundaries = xy
+exchange:interaction-range = 1.0
+exchange:function = shell
+dimensions:unit-cell-size = 10.0 !A
+dimensions:system-size-x = 8 !nm
+dimensions:system-size-y = 8 !nm
+dimensions:system-size-z = 20 !nm
+material:file = FePt_sensor.mat
+sim:time-step = 1.0 !fs
+sim:equilibration-time-steps = 0
+sim:minimum-applied-field-strength = 0.0 !T
+sim:maximum-applied-field-strength = 1.0 !T
+sim:applied-field-unit-vector = 0,0,-1
+hamr:laser-FWHM-x = 5 !nm
+hamr:laser-FWHM-y = 5 !nm
+hamr:head-speed = 5000 !m/s
+hamr:head-field-x = 5 !nm
+hamr:head-field-y = 6 !nm
+hamr:NPS = 1 !nm
+hamr:field-rise-time = 0.2e-12 !s
+hamr:field-fall-time = 0.2e-12 !s
+hamr:bit-size = 4 !nm
+hamr:track-size = 7 !nm
+hamr:track-padding = 0 !nm
+hamr:number-of-bits = 1
+hamr:bit-sequence-type = single-tone-predefined
+sim:program = hamr-simulation
+sim:integrator = llg-heun
+output:real-time
+output:temperature
+output:applied-field-strength
+output:magnetisation
+output:material-magnetisation
+output:precision = 16
+output:column-headers
+grain:real-time
+grain:temperature
+grain:magnetisation
+grain:material-magnetisation
+sim:equilibration-temperature = 300.0
+sim:minimum-temperature = 300.0
+sim:maximum-temperature = 800.0
+output:output-rate = 500
+grain:output-rate = 500

@@ -12,6 +12,7 @@
 // Vampire headers
 #include "gpu.hpp"
 #include "cuda.hpp"
+#include "mgpu.hpp"
 #include "errors.hpp"
 
 namespace gpu{
@@ -20,6 +21,10 @@ namespace gpu{
    // Function to call correct de-initialization function depending on the backend (cuda)
    //----------------------------------------------------------------------------------
    void finalize(){
+
+      #ifdef CUDA_MULTIGPU
+         mgpu::finalize();
+      #endif
 
       #ifdef CUDA
          vcuda::finalize();

@@ -1,0 +1,23 @@
+#------------------------------------------
+# 4500-atom periodic sc Co with tensorial exchange
+# (unit cell file), initial spin spiral along z
+# (independent of the MPI decomposition), T=0, field at 45 degrees
+#------------------------------------------
+material:unit-cell-file = "sc-tensor.ucf"
+create:periodic-boundaries
+dimensions:system-size-x = 5.31 !nm
+dimensions:system-size-y = 5.31 !nm
+dimensions:system-size-z = 7.08 !nm
+material:file=Co.mat
+sim:temperature=0.0
+sim:time-steps-increment=20
+sim:total-time-steps=2000
+sim:time-step=1.0E-15
+sim:applied-field-strength=0.5 !T
+sim:applied-field-unit-vector=1,0,1
+sim:program=time-series
+sim:integrator=llg-heun
+output:real-time
+output:magnetisation
+output:precision=16
+output:column-headers

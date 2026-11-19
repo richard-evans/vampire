@@ -15,6 +15,7 @@
 // Vampire headers
 #include "vio.hpp"
 #include "grains.hpp"
+#include "gpu.hpp"
 #include "montecarlo.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
@@ -35,6 +36,9 @@ void write_grain_file(){
 
       // disable headers for variables
       bool header = false;
+
+      // For gpu acceleration get statistics from device
+      if(gpu::acceleration) gpu::stats::get();
 
       // Output data to zgrain
       if(vmpi::my_rank==0){

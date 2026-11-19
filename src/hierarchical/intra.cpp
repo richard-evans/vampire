@@ -50,6 +50,9 @@ namespace hierarchical{
 
       const int num_atoms = global_atoms_in_cell_count[celli];
 
+      // a cell without magnetic atoms (cells:probe-non-magnetic-cells) has no self term
+      if( num_atoms == 0 ) return;
+
       // find cell i in the atom table of the region
       const int ki = atoms_table.find(celli);
       if( ki == -1 || atoms_table.cell_starts[ki+1] - atoms_table.cell_starts[ki] != num_atoms ){

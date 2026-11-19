@@ -37,13 +37,13 @@ namespace internal{
 //------------------------------------------------------------------------------
 // Host function to calculate neel fields using gpu kernel
 //------------------------------------------------------------------------------
-void update_rotational_fields()
+void update_rotational_fields(const int num_atoms, const int first_atom)
 {
    cu::update_rotational_fields_kernel <<<cu::grid_size, cu::block_size>>> (cu::atoms::d_materials, cu::mp::d_material_params,
          cu::mp::d_material_params_r,
          cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
          cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
-         ::atoms::num_atoms);
+         num_atoms, first_atom);
 
    check_cuda_errors(__FILE__, __LINE__);
 }
@@ -54,12 +54,13 @@ __global__ void update_rotational_fields_kernel (
    cu::material_parameters_rotational_t * material_params_r,
    cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
    cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
-   int n_atoms
+   int n_atoms,
+   int first_atom
    )
 {
    // TODO: Figure out why the results are still different from the serial output
    //
-   for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
+   for ( int i = first_atom + blockIdx.x * blockDim.x + threadIdx.x;
          i < n_atoms;
          i += blockDim.x * gridDim.x) {
       int mid = material[i];

@@ -1,0 +1,23 @@
+#------------------------------------------
+# Curie temperature sweep (LLG): mean
+# magnetisation length at each temperature
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 5.31 !nm
+dimensions:system-size-y = 5.31 !nm
+dimensions:system-size-z = 5.31 !nm
+material:file=Co.mat
+sim:minimum-temperature=200.0
+sim:maximum-temperature=1400.0
+sim:temperature-increment=300.0
+sim:equilibration-time-steps=2000
+sim:loop-time-steps=3000
+sim:time-steps-increment=10
+sim:time-step=1.0E-15
+sim:program=curie-temperature
+sim:integrator=llg-heun
+output:temperature
+output:mean-magnetisation-length
+output:precision=16
+output:column-headers

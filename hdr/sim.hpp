@@ -144,6 +144,8 @@ namespace sim{
    std::vector<double> get_stt_polarization_unit_vector(); // unit vector spin polarization
    std::vector<double> get_stt_rj(); // array of stt relaxation constants
    std::vector<double> get_stt_pj(); // array of stt precession constants
+   bool spin_torque_fields_enabled(); // spin transfer and spin orbit torque fields
+   bool vcma_fields_enabled(); // voltage controlled anisotropy fields
 
 }
 

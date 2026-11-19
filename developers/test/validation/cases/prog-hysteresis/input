@@ -1,0 +1,29 @@
+#------------------------------------------
+# hysteresis-loop program, 3375-atom sc Co, T=0,
+# +/-2 T in 0.5 T steps of 1 ps (too short to
+# switch: tests the program, not coercivity)
+# (a program whose statistics can be
+# calculated on the GPU)
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 5.31 !nm
+dimensions:system-size-y = 5.31 !nm
+dimensions:system-size-z = 5.31 !nm
+material:file=Co.mat
+sim:time-step=1.0E-15
+sim:program=hysteresis-loop
+sim:integrator=llg-heun
+sim:temperature=0.0
+sim:equilibration-applied-field-strength=2.0 !T
+sim:maximum-applied-field-strength=2.0 !T
+sim:applied-field-strength-increment=0.5 !T
+sim:applied-field-unit-vector=0.1,0,1
+sim:equilibration-time-steps=1000
+sim:loop-time-steps=1000
+sim:time-steps-increment=100
+output:applied-field-strength
+output:magnetisation
+output:mean-magnetisation
+output:precision=16
+output:column-headers

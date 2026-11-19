@@ -26,6 +26,8 @@ namespace vcuda{
    extern void stats_update();
    extern void finalize();
    extern void transfer_spin_positions_from_gpu_to_cpu();
+   extern void invalidate_host_spins();
+   extern void update_host_spins();
    extern void transfer_dipole_fields_from_cpu_to_gpu();
    extern void transfer_dipole_cells_fields_from_gpu_to_cpu();
    extern void update_dipolar_fields();

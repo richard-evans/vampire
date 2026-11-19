@@ -156,8 +156,8 @@ namespace dipole{
             //int i = dipole::internal::cells_local_cell_array[lc];
             int i = cells::cell_id_array[lc];
 
-            // check that the cell constains at least one atom
-            if(cells_num_atoms_in_cell[i]>0){
+            // check that the cell constains at least one atom (cells without magnetic atoms only receive the field)
+            if(cells_num_atoms_in_cell[i]>0 || cells::probe_non_magnetic_cells){
 
                // Loop over all other cells to calculate contribution to local cell
                for(int j=0;j<cells_num_cells;j++){

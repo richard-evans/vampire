@@ -47,7 +47,8 @@ namespace internal{
    // within their respective cutoff ranges for i-k and j-k interactions.
    //
    //------------------------------------------------------------------------------
-   void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
+   void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                      std::vector<std::vector <neighbours::vector_t> >& cvectors){
 
       // if dmi is not needed then do nothing
       if(!internal::enable_dmi) return;
@@ -128,11 +129,11 @@ namespace internal{
                      const unsigned int kmat = atoms::type_array[nk];
 
                      // get atomic position vector i->k
-                     double eik[3]={cneighbourlist[i][k].vx, cneighbourlist[i][k].vy, cneighbourlist[i][k].vz};
+                     double eik[3]={cvectors[i][k].x, cvectors[i][k].y, cvectors[i][k].z};
                      const double mod_eik_sq = eik[0]*eik[0] + eik[1]*eik[1] + eik[2]*eik[2];
 
                      // get atomic position vector i->j
-                     double eij[3]={cneighbourlist[i][j].vx, cneighbourlist[i][j].vy, cneighbourlist[i][j].vz};
+                     double eij[3]={cvectors[i][j].x, cvectors[i][j].y, cvectors[i][j].z};
 
                      // calculate ejk from vector addition eik - eij
                      double ejk[3]={eik[0] - eij[0], eik[1] - eij[1], eik[2] - eij[2]};
@@ -250,7 +251,7 @@ namespace internal{
             if(internal::output_dmi_vectors && num_mediators > 0){
                ofile << i << "\t" << nj << "\t" << imat << "\t" << jmat << "\t" <<
                         atoms::x_coord_array[i] << "\t" << atoms::y_coord_array[i] << "\t" << atoms::z_coord_array[i] << "\t" <<
-                        cneighbourlist[i][j].vx << "\t" << cneighbourlist[i][j].vy << "\t" << cneighbourlist[i][j].vz << "\t" <<
+                        cvectors[i][j].x << "\t" << cvectors[i][j].y << "\t" << cvectors[i][j].z << "\t" <<
                         net_dmi[0] << "\t" << net_dmi[1] << "\t" << net_dmi[2] << "\t" << num_mediators << "\n";
             }
 

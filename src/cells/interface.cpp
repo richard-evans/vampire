@@ -75,6 +75,15 @@ namespace cells{
          return true;
       }
 
+      //----------------------------------
+      // cells:probe-non-magnetic-cells (bool, default false)
+      // keep cells with only non-magnetic atoms as points where the dipole field is evaluated
+      //----------------------------------
+      test="probe-non-magnetic-cells";
+      if(word==test){
+         cells::probe_non_magnetic_cells = true;
+         return true;
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found

@@ -99,3 +99,9 @@ developers/test/unit/unit_tests
 
 temp/*
 #EOF
+
+# validation suite: scratch results ignored; case definitions and reference outputs tracked
+developers/test/validation/results/
+__pycache__/
+!developers/test/validation/cases/**/case.json
+!developers/test/validation/reference/**

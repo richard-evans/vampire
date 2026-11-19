@@ -15,6 +15,10 @@
 // not be accessed outside of the cuda code.
 //---------------------------------------------------------------------
 
+// C++ standard library headers
+#include <algorithm>
+#include <vector>
+
 // Include type definitions for cuda code
 #include "typedefs.hpp"
 
@@ -73,16 +77,29 @@ namespace vcuda{
        * Field updates
        */
 
-      void update_spin_fields ();
+      void update_spin_fields (const int num_atoms, const int first_atom = 0); // atoms first_atom to num_atoms-1
       void update_external_fields ();
       void update_dipolar_fields ();
       void update_cell_magnetizations ();
       void update_hamr_field ();
+
+      // atoms integrated with the HAMR active window (hamr:active-window), in increasing order; nullptr: all atoms
+      extern int *d_active_atoms;
+      extern std::vector<int> h_active_atoms; // host copy
+      void update_active_atoms(); // copies the window's atoms to d_active_atoms when it changes
+      extern std::vector<int> active_ranges; // the window's atoms as [first, last+1) pairs
+      extern int active_window_version;      // incremented when the window changes
+      // number of the atoms 0 to num_atoms-1 the kernels loop over: all, or those in the active window; kernels
+      // for the atoms first to last-1 loop over positions num_integrated_atoms(first) to num_integrated_atoms(last)-1
+      inline int num_integrated_atoms(const int num_atoms){
+         return d_active_atoms ? std::lower_bound(h_active_atoms.begin(), h_active_atoms.end(), num_atoms) - h_active_atoms.begin() : num_atoms;
+      }
+
       void update_global_thermal_field ();
       void update_applied_fields ();
       void update_fmr_fields ();
-      void update_neel_fields ();
-      void update_rotational_fields ();
+      void update_neel_fields (const int num_atoms, const int first_atom = 0);
+      void update_rotational_fields (const int num_atoms, const int first_atom = 0);
 
 
 
@@ -110,6 +127,37 @@ namespace vcuda{
           return ::atomicAdd(address, value);
       }
 
+      // width of the thermal field of a material at a temperature (with the material's temperature
+      // rescaling); shared by the thermal field kernels of the CUDA and multi-GPU versions
+      inline __device__ cu_real_t thermal_field_sigma(const material_parameters_t &mat, const cu_real_t temp) {
+         const cu_real_t alpha = mat.temperature_rescaling_alpha;
+         const cu_real_t tc = mat.temperature_rescaling_Tc;
+         const cu_real_t sigma = mat.H_th_sigma;
+         #ifdef CUDA_DP
+            const double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
+            return sigma * sqrt(resc_temp);
+         #else
+            const float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
+            return sigma * sqrtf(resc_temp);
+         #endif
+      }
+
+      // temperature of the Gaussian HAMR laser profile centred on the head (px, py) at (cx, cy)
+      inline __device__ cu_real_t laser_temperature(const cu_real_t cx, const cu_real_t cy, const cu_real_t px, const cu_real_t py,
+                                                          const cu_real_t Tmin, const cu_real_t DeltaT,
+                                                          const cu_real_t one_over_denx, const cu_real_t one_over_deny) {
+         const cu_real_t cx2 = (cx - px) * (cx - px);
+         const cu_real_t cy2 = (cy - py) * (cy - py);
+         #ifdef CUDA_DP
+            const cu_real_t exp_x = exp(-cx2 * one_over_denx);
+            const cu_real_t exp_y = exp(-cy2 * one_over_deny);
+         #else
+            const cu_real_t exp_x = __expf(-cx2 * one_over_denx);
+            const cu_real_t exp_y = __expf(-cy2 * one_over_deny);
+         #endif
+         return Tmin + DeltaT * exp_x * exp_y;
+      }
+
       /*
        * Shared kernel definitions
        */
@@ -120,7 +168,14 @@ namespace vcuda{
             int * material, material_parameters_t * material_params,
             cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
             cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
-            int num_atoms
+            int num_atoms, int first_atom);
+
+      __global__ void update_isotropic_exchange_and_anisotropy_fields_kernel(
+            const int * material, const material_parameters_t * material_params,
+            const int * nbr_start, const int * nbr_atom, const cu_real_t * nbr_J,
+            const cu_real_t * x_spin, const cu_real_t * y_spin, const cu_real_t * z_spin,
+            cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
+            int num_atoms, int first_atom, const int * active
             );
 
       __global__ void update_external_fields_kernel (
@@ -164,7 +219,8 @@ namespace vcuda{
             curandState * rand_states,
             material_parameters_t * material_params,
             int * material,
-            int n_atoms);
+            int n_atoms,
+            const int * active);
 
       __global__ void update_applied_fields_kernel(
             cu_real_t * x_field_array, cu_real_t * y_field_array, cu_real_t * z_field_array,
@@ -187,7 +243,8 @@ namespace vcuda{
          cu_real_t * x_sp_field,
          cu_real_t * y_sp_field,
          cu_real_t * z_sp_field,
-         int n_atoms
+         int n_atoms,
+         int first_atom
          );
 
       __global__ void update_rotational_fields_kernel (
@@ -196,11 +253,14 @@ namespace vcuda{
          material_parameters_rotational_t * material_params_r,
          cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
          cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
-         int n_atoms
+         int n_atoms, int first_atom
          );
 
       namespace stats{
          extern bool use_cpu;
+         extern bool device_owns_spins;
+         extern bool host_spins_current;
+         void finalise();
       }
 
    } // end of iternal namespace

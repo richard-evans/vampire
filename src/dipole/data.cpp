@@ -90,6 +90,15 @@ namespace dipole{
       std::vector <std::vector < double > > rij_tensor_yz;
       std::vector <std::vector < double > > rij_tensor_zz;
 
+      // tensor solver with dipole:on-the-fly-tensors: one tensor row, recomputed for each local cell at
+      // every update from the atomistic cell data kept from initialisation (instead of a row per local cell)
+      bool on_the_fly_tensors = false;
+      double otf_cutoff = 0.0;
+      std::vector<int> otf_global_atoms_in_cell_count;
+      std::vector<double> otf_cells_pos_and_mom_array;
+      std::vector<int> otf_list_of_cells_with_atoms;
+      std::vector< std::vector<double> > otf_atoms_in_cells_array;
+
       int num_atoms;
       std::vector < int > atom_type_array;
       std::vector < int > atom_cell_id_array;

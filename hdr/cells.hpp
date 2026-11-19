@@ -69,6 +69,10 @@ namespace cells{
 
    extern std::vector < double > num_macro_cells_fft; /// lateral size of local macro-cells (A)
 
+   // cells:probe-non-magnetic-cells: cells holding only non-magnetic atoms are kept as points where the dipole
+   // field is evaluated, and non-magnetic atoms are given the dipole field of their cell
+   extern bool probe_non_magnetic_cells;
+
    //---------------------------------------------------------------------------
    // Function to calculate magnetisation in cells
    //---------------------------------------------------------------------------

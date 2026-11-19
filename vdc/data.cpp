@@ -125,6 +125,7 @@ namespace vdc{
    // array to store subsidiary data file names
    std::vector<std::string> coord_filenames(0);
    std::vector<std::string> spin_filenames(0);
+   bool spin_window_data = false;
    std::vector<std::string> nm_filenames(0);
 
    // arrays for storing time-averaged spin-spin correlations

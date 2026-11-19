@@ -86,6 +86,7 @@ namespace internal{
       cu_real_t temperature_rescaling_alpha;
       cu_real_t temperature_rescaling_Tc;
       cu_real_t H_th_sigma;
+      int skip; // atoms of this material are not integrated (gpu:skip-non-magnetic-atoms)
    };
 
    // TODO: Add struct for rotational params

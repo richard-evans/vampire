@@ -184,6 +184,7 @@ namespace cells{
 
          cells::num_atoms_in_cell.resize(cells::num_cells,0);
          cells::num_atoms_in_cell_global.resize(0);
+         cells::internal::num_any_atoms_in_cell.resize(cells::num_cells,0);
          cells::volume_array.resize(cells::num_cells,0.0);
 
          // Now add atoms to each cell as magnetic 'centre of mass'
@@ -197,6 +198,10 @@ namespace cells{
             cells::pos_array[3*local_cell+0] += atom_coords_x[atom];
             cells::pos_array[3*local_cell+1] += atom_coords_y[atom];
             cells::pos_array[3*local_cell+2] += atom_coords_z[atom];
+
+            // count every atom (magnetic or not) in the cell, for cells:probe-non-magnetic-cells
+            cells::internal::num_any_atoms_in_cell[local_cell]++;
+
             if(mp::material[type].non_magnetic==0){
 
                cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
@@ -216,6 +221,10 @@ namespace cells{
                // add index of cell only if there are atoms inside
                cells::cell_id_array.push_back(local_cell);
             }
+            else if(cells::probe_non_magnetic_cells && cells::internal::num_any_atoms_in_cell[local_cell]>0){
+               // non-magnetic-only cell kept as a probe (cells:probe-non-magnetic-cells)
+               cells::cell_id_array.push_back(local_cell);
+            }
          }
 
 
@@ -223,6 +232,7 @@ namespace cells{
             MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(MPI_IN_PLACE, &cells::pos_array[0],     cells::pos_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &cells::internal::num_any_atoms_in_cell[0], cells::internal::num_any_atoms_in_cell.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
             cells::num_atoms_in_cell_global.resize(cells::num_cells);
             cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
             MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -258,6 +268,20 @@ namespace cells{
                cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/cells::num_atoms_in_cell[local_cell];
 
             }
+            else if(cells::probe_non_magnetic_cells && cells::internal::num_any_atoms_in_cell[local_cell]>0){
+               // non-magnetic-only cell (cells:probe-non-magnetic-cells): plain average position,
+               // zero moment (so it is not a source of dipole field) and zero volume
+               const double n_any = double(cells::internal::num_any_atoms_in_cell[local_cell]);
+
+               cells::pos_and_mom_array[4*local_cell+0] = cells::pos_array[3*local_cell+0]/n_any;
+               cells::pos_and_mom_array[4*local_cell+1] = cells::pos_array[3*local_cell+1]/n_any;
+               cells::pos_and_mom_array[4*local_cell+2] = cells::pos_array[3*local_cell+2]/n_any;
+               // cells::pos_and_mom_array[4*local_cell+3] intentionally left at 0.0 (no moment)
+
+               cells::pos_array[3*local_cell+0] = cells::pos_array[3*local_cell+0]/n_any;
+               cells::pos_array[3*local_cell+1] = cells::pos_array[3*local_cell+1]/n_any;
+               cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/n_any;
+            }
 
          }
 
@@ -284,6 +308,7 @@ namespace cells{
          //Set number of atoms in cell to zero
          for(int cell=0;cell<cells::num_cells;cell++){
             cells::num_atoms_in_cell[cell]=0;
+            cells::internal::num_any_atoms_in_cell[cell]=0;
          }
 
          // Now re-update num_atoms in cell for local atoms only
@@ -291,6 +316,12 @@ namespace cells{
             int local_cell=cells::atom_cell_id_array[atom];
             int type = cells::internal::atom_type_array[atom];
             // const double mus = mp::material[type].mu_s_SI; unused variable
+
+            // Re-derive the local (this-rank) any-atom count alongside the
+            // magnetic-only re-update below, for use in the local_cell_array
+            // construction further down.
+            cells::internal::num_any_atoms_in_cell[local_cell]++;
+
             // Consider only magnetic elements
             if(mp::material[type].non_magnetic==0){
                if(cells::build_atom_lists){
@@ -329,6 +360,11 @@ namespace cells{
       // Calculate number of local cells
       for(int cell=0;cell<cells::num_cells;cell++){
          if(cells::num_atoms_in_cell[cell]!=0){
+            cells::local_cell_array.push_back(cell);
+            cells::num_local_cells++;
+         }
+         else if(cells::probe_non_magnetic_cells && cells::internal::num_any_atoms_in_cell[cell]!=0){
+            // non-magnetic-only cell kept as a probe (cells:probe-non-magnetic-cells)
             cells::local_cell_array.push_back(cell);
             cells::num_local_cells++;
          }

@@ -1,0 +1,20 @@
+{
+   "description": "Same film as hamr-small at T=0 with tilted initial spins: deterministic test of head motion, field box and field ramp",
+   "kind": "deterministic",
+   "quantities": {
+      "B": "B_applied",
+      "mx": "s0M_norm_x*s0M_norm_l",
+      "my": "s0M_norm_y*s0M_norm_l",
+      "mz": "s0M_norm_z*s0M_norm_l"
+   },
+   "tolerance": {
+      "dp": {
+         "rtol": 1e-08,
+         "atol": 1e-08
+      },
+      "sp": {
+         "rtol": 0.0001,
+         "atol": 0.0001
+      }
+   }
+}

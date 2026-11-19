@@ -102,6 +102,7 @@ int main(int argc, char* argv[]){
 
    // Create system
    cs::create();
+   vout::log_memory_usage("system creation");
 
    //test initialise SLD
    sld::initialize();

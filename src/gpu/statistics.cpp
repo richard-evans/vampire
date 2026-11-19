@@ -13,8 +13,32 @@
 #include "gpu.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
+#include "program.hpp"
 
 namespace gpu{
+
+   //---------------------------------------------------------------------------
+   // Function to determine whether the program may read the spins on the host
+   // directly during the simulation
+   //---------------------------------------------------------------------------
+   bool program_reads_host_spins(){
+
+      // programs which only use statistics of the spins during the simulation
+      switch(::program::program){
+         case ::program::program_t::time_series:
+         case ::program::program_t::hysteresis_loop:
+         case ::program::program_t::curie_temperature:
+         case ::program::program_t::field_cool:
+         case ::program::program_t::laser_pulse:
+         case ::program::program_t::hamr_simulation:
+         case ::program::program_t::partial_hysteresis_loop:
+         case ::program::program_t::fmr:
+            return false;
+         default:
+            return true;
+      }
+
+   }
 
    namespace stats{
 

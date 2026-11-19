@@ -1,0 +1,8 @@
+{
+   "description": "3375-atom sc Co, curie-temperature program with Monte Carlo (odd atom count), 200-1400 K: per-temperature mean |m| (compare only against the same integrator)",
+   "kind": "statistical",
+   "per_row": true,
+   "quantities": {"mean_m": "s0M_norm_mean_l"},
+   "seeds": 8,
+   "k": 4
+}

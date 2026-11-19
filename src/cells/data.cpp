@@ -62,6 +62,7 @@ namespace cells{
    std::vector<double> pos_array; /// arrays to store cells positions
 
    std::vector < double > num_macro_cells_fft(3,10.0); /// macro-cells size (A)
+   bool probe_non_magnetic_cells=false; /// cells:probe-non-magnetic-cells opt-in flag (default off)
 
    //---------------------------------------------------------------------------
    // Function to calculate magnetisation in cells
@@ -75,6 +76,7 @@ namespace cells{
       //------------------------------------------------------------------------
       //bool enabled=false; // enable localised temperature pulse calculation
       bool initialised=false; /// flag set if initialised
+      std::vector<int> num_any_atoms_in_cell; /// number of atoms of any kind (magnetic + non-magnetic) in each cell
       std::vector<double> volume_array;
 
       std::vector<double> spin_array_x;

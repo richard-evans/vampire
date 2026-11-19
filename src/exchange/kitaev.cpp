@@ -39,7 +39,8 @@ namespace internal{
    // limit the interaction range to nearest neighbours.
    //
    //------------------------------------------------------------------------------
-   void calculate_kitaev(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
+   void calculate_kitaev(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                         std::vector<std::vector <neighbours::vector_t> >& cvectors){
 
       // if kitaev is not needed then do nothing
       if(!internal::enable_kitaev) return;
@@ -84,7 +85,7 @@ namespace internal{
             if(i != nj){
 
                // get atomic position vector i->j
-               double eij[3]={cneighbourlist[i][j].vx, cneighbourlist[i][j].vy, cneighbourlist[i][j].vz};
+               double eij[3]={cvectors[i][j].x, cvectors[i][j].y, cvectors[i][j].z};
 
                // get length of vector
                const double mod_eij_sq = eij[0]*eij[0] + eij[1]*eij[1] + eij[2]*eij[2];

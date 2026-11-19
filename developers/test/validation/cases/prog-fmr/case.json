@@ -1,0 +1,20 @@
+{
+   "description": "fmr program, 3375-atom sc Co, T=0, 0.5 T static field along z and 0.05 T, 500 GHz field along x: magnetisation trajectory; also writes atom and cell configurations during the run",
+   "kind": "deterministic",
+   "quantities": {
+      "mx": "s0M_norm_x*s0M_norm_l",
+      "my": "s0M_norm_y*s0M_norm_l",
+      "mz": "s0M_norm_z*s0M_norm_l"
+   },
+   "tolerance": {
+      "dp": {
+         "rtol": 1e-08,
+         "atol": 1e-08
+      },
+      "sp": {
+         "rtol": 0.0001,
+         "atol": 0.0001,
+         "rows": 10
+      }
+   }
+}

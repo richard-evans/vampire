@@ -1,0 +1,8 @@
+{
+   "description": "Granular FePt film of hamr-granular-t0, HAMR write of one bit (300-800 K laser, 1 T field, 5000 m/s head) and 10 ps cooling: seed-mean magnetisation at every output",
+   "kind": "statistical",
+   "per_row": true,
+   "quantities": {"mz": "s0M_norm_z*s0M_norm_l", "m": "s0M_norm_l"},
+   "seeds": 8,
+   "k": 4
+}

@@ -1,0 +1,8 @@
+{
+   "description": "9918-atom FePt-like film, HAMR write of 3 bits (300-900 K laser, 1 T field, 1000 m/s head): seed-mean magnetisation at 12 points along the write",
+   "kind": "statistical",
+   "per_row": true,
+   "quantities": {"mz": "s0M_norm_z*s0M_norm_l", "m": "s0M_norm_l"},
+   "seeds": 8,
+   "k": 4
+}

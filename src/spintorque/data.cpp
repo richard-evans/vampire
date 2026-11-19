@@ -91,4 +91,7 @@ namespace st{
       st::internal::mp_t default_properties;
 
    } // end of internal namespace
+
+   bool is_enabled(){ return internal::enabled; }
+
 } // end of st namespace

@@ -184,11 +184,15 @@ int run(){
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
 
+   // Initialize GPU acceleration if enabled
+   if(gpu::acceleration){
+      gpu::initialize();
+      vout::log_memory_usage("GPU initialisation");
+   }
+
    // For continuous checkpoints inform user about I/O
    if(sim::save_checkpoint_continuous_flag) zlog << zTs() << "Continuously writing checkpoints to disk throughout simulation." << std::endl;
 
-   // Initialize GPU acceleration if enabled
-   if(gpu::acceleration) gpu::initialize();
 
    vmpi::memory_checkpoint("after_modules_initialize");
 
@@ -324,8 +328,14 @@ int run(){
 
    //program::LLB_Boltzmann();
 
-   // De-initialize GPU
-   if(gpu::acceleration) gpu::finalize();
+   vout::log_memory_usage("simulation");
+
+   // De-initialize GPU, copying the final spin configuration to the host first
+   // (not kept up to date on the host when statistics are calculated on the GPU)
+   if(gpu::acceleration){
+      gpu::transfer_spin_positions_from_gpu_to_cpu();
+      gpu::finalize();
+   }
 
    // optionally save checkpoint file
    if(sim::save_checkpoint_flag && !sim::save_checkpoint_continuous_flag) save_checkpoint();

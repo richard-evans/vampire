@@ -293,6 +293,7 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
 
    // re-seed random number generator on each CPU with a different number
    create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::mixing_seed));
+   if(create::internal::decomposition_independent_random) create::internal::check_keyed_random(catom_array);
 
    // loop over all atoms
    for(unsigned int atom=0;atom<catom_array.size();atom++){
@@ -310,20 +311,20 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
             double mean = (min+max)/2.0;
             if(z<=min){
                double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-               if(create::internal::grnd() < probability) final_material=mat;
+               if(create::internal::draw_uniform(create::internal::mixing_seed, catom_array[atom], mat) < probability) final_material=mat;
             }
             else if(z>min && z<=mean){
                double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-               if(create::internal::grnd() < probability) final_material=mat;
+               if(create::internal::draw_uniform(create::internal::mixing_seed, catom_array[atom], mat) < probability) final_material=mat;
             }
             else if(z>mean && z<=max){
                double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-               if(create::internal::grnd() < probability) final_material=mat;
+               if(create::internal::draw_uniform(create::internal::mixing_seed, catom_array[atom], mat) < probability) final_material=mat;
             }
             else if(z>max){
                double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
                //std::cout << current_material << "\t" << mat << "\t" << atom << "\t" << z << "\t" << max << "\t" << probability << std::endl;
-               if(create::internal::grnd() < probability) final_material=mat;
+               if(create::internal::draw_uniform(create::internal::mixing_seed, catom_array[atom], mat) < probability) final_material=mat;
             }
          }
       }
@@ -341,13 +342,14 @@ void dilute (std::vector<cs::catom_t> & catom_array){
 
    // re-seed random number generator on each CPU with a different number
    create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::dilute_seed));
+   if(create::internal::decomposition_independent_random) create::internal::check_keyed_random(catom_array);
 
    // loop over all atoms
    for(unsigned int atom=0;atom<catom_array.size();atom++){
       // if atom material is alloy master
       int local_material=catom_array[atom].material;
       double probability = mp::material[local_material].density;
-      if(create::internal::grnd() > probability) catom_array[atom].include=false;
+      if(create::internal::draw_uniform(create::internal::dilute_seed, catom_array[atom], 0) > probability) catom_array[atom].include=false;
    }
 
    return;

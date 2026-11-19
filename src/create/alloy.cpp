@@ -114,6 +114,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 
    // re-seed random number generator on each CPU
    create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::alloy_seed));
+   if(create::internal::decomposition_independent_random) create::internal::check_keyed_random(catom_array);
 
    // determine local probability
    for(unsigned int atom=0;atom<catom_array.size();atom++){
@@ -132,7 +133,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 
                // if distribution is homogenoues calculate direct probability
                if(create::internal::mp[host_material].host_alloy_distribution == homogeneous){
-                  if(create::internal::grnd() < fraction) catom_array[atom].material=slave_material;
+                  if(create::internal::draw_uniform(create::internal::alloy_seed, catom_array[atom], sm) < fraction) catom_array[atom].material=slave_material;
                }
                // otherwise determine probability from distribution
                else{
@@ -158,7 +159,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
                   }
 
                   // check if atom is to be replaced
-                  if(create::internal::grnd() < probability) catom_array[atom].material=slave_material;
+                  if(create::internal::draw_uniform(create::internal::alloy_seed, catom_array[atom], sm) < probability) catom_array[atom].material=slave_material;
 
                }
             } // if sm

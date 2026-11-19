@@ -25,6 +25,9 @@ namespace vcuda{
       cu_real_t *h_y_spin_transfer_buffer;
       cu_real_t *h_z_spin_transfer_buffer;
 
+      int *d_active_atoms = nullptr;
+      std::vector<int> h_active_atoms;
+
       namespace atoms
       {
          /*
@@ -166,6 +169,13 @@ namespace vcuda{
 
          bool use_cpu = false;
          long counter(0L);
+
+         // true when statistics are calculated on the device, so that the spins on the host
+         // are only valid directly after an explicit transfer
+         bool device_owns_spins = false;
+
+         // true when the spins on the host hold the current spins from the device
+         bool host_spins_current = true;
 
       } /* stats */
 

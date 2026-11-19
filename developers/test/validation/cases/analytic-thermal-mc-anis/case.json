@@ -1,0 +1,27 @@
+{
+   "description": "3375 non-interacting spins (Monte Carlo), second, fourth and sixth order uniaxial anisotropy along z, H=200 T, T=500 K rescaled to 250 K (Tc=1000 K, exponent 2): time/seed averaged <mz> vs Boltzmann average at the rescaled temperature",
+   "kind": "analytic",
+   "model": "thermal",
+   "params": {
+      "T": 250.0,
+      "H": 200.0,
+      "mu_s": 1.72,
+      "ku": 5e-21,
+      "ku4": 2e-20,
+      "ku6": 2e-20
+   },
+   "quantities": {
+      "mz": "s0M_norm_z*s0M_norm_l"
+   },
+   "seeds": 8,
+   "skip_rows": 20,
+   "k": 4,
+   "tolerance": {
+      "dp": {
+         "atol": 0.001
+      },
+      "sp": {
+         "atol": 0.001
+      }
+   }
+}

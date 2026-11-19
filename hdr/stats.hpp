@@ -283,6 +283,7 @@ namespace stats
          void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
          void get_mask(std::vector<int>& out_mask, std::vector<double>& out_saturation);
          void calculate_magnetization(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
+         void calculate_magnetization_from_sums(const std::vector<double>& sums);
          void set_magnetization(std::vector<double>& magnetization, std::vector<double>& mean_magnetization, long counter);
          void reset_magnetization_averages();
          const std::vector<double>& get_magnetization();
@@ -309,6 +310,8 @@ namespace stats
          std::vector<int> zero_list;
          std::vector<double> saturation;
          std::string name;
+
+         void normalise_and_accumulate_magnetization();
 
    };
 

@@ -1,0 +1,35 @@
+{
+   "description": "Two-material sc bilayer as t0-multimaterial but without energy outputs, so that on GPUs the system, material and height (15 layers) magnetisation statistics are calculated on the device",
+   "kind": "deterministic",
+   "quantities": {
+      "mx": "s0M_norm_x*s0M_norm_l",
+      "my": "s0M_norm_y*s0M_norm_l",
+      "mz": "s0M_norm_z*s0M_norm_l",
+      "m1x": "m0M_norm_x*m0M_norm_l",
+      "m1y": "m0M_norm_y*m0M_norm_l",
+      "m1z": "m0M_norm_z*m0M_norm_l",
+      "m2x": "m1M_norm_x*m1M_norm_l",
+      "m2y": "m1M_norm_y*m1M_norm_l",
+      "m2z": "m1M_norm_z*m1M_norm_l",
+      "h0x": "h0M_x*h0M_l",
+      "h0y": "h0M_y*h0M_l",
+      "h0z": "h0M_z*h0M_l",
+      "h7x": "h7M_x*h7M_l",
+      "h7y": "h7M_y*h7M_l",
+      "h7z": "h7M_z*h7M_l",
+      "h14x": "h14M_x*h14M_l",
+      "h14y": "h14M_y*h14M_l",
+      "h14z": "h14M_z*h14M_l"
+   },
+   "tolerance": {
+      "dp": {
+         "rtol": 1e-08,
+         "atol": 1e-08
+      },
+      "sp": {
+         "rtol": 0.0001,
+         "atol": 0.0001,
+         "rows": 6
+      }
+   }
+}

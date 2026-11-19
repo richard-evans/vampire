@@ -117,7 +117,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
                 if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
 
              }
-            config::internal::atoms(); // call function to output spins coords
+            config::internal::atoms(true); // call function to output spins coords (a window snapshot if possible)
 
             //for Spin-lattice simulations - Modified by Mara Strungaru 2022
             if (config::internal::sld_format) config::internal::atoms_coords_sld();// call function to output coords for dynamic lattice calc
@@ -166,12 +166,18 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       // Print only at the end of simulation
       if(config::internal::output_cells_config_end && (sim::time ==  sim::total_time+sim::equilibration_time))
       {
+         // If using GPU acceleration then synchonise spins from device
+         gpu::config::synchronise();
+
          config::internal::legacy_cells_coords();
          config::internal::legacy_cells();
       }
       // Otherwise print cells configurations during simulation
       else if (config::internal::output_cells_config_continuous  && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
       {
+         // If using GPU acceleration then synchonise spins from device
+         gpu::config::synchronise();
+
          // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
          if ((program::program != program::program_t::hysteresis_loop) && (program::program != program::program_t::static_hysteresis_loop) && (program::program != program::program_t::partial_hysteresis_loop))
          {

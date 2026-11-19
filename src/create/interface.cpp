@@ -549,6 +549,15 @@ namespace create{
          create::internal::spin_init_seed = sirs;
          return true;
       }
+      //--------------------------------------------------------------------
+      // draw the random choices of alloying, intermixing and dilution from the
+      // key of each atom, so that the structure is the same on any number of
+      // processes (default: a random number sequence per process)
+      test="decomposition-independent-random";
+      if(word==test){
+         create::internal::decomposition_independent_random = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         return true;
+      }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);

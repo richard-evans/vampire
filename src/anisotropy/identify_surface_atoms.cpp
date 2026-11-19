@@ -34,7 +34,8 @@ namespace anisotropy{
    //---------------------------------------------------------------------------
    // Function to identify less than fully coordinated atoms
    //---------------------------------------------------------------------------
-   void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbours::neighbour_t> > & cneighbourlist){
+   void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbours::neighbour_t> > & cneighbourlist,
+                                                                       std::vector<std::vector <neighbours::vector_t> > & cvectors){
 
       // initialise surface threshold if not overidden by input file
       if(internal::neel_anisotropy_threshold == 123456789) internal::neel_anisotropy_threshold = cs::unit_cell.surface_threshold;
@@ -198,7 +199,7 @@ namespace anisotropy{
       // If neel surface anisotropy is enabled, calculate necessary data
       //----------------------------------------------------------------
       if(internal::enable_neel_anisotropy){
-         internal::initialise_neel_anisotropy_tensor(nearest_neighbour_interactions_list, cneighbourlist);
+         internal::initialise_neel_anisotropy_tensor(nearest_neighbour_interactions_list, cneighbourlist, cvectors);
       }
 
       return;

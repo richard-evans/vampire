@@ -1,0 +1,4 @@
+{
+   "description": "~168k-atom FePt-like film, HAMR write of 4 bits: run on request only (--cases hamr-perf) for timing/profiling, not compared",
+   "kind": "benchmark"
+}

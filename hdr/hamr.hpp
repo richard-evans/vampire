@@ -12,6 +12,8 @@
 #define HAMR_H_
 
 // System headers
+#include <cstdint>
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -76,6 +78,31 @@ namespace hamr{
    double get_NPS();
    double get_track_padding();
    bool get_initialisation_state();
+
+   //-----------------------------------------------------------------------------
+   // Functions to write and read the state of the write head in checkpoint files,
+   // so that a HAMR simulation can be continued from a checkpoint
+   //-----------------------------------------------------------------------------
+   void save_checkpoint(std::ostream& chkfile);
+   void load_checkpoint(std::istream& chkfile);
+
+   //-----------------------------------------------------------------------------
+   // Active window (hamr:active-window)
+   //-----------------------------------------------------------------------------
+   bool active_window_requested(); // hamr:active-window set for the HAMR program (for the decomposition)
+   bool active_window_enabled(); // true once the write has started with the window
+   const std::vector<int>& update_active_window(); // update for the current head position; returns the [first, last+1) pairs of atoms to integrate
+   bool atom_in_window(const int atom); // the atom (local or halo) belongs to a grain of the window
+   uint64_t window_changes();           // number of times the grains of the window have changed (same on every process)
+
+   //-----------------------------------------------------------------------------
+   // Spin snapshots with the active window: whether the next snapshot may hold
+   // only the atoms that changed since the previous one, whether an atom has
+   // changed, and notice that a snapshot has been written
+   //-----------------------------------------------------------------------------
+   bool window_snapshot_possible();
+   bool spin_changed_since_snapshot(const int atom);
+   void snapshot_written();
 
    //-----------------------------------------------------------------------------------------------
    // Externally visible variables used for HAMR calculation

@@ -38,6 +38,7 @@ namespace micromagnetic{
    extern std::vector <double> atomistic_bias_field_x;
    extern std::vector <double> atomistic_bias_field_y;
    extern std::vector <double> atomistic_bias_field_z;
+   bool bias_magnets_enabled(); // true if micromagnetic bias magnets add a field to the atoms
    //variables to store the numbers of atomistic/ microamgnetic atoms for multiscale simulations
    extern int number_of_atomistic_atoms;
    extern int number_of_none_atomistic_atoms;

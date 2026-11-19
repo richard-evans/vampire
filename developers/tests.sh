@@ -5,12 +5,13 @@
 #------------------------------------------------------
 
 usage(){
-   echo "Usage: $0 [-a] [-i] [-e] [-u] [-r] [-m [N]] [-b] [-c] [-s] [-h]"
+   echo "Usage: $0 [-a] [-i] [-e] [-u] [-r] [-v] [-m [N]] [-b] [-c] [-s] [-h]"
    echo "   -a   run all tests, including extended integration tests, regression tests and the style check"
    echo "   -i   run standard integration tests"
    echo "   -e   run extended (long running) integration tests"
    echo "   -u   run unit tests"
    echo "   -r   run regression tests with vampire-serial"
+   echo "   -v   run the physics validation suite with vampire-serial against the CPU references"
    echo "   -m   run regression tests with vampire-parallel on N processes (default 2)"
    echo "   -b   build matrix: clean build of every build variant in a temporary copy"
    echo "   -c   coverage report from a debug build in a temporary copy (needs gcovr)"
@@ -23,19 +24,21 @@ integration=false
 extended=false
 unit=false
 regression=false
+validation=false
 mpi_processes=0
 build=false
 coverage=false
 style=false
 
-while getopts "aieurmbcsh" flag
+while getopts "aieurvmbcsh" flag
 do
    case "${flag}" in
-      a) integration=true; extended=true; unit=true; regression=true; style=true;;
+      a) integration=true; extended=true; unit=true; regression=true; validation=true; style=true;;
       i) integration=true;;
       e) extended=true;;
       u) unit=true;;
       r) regression=true;;
+      v) validation=true;;
       m) mpi_processes=2
          # optional number of processes as the next argument
          if [[ "${!OPTIND}" =~ ^[1-9][0-9]*$ ]]; then
@@ -51,7 +54,7 @@ do
 done
 
 # run standard integration and unit tests if no test type is specified
-if [ "$integration" = false ] && [ "$extended" = false ] && [ "$unit" = false ] && [ "$regression" = false ] &&
+if [ "$integration" = false ] && [ "$extended" = false ] && [ "$unit" = false ] && [ "$regression" = false ] && [ "$validation" = false ] &&
    [ "$mpi_processes" -eq 0 ] && [ "$build" = false ] && [ "$coverage" = false ] && [ "$style" = false ]; then
    integration=true
    unit=true
@@ -104,6 +107,12 @@ fi
 
 if [ "$regression" = true ]; then
    time "$root/developers/test/regression/run_regression.sh" --serial || status=1
+fi
+
+if [ "$validation" = true ]; then
+   cd "$root" || exit 1
+   python3 developers/test/validation/vtest.py run --exe ./vampire-serial --label serial --jobs 4 || status=1
+   python3 developers/test/validation/vtest.py compare --test serial --ref cpu || status=1
 fi
 
 if [ "$mpi_processes" -gt 0 ]; then

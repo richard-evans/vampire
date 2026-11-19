@@ -1,0 +1,36 @@
+#------------------------------------------
+# fmr program, 3375-atom sc Co, T=0, 0.5 T
+# static field along z and 0.05 T, 500 GHz
+# field along x, with atom and cell
+# configuration output
+# (a program whose statistics can be
+# calculated on the GPU)
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 5.31 !nm
+dimensions:system-size-y = 5.31 !nm
+dimensions:system-size-z = 5.31 !nm
+material:file=Co.mat
+sim:time-step=1.0E-15
+sim:program=fmr
+sim:integrator=llg-heun
+sim:temperature=0.0
+sim:equilibration-temperature=0.0
+sim:applied-field-strength=0.5 !T
+sim:applied-field-unit-vector=0,0,1
+sim:fmr-field-strength=0.05 !T
+sim:fmr-field-frequency=5.0E11
+sim:fmr-field-unit-vector=1,0,0
+sim:equilibration-time-steps=1000
+sim:total-time-steps=4000
+sim:time-steps-increment=50
+config:atoms
+config:atoms-output-rate=20
+config:macro-cells
+config:macro-cells-output-rate=20
+config:output-format=text
+output:real-time
+output:magnetisation
+output:precision=16
+output:column-headers

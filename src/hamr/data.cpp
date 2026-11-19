@@ -69,5 +69,16 @@ namespace hamr{
       std::vector<double> atom_coords_y;
       std::vector<double> atom_coords_z;
 
+      bool active_window = false;
+      double active_window_dT = 1.0; // K
+      bool active_window_full_snapshots = false;
+      bool active_window_options_set = false; // a window sub-option is set in the input file
+
+      // state for continuing from a checkpoint (checkpoint.cpp)
+      bool resume_state_loaded = false;
+      double resume_head_position_x = 0.0;
+      double resume_H_applied = 0.0;
+      uint64_t resume_steps = 0;
+
    } // end of internal namespace
 } // end of hamr namespace

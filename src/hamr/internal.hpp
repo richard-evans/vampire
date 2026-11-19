@@ -11,6 +11,7 @@
 
 // C++ standard library headers
 #include <cstdint>
+#include <iostream>
 
 
 // Vampire headers
@@ -106,6 +107,28 @@ namespace hamr{
       extern std::vector<double> x_field_array; /// arrays to store atomic hamr field
       extern std::vector<double> y_field_array;
       extern std::vector<double> z_field_array;
+
+      //-----------------------------------------------------------------------------
+      // State for continuing from a checkpoint (checkpoint.cpp): head position and
+      // field strength read from the checkpoint, and the number of steps simulated
+      // before it was saved, which are skipped without simulating them
+      //-----------------------------------------------------------------------------
+      extern bool resume_state_loaded;
+      extern double resume_head_position_x;
+      extern double resume_H_applied;
+      extern uint64_t resume_steps;
+      void skip_simulated_step();
+
+      //-----------------------------------------------------------------------------
+      // Active window (active_window.cpp)
+      //-----------------------------------------------------------------------------
+      extern bool active_window;      /// integrate only the grains near the head
+      extern double active_window_dT; /// laser temperature rise (K) from which a grain is integrated
+      extern bool active_window_full_snapshots; /// write every spin snapshot in full with the window
+      extern bool active_window_options_set;    /// a window sub-option is set in the input file
+      void initialize_active_window();
+      void save_window_state(std::ostream& chkfile);
+      void load_window_state(std::istream& chkfile);
 
    } // end of internal namespace
 } // end of hamr namespace

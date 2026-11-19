@@ -1,0 +1,8 @@
+material:num-materials=1
+material[1]:material-name=Co
+material[1]:damping-constant=0.1
+material[1]:exchange-matrix[1]=11.2e-21
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:initial-spin-direction=random
+material[1]:2-2-order-anisotropy-constant=1.0e-23
+material[1]:4--3-order-anisotropy-constant=5.0e-24

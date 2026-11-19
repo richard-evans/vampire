@@ -1,0 +1,29 @@
+{
+   "description": "Two-material sc bilayer (AFM interlayer exchange, different moments/damping/anisotropy axes), applied field, T=0: per-material trajectories",
+   "kind": "deterministic",
+   "quantities": {
+      "mx": "s0M_norm_x*s0M_norm_l",
+      "my": "s0M_norm_y*s0M_norm_l",
+      "mz": "s0M_norm_z*s0M_norm_l",
+      "m1x": "m0M_norm_x*m0M_norm_l",
+      "m1y": "m0M_norm_y*m0M_norm_l",
+      "m1z": "m0M_norm_z*m0M_norm_l",
+      "m2x": "m1M_norm_x*m1M_norm_l",
+      "m2y": "m1M_norm_y*m1M_norm_l",
+      "m2z": "m1M_norm_z*m1M_norm_l",
+      "E_exchange": "s0_E1_Energy",
+      "E_anisotropy": "s0_E2_Energy",
+      "E_applied": "s0_E3_Energy"
+   },
+   "tolerance": {
+      "dp": {
+         "rtol": 1e-08,
+         "atol": 1e-08
+      },
+      "sp": {
+         "rtol": 0.0001,
+         "atol": 0.0001,
+         "rows": 10
+      }
+   }
+}

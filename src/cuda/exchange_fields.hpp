@@ -27,6 +27,14 @@ namespace vcuda
 
             extern cu_real_t *d_spin3n;
 
+            extern bool exchange_initialised;
+
+            // neighbour list of each atom for isotropic exchange (used instead of the 3N x 3N matrix for spin fields)
+            extern bool use_isotropic_kernel;
+            extern int *d_nbr_start;
+            extern int *d_nbr_atom;
+            extern cu_real_t *d_nbr_J;
+
 
             int initialise_exchange();
 

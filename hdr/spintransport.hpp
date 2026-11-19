@@ -81,6 +81,11 @@ namespace spin_transport{
    //---------------------------------------------------------------------------
    double get_voltage();
 
+   //---------------------------------------------------------------------------
+   // Function to determine whether the spin transport calculation is enabled
+   //---------------------------------------------------------------------------
+   bool is_enabled();
+
 } // end of spin_transport namespace
 
 #endif //SPINTRANSPORT_H_

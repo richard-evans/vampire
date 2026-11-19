@@ -36,11 +36,11 @@ namespace internal{
 //------------------------------------------------------------------------------
 // Host function to calculate neel fields using gpu kernel
 //------------------------------------------------------------------------------
-void update_neel_fields()
+void update_neel_fields(const int num_atoms, const int first_atom)
 {
    //Call kernel to calculate neel fields
    cu::update_neel_fields_kernel <<< cu::grid_size, cu::block_size >>> (
-         cu::d_neel_tensor, cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin, cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field, ::atoms::num_atoms
+         cu::d_neel_tensor, cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin, cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field, num_atoms, first_atom
       );
 
    check_cuda_errors(__FILE__, __LINE__);
@@ -54,10 +54,11 @@ __global__ void update_neel_fields_kernel (
    cu_real_t * x_sp_field,
    cu_real_t * y_sp_field,
    cu_real_t * z_sp_field,
-   int n_atoms
+   int n_atoms,
+   int first_atom
    )
 {
-   for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
+   for ( int i = first_atom + blockIdx.x * blockDim.x + threadIdx.x;
          i < n_atoms;
          i += blockDim.x * gridDim.x) {
 

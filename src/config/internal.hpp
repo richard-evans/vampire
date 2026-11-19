@@ -107,7 +107,7 @@ namespace internal
    //-------------------------------------------------------------------------
    void initialize();
 
-   void atoms();
+   void atoms(const bool allow_window = false); // allow_window: may write a window snapshot (HAMR active window)
    void atoms_coords();
    void atoms_coords_sld();
    void atoms_non_magnetic();
@@ -118,6 +118,7 @@ namespace internal
    void legacy_cells_coords();
 
    double write_data(std::string, const std::vector<double> &buffer);
+   double write_window_data(std::string filename, const uint64_t num_atoms, const std::vector<uint64_t>& ranges, const std::vector<double>& buffer);
    double write_coord_data(std::string filename, const std::vector<double>& buffer, const std::vector<int>& type_buffer, const std::vector<int>& category_buffer, const std::vector<int>& grain_buffer);
 
    void copy_data_to_buffer(const std::vector<double> &x, // vector data
@@ -136,7 +137,8 @@ namespace internal
                    const double applied_field_mag,
                    const double magnetization_x, // magnetization components (normalized)
                    const double magnetization_y,
-                   const double magnetization_z);
+                   const double magnetization_z,
+                   const bool window_data = false); // data files hold a window snapshot
 
    std::string data_filename(bool coords);
 

@@ -12,6 +12,7 @@
 
 // Vampire headers
 #include "cuda.hpp"
+#include "gpu.hpp"
 
 // Local cuda headers
 #include "cuda_utils.hpp"
@@ -118,6 +119,7 @@ namespace vcuda{
                // save derived variables to host array
                h_heun_params.at(i).prefactor = -gamma / (1.0 + alpha * alpha);
                h_heun_params.at(i).lambda_times_prefactor = -gamma * alpha / (1.0 + alpha * alpha);
+               h_heun_params.at(i).skip = gpu::skipped_material(i);
 
                #ifdef CUDA_SPIN_DEBUG
                   // output variables to screen for debugging
@@ -139,6 +141,29 @@ namespace vcuda{
             initialized=true;
 
             // check for errors?
+            return;
+
+         }
+
+         //-----------------------------------------------------------
+         // Function to free llg data structures
+         //-----------------------------------------------------------
+         void __llg_finalise (){
+
+            if(!initialized) return;
+
+            cudaFree(cu::llg::d_x_spin_buffer);
+            cudaFree(cu::llg::d_y_spin_buffer);
+            cudaFree(cu::llg::d_z_spin_buffer);
+            cudaFree(cu::llg::d_ds_x);
+            cudaFree(cu::llg::d_ds_y);
+            cudaFree(cu::llg::d_ds_z);
+            cudaFree(cu::llg::d_heun_params);
+            cudaFree(cu::d_active_atoms);
+            cu::d_active_atoms = nullptr;
+
+            initialized=false;
+
             return;
 
          }
@@ -190,8 +215,11 @@ namespace vcuda{
             cu_real_t * dS_y_dptr = thrust::raw_pointer_cast(cu::llg::dS_y_array.data());
             cu_real_t * dS_z_dptr = thrust::raw_pointer_cast(cu::llg::dS_z_array.data());
             */
+            // Atoms to integrate (HAMR active window)
+            cu::update_active_atoms();
+
             // Calculate spin dependent fields
-            cu::update_spin_fields ();
+            cu::update_spin_fields (::atoms::num_atoms);
 
             // Calculate external fields (fixed for integration step)
             cu::update_external_fields ();
@@ -206,7 +234,7 @@ namespace vcuda{
                cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
                cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
                cu::llg::d_ds_x, cu::llg::d_ds_y, cu::llg::d_ds_z,
-               ::mp::dt, ::atoms::num_atoms);
+               ::mp::dt, cu::num_integrated_atoms(::atoms::num_atoms), cu::d_active_atoms);
 
             #ifdef CUDA_SPIN_DEBUG
                // std::cout << cu::atoms::x_spin_array[0] << " "
@@ -220,7 +248,7 @@ namespace vcuda{
             check_cuda_errors (__FILE__, __LINE__);
 
             // Recalculate spin dependent fields
-            cu::update_spin_fields ();
+            cu::update_spin_fields (::atoms::num_atoms);
 
             check_cuda_errors (__FILE__, __LINE__);
 
@@ -232,7 +260,7 @@ namespace vcuda{
                cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
                cu::llg::d_x_spin_buffer, cu::llg::d_y_spin_buffer, cu::llg::d_z_spin_buffer,
                cu::llg::d_ds_x, cu::llg::d_ds_y, cu::llg::d_ds_z,
-               ::mp::dt, ::atoms::num_atoms);
+               ::mp::dt, cu::num_integrated_atoms(::atoms::num_atoms), cu::d_active_atoms);
 
             check_cuda_errors (__FILE__, __LINE__);
 
@@ -251,16 +279,18 @@ namespace vcuda{
                cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
                cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
                cu_real_t * dSx, cu_real_t * dSy, cu_real_t * dSz,
-               cu_real_t dt, size_t num_atoms){
+               cu_real_t dt, size_t num_atoms, const int * active){
 
             // Loop over blocks for large systems > ~100k spins
-            for ( size_t atom = blockIdx.x * blockDim.x + threadIdx.x;
-                  atom < num_atoms;
-                  atom += blockDim.x * gridDim.x)
+            for ( size_t k = blockIdx.x * blockDim.x + threadIdx.x;
+                  k < num_atoms;
+                  k += blockDim.x * gridDim.x)
             {
+               const size_t atom = active ? active[k] : k;
 
                // Determine material id for atom
                size_t mid = material_id[atom];
+               if(heun_parameters[mid].skip) continue;
 
                // prestore prefactors into registers
                const cu_real_t prefactor = heun_parameters[mid].prefactor;
@@ -329,16 +359,18 @@ namespace vcuda{
                cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
                cu_real_t * x_spin_buffer, cu_real_t * y_spin_buffer, cu_real_t * z_spin_buffer, // initial spin
                cu_real_t * dSx, cu_real_t * dSy, cu_real_t * dSz,
-               cu_real_t dt, size_t num_atoms
+               cu_real_t dt, size_t num_atoms, const int * active
                )
          {
 
-            for ( size_t atom = blockIdx.x * blockDim.x + threadIdx.x;
-                  atom < num_atoms;
-                  atom += blockDim.x * gridDim.x)
+            for ( size_t k = blockIdx.x * blockDim.x + threadIdx.x;
+                  k < num_atoms;
+                  k += blockDim.x * gridDim.x)
             {
+               const size_t atom = active ? active[k] : k;
 
                size_t mid = material_id[atom];
+               if(heun_parameters[mid].skip) continue;
 
                cu_real_t prefactor = heun_parameters[mid].prefactor;
                cu_real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;

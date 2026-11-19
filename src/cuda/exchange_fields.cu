@@ -10,12 +10,20 @@
 #include "exchange_fields.hpp"
 
 #include "atoms.hpp"
+#include "errors.hpp"
 #include "exchange.hpp"
+#include "gpu.hpp"
+#include "integrate.hpp"
+#include "sim.hpp"
 #include "vio.hpp"
 #include "cuda_utils.hpp"
 #include "internal.hpp"
 #include "data.hpp"
 
+#include <algorithm>
+#include <climits>
+#include <cstdint>
+#include <sstream>
 #include <vector>
 
 #include "cusparse.h"
@@ -49,6 +57,12 @@ namespace vcuda
 
          cusparseDnVecDescr_t vecX, vecY;
          cu_exch_mat_t  J_matrix_d;
+
+         // Neighbour list of each atom for isotropic exchange
+         bool use_isotropic_kernel = false;
+         int *d_nbr_start = nullptr;
+         int *d_nbr_atom = nullptr;
+         cu_real_t *d_nbr_J = nullptr;
 
          // Arrays to store the coo and csr matrix
         int *d_csr_rows;
@@ -140,12 +154,27 @@ namespace vcuda
             std::vector<int> col_inds;
             std::vector<cu_real_t> vals;
 
+            // The 3N x 3N exchange matrix is only used for exchange that is not isotropic
+            // (spin fields from cuSPARSE) and by Monte Carlo; isotropic exchange in the LLG
+            // integrator uses the neighbour list of each atom below instead
+            const bool build_matrix = ::exchange::get_exchange_type() != 0 || ::integrate::integrator == ::integrate::integrator_t::monte_carlo;
+
+            // device indices are 32 bit integers
+            const uint64_t num_nbrs = ::atoms::neighbour_list_array.size();
+            const uint64_t max_entries = build_matrix ? num_nbrs * (::exchange::get_exchange_type() == 2 ? 9 : 3) : num_nbrs;
+            if(max_entries > uint64_t(INT_MAX) || 3 * uint64_t(Natoms) > uint64_t(INT_MAX)){
+               std::ostringstream message;
+               message << "Error: " << Natoms << " atoms with " << num_nbrs << " exchange interactions are too many for one GPU"
+                       << " (more than " << INT_MAX << " exchange entries); use more GPUs with vampire-cuda-multigpu";
+               err::fatal(message.str());
+            }
+
             // NOTE: Below calculations have been left in double precision
             // for now !!
             // tolerance to ignore exchange components
-            const cu_real_t tol = 1e-10;
+            const cu_real_t tol = ::gpu::exchange_tolerance;
             // loop over all atoms
-            for(int atom = 0; atom < ::atoms::num_atoms; ++atom){
+            for(int atom = 0; build_matrix && atom < ::atoms::num_atoms; ++atom){
 
                 // temporray constants for loop start and end indices
                 const int start = ::atoms::neighbour_list_start_index[atom];
@@ -202,7 +231,41 @@ namespace vcuda
 
             }
 
-            zlog << zTs() << "Expanded CPU nbr list to 3N by 3N format, no. of non-zeros is :" << vals.size() << " with a tol = " << tol << std::endl;
+            if(build_matrix) zlog << zTs() << "Expanded CPU nbr list to 3N by 3N format, no. of non-zeros is :" << vals.size() << " with a tol = " << tol << std::endl;
+            else zlog << zTs() << "Exchange matrix not needed (isotropic exchange, LLG integrator)" << std::endl;
+
+            // For isotropic exchange also store the neighbour list of each atom, with neighbours in the
+            // same (sorted) order as the rows of the exchange matrix, for the combined spin field kernel
+            if( ::exchange::get_exchange_type() == 0 ){
+               std::vector<int> nbr_start(Natoms + 1, 0);
+               std::vector<int> nbr_atom;
+               std::vector<cu_real_t> nbr_J;
+               std::vector< std::pair<int, cu_real_t> > row;
+               for(int atom = 0; atom < Natoms; ++atom){
+                  row.clear();
+                  for(int nn = ::atoms::neighbour_list_start_index[atom]; nn <= ::atoms::neighbour_list_end_index[atom]; ++nn){
+                     const int iid = ::atoms::neighbour_interaction_type_array[nn];
+                     const cu_real_t J = ::atoms::i_exchange_list[iid].Jij;
+                     if( fabs(J) > tol ) row.push_back( std::make_pair(::atoms::neighbour_list_array[nn], J) );
+                  }
+                  std::sort( row.begin(), row.end() );
+                  for(size_t n = 0; n < row.size(); ++n){
+                     nbr_atom.push_back(row[n].first);
+                     nbr_J.push_back(row[n].second);
+                  }
+                  nbr_start[atom + 1] = nbr_atom.size();
+               }
+               cudaMalloc((void**)&d_nbr_start, nbr_start.size() * sizeof(int));
+               cudaMemcpy(d_nbr_start, nbr_start.data(), nbr_start.size() * sizeof(int), cudaMemcpyHostToDevice);
+               if( nbr_atom.size() > 0 ){
+                  cudaMalloc((void**)&d_nbr_atom, nbr_atom.size() * sizeof(int));
+                  cudaMalloc((void**)&d_nbr_J, nbr_J.size() * sizeof(cu_real_t));
+                  cudaMemcpy(d_nbr_atom, nbr_atom.data(), nbr_atom.size() * sizeof(int), cudaMemcpyHostToDevice);
+                  cudaMemcpy(d_nbr_J, nbr_J.data(), nbr_J.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+               }
+               use_isotropic_kernel = true;
+               zlog << zTs() << "Isotropic exchange: spin fields calculated from the neighbour list of each atom" << std::endl;
+            }
 
             Ncols = 3 * Natoms;
             Nrows = 3 * Natoms;
@@ -281,7 +344,7 @@ namespace vcuda
                                     CUSPARSE_OPERATION_NON_TRANSPOSE,
                                     &alpha, J_matrix_d, vecX, &beta, vecY,
                                     CUSPARSE_REAL,
-                                    CUSPARSE_SPMV_CSR_ALG1,
+                                    CUSPARSE_SPMV_CSR_ALG2,
                                     &buffer_size);
 
                 cudaMalloc(&spmv_buffer_d, buffer_size);
@@ -342,6 +405,11 @@ namespace vcuda
 
          int finalise_exchange()
          {
+
+            cudaFree(d_nbr_start);
+            cudaFree(d_nbr_atom);
+            cudaFree(d_nbr_J);
+            use_isotropic_kernel = false;
             //cudaFree(d_spin3n);
             //cudaFree(d_field3n);
             //spin3N.cu_real_array_t::~cu_real_array_t();
@@ -359,7 +427,9 @@ namespace vcuda
             //coo_vals_d.cu_real_array_t::~cu_real_array_t();
 
             if( !empty_exchange ) {
-                // destroy vector and matrix descriptors
+                // free the SpMV work buffer and destroy vector and matrix descriptors
+                cudaFree(spmv_buffer_d);
+                spmv_buffer_d = NULL;
                 cusparseDestroyDnVec(vecX);
                 cusparseDestroyDnVec(vecY);
                 status = cusparseDestroySpMat(J_matrix_d);
@@ -395,7 +465,7 @@ namespace vcuda
                 //cudaMemcpy(d_spin3n + 2 * ::atoms::num_atoms,   cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
                 check_cuda_errors(__FILE__,__LINE__);
 
-                // cusparseSpMV using CSR algorithm 1
+                // cusparseSpMV using CSR algorithm 2 (deterministic, no per-call preprocessing)
                 status = cusparseSpMV(  handle,
                                         CUSPARSE_OPERATION_NON_TRANSPOSE,
                                         &alpha,
@@ -404,7 +474,7 @@ namespace vcuda
                                         &beta,
                                         vecY,
                                         CUSPARSE_REAL,
-                                        CUSPARSE_SPMV_CSR_ALG1,
+                                        CUSPARSE_SPMV_CSR_ALG2,
                                         spmv_buffer_d);
 
                 if (status != CUSPARSE_STATUS_SUCCESS) {
@@ -419,6 +489,10 @@ namespace vcuda
                 //cudaMemcpy(cu::d_z_spin_field, d_field3n + 2 * ::atoms::num_atoms,   ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
             }
+            else {
+                // No exchange interactions: zero the spin field directly, since the other spin field kernels add to it
+                cudaMemset(cu::d_spin_field, 0, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            }
 
 
             check_cuda_errors(__FILE__,__LINE__);
@@ -430,6 +504,8 @@ namespace vcuda
          __device__ cu_real_t exchange_field_component(int *csr_cols, int* csr_rows, cu_real_t *vals, cu_real_t *s, const int i)
          {
              cu_real_t hx = 0.0;
+             // hx is not allocated when there are no exchange interactions
+             if (csr_rows == nullptr) return hx;
              for (int n = csr_rows[i]; n < csr_rows[i+1]; n++){
                  int j = csr_cols[n];
                  cu_real_t val = vals[n];

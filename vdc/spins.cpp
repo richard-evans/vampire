@@ -49,6 +49,21 @@ void process_spins(){
 
    unsigned int last_file_id = max_file_id;
 
+   // a window snapshot (active HAMR window) holds only the atoms that changed since the previous
+   // snapshot, so read from the latest complete snapshot before the first one requested
+   if(min_file_id > 0 && vdc::read_spin_metadata(min_file_id) && vdc::spin_window_data){
+      unsigned int file_id = min_file_id - 1;
+      while(file_id > 0 && vdc::read_spin_metadata(file_id) && vdc::spin_window_data) file_id--;
+      if(!vdc::read_spin_metadata(file_id) || vdc::spin_window_data){
+         std::cerr << "Error! No complete spin snapshot found before window snapshot " << min_file_id << ". Exiting" << std::endl;
+         exit(1);
+      }
+      for(; file_id < min_file_id; file_id++){
+         vdc::read_spin_metadata(file_id);
+         vdc::read_spin_data();
+      }
+   }
+
    // loop over all spin files
    for(unsigned int file_id = min_file_id; file_id < max_file_id; file_id++){
 
@@ -161,6 +176,10 @@ bool read_spin_metadata(unsigned int file_id){
       if(vdc::verbose) std::cout << "      " << line << std::endl;
    }
 
+   // window snapshot marker (after the file list)
+   vdc::spin_window_data = false;
+   while(getline(smfile, line)) if(line.find("Spin data: window") == 0) vdc::spin_window_data = true;
+
    return true;
 
 }
@@ -171,6 +190,13 @@ bool read_spin_metadata(unsigned int file_id){
 void read_spin_data(){
 
    if(vdc::verbose) std::cout << "   Reading spin data... " << std::flush;
+
+   // a window snapshot updates the spins of the previous snapshot
+   static bool have_spins = false;
+   if(vdc::spin_window_data && (!have_spins || vdc::format != vdc::binary)){
+      std::cerr << std::endl << "   Error! Window snapshot without a complete snapshot before it, or not in binary format. Exiting" << std::endl;
+      exit(1);
+   }
 
    // resize arrays
    if(vdc::spins.size() != 3*vdc::num_atoms) vdc::spins.resize(3*vdc::num_atoms);
@@ -195,8 +221,18 @@ void read_spin_data(){
             }
             // read number of atoms
             ifile.read( (char*)&num_atoms_in_file,sizeof(uint64_t) );
+            // window snapshot: (first, number) ranges of atom positions in this file, then their spins
+            if(vdc::spin_window_data){
+               uint64_t num_ranges = 0;
+               ifile.read( (char*)&num_ranges, sizeof(uint64_t) );
+               std::vector<uint64_t> ranges(2*num_ranges);
+               ifile.read( (char*)ranges.data(), sizeof(uint64_t)*ranges.size() );
+               for(uint64_t r = 0; r < num_ranges; r++){
+                  ifile.read((char*)&vdc::spins[(atom_id + ranges[2*r])*3], sizeof(double)*ranges[2*r+1]*3);
+               }
+            }
             // read spin data
-            ifile.read((char*)&vdc::spins[atom_id*3], sizeof(double)*num_atoms_in_file*3);
+            else ifile.read((char*)&vdc::spins[atom_id*3], sizeof(double)*num_atoms_in_file*3);
             // increment counter
             atom_id += num_atoms_in_file;
             ifile.close();
@@ -239,6 +275,8 @@ void read_spin_data(){
       }
 
    }
+
+   have_spins = true;
 
    // output informative message to user
    if(vdc::verbose) std::cout << "done!" << std::endl;

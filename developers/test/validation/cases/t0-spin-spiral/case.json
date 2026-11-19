@@ -1,0 +1,21 @@
+{
+   "description": "4500-atom periodic sc Co starting from a spin spiral along z, T=0, field at 45 degrees: the initial state does not depend on the MPI decomposition, so runs on any number of ranks can be compared with each other and with the serial reference. The net magnetisation starts at zero, so single precision runs also get an absolute tolerance of 1e-6 (single precision round-off of an average of unit vectors)",
+   "kind": "deterministic",
+   "quantities": {
+      "mx": "s0M_norm_x*s0M_norm_l",
+      "my": "s0M_norm_y*s0M_norm_l",
+      "mz": "s0M_norm_z*s0M_norm_l"
+   },
+   "tolerance": {
+      "dp": {
+         "rtol": 1e-08,
+         "atol": 1e-08
+      },
+      "sp": {
+         "rtol": 0.0001,
+         "atol": 0.0001,
+         "abs": 1e-06,
+         "rows": 10
+      }
+   }
+}

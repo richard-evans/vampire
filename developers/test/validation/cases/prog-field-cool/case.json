@@ -1,0 +1,10 @@
+{
+   "description": "field-cool program, 3375-atom sc Co, exponential cooling from 1500 K to 300 K (2 ps) in 0.5 T: per-row magnetisation length",
+   "kind": "statistical",
+   "per_row": true,
+   "quantities": {
+      "m": "s0M_norm_l"
+   },
+   "seeds": 8,
+   "k": 4
+}

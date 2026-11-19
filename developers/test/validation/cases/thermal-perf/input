@@ -1,0 +1,26 @@
+#------------------------------------------
+# Thermal LLG profiling case (~168k atoms):
+# same system as hamr-perf, time series at a
+# uniform 300 K, not compared, used for
+# timing and profiling
+#------------------------------------------
+create:crystal-structure=sc
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 41.0 !nm
+dimensions:system-size-y = 30.0 !nm
+dimensions:system-size-z = 6.0 !nm
+material:file=hamr.mat
+sim:time-step=1.0E-15
+sim:temperature=300.0
+sim:equilibration-temperature=300.0
+sim:equilibration-time-steps=1000
+sim:total-time-steps=20000
+sim:time-steps-increment=1
+sim:program=time-series
+sim:integrator=llg-heun
+output:real-time
+output:temperature
+output:magnetisation
+output:output-rate=1000
+output:precision=16
+output:column-headers

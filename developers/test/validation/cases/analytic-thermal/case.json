@@ -1,0 +1,11 @@
+{
+   "description": "3375 non-interacting spins, T=5 K, H=10 T and Ku=5e-23 J along z: time/seed averaged <mz> vs Boltzmann average",
+   "kind": "analytic",
+   "model": "thermal",
+   "params": {"T": 5.0, "H": 10.0, "mu_s": 1.72, "ku": 5.0e-23},
+   "quantities": {"mz": "s0M_norm_z*s0M_norm_l"},
+   "seeds": 8,
+   "skip_rows": 50,
+   "k": 4,
+   "tolerance": {"dp": {"atol": 1e-3}, "sp": {"atol": 1e-3}}
+}

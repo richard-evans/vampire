@@ -51,7 +51,8 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
                const unsigned int num_atoms_in_unit_cell,        // number of atoms in each cell to estimate interaction numbers
                const double ucdx,                       // unit cell size
                const double ucdy,
-               const double ucdz
+               const double ucdz,
+               const bool store_vectors                 // also store the vectors i->j
              ){
 
    // put number of atoms into temporary variable
@@ -67,6 +68,10 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
    for(int atom=0; atom < num_atoms; atom++){
       list.push_back(std::vector<neighbour_t>());
       list[atom].reserve(max_nn);
+   }
+   if(store_vectors){
+      vectors.resize(num_atoms);
+      for(int atom=0; atom < num_atoms; atom++) vectors[atom].reserve(max_nn);
    }
 
    // Calculate system dimensions and number of supercells
@@ -365,12 +370,10 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
                // set neighbour data
                tmp_nt.nn = supercell_array[nx][ny][nz][natom]; // atom ID of neighbour
                tmp_nt.i = i;                                   // interaction type
-               tmp_nt.vx = vx;                                 // position vector i->j
-               tmp_nt.vy = vy;
-               tmp_nt.vz = vz;
 
                // push back array of class
                list[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back(tmp_nt);
+               if(store_vectors) vectors[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back({vx, vy, vz}); // position vector i->j
 
             }
          }

@@ -5,6 +5,7 @@
 # List module object filenames
 create_objects=\
 agglomorate.o \
+atom_keys.o \
 alloy.o \
 bubble.o \
 bulk.o \

@@ -165,6 +165,30 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
       magnetization[4*mask_id + 3] += mm[atom];
    }
 
+   normalise_and_accumulate_magnetization();
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to calculate magnetisation from sums of spin moments (sum mx, my, mz, m for each mask id)
+// computed elsewhere, for example on a GPU
+//------------------------------------------------------------------------------------------------------
+void magnetization_statistic_t::calculate_magnetization_from_sums(const std::vector<double>& sums){
+
+   magnetization = sums;
+   normalise_and_accumulate_magnetization();
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to normalise summed magnetisation and add it to the mean
+//------------------------------------------------------------------------------------------------------
+void magnetization_statistic_t::normalise_and_accumulate_magnetization(){
+
    // Reduce on all CPUS
    #ifdef MPICF
       MPI_Allreduce(MPI_IN_PLACE, &magnetization[0], 4*mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);

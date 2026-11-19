@@ -1,0 +1,7 @@
+material:num-materials=1
+material[1]:material-name=Ideal
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=0.0
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:second-order-uniaxial-anisotropy-constant=5.0e-23
+material[1]:initial-spin-direction=0,0,1

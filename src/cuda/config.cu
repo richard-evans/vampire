@@ -26,16 +26,12 @@ namespace vcuda{
 
       void synchronise(){
 
-         // copy spin data to CPU
-         cudaMemcpy(::atoms::x_spin_array.data(), internal::atoms::d_x_spin, ::atoms::num_atoms * sizeof(internal::cu_real_t), cudaMemcpyDeviceToHost);
-         cudaMemcpy(::atoms::y_spin_array.data(), internal::atoms::d_y_spin, ::atoms::num_atoms * sizeof(internal::cu_real_t), cudaMemcpyDeviceToHost);
-         cudaMemcpy(::atoms::z_spin_array.data(), internal::atoms::d_z_spin, ::atoms::num_atoms * sizeof(internal::cu_real_t), cudaMemcpyDeviceToHost);
+         // copy spin data to CPU (via the transfer buffers, which also converts single precision spins)
+         vcuda::transfer_spin_positions_from_gpu_to_cpu();
 
-         /*
-         thrust::copy(internal::atoms::x_spin_array.begin(),internal::atoms::x_spin_array.end(),::atoms::x_spin_array.begin());
-         thrust::copy(internal::atoms::y_spin_array.begin(),internal::atoms::y_spin_array.end(),::atoms::y_spin_array.begin());
-         thrust::copy(internal::atoms::z_spin_array.begin(),internal::atoms::z_spin_array.end(),::atoms::z_spin_array.begin());
-         */
+         // configuration files include the magnetisation statistics
+         vcuda::stats::get();
+
          return;
 
       }

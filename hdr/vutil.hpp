@@ -57,6 +57,40 @@ namespace vutil{
 
    }
 
+   // Function to read memory entries from /proc/status (linux only) in kB
+   // if /proc/self/status does not exist the function will return -1 and the logging code will fallback to platform independent logic
+   inline double proc_status_kb(const std::string& entry){
+
+      std::ifstream status("/proc/self/status");
+      std::string key;
+      while(status >> key){
+         if(key == entry){
+            double kb = -1.0;
+            status >> kb;
+            return kb;
+         }
+      }
+      return -1.0;
+
+   }
+
+   // Function to read the memory available for new allocations on this node from /proc/meminfo
+   // (linux only) in kB; returns -1 if it cannot be read
+   inline double available_memory_kb(){
+
+      std::ifstream meminfo("/proc/meminfo");
+      std::string key;
+      while(meminfo >> key){
+         if(key == "MemAvailable:"){
+            double kb = -1.0;
+            meminfo >> kb;
+            return kb;
+         }
+      }
+      return -1.0;
+
+   }
+
    // simple class for performing code timing
    class vtimer_t{
 

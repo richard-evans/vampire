@@ -14,6 +14,7 @@
 // Vampire headers
 #include "errors.hpp"
 #include "gpu.hpp"
+#include "mgpu.hpp"
 #include "vio.hpp"
 
 namespace gpu{
@@ -52,6 +53,28 @@ namespace gpu{
             terminaltextcolor(WHITE);
             err::vexit();
          }
+      }
+      //--------------------------------------------------------------------
+      // multi-GPU version: sum exchange contributions in atom key order, so that
+      // results are bit for bit identical on any number of GPUs (testing); accepted
+      // and without effect in the other versions
+      test="decomposition-independent-order";
+      if(word==test){
+         const bool order = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         #ifdef CUDA_MULTIGPU
+            mgpu::decomposition_independent_order = order;
+         #else
+            (void)order;
+         #endif
+         return true;
+      }
+      //--------------------------------------------------------------------
+      // Atoms of non-magnetic=keep materials are not integrated and keep their
+      // initial spin directions; they enter no field or statistic of the other atoms
+      test="skip-non-magnetic-atoms";
+      if(word==test){
+         gpu::skip_non_magnetic_atoms = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         return true;
       }
       //--------------------------------------------------------------------
       test="calculate-statistics-on-cpu";

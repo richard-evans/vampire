@@ -36,7 +36,8 @@ namespace internal{
    // Function to calculate surface anisotropy tensor
    //---------------------------------------------------------------------------
    void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
-                                          std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
+                                          std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist,
+                                          std::vector<std::vector <neighbours::vector_t> >& cvectors){
 
       // Print informative message to log file
       zlog << zTs() << "Using Néel pair anisotropy for surface atoms." << std::endl;
@@ -83,7 +84,7 @@ namespace internal{
                   const unsigned int jmat = atoms::type_array[natom];
 
                   // get atomic position vector i->j
-                  double eij[3]={cneighbourlist[atom][nn].vx, cneighbourlist[atom][nn].vy, cneighbourlist[atom][nn].vz};
+                  double eij[3]={cvectors[atom][nn].x, cvectors[atom][nn].y, cvectors[atom][nn].z};
 
                   // normalise to unit vector
                   const double rij = sqrt(eij[0]*eij[0]+eij[1]*eij[1]+eij[2]*eij[2]);
