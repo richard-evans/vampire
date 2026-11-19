@@ -24,8 +24,10 @@
 ///
 
 // Standard Libraries
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
+#include <thread>
 
 // vampire header files
 #include "errors.hpp"
@@ -35,6 +37,21 @@
 namespace err
    {
    bool check=false;
+
+   #ifdef MPICF
+   //-----------------------------------------------------------------------------------------
+   // Flush output, wait briefly and abort all MPI processes. The MPI launcher forwards each
+   // rank's stdout and stderr asynchronously, and an immediate MPI_Abort can kill the processes
+   // before the error message printed just before it has been forwarded.
+   //-----------------------------------------------------------------------------------------
+   void flush_and_abort(){
+      std::cout.flush();
+      std::cerr.flush();
+      zlog.flush();
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+   }
+   #endif
 
    /// Default vexit
    void vexit(){
@@ -59,7 +76,7 @@ namespace err
          system("ls log.* | xargs cat | sort -n > log");
       #endif*/
 
-      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+      flush_and_abort();
       // MPI program dies ungracefully here
       #endif
 
@@ -118,7 +135,7 @@ namespace err
       zlog << zTs() << "Fatal error on rank " << vmpi::my_rank << ": " << message << std::endl;
       zlog << zTs() << "Aborting program." << std::endl;
 
-      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+      flush_and_abort();
       // MPI program dies ungracefully here
       #else
          // Print Error message to screen and log
